@@ -6,10 +6,19 @@
 		"title": {
 			"type": "string"
 		},
-	    "thumbnail": {
+	    "id_moodle": {
 			"type": "string"
 		},
-	    "content": {
+		"description": {
+			"type": "string"
+		},
+		"userId": {
+			"type": "string"
+		},
+		"firstName": {
+			"type": "string"
+		},
+		"lastName": {
 			"type": "string"
 		}
  	},

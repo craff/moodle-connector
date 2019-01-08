@@ -32,6 +32,8 @@
 	"title": "Titre",
 	"from": "De",
 	"date": "Date",
+	"cancel": "Annuler",
+	"validate": "Valider",
 	"share.search.title": "Rechercher des utilisateurs et des groupes",
 	"tuto.title": "Naviguez au sein de vos documents en vue vignettes : ",
 	"tuto.action.select": "Cliquez",
@@ -41,5 +43,11 @@
 	"modified.on": "Modifié le ",
 	"view": "Afficher",
 	"remove.confirm": "Voulez-vous vraiment supprimer ce contenu ?",
-	"open": "Ouvrir"
+	"open": "Ouvrir",
+
+	"moodle.course.new": "Créer un cours",
+	"moodle.course.information": "Informations",
+	"moodle.course.name.long" : "Titre long",
+	"moodle.course.name.short" : "Titre court",
+	"moodle.course.description" : "Descriptif"
 }
