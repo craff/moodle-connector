@@ -9,4 +9,4 @@
 .idea
 *.iml
 node_modules
-/src/main/resources/public/dist
+src/main/resources/public/dist
