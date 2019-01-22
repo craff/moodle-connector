@@ -10,3 +10,4 @@
 *.iml
 node_modules
 src/main/resources/public/dist
+rev-manifest.json
