@@ -6,6 +6,8 @@ import org.entcore.common.http.BaseServer;
 
 public class Moodle extends BaseServer {
 
+	public static String DIRECTORY_BUS_ADDRESS = "directory";
+
 	public static String moodleSchema;
 	@Override
 	public void start() throws Exception {
@@ -14,6 +16,6 @@ public class Moodle extends BaseServer {
 		moodleSchema = config.getString("db-schema");
 		EventBus eb = getEventBus(vertx);
 
-		addController(new MoodleController(vertx));
+		addController(new MoodleController(vertx, eb));
 	}
 }

@@ -3,24 +3,35 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"title": {
+		"username": {
 			"type": "string"
 		},
-	    "id_moodle": {
+	    "idnumber": {
 			"type": "string"
 		},
-		"description": {
+		"firstname": {
 			"type": "string"
 		},
-		"userId": {
+		"lastname": {
 			"type": "string"
 		},
-		"firstName": {
+		"fullname": {
 			"type": "string"
 		},
-		"lastName": {
-			"type": "string"
+        "shortname":{
+          "type" : "string"
+        },
+		"categoryid": {
+			"type": "number"
 		}
  	},
-	"required": [ "title" ]
+	"required": [
+		"username",
+		"idnumber",
+		"firstname",
+		"lastname",
+		"fullname",
+        "shortname",
+		"categoryid"
+	]
 }

@@ -21,6 +21,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.openLightbox = true;
     };
 
+    $scope.openDeletePopUp = function () {
+        $scope.course = new Course();
+        $scope.course.delete();
+    };
+
     $scope.closePopUp = function () {
         $scope.openLightbox = false;
     };

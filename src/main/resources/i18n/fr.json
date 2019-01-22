@@ -46,6 +46,7 @@
 	"open": "Ouvrir",
 
 	"moodle.course.new": "Créer un cours",
+	"moodle.course.delete": "Supprimer un cours",
 	"moodle.course.information": "Informations",
 	"moodle.course.name.long" : "Titre long",
 	"moodle.course.name.short" : "Titre court",
