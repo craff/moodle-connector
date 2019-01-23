@@ -61,16 +61,23 @@ public class MoodleController extends ControllerHelper {
                     @Override
                     public void handle(Either<String, JsonObject> email) {
                         if (email.isRight()){
-                            course.put("email", email.right().getValue().getString("email"));
+                            course.put("email", "gopo@giroscop.com");
                             course.put("wstoken", "df92b3978e2b958e0335b2f4df505977");
                             course.put("wsfunction", "local_entcgi_services_createcourse");
+                            course.put("username", "cabral");
+                            course.put("idnumber", "biz1234");
+                            course.put("firstname", "soare");
+                            course.put("lastname", "noaptea");
+                            course.put("fullname", "magicCGI");
+                            course.put("shortname", "wonderCGI3");
+                            course.put("categoryid", 1);
                             course.put("address", "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php");
                             final AtomicBoolean responseIsSent = new AtomicBoolean(false);
 
                             URI moodleUri = null;
                             try {
                                 final String service = course.getString("address", "");
-                                final String urlSeparator = service.endsWith("/")  ? "" : "/";
+                                final String urlSeparator = service.endsWith("") ? "" : "/";
                                 moodleUri = new URI(service + urlSeparator);
                             } catch (URISyntaxException e) {
                                 log.debug("Invalid moodle web service uri", e);
@@ -79,7 +86,7 @@ public class MoodleController extends ControllerHelper {
                                 final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                 final String moodleUrl = moodleUri.toString() +
                                         "?wstoken=" + course.getString("wstoken") +
-                                        "&wsfunction" + course.getString("wsfunction") +
+                                        "&wsfunction=" + course.getString("wsfunction") +
                                         "&parameters[username]=" + course.getString("username") +
                                         "&parameters[idnumber]=" + course.getString("idnumber") +
                                         "&parameters[email]=" + course.getString("email") +
@@ -90,7 +97,7 @@ public class MoodleController extends ControllerHelper {
                                         "&parameters[categoryid]=" + course.getInteger("categoryid") +
                                         "&moodlewsrestformat=" + "json";
 
-                                final HttpClientRequest httpClientRequest = httpClient.post(moodleUrl, new Handler<HttpClientResponse>() {
+                                final HttpClientRequest httpClientRequest = httpClient.postAbs(moodleUrl, new Handler<HttpClientResponse>() {
                                     @Override
                                     public void handle(HttpClientResponse response) {
                                         System.out.println("essai");
@@ -99,14 +106,15 @@ public class MoodleController extends ControllerHelper {
                                             response.handler(new Handler<Buffer>() {
                                                 @Override
                                                 public void handle(Buffer event) {
-                                                    moodleWebService.create(course, defaultResponseHandler(request));
                                                     buff.appendBuffer(event);
                                                 }
                                             });
                                             response.endHandler(new Handler<Void>() {
                                                 @Override
                                                 public void handle(Void end) {
-                                                    final String json = buff.toString();
+                                                    JsonObject object = new JsonObject(buff.toString().substring(1, buff.toString().length()-1));
+                                                    course.put("moodleid", object.getValue("courseid"));
+                                                    moodleWebService.create(course, defaultResponseHandler(request));
                                                     handle(end);
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
