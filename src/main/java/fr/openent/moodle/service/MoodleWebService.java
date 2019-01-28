@@ -21,7 +21,7 @@ public interface MoodleWebService{
     void delete(String id, Handler<Either<String, JsonObject>> handler);
 
     /**
-     *
+     * get list courses ant shared by folder
      * @param id_folder
      * @param id_user
      * @param handler
@@ -33,4 +33,11 @@ public interface MoodleWebService{
      * @return
      */
     boolean getValueMoodleIdinEnt(Integer courid,JsonArray object);
+
+    /**
+     * get list folders by user
+     * @param id_user
+     * @param handler
+     */
+    void getFoldersInEnt(String id_user,Handler<Either<String, JsonArray>> handler);
 }

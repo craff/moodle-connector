@@ -65,5 +65,15 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         return false;
     }
 
+    @Override
+    public void getFoldersInEnt(String id_user, Handler<Either<String, JsonArray>> handler) {
+        String query = "SELECT * " +
+                "FROM " + Moodle.moodleSchema + ".folder " +
+                "WHERE user_id = ?;";
+        JsonArray values = new JsonArray();
+        values.add(id_user);
+        sql.prepared(query, values, SqlResult.validResultHandler(handler));
+    }
+
 
 }

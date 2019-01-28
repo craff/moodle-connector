@@ -165,6 +165,24 @@ public class MoodleController extends ControllerHelper {
             }
         });
 	}
+    @Get("/folders")
+    @ApiDoc("Get cours in database by folder id")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void listFoldersAndShared(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    moodleWebService.getFoldersInEnt(user.getUserId(), arrayResponseHandler(request));
+                }
+                else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
 
     @Get("/coursesAndshared/:id")
     @ApiDoc("Get cours in database by folder id")
