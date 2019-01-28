@@ -7,14 +7,17 @@ import fr.openent.moodle.service.MoodleWebService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBusService;
 import fr.openent.moodle.service.impl.DefaultMoodleWebService;
 import fr.wseduc.rs.*;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.*;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
@@ -22,8 +25,11 @@ import org.entcore.common.user.UserUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
+import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.defaultResponseHandler;
 
 public class MoodleController extends ControllerHelper {
@@ -160,6 +166,104 @@ public class MoodleController extends ControllerHelper {
         });
 	}
 
+    @Get("/coursesAndshared/:id")
+    @ApiDoc("Get cours in database by folder id")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void listCouresAndShared(final HttpServerRequest request){
+            UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                @Override
+                public void handle(UserInfos user) {
+                    if(user!=null){
+                        long id_folder =Long.parseLong(request.params().get("id"));
+                        Handler<Either<String, JsonArray>> handler = arrayResponseHandler(request);
+                        moodleWebService.getCoursInEnt(id_folder, user.getUserId(), new Handler<Either<String, JsonArray>>() {
+                            @Override
+                            public void handle(Either<String, JsonArray> stringJsonArrayEither) {
+                                if(stringJsonArrayEither.isRight()){
+                                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                    final String moodleUrl = "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php" +
+                                            "?wstoken=" + "df92b3978e2b958e0335b2f4df505977" +
+                                            "&wsfunction=" + "local_entcgi_services_usercourses" +
+                                            "&parameters[userid]=" + "biz1234" +
+                                            "&moodlewsrestformat=" + "json";
+                                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                                    final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
+                                        @Override
+                                        public void handle(HttpClientResponse response) {
+                                            if (response.statusCode() == 200) {
+                                                final Buffer buff = Buffer.buffer();
+                                                response.handler(new Handler<Buffer>() {
+                                                    @Override
+                                                    public void handle(Buffer event) {
+                                                        buff.appendBuffer(event);
+                                                        JsonArray mydata=new JsonArray();
+                                                        JsonArray object = new JsonArray(buff.toString().substring(15, buff.toString().length()-21));
+
+                                                        for(int i=0;i<object.size();i++){
+                                                            JsonObject  o=object.getJsonObject(i);
+                                                            if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
+                                                                mydata.add(o);
+                                                            }else{
+                                                                JsonArray obj=o.getJsonArray("auteur");
+                                                                if(!obj.getJsonObject(0).getString("entidnumber").equals(user.getUserId())){
+                                                                    mydata.add(o);
+                                                                }
+                                                            }
+                                                        }
+                                                        Renders.renderJson(request, mydata);
+                                                    }
+                                                });
+                                                response.endHandler(new Handler<Void>() {
+                                                    @Override
+                                                    public void handle(Void end) {
+                                                        handle(end);
+                                                        if (!responseIsSent.getAndSet(true)) {
+                                                            httpClient.close();
+                                                        }
+                                                    }
+                                                });
+
+                                            }else{
+                                                log.debug(response.statusMessage());
+                                                response.bodyHandler(new Handler<Buffer>() {
+                                                    @Override
+                                                    public void handle(Buffer event) {
+                                                        log.debug("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                                                        if (!responseIsSent.getAndSet(true)) {
+                                                            httpClient.close();
+                                                        }
+                                                    }
+                                                });
+                                                handle(response);
+                                            }
+                                        }
+                                    });
+                                    httpClientRequest.headers().set("Content-Length", "0");
+                                    httpClientRequest.setTimeout(20001);
+                                    //Typically an unresolved Address, a timeout about connection or response
+                                    httpClientRequest.exceptionHandler(new Handler<Throwable>() {
+                                        @Override
+                                        public void handle(Throwable event) {
+                                            log.debug(event.getMessage(), event);
+                                            if (!responseIsSent.getAndSet(true)) {
+                                                handle(event);
+                                                httpClient.close();
+                                            }
+                                        }
+                                    }).end();
+                                }else{
+                                    handle(new Either.Left<>("Get list in Ent Base failed"));
+                                }
+                            }
+                        });
+                    } else {
+                        unauthorized(request);
+                    }
+                }
+            });
+    }
+
 	@Delete("/course/:id")
     @ApiDoc("Delete a course")
     @SecuredAction("moodle.delete")
@@ -187,6 +291,8 @@ public class MoodleController extends ControllerHelper {
                 .setKeepAlive(false);
         return vertx.createHttpClient(options);
     }
+
+
 
 //	    1)Appel WS eNovation de creation
 

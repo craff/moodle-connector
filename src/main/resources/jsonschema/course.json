@@ -3,35 +3,35 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"username": {
-			"type": "string"
-		},
-	    "idnumber": {
-			"type": "string"
-		},
-		"firstname": {
-			"type": "string"
-		},
-		"lastname": {
-			"type": "string"
+		"courseid": {
+			"type": "number"
 		},
 		"fullname": {
 			"type": "string"
 		},
-        "shortname":{
-          "type" : "string"
-        },
-		"categoryid": {
-			"type": "number"
+		"summary":{
+			"type" : "string"
+		},
+		"date": {
+			"type": ["string","null"]
+		},
+	    "entidnumber": {
+			"type": ["string","null"]
+		},
+		"firstname": {
+			"type": ["string","null"]
+		},
+		"lastname": {
+			"type": ["string","null"]
+		},
+		"role": {
+			"type": "string"
 		}
  	},
 	"required": [
-		"username",
-		"idnumber",
-		"firstname",
-		"lastname",
-		"fullname",
-        "shortname",
-		"categoryid"
+		"courseid",
+		"summary",
+		"role",
+		"fullname"
 	]
 }

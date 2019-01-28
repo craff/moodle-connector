@@ -1,5 +1,11 @@
 CREATE SCHEMA moodle;
 
+CREATE TABLE moodle.scripts (
+  filename character varying(255) NOT NULL,
+  passed timestamp without time zone NOT NULL DEFAULT now(),
+  CONSTRAINT scripts_pkey PRIMARY KEY (filename)
+);
+
 CREATE TABLE moodle.folder (
   id bigserial NOT NULL,
   parent_id bigserial,
@@ -17,9 +23,5 @@ CREATE TABLE moodle.course (
   moodle_id bigserial NOT NULL,
   folder_id bigserial,
   user_id character varying(36) NOT NULL,
-  CONSTRAINT course_pkey PRIMARY KEY (moodle_id)--,
---   CONSTRAINT fk_folder_id FOREIGN KEY (folder_id)
---     REFERENCES moodle.folder (id) MATCH SIMPLE
---     ON UPDATE NO ACTION
---     ON DELETE CASCADE
+  CONSTRAINT course_pkey PRIMARY KEY (moodle_id)
 );

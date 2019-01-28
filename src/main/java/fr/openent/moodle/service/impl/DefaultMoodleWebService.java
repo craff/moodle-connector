@@ -9,6 +9,10 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.SqlResult;
 
+import java.util.stream.Collectors;
+
+import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
+
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
 
     public DefaultMoodleWebService(String schema, String table) {
@@ -25,7 +29,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         values.add(1);
         values.add(course.getValue("idnumber"));
 
-        sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(createCourse, values, validUniqueResultHandler(handler));
     }
 
     @Override
@@ -35,6 +39,31 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         JsonArray values = new JsonArray();
         values.add(id);
 
-        sql.prepared(deleteCourse, values, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(deleteCourse, values, validUniqueResultHandler(handler));
     }
+
+    @Override
+    public void getCoursInEnt(final long id_folder, String id_user, final Handler<Either<String, JsonArray>> handler) {
+        String query = "SELECT moodle_id, folder_id  " +
+                "FROM " + Moodle.moodleSchema + ".course " +
+                "WHERE folder_id = ? and  user_id = ?;";
+
+        JsonArray values = new JsonArray();
+        values.add(id_folder)
+                .add(id_user);
+        sql.prepared(query, values, SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public boolean getValueMoodleIdinEnt(Integer courid, JsonArray object) {
+        for(int i=0;i<object.size();i++){
+            JsonObject  o=object.getJsonObject(i);
+            if(o.getInteger("moodle_id")==courid){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }

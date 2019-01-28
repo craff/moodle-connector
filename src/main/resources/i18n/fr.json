@@ -50,5 +50,6 @@
 	"moodle.course.information": "Informations",
 	"moodle.course.name.long" : "Titre long",
 	"moodle.course.name.short" : "Titre court",
-	"moodle.course.description" : "Descriptif"
+	"moodle.course.description" : "Descriptif",
+	"moodle.course.author" : "Auteur"
 }

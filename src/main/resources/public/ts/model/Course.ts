@@ -1,35 +1,29 @@
 import { notify, model, } from 'entcore';
 import http from 'axios';
+import {Mix, Selectable, Selection} from 'entcore-toolkit';
+
 
 export interface Course {
-    username : string;
-    idnumber : string;
-    email : string;
-    firstname : string;
-    lastname : string;
     fullname : string;
-    shortname : string;
-    categoryid : number;
-    // courseidnumber : number;
-    // summary : string;
-    // imagebase64 :
-
+    courseid:number;
+    summary : string;
+    date : Date;
+    author: Author;
+    role: string;
+    imagebase64 : string;
 }
 
 export class Course {
     
     toJSON() {
         return {
-            username : model.me.username,
-            idnumber : model.me.userId,
-            firstname : model.me.firstName,
-            lastname : model.me.lastName,
+            courseid : this.courseid,
             fullname : this.fullname,
-            shortname : this.shortname,
-            categoryid : 1,
-            // courseidnumber : this.courseidnumber,
-            // summary : this.summary,
-            // imagebase64 : this.
+            summary: this.summary,
+            date : this.date,
+            author : this.author,
+            role : this.role,
+            imagebase64 : this.imagebase64
         }
     }
 
@@ -47,6 +41,37 @@ export class Course {
         } catch (e) {
             notify.error("Save function didn't work");
             throw e;
+        }
+    }
+}
+
+
+export class Courses {
+    all: Course[];
+
+    constructor() {
+        this.all = [];
+    }
+    async sync (folder_id: number) {
+        try {
+            let courses = await http.get(`/moodle/coursesAndshared/${folder_id}`);
+            this.all = Mix.castArrayAs(Course, courses.data);
+        } catch (e) {
+            throw e;
+        }
+    }
+}
+
+export class Author{
+    entidnumber : string;
+    firstname : string;
+    lastname : string;
+
+    toJson() {
+        return {
+            entidnumber : this.entidnumber,
+            firstname : this.firstname,
+            lastname : this.lastname,
         }
     }
 }
