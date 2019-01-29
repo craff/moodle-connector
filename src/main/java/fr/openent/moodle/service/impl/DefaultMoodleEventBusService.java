@@ -21,7 +21,7 @@ public class DefaultMoodleEventBusService extends SqlCrudService implements Mood
     }
 
     @Override
-    public void getEmail (JsonObject action, Handler<Either<String, JsonObject>> handler) {
+    public void getParams (JsonObject action, Handler<Either<String, JsonObject>> handler) {
         eb.send(Moodle.DIRECTORY_BUS_ADDRESS, action, handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
             @Override
             public void handle(Message<JsonObject> message){

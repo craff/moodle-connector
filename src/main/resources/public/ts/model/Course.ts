@@ -4,13 +4,20 @@ import {Mix, Selectable, Selection} from 'entcore-toolkit';
 
 
 export interface Course {
+    id? : 91;
+    username : string;
+    idnumber : string;
+    email : string;
+    firstname : string;
+    lastname : string;
     fullname : string;
-    courseid:number;
+    courseid : number;
     summary : string;
     date : Date;
-    author: Author;
-    role: string;
-    imagebase64 : string;
+    author : Author;
+    role : string;
+    categoryid : number;
+    // imagebase64 : string;
 }
 
 export class Course {
@@ -19,11 +26,12 @@ export class Course {
         return {
             courseid : this.courseid,
             fullname : this.fullname,
+            categoryid : 1,
             summary: this.summary,
             date : this.date,
             author : this.author,
             role : this.role,
-            imagebase64 : this.imagebase64
+            // imagebase64 : this.imagebase64
         }
     }
 
@@ -37,10 +45,9 @@ export class Course {
     }
     async delete() {
         try {
-            await http.delete(`/moodle/course/1`);
+            await http.delete(`/moodle/course/${this.id}`);
         } catch (e) {
-            notify.error("Save function didn't work");
-            throw e;
+            notify.error("Delete function didn't work");
         }
     }
 }

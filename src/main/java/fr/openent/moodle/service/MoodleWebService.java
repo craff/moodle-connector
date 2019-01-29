@@ -15,10 +15,10 @@ public interface MoodleWebService{
 
     /**
      * Delete a course
-     * @param id course id
+     * @param course course to delete
      * @param handler function handler returning data
      */
-    void delete(String id, Handler<Either<String, JsonObject>> handler);
+    void delete(JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
      * get list courses ant shared by folder

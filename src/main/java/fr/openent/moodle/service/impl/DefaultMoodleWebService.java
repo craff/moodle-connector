@@ -9,9 +9,6 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.SqlResult;
 
-import java.util.stream.Collectors;
-
-import static org.entcore.common.sql.SqlResult.validUniqueResultHandler;
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
 
@@ -29,17 +26,17 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         values.add(1);
         values.add(course.getValue("idnumber"));
 
-        sql.prepared(createCourse, values, validUniqueResultHandler(handler));
+        sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
-    public void delete(final String id, final Handler<Either<String, JsonObject>> handler) {
+    public void delete(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
         String deleteCourse = "DELETE FROM " + Moodle.moodleSchema + ".course WHERE moodle_id = ?;";
 
         JsonArray values = new JsonArray();
-        values.add(id);
+        values.add(course.getValue("courseids"));
 
-        sql.prepared(deleteCourse, values, validUniqueResultHandler(handler));
+        sql.prepared(deleteCourse, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override

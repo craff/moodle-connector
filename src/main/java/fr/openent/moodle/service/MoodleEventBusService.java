@@ -12,5 +12,5 @@ public interface MoodleEventBusService {
      * @param handler function handler returning data
      */
 
-    void getEmail (JsonObject action, Handler<Either<String,JsonObject>> handler);
+    void getParams (JsonObject action, Handler<Either<String,JsonObject>> handler);
 }

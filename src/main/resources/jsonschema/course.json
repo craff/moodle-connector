@@ -4,34 +4,35 @@
 	"additionalProperties": false,
 	"properties": {
 		"courseid": {
-			"type": "number"
+			"type" : "number"
 		},
 		"fullname": {
-			"type": "string"
+			"type" : "string"
 		},
 		"summary":{
 			"type" : "string"
 		},
+		"categoryid":{
+			"type" : "number"
+		},
 		"date": {
-			"type": ["string","null"]
+			"type" : ["string","null"]
 		},
 	    "entidnumber": {
-			"type": ["string","null"]
+			"type" : ["string","null"]
 		},
 		"firstname": {
-			"type": ["string","null"]
+			"type" : ["string","null"]
 		},
 		"lastname": {
-			"type": ["string","null"]
+			"type" : ["string","null"]
 		},
 		"role": {
-			"type": "string"
+			"type" : "string"
 		}
  	},
 	"required": [
-		"courseid",
-		"summary",
-		"role",
-		"fullname"
+		"fullname",
+		"categoryid"
 	]
 }

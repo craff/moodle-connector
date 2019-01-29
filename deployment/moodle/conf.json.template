@@ -16,6 +16,6 @@
         "entcore.port" : 8009,
         "sql": true,
         "db-schema": "moodle",
-        "wstocken": "df92b3978e2b958e0335b2f4df505977"
+        "address_moodle": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php"
       }
     }
