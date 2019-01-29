@@ -6,18 +6,42 @@ import {Folder, Folders} from "../model/Folder";
 export const mainController = ng.controller('MoodleController', ['$scope', 'route',($scope, route) => {
 	$scope.lightboxes = {};
 	$scope.params = {};
-
+    $scope.printcours=false;
+    $scope.printfolders=true;
+    $scope.printfoldersshared=false;
 	$scope.courses= new Courses();
     $scope.folders=new Folders();
 
-	$scope.initCoures = async function(){
+	$scope.initCoures = async function(idfolder:number){
         Promise.all([
-            await $scope.courses.sync(1)
+            await $scope.courses.sync(idfolder)
         ]).then( $scope.$apply());
     }
     $scope.initFolders = async function(){
         Promise.all([
             await $scope.folders.sync()
+        ]).then( $scope.$apply());
+        $scope.printfolders=true;
+        $scope.printcours=false;
+        $scope.printfoldersshared=false;
+    }
+    $scope.printCouresbyFolder= function(idfolder:number){
+        $scope.initCoures(idfolder);
+        $scope.printcours=true;
+        $scope.printfolders=false;
+        $scope.$apply();
+    }
+    $scope.printFolder= function (){
+        $scope.printfolders=true;
+        $scope.printcours=false;
+        $scope.printfoldersshared=false;
+    }
+    $scope.printFoldershared= function (){
+	    alert("none");
+    }
+    $scope.countItems =async function (folder:Folder){
+        Promise.all([
+            await folder.countitems()
         ]).then( $scope.$apply());
     }
 	route({
@@ -25,7 +49,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
 			template.open('main', 'main');
 		}
 	});
-
     $scope.openLightbox = false;
 
     /**

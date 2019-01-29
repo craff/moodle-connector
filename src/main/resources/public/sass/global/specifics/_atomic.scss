@@ -1,0 +1,79 @@
+.course-article{
+  width: 450px;
+  height: 165px;
+  margin-right: 10px;
+}
+.folder-article{
+  width: 450px;
+  height: 80px;
+  margin-right: 10px;
+}
+.summary{
+  border-bottom-right-radius: 6%;
+  border-bottom-left-radius: 6%;
+  padding: 2%;
+  max-height: 100px;
+}
+.image{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100px;
+  max-height: 130px;
+}
+i.sort-desc::before {
+  content: "\e925";
+  font-family:"generic-icons";
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background-image:none;
+}
+.icon-play::before {
+  content: '\e85d';
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background-image:none;
+}
+.foldericon::before {
+  content: '\e81b';
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  background-image:none;
+}
+.left-padding{
+  padding-left: 15px;
+}
+
+.left-border-menu{
+  border-left-color: #ff8500;
+  border-left-style: outset;
+  padding-left: 5px;
+}
+
+.colorfolder{
+   color: #ff8500;
+ }
+
+.colorSubfolder{
+   color: #4bafd5;
+ }
+.colorbutton{
+  color: #4bafd5;
+  background: $white ;
+}
+
+.bodyBacgroundSecond{
+  background: #F9F9F9
+}
+.bodyBacground{
+  background: #ffffff
+}
+
+
+.padding-left-corp{
+  padding-left: 50px;
+}
+
+.left-magnet{
+  float: left;
+}

@@ -75,5 +75,15 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         sql.prepared(query, values, SqlResult.validResultHandler(handler));
     }
 
+    @Override
+    public void countItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
+        String query = "SELECT  count(*) " +
+                "FROM " + Moodle.moodleSchema + ".course " +
+                "WHERE user_id = ? AND folder_id = ?;";
+        JsonArray values = new JsonArray();
+        values.add(userId).add(id_folder);
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(defaultResponseHandler));
+    }
+
 
 }

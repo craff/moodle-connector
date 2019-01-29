@@ -40,4 +40,12 @@ public interface MoodleWebService{
      * @param handler
      */
     void getFoldersInEnt(String id_user,Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * count Item In folder
+     * @param id_folder
+     * @param userId
+     * @param defaultResponseHandler
+     */
+    void countItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler);
 }

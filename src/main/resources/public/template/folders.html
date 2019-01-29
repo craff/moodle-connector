@@ -1,3 +1,16 @@
-<div ng-repeat="folder in folders.all">
-    <i>&#x45;</i> [[folder.name]]
-</div>
+<article class="six cell twelve-mobile horizontal-spacing folder-article"
+         ng-repeat="folder in folders.all track by $index" >
+    <div ng-click="printCouresbyFolder(folder.id)">
+            <i class="foldericon"></i>
+
+            <label>
+                <span class="summary">[[folder.name]]</span>
+            </label></br>
+            <label ng-init="countItems(folder)">
+              [[folder.nbItems]] <i18n>moodle.folder.item</i18n>:
+            </label>
+        <input type="checkbox" class="right-magnet">
+
+    </div>
+
+</article>

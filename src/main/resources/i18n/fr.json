@@ -8,6 +8,8 @@
 	"moodle.notify.trashed": "La donnée a été mise à la corbeille",
 	"moodle.notify.restored": "La donnée a été restaurée",
 
+	"moodle.cours": "Mes cours",
+	"moodle.cours.shared": "Cours partagés avec moi",
 	"moodle.folders": "Mes dossiers",
 	"moodle.root": "Mes moodles",
 	"list.title": "Mes moodles",
@@ -46,6 +48,7 @@
 	"remove.confirm": "Voulez-vous vraiment supprimer ce contenu ?",
 	"open": "Ouvrir",
 
+	"moodle.folder.item" : "items",
 	"moodle.folder.new": "Créer un nouveau dossier",
 	"moodle.course.new": "Créer un cours",
 	"moodle.course.delete": "Supprimer un cours",
