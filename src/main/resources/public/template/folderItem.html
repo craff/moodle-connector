@@ -1,0 +1,38 @@
+<div class="vertical-spacing left-border-menu ">
+    <div ng-click="isprintMenuFolder()" class="colorfolder">
+        <i class="sort-desc" ng-if="printmenufolder"></i>
+        <i class="icon-play" ng-if="!printmenufolder"></i>
+        <i18n>moodle.courses</i18n><br>
+    </div>
+    <!--<div ng-repeat="folder in printFolderParent()" ng-if="printfolders">
+        <span ng-click="isprintFolder(folder)" class="left-padding colorSubfolder" ng-if="printfolders">
+            <i  class="icon-play" ng-if="!folder.printsubfolder"></i>
+            <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
+        </span>
+    </div>-->
+    <script type="text/ng-template"  id="tree_item_renderer.html">
+        <span ng-click="isprintFolder(folder)" class="left-padding colorSubfolder" ng-if="printfolders" ng-init="folders.getSubFolder(folder.id)">
+            <i  class="icon-play" ng-if="!folder.printsubfolder"></i>
+            <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
+        </span>
+        <div ng-repeat="folder in folder.subFolders" ng-include="'tree_item_renderer.html'" ng-if="folder.subFolders">
+            <span ng-click="isprintFolder(folder)" class="left-padding colorSubfolder" ng-if="printfolders" ng-init="folders.getSubFolder(folder.id)">
+            <i  class="icon-play" ng-if="!folder.printsubfolder"></i>
+            <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
+            </span>
+        </div>
+
+    </script>
+
+    <div ng-repeat="folder in printFolderParent()" ng-include="'tree_item_renderer.html'" ng-if="printfolders">
+    </div>
+
+    <div ng-click="isprintSubMenuFolder()"  class="colorfolder">
+        <i class="icon-play" ng-if="!printmenusubfolder"></i>
+        <i class="sort-desc" ng-if="printmenusubfolder"></i>
+         <i18n>moodle.courses.shared</i18n><br>
+    </div>
+</div>
+<div class="vertical-spacing">
+    <input type="submit" i18n-value="moodle.folder.new" class="colorbutton">
+</div>

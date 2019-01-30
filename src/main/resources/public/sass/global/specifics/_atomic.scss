@@ -27,12 +27,14 @@ i.sort-desc::before {
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   background-image:none;
+  font-size: 28px;
 }
 .icon-play::before {
   content: '\e85d';
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   background-image:none;
+  font-size: 16px;
 }
 .foldericon::before {
   content: '\e81b';

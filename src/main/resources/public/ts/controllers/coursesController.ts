@@ -6,11 +6,47 @@ import {Folder, Folders} from "../model/Folder";
 export const mainController = ng.controller('MoodleController', ['$scope', 'route',($scope, route) => {
 	$scope.lightboxes = {};
 	$scope.params = {};
+	$scope.currentTab='courses';
+	$scope.printmenufolder=false;
+    $scope.printmenusubfolder=false;
     $scope.printcours=false;
-    $scope.printfolders=true;
+    $scope.printfolders=false;
     $scope.printfoldersshared=false;
 	$scope.courses= new Courses();
     $scope.folders=new Folders();
+
+    $scope.isprintMenuFolder= function(){
+        $scope.printmenufolder=!$scope.printmenufolder;
+        $scope.printmenusubfolder=false;
+        if($scope.printmenufolder){
+            $scope.printfolders=true;
+            $scope.printcours=false;
+            $scope.printfoldersshared=false;
+        }else{
+            $scope.printfolders=false;
+            $scope.printcours=false;
+            $scope.printfoldersshared=false;
+        }
+    }
+    $scope.isprintSubMenuFolder= function(){
+        $scope.printmenusubfolder=!$scope.printmenusubfolder;
+        $scope.printmenufolder=false;
+        if($scope.printmenusubfolder){
+            $scope.printfolders=false;
+            $scope.printcours=false;
+            $scope.printfoldersshared=true;
+        }else{
+            $scope.printfolders=false;
+            $scope.printcours=false;
+            $scope.printfoldersshared=false;
+        }
+    }
+    $scope.isprintFolder= function(folder:Folder){
+        folder.printsubfolder=! folder.printsubfolder;
+        if(folder.printsubfolder){
+           folder.subFolders=$scope.folders.getSubFolder(folder.id);
+        }
+    }
 
 	$scope.initCoures = async function(idfolder:number){
         Promise.all([
@@ -21,9 +57,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         Promise.all([
             await $scope.folders.sync()
         ]).then( $scope.$apply());
-        $scope.printfolders=true;
-        $scope.printcours=false;
-        $scope.printfoldersshared=false;
     }
     $scope.printCouresbyFolder= function(idfolder:number){
         $scope.initCoures(idfolder);
@@ -31,11 +64,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.printfolders=false;
         $scope.$apply();
     }
-    $scope.printFolder= function (){
-        $scope.printfolders=true;
-        $scope.printcours=false;
-        $scope.printfoldersshared=false;
+    $scope.printFolderParent= function (): Folder[]{
+        let obj=$scope.folders.getparentFolder();
+        return obj;
     }
+
     $scope.printFoldershared= function (){
 	    alert("none");
     }
@@ -43,6 +76,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         Promise.all([
             await folder.countitems()
         ]).then( $scope.$apply());
+    }
+    $scope.switchTab= function(current: string){
+        $scope.currentTab=current;
     }
 	route({
 		view: function(params){

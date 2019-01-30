@@ -1,6 +1,19 @@
 <div ng-controller="MoodleController" xmlns="http://www.w3.org/1999/html">
     <div class="row bodyBacground" >
         <h1><i18n>moodle.title</i18n></h1>
+        <div class="row twelve cell tabs" style="min-height: 60px;">
+            <div class="cell">
+                <header class="horizontal-spacing " data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
+                    <i18n><span class="no-style ng-scope">moodle.dashboard.dashboard</span></i18n>
+                </header>
+                <header class="horizontal-spacing selected" data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
+                    <i18n><span class="no-style ng-scope">moodle.dashboard.coures</span></i18n>
+                </header>
+                <header class="horizontal-spacing" data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
+                    <i18n><span class="no-style ng-scope">moodle.dashboard.libraries</span></i18n>
+                </header>
+            </div>
+        </div>
         <input type="submit" class="right-magnet" i18n-value="moodle.course.delete" ng-click="openDeletePopUp()"/>
         <input type="submit" class="right-magnet" i18n-value="moodle.course.new" ng-click="openPopUp()"/>
         <div class="row bodyBacgroundSecond">
@@ -19,22 +32,8 @@
                </div>
            </div>
            <div class="twelve cell twelve-mobile">
-               <div  class="two cell horizontal-spacing" ng-init="initFolders()">
-                    <div class="vertical-spacing left-border-menu ">
-                        <div ng-click="printFolder()" class="colorfolder">
-                            <i class="icon-play"></i><i18n>moodle.cours</i18n><br>
-                        </div>
-                        <div ng-repeat="folder in folders.all">
-                            <span ng-click="printCouresbyFolder(folder.id)" class="left-padding colorSubfolder">
-                           <i  class="icon-play"></i>  [[folder.name]]</span>
-                        </div>
-                        <div ng-click="printFoldershared()"  class="colorfolder">
-                            <i class="icon-play"></i><i18n>moodle.cours.shared</i18n><br>
-                        </div>
-                    </div>
-                   <div class="vertical-spacing">
-                       <input type="submit" i18n-value="moodle.folder.new" class="colorbutton">
-                   </div>
+               <div  class="two cell horizontal-spacing" ng-init="initFolders()" static-include="/moodle/public/template/folderItem.html">
+
                </div>
                <div class="ten cell horizontal-spacing padding-left-corp" >
                    <div static-include="/moodle/public/template/folders.html" ng-if="printfolders">

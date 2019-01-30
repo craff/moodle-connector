@@ -3,18 +3,21 @@ import {Mix, Selectable, Selection} from 'entcore-toolkit';
 
 export class Folder {
     id : number;
-    parentid : number;
-    userid : string;
+    parent_id : number;
+    user_id : string;
     name : string;
-    structureid : string;
+    structure_id : string;
     nbItems: number=0;
+    subFolders : Folder[];
+    printfolder: boolean=true;
+    printsubfolder: boolean=false;
     toJson() {
         return {
             id : this.id,
-            parentid : this.parentid,
-            userid : this.userid,
+            parentid : this.parent_id,
+            userid : this.user_id,
             name : this.name,
-            structureid : this.structureid
+            structureid : this.structure_id
         }
 
     }
@@ -44,5 +47,16 @@ export class Folders {
             throw e;
         }
     }
-
+    getSubFolder(folderId:number): Folder[]  {
+        if(this.all){
+            return this.all.filter(folder=>folder.parent_id == folderId &&  folder.id != folderId);
+        }
+        return [];
+    }
+    getparentFolder(): Folder[]  {
+        if(this.all){
+            return this.all.filter(folder=>folder.parent_id == folder.id);
+        }
+        return [];
+    }
 }

@@ -1,9 +1,9 @@
 <article class="six cell twelve-mobile horizontal-spacing folder-article"
          ng-repeat="folder in folders.all track by $index" >
-    <div ng-click="printCouresbyFolder(folder.id)">
+    <div >
             <i class="foldericon"></i>
 
-            <label>
+            <label ng-click="printCouresbyFolder(folder.id)">
                 <span class="summary">[[folder.name]]</span>
             </label></br>
             <label ng-init="countItems(folder)">

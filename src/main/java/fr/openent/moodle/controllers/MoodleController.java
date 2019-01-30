@@ -179,11 +179,11 @@ public class MoodleController extends ControllerHelper {
                         public void handle(Either<String, JsonArray> stringJsonArrayEither) {
                             if(stringJsonArrayEither.isRight()){
                                 final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                final String moodleUrl = "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php" +
-                                        "?wstoken=" + "df92b3978e2b958e0335b2f4df505977" +
-                                        "&wsfunction=" + "local_entcgi_services_usercourses" +
+                                final String moodleUrl = config.getString("address_moodle") +
+                                        "?wstoken=" + WSTOKEN +
+                                        "&wsfunction=" + WS_GET_USERCOURSES +
                                         "&parameters[userid]=" + "biz1234" +
-                                        "&moodlewsrestformat=" + "json";
+                                        "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                 final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
                                     @Override
@@ -201,12 +201,12 @@ public class MoodleController extends ControllerHelper {
                                                         JsonObject  o=object.getJsonObject(i);
                                                         if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
                                                             mydata.add(o);
-                                                        }else{
+                                                        }/*else{
                                                             JsonArray obj=o.getJsonArray("auteur");
                                                             if(!obj.getJsonObject(0).getString("entidnumber").equals(user.getUserId())){
                                                                 mydata.add(o);
                                                             }
-                                                        }
+                                                        }*/
                                                     }
                                                     Renders.renderJson(request, mydata);
                                                 }

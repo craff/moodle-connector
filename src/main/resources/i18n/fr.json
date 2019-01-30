@@ -8,8 +8,11 @@
 	"moodle.notify.trashed": "La donnée a été mise à la corbeille",
 	"moodle.notify.restored": "La donnée a été restaurée",
 
-	"moodle.cours": "Mes cours",
-	"moodle.cours.shared": "Cours partagés avec moi",
+	"moodle.dashboard.dashboard": "TABLEAU DE BORD",
+	"moodle.dashboard.libraries": "BIBLIOTHEQUE",
+	"moodle.dashboard.coures": "MES COURS",
+	"moodle.courses": "Mes cours",
+	"moodle.courses.shared": "Cours partagés avec moi",
 	"moodle.folders": "Mes dossiers",
 	"moodle.root": "Mes moodles",
 	"list.title": "Mes moodles",
