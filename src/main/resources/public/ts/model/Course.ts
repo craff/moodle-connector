@@ -17,7 +17,7 @@ export interface Course {
     author : Author;
     role : string;
     categoryid : number;
-    // imagebase64 : string;
+    imageurl : string;
 }
 
 export class Course {
@@ -31,7 +31,9 @@ export class Course {
             date : this.date,
             author : this.author,
             role : this.role,
-            // imagebase64 : this.imagebase64
+            imageurl : this.imageurl,
+            firstname :this.firstname,
+            lastname : this.lastname,
         }
     }
 

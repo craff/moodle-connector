@@ -26,6 +26,7 @@ import org.entcore.common.user.UserUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static fr.openent.moodle.Moodle.*;
@@ -64,18 +65,19 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(JsonObject course) {
                 JsonObject action = new JsonObject();
-                action.put("action", "getUserInfos").put("userId", course.getString("idnumber", "6c1a55f3-92a5-463b-8fac-36c4dfb83976"));
+                action.put("action", "getUserInfos").put("userId", course.getString("idnumber", "3fbc462a-eead-48b5-978b-e8e8f500b0f5"));
                 moodleEventBusService.getParams(action, new Handler<Either<String, JsonObject>>() {
                     @Override
                     public void handle(Either<String, JsonObject> event) {
                         if (event.isRight()) {
-                            course.put("email", "gopo@giroscop.com");
+                            course.put("email", ((JsonObject) ((Either.Right) event).getValue()).getString("email"));
                             course.put("username", "cabral");
                             course.put("idnumber", "biz1234");
-                            course.put("firstname", "soare");
-                            course.put("lastname", "noaptea");
-                            course.put("shortname", "Test");
                             course.put("address", config.getString("address_moodle"));
+                            course.put("firstname", ((JsonObject) ((Either.Right) event).getValue()).getString("firstname"));
+                            course.put("lastname", ((JsonObject) ((Either.Right) event).getValue()).getString("lastname"));
+                            course.put("lastname", ((JsonObject) ((Either.Right) event).getValue()).getString("lastname"));
+//                            course.put("imageurl", (config.getString("host") + course.getValue("imageurl")));
                             final AtomicBoolean responseIsSent = new AtomicBoolean(false);
 
                             URI moodleUri = null;
@@ -97,7 +99,7 @@ public class MoodleController extends ControllerHelper {
                                         "&parameters[firstname]=" + course.getString("firstname") +
                                         "&parameters[lastname]=" + course.getString("lastname") +
                                         "&parameters[fullname]=" + course.getString("fullname") +
-                                        "&parameters[shortname]=" + course.getString("shortname") +
+                                        "&parameters[shortname]=" + "CGI001" +
                                         "&parameters[categoryid]=" + course.getInteger("categoryid") +
 //                                        "&parameters[courseidnumber]=" + course.getInteger("courseidnumber") +
 //                                        "&parameters[sumamry]=" + course.getString("description") +
@@ -107,7 +109,7 @@ public class MoodleController extends ControllerHelper {
                                     @Override
                                     public void handle(Either<String, Buffer> event) {
                                         if (event.isRight()) {
-                                            JsonObject object = new JsonObject(event.right().getValue().toString().substring(1, event.right().toString().length()+9));
+                                            JsonObject object = new JsonObject(event.right().getValue().toString().substring(1, event.right().toString().length()+10));
                                             course.put("moodleid", object.getValue("courseid"));
                                             moodleWebService.create(course, defaultResponseHandler(request));
                                         } else {

@@ -30,6 +30,9 @@
 		"role": {
 			"type" : "string"
 		}
+//		"imageurl": {
+//			"type" : "string"
+//		}
  	},
 	"required": [
 		"fullname",
