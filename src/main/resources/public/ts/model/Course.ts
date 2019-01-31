@@ -1,6 +1,7 @@
 import { notify, model, } from 'entcore';
 import http from 'axios';
 import {Mix, Selectable, Selection} from 'entcore-toolkit';
+import {Folder} from "./Folder";
 
 
 export interface Course {
@@ -56,19 +57,32 @@ export class Course {
 
 
 export class Courses {
-    all: Course[];
-
+    allbyfolder: Course[];
+    coursesShared: Course[];
     constructor() {
-        this.all = [];
+        this.allbyfolder = [];
+        this.coursesShared = [];
     }
-    async sync (folder_id: number) {
+    async getCoursesbyFolder (folder_id: number) {
         try {
-            let courses = await http.get(`/moodle/coursesAndshared/${folder_id}`);
-            this.all = Mix.castArrayAs(Course, courses.data);
+            let courses = await http.get(`/moodle/courses/${folder_id}`);
+            this.allbyfolder = Mix.castArrayAs(Course, courses.data);
         } catch (e) {
             throw e;
         }
     }
+
+    async getCoursesAndSheredbyFolder () {
+        try {
+            let courses = await http.get(`/moodle/users/coursesAndShared`);
+            this.coursesShared = Mix.castArrayAs(Course, courses.data);
+        } catch (e) {
+            throw e;
+        }
+    }
+
+
+
 
 }
 

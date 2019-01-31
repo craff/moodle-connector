@@ -22,9 +22,11 @@ export class Folder {
     }
     async countitems () {
         try {
-            let counts = await http.get(`/moodle/folder/counts/${this.id}`);
-            if(counts){
-                this.nbItems=counts.data.count;
+            let countsfolders = await http.get(`/moodle/folder/countsFolders/${this.id}`);
+            let countscourses = await http.get(`/moodle/folder/countsCourses/${this.id}`);
+
+            if(countsfolders && countscourses){
+                this.nbItems=countsfolders.data.count+countscourses.data.count;
             }
 
         } catch (e) {
@@ -58,4 +60,6 @@ export class Folders {
         }
         return [];
     }
+
+
 }

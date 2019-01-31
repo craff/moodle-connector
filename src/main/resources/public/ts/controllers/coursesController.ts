@@ -8,70 +8,81 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
 	$scope.params = {};
 	$scope.currentTab='courses';
 	$scope.printmenufolder=false;
-    $scope.printmenusubfolder=false;
+    $scope.printmenucourseShared=false;
+    $scope.currentfolderid=null;
     $scope.printcours=false;
     $scope.printfolders=false;
-    $scope.printfoldersshared=false;
 	$scope.courses= new Courses();
     $scope.folders=new Folders();
 
     $scope.isprintMenuFolder= function(){
         $scope.printmenufolder=!$scope.printmenufolder;
-        $scope.printmenusubfolder=false;
+        $scope.printmenucourseShared=false;
+        $scope.currentfolderid=null;
         if($scope.printmenufolder){
             $scope.printfolders=true;
-            $scope.printcours=false;
-            $scope.printfoldersshared=false;
+            $scope.printcours=true;
+
         }else{
             $scope.printfolders=false;
             $scope.printcours=false;
-            $scope.printfoldersshared=false;
         }
     }
-    $scope.isprintSubMenuFolder= function(){
-        $scope.printmenusubfolder=!$scope.printmenusubfolder;
+    $scope.isprintMenuFolderShared= function(){
+        $scope.printmenucourseShared=!$scope.printmenucourseShared;
         $scope.printmenufolder=false;
+        $scope.currentfolderid=null;
         if($scope.printmenusubfolder){
             $scope.printfolders=false;
-            $scope.printcours=false;
-            $scope.printfoldersshared=true;
+            $scope.printcours=true;
+            $scope.initAllCouresbyuser();
         }else{
             $scope.printfolders=false;
             $scope.printcours=false;
-            $scope.printfoldersshared=false;
         }
     }
     $scope.isprintSubFolder= function(folder:Folder){
-       $scope.folders.forEach(e=>{
+       $scope.folders.all.forEach(function (e) {
            if(e.id==folder.id){
                e.printsubfolder=!e.printsubfolder;
-               folder.printsubfolder=e.printsubfolder
+               folder.printsubfolder=e.printsubfolder;
            }
        });
-        if(folder.printsubfolder){
+       if(folder.printsubfolder){
+            $scope.currentfolderid=folder.id;
             $scope.printcours=true;
-            $scope.printcours=true;
-        }
-       $scope.$apply();
+           $scope.printCouresbySubFolder(folder.id);
+       }else{
+            (folder.parent_id!=folder.id)? $scope.currentfolderid=folder.parent_id :$scope.currentfolderid=null;
+           $scope.printCouresbySubFolder(folder.parent_id);
+       }
+
     }
 
+    $scope.printCouresbySubFolder= function(idfolder:number){
+        $scope.initCouresbyFolder(idfolder);
+        $scope.printcours=true;
+        $scope.printfolders=true;
 
-	$scope.initCoures = async function(idfolder:number){
+    }
+
+	$scope.initCouresbyFolder = async function(idfolder:number){
         Promise.all([
-            await $scope.courses.sync(idfolder)
-        ]).then( $scope.$apply());
+            await $scope.courses.getCoursesbyFolder(idfolder)
+        ]).then($scope.$apply());
     }
+    $scope.initAllCouresbyuser = async function(){
+        Promise.all([
+            await $scope.courses.getCoursesAndSheredbyFolder()
+        ]).then($scope.$apply());
+    }
+
     $scope.initFolders = async function(){
         Promise.all([
             await $scope.folders.sync()
-        ]).then( $scope.$apply());
+        ]).then();
     }
-    $scope.printCouresbyFolder= function(idfolder:number){
-        $scope.initCoures(idfolder);
-        $scope.printcours=true;
-        $scope.printfolders=false;
-        $scope.$apply();
-    }
+
 
     $scope.getFolderParent= function (): Folder[]{
         return $scope.folders.getparentFolder();

@@ -75,11 +75,32 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     @Override
     public void countItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
         String query = "SELECT  count(*) " +
+                "FROM " + Moodle.moodleSchema + ".folder " +
+                "WHERE user_id = ? AND parent_id = ?;";
+        JsonArray values = new JsonArray();
+        values.add(userId).add(id_folder);
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(defaultResponseHandler));
+    }
+
+    @Override
+    public void countCoursesItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
+        String query = "SELECT  count(*) " +
                 "FROM " + Moodle.moodleSchema + ".course " +
                 "WHERE user_id = ? AND folder_id = ?;";
         JsonArray values = new JsonArray();
         values.add(userId).add(id_folder);
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(defaultResponseHandler));
+    }
+
+    @Override
+    public void getCoursesSharedByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler) {
+        String query = "SELECT moodle_id, folder_id  " +
+                "FROM " + Moodle.moodleSchema + ".course " +
+                "WHERE user_id = ?;";
+
+        JsonArray values = new JsonArray();
+        values.add(userId);
+        sql.prepared(query, values, SqlResult.validResultHandler(eitherHandler));
     }
 
 

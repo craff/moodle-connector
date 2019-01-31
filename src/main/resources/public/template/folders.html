@@ -1,14 +1,30 @@
 <article class="six cell twelve-mobile horizontal-spacing folder-article"
-         ng-repeat="folder in folders.all track by $index" >
+         ng-repeat="folder in folders.getparentFolder() track by $index" ng-if="!currentfolderid">
     <div >
             <i class="foldericon"></i>
 
-            <label ng-click="printCouresbyFolder(folder.id)">
+            <label ng-click="isprintSubFolder(folder)">
                 <span class="summary">[[folder.name]]</span>
             </label></br>
             <label ng-init="countItems(folder)">
               [[folder.nbItems]] <i18n>moodle.folder.item</i18n>:
             </label>
+        <input type="checkbox" class="right-magnet">
+
+    </div>
+
+</article>
+<article class="six cell twelve-mobile horizontal-spacing folder-article"
+         ng-repeat="folder in folders.getSubFolder(currentfolderid) track by $index" ng-if="currentfolderid">
+    <div >
+        <i class="foldericon"></i>
+
+        <label ng-click="isprintSubFolder(folder)">
+            <span class="summary">[[folder.name]]</span>
+        </label></br>
+        <label ng-init="countItems(folder)">
+            [[folder.nbItems]] <i18n>moodle.folder.item</i18n>:
+        </label>
         <input type="checkbox" class="right-magnet">
 
     </div>

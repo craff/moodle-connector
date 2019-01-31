@@ -35,9 +35,11 @@
 
                </div>
                <div class="ten cell horizontal-spacing padding-left-corp" >
-                   <div static-include="/moodle/public/template/folders.html" ng-if="printfolders">
+                   <div  class ="row" static-include="/moodle/public/template/folders.html" ng-if="printfolders">
                    </div>
-                   <div static-include="/moodle/public/template/courses.html" ng-if="printcours">
+
+                   <div class="row" static-include="/moodle/public/template/courses.html"
+                        ng-if="printcours" >
                    </div>
                </div>
            </div>

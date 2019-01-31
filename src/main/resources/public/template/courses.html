@@ -1,4 +1,35 @@
-<article class="five cell twelve-mobile horizontal-spacing course-article" ng-repeat="course in courses.all track by $index" >
+<article ng-init="printCouresbySubFolder(currentfolderid)" ng-if="currentfolderid"
+        class="five cell twelve-mobile horizontal-spacing course-article"
+         ng-repeat="course in courses.allbyfolder track by $index">
+    <div class="row">
+        <input type="checkbox" class="left-magnet">
+    </div>
+    <div class="row">
+        <div class="three cell">
+            <img ng-src="[[course.image]]" class="image"
+                 ng-show="course.image!==null && course.image!==undefined"/>
+            <img skin-src="/img/illustrations/pages-default.png"  class="image"
+                 ng-show="course.image===null || course.image===undefined"/>
+        </div>
+        <div class="nine cell">
+            <label>
+                <i18n>moodle.course.description</i18n>:<br>
+                <span class="summary">[[course.summary]]</span>
+            </label></br>
+            <label>
+                <i18n>date</i18n>:
+                [[course.date]]
+            </label></br>
+            <label>
+                <i18n>moodle.course.author</i18n>:
+                [[course.author.lastname]] [[course.author.firstname]]
+            </label>
+        </div>
+    </div>
+</article>
+<article ng-if="printmenucourseShared"
+         class="five cell twelve-mobile horizontal-spacing course-article"
+         ng-repeat="course in courses.coursesShared track by $index">
     <div class="row">
         <input type="checkbox" class="left-magnet">
     </div>

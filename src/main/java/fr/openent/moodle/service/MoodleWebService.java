@@ -42,10 +42,26 @@ public interface MoodleWebService{
     void getFoldersInEnt(String id_user,Handler<Either<String, JsonArray>> handler);
 
     /**
-     * count Item In folder
+     * count Item folders In folder
      * @param id_folder
      * @param userId
      * @param defaultResponseHandler
      */
     void countItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler);
+
+    /**
+     * count Item courses In folder
+     * @param id_folder
+     * @param userId
+     * @param defaultResponseHandler
+     */
+    void countCoursesItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler);
+
+    /**
+     * get courses and shared by users
+     * @param userId
+     * @param eitherHandler
+     */
+    void getCoursesSharedByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler);
+
 }
