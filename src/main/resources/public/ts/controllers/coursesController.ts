@@ -44,8 +44,17 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.isprintFolder= function(folder:Folder){
         folder.printsubfolder=! folder.printsubfolder;
         if(folder.printsubfolder){
-           folder.subFolders=$scope.folders.getSubFolder(folder.id);
+            $scope.printcours=true;
+            $scope.printcours=true;
         }
+    }
+    $scope.isprintSubFolder= function(folder:Folder){
+       $scope.folders.forEach((e)=>{
+           if(e.id==folder.id){
+               e.printsubfolder=!e.printsubfolder;
+           }
+       });
+       $scope.$apply();
     }
 
 	$scope.initCoures = async function(idfolder:number){
@@ -64,11 +73,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.printfolders=false;
         $scope.$apply();
     }
-    $scope.printFolderParent= function (): Folder[]{
-        let obj=$scope.folders.getparentFolder();
-        return obj;
-    }
 
+    $scope.getFolderParent= function (): Folder[]{
+        return $scope.folders.getparentFolder();
+    }
+    $scope.getSubFolder= function (folder:Folder): Folder[]{
+        return $scope.folders.getSubFolder(folder.id);
+    }
     $scope.printFoldershared= function (){
 	    alert("none");
     }
