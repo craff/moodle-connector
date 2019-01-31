@@ -203,12 +203,12 @@ public class MoodleController extends ControllerHelper {
                                                         JsonObject  o=object.getJsonObject(i);
                                                         if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
                                                             mydata.add(o);
-                                                        }else{
+                                                        }/*else{
                                                             JsonArray obj=o.getJsonArray("auteur");
                                                             if(!obj.getJsonObject(0).getString("entidnumber").equals(user.getUserId())){
                                                                 mydata.add(o);
                                                             }
-                                                        }
+                                                        }*/
                                                     }
                                                     Renders.renderJson(request, mydata);
                                                 }

@@ -41,21 +41,20 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
             $scope.printfoldersshared=false;
         }
     }
-    $scope.isprintFolder= function(folder:Folder){
-        folder.printsubfolder=! folder.printsubfolder;
+    $scope.isprintSubFolder= function(folder:Folder){
+       $scope.folders.forEach(e=>{
+           if(e.id==folder.id){
+               e.printsubfolder=!e.printsubfolder;
+               folder.printsubfolder=e.printsubfolder
+           }
+       });
         if(folder.printsubfolder){
             $scope.printcours=true;
             $scope.printcours=true;
         }
-    }
-    $scope.isprintSubFolder= function(folder:Folder){
-       $scope.folders.forEach((e)=>{
-           if(e.id==folder.id){
-               e.printsubfolder=!e.printsubfolder;
-           }
-       });
        $scope.$apply();
     }
+
 
 	$scope.initCoures = async function(idfolder:number){
         Promise.all([

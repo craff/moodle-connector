@@ -4,14 +4,9 @@
         <i class="icon-play" ng-if="!printmenufolder"></i>
         <i18n>moodle.courses</i18n><br>
     </div>
-    <!--<div ng-repeat="folder in printFolderParent()" ng-if="printfolders">
-        <span ng-click="isprintFolder(folder)" class="left-padding colorSubfolder" ng-if="printfolders">
-            <i  class="icon-play" ng-if="!folder.printsubfolder"></i>
-            <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
-        </span>
-    </div>-->
     <div class="colorfolder" ng-repeat="folder in getFolderParent()" ng-if="printfolders">
-        <span ng-init="folder.subFolders=getSubFolder(folder)" class="left-padding colorSubfolder" ng-click="isprintSubFolder(folder)">
+        <span ng-init="folder.subFolders=getSubFolder(folder)" class="left-padding colorSubfolder"
+              ng-click="isprintSubFolder(folder)">
             <i  class="icon-play" ng-if="!folder.printsubfolder"></i>
             <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
         </span>
