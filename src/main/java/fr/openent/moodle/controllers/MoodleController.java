@@ -65,7 +65,7 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(JsonObject course) {
                 JsonObject action = new JsonObject();
-                action.put("action", "getUserInfos").put("userId", course.getString("idnumber", "3fbc462a-eead-48b5-978b-e8e8f500b0f5"));
+                action.put("action", "getUserInfos").put("userId", course.getString("idnumber", "602a0ce2-48f8-4323-b80c-fa37090f6ebd"));
                 moodleEventBusService.getParams(action, new Handler<Either<String, JsonObject>>() {
                     @Override
                     public void handle(Either<String, JsonObject> event) {
@@ -386,7 +386,7 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 JsonObject course = new JsonObject();
-                course.put("courseids", 91);
+                course.put("courseids", 111);
                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 URI moodleDeleteUri = null;
                 try {
