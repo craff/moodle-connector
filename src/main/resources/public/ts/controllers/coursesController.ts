@@ -32,7 +32,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.printmenucourseShared=!$scope.printmenucourseShared;
         $scope.printmenufolder=false;
         $scope.currentfolderid=null;
-        if($scope.printmenusubfolder){
+        if($scope.printmenucourseShared){
             $scope.printfolders=false;
             $scope.printcours=true;
             $scope.initAllCouresbyuser();
