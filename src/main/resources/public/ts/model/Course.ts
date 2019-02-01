@@ -19,10 +19,13 @@ export interface Course {
     role : string;
     categoryid : number;
     imageurl : string;
+     type : string;
 }
 
 export class Course {
-    
+    constructor(){
+        this.type="parcour";
+    }
     toJSON() {
         return {
             courseid : this.courseid,

@@ -1,0 +1,31 @@
+<div class="row">
+    <input type="checkbox" class="left-magnet">
+</div>
+<div class="row">
+    <div class="three cell BackgroundColorActivity" ng-if="course.type=='activity'">
+        <img ng-src="[[course.image]]" class="image"
+             ng-show="course.image!==null && course.image!==undefined"/>
+        <img skin-src="/img/illustrations/pages-default.png"  class="image"
+             ng-show="course.image===null || course.image===undefined"/>
+    </div>
+    <div class="three cell BackgroundColorBlueParcour" ng-if="course.type=='parcour'">
+        <img ng-src="[[course.image]]" class="image"
+             ng-show="course.image!==null && course.image!==undefined"/>
+        <img skin-src="/img/illustrations/pages-default.png"  class="image"
+             ng-show="course.image===null || course.image===undefined"/>
+    </div>
+    <div class="nine cell">
+        <label>
+            <i18n>moodle.course.description</i18n>:<br>
+            <span class="summary">[[course.summary]]</span>
+        </label></br>
+        <label>
+            <i18n>date</i18n>:
+            [[course.date]]
+        </label></br>
+        <label>
+            <i18n>moodle.course.author</i18n>:
+            [[course.author.lastname]] [[course.author.firstname]]
+        </label>
+    </div>
+</div>

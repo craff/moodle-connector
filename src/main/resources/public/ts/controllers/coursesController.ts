@@ -22,7 +22,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         if($scope.printmenufolder){
             $scope.printfolders=true;
             $scope.printcours=true;
-
         }else{
             $scope.printfolders=false;
             $scope.printcours=false;
