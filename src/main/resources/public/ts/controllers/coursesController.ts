@@ -3,7 +3,7 @@ import {Course,Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 
 
-export const mainController = ng.controller('MoodleController', ['$scope', 'route',($scope, route) => {
+export const mainController = ng.controller('MoodleController', ['$scope', 'route','$rootScope',($scope, route,$rootScope) => {
 	$scope.lightboxes = {};
 	$scope.params = {};
 	$scope.currentTab='courses';
@@ -18,13 +18,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.isprintMenuFolder= function(){
         $scope.printmenufolder=!$scope.printmenufolder;
         $scope.printmenucourseShared=false;
-        $scope.currentfolderid=null;
         if($scope.printmenufolder){
             $scope.printfolders=true;
             $scope.printcours=true;
+            $scope.currentfolderid=0;
+            $scope.printCouresbySubFolder($scope.currentfolderid);
         }else{
             $scope.printfolders=false;
             $scope.printcours=false;
+            $scope.currentfolderid=null;
         }
     }
     $scope.isprintMenuFolderShared= function(){
@@ -52,8 +54,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
             $scope.printcours=true;
            $scope.printCouresbySubFolder(folder.id);
        }else{
-            (folder.parent_id!=folder.id)? $scope.currentfolderid=folder.parent_id :$scope.currentfolderid=null;
-           $scope.printCouresbySubFolder(folder.parent_id);
+           (folder.parent_id!=folder.id)? $scope.currentfolderid=folder.parent_id :$scope.currentfolderid=0;
+
+           $scope.printCouresbySubFolder($scope.currentfolderid);
        }
 
     }
@@ -79,7 +82,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.initFolders = async function(){
         Promise.all([
             await $scope.folders.sync()
-        ]).then();
+        ]).then($scope.$apply());
     }
 
 
@@ -89,9 +92,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.getSubFolder= function (folder:Folder): Folder[]{
         return $scope.folders.getSubFolder(folder.id);
     }
-    $scope.printFoldershared= function (){
-	    alert("none");
-    }
+
     $scope.countItems =async function (folder:Folder){
         Promise.all([
             await folder.countitems()
@@ -103,7 +104,19 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
 	route({
 		view: function(params){
 			template.open('main', 'main');
-		}
+		},
+        dashboard: async () => {
+            template.open('dashboard-main', 'page-dashboard');
+            $scope.$apply();
+        },
+        mycourses: async () => {
+        template.open('courses-main', 'page-courses');
+        $scope.$apply();
+        },
+        library: async () => {
+        template.open('library-main', 'page-library');
+        $scope.$apply();
+    }
 	});
     $scope.openLightbox = false;
 

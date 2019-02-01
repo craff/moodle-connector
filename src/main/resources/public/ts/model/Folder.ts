@@ -56,7 +56,7 @@ export class Folders {
     }
     getparentFolder(): Folder[]  {
         if(this.all){
-            return this.all.filter(folder=>folder.parent_id == folder.id);
+            return this.all.filter(folder=>folder.id!=0 && folder.parent_id == folder.id);
         }
         return [];
     }

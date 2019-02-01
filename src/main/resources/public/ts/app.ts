@@ -13,5 +13,18 @@ routes.define(function($routeProvider){
 	$routeProvider
 		.when('/', {
 			action: 'view'
-		});
-})
+		})
+        .when('/dashboard', {
+            action: 'dashboard'
+        })
+        .when('/mycourses', {
+            action: 'mycourses'
+        })
+        .when('/library', {
+            action: 'library'
+        });
+    $routeProvider.otherwise({
+        redirectTo: '/'
+    });
+
+});
