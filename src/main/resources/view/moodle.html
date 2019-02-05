@@ -4,11 +4,29 @@
 		<title>{{#i18n}}moodle.title{{/i18n}}</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<script src="/moodle/public/dist/entcore/ng-app-806c034edf.js" type="text/javascript" id="context"></script>
-		<script src="/moodle/public/dist/application-cb7e67c07d.js" type="text/javascript"></script>
+		<script src="/moodle/public/dist/application-9e4f9bb0ba.js" type="text/javascript"></script>
 		<script type="text/ng-template" id="empty"></script>
 	</head>
 	<body ng-controller="MoodleController" class="moodle">
 		<portal>
+			<div class="row " >
+				<h1><i18n>moodle.title</i18n></h1>
+				<div class="row twelve cell tabs" style="min-height: 60px;">
+					<div class="cell">
+						<header class="horizontal-spacing selected" data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
+							<i18n><span class="no-style ng-scope">moodle.dashboard.dashboard</span></i18n>
+						</header>
+						<header class="horizontal-spacing " data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
+							<i18n><span class="no-style ng-scope">moodle.dashboard.coures</span></i18n>
+						</header>
+						<header class="horizontal-spacing" data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
+							<i18n><span class="no-style ng-scope">moodle.dashboard.libraries</span></i18n>
+						</header>
+					</div>
+				</div>
+
+				<input type="submit" class="right-magnet" i18n-value="moodle.course.delete" ng-click="openDeletePopUp()"/>
+			</div>
 			<container template="main"></container>
 		</portal>
 	</body>

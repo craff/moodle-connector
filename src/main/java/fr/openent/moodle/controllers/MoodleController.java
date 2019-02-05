@@ -26,7 +26,8 @@ import org.entcore.common.user.UserUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Random;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static fr.openent.moodle.Moodle.*;
@@ -224,13 +225,114 @@ public class MoodleController extends ControllerHelper {
                                                         JsonObject  o=object.getJsonObject(i);
                                                         if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
                                                             mydata.add(o);
-                                                        }/*else{
-                                                            JsonArray obj=o.getJsonArray("auteur");
-                                                            if(!obj.getJsonObject(0).getString("entidnumber").equals(user.getUserId())){
-                                                                mydata.add(o);
-                                                            }
-                                                        }*/
+                                                        }
                                                     }
+                                                    Renders.renderJson(request, mydata);
+                                                }
+                                            });
+                                            response.endHandler(new Handler<Void>() {
+                                                @Override
+                                                public void handle(Void end) {
+                                                    handle(end);
+                                                    if (!responseIsSent.getAndSet(true)) {
+                                                        httpClient.close();
+                                                    }
+                                                }
+                                            });
+
+                                        }else{
+                                            log.debug(response.statusMessage());
+                                            response.bodyHandler(new Handler<Buffer>() {
+                                                @Override
+                                                public void handle(Buffer event) {
+                                                    log.debug("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                                                    if (!responseIsSent.getAndSet(true)) {
+                                                        httpClient.close();
+                                                    }
+                                                }
+                                            });
+                                            handle(response);
+                                        }
+                                    }
+                                });
+                                httpClientRequest.headers().set("Content-Length", "0");
+                                httpClientRequest.setTimeout(20001);
+                                //Typically an unresolved Address, a timeout about connection or response
+                                httpClientRequest.exceptionHandler(new Handler<Throwable>() {
+                                    @Override
+                                    public void handle(Throwable event) {
+                                        log.debug(event.getMessage(), event);
+                                        if (!responseIsSent.getAndSet(true)) {
+                                            handle(event);
+                                            httpClient.close();
+                                        }
+                                    }
+                                }).end();
+                            }else{
+                                handle(new Either.Left<>("Get list in Ent Base failed"));
+                            }
+                        }
+                    });
+                } else {
+                    unauthorized(request);
+                }
+            }
+        });
+    }
+    @Get("/users/courses")
+    @ApiDoc("Get cours by user in database")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void listCouresByuser(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(UserInfos user) {
+                if(user!=null){
+                    Handler<Either<String, JsonArray>> handler = arrayResponseHandler(request);
+                    moodleWebService.getCoursesByUserInEnt(user.getUserId(), new Handler<Either<String, JsonArray>>() {
+                        @Override
+                        public void handle(Either<String, JsonArray> stringJsonArrayEither) {
+                            if(stringJsonArrayEither.isRight()){
+                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                final String moodleUrl = config.getString("address_moodle") +
+                                        "?wstoken=" + WSTOKEN +
+                                        "&wsfunction=" + WS_GET_USERCOURSES +
+                                        "&parameters[userid]=" + "biz1234" +
+                                        "&moodlewsrestformat=" + JSON;
+                                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                                final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
+                                    @Override
+                                    public void handle(HttpClientResponse response) {
+                                        if (response.statusCode() == 200) {
+                                            final Buffer buff = Buffer.buffer();
+                                            response.handler(new Handler<Buffer>() {
+                                                @Override
+                                                public void handle(Buffer event) {
+                                                    buff.appendBuffer(event);
+                                                    JsonArray mydata=new JsonArray();
+                                                    JsonArray object = new JsonArray(buff.toString().substring(15, buff.toString().length()-21));
+                                                    for(int i=0;i<object.size();i++){
+                                                        JsonObject  o=object.getJsonObject(i);
+                                                        if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
+                                                                mydata.add(o);
+                                                        }
+
+                                                    }
+                                                    List<JsonObject> listObject=mydata.getList();
+                                                    Collections.sort(listObject, new Comparator<JsonObject>() {
+                                                        public int compare(JsonObject ob, JsonObject ob1) {
+                                                            LocalDateTime ldt1=getDateString(ob.getString("date"));
+                                                            LocalDateTime ldt2=getDateString(ob1.getString("date"));
+                                                            return (ldt1.compareTo(ldt2)>=0) ? 1:-1;
+                                                        }
+                                                    });
+                                                    Collections.reverse(listObject);
+                                                    //listObject.stream().skip(0).limit(4).toString()
+                                                    List<JsonObject> ob=new ArrayList<>();
+                                                    for(int i=0;i<4;i++){
+                                                        ob.add(listObject.get(i));
+                                                    }
+                                                    mydata=new JsonArray(ob.toString());
                                                     Renders.renderJson(request, mydata);
                                                 }
                                             });
@@ -293,7 +395,7 @@ public class MoodleController extends ControllerHelper {
             public void handle(UserInfos user) {
                 if(user!=null){
                     Handler<Either<String, JsonArray>> handler = arrayResponseHandler(request);
-                    moodleWebService.getCoursesSharedByUserInEnt(user.getUserId(), new Handler<Either<String, JsonArray>>() {
+                    moodleWebService.getCoursesByUserInEnt(user.getUserId(), new Handler<Either<String, JsonArray>>() {
                         @Override
                         public void handle(Either<String, JsonArray> stringJsonArrayEither) {
                             if(stringJsonArrayEither.isRight()){
@@ -417,4 +519,8 @@ public class MoodleController extends ControllerHelper {
             }
         });
 	}
+    public LocalDateTime getDateString(String date){
+        return LocalDateTime.parse(date.substring(0,10)+"T"+date.substring(11));
+    }
 }
+

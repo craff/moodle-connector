@@ -93,7 +93,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void getCoursesSharedByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler) {
+    public void getCoursesByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler) {
         String query = "SELECT moodle_id, folder_id  " +
                 "FROM " + Moodle.moodleSchema + ".course " +
                 "WHERE user_id = ?;";

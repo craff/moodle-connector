@@ -1,0 +1,11 @@
+<div ng-init="printCouresbySubFolder(currentfolderid)" ng-if="currentfolderid>=0"
+        class="five cell twelve-mobile course-article sytle-bord coursesInfoBackground bottom-margin"
+         ng-repeat="course in courses.allbyfolder track by $index">
+    <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
+</div>
+
+<div ng-if="printmenucourseShared"
+         class="five cell twelve-mobile course-article sytle-bord coursesInfoBackground bottom-margin"
+         ng-repeat="course in courses.coursesShared track by $index">
+    <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
+</div>

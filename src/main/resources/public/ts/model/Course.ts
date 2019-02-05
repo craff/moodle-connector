@@ -24,7 +24,7 @@ export interface Course {
 
 export class Course {
     constructor(){
-        this.type="parcour";
+        this.type="activity";
     }
     toJSON() {
         return {
@@ -62,9 +62,11 @@ export class Course {
 export class Courses {
     allbyfolder: Course[];
     coursesShared: Course[];
+    coursesByUser: Course[];
     constructor() {
         this.allbyfolder = [];
         this.coursesShared = [];
+        this.coursesByUser = [];
     }
     async getCoursesbyFolder (folder_id: number) {
         try {
@@ -74,7 +76,14 @@ export class Courses {
             throw e;
         }
     }
-
+    async getCoursesbyUser () {
+        try {
+            let courses = await http.get(`/moodle/users/courses`);
+            this.coursesByUser = Mix.castArrayAs(Course, courses.data);
+        } catch (e) {
+            throw e;
+        }
+    }
     async getCoursesAndSheredbyFolder () {
         try {
             let courses = await http.get(`/moodle/users/coursesAndShared`);

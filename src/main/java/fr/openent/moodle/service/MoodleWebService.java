@@ -62,6 +62,6 @@ public interface MoodleWebService{
      * @param userId
      * @param eitherHandler
      */
-    void getCoursesSharedByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler);
+    void getCoursesByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler);
 
 }

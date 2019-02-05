@@ -1,7 +1,4 @@
 <div class="row">
-    <input type="checkbox" class="left-magnet">
-</div>
-<div class="row">
     <div class="three cell BackgroundColorActivity" ng-if="course.type=='activity'">
         <img ng-src="[[course.image]]" class="image"
              ng-show="course.image!==null && course.image!==undefined"/>
@@ -15,17 +12,12 @@
              ng-show="course.image===null || course.image===undefined"/>
     </div>
     <div class="nine cell">
-        <label>
-            <i18n>moodle.course.description</i18n>:<br>
-            <span class="summary">[[course.summary]]</span>
-        </label></br>
-        <label>
-            <i18n>date</i18n>:
+        <span class="summary text-font">[[course.summary]]</span>
+        </br>
+        <label >
+            <i18n>modified.on</i18n>:
             [[course.date]]
-        </label></br>
-        <label>
-            <i18n>moodle.course.author</i18n>:
-            [[course.author.lastname]] [[course.author.firstname]]
         </label>
+        <input type="checkbox" class="right-magnet">
     </div>
 </div>

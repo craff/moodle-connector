@@ -11,18 +11,13 @@ for(let controller in controllers){
 
 routes.define(function($routeProvider){
 	$routeProvider
+        .when('/dashboard', {
+            action: 'view'
+        })
 		.when('/', {
 			action: 'view'
 		})
-        .when('/dashboard', {
-            action: 'dashboard'
-        })
-        .when('/mycourses', {
-            action: 'mycourses'
-        })
-        .when('/library', {
-            action: 'library'
-        });
+
     $routeProvider.otherwise({
         redirectTo: '/'
     });
