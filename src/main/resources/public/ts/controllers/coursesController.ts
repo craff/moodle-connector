@@ -56,7 +56,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     }
     $scope.setprintsubfolderValuebyFolder = function (folder:Folder){
         $scope.folders.all.forEach(function (e) {
-            if(e.parent_id!=folder.parent_id && e.id!=folder.id)
+            if(e.id!=folder.parent_id && e.id!=folder.id && e.id!=0)
             e.printsubfolder=false;
         });
         Utils.safeApply($scope);
@@ -68,15 +68,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
                folder.printsubfolder=e.printsubfolder;
            }
        });
+
        if(folder.printsubfolder){
             $scope.currentfolderid=folder.id;
             $scope.printcours=true;
            $scope.printCouresbySubFolder(folder.id);
        }else{
            (folder.parent_id!=folder.id)? $scope.currentfolderid=folder.parent_id :$scope.currentfolderid=0;
-
            $scope.printCouresbySubFolder($scope.currentfolderid);
        }
+       $scope.setprintsubfolderValuebyFolder(folder);
 
     }
 
@@ -120,7 +121,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.countItems =async function (folder:Folder){
         Promise.all([
             await folder.countitems()
-        ]).then( $scope.$apply());
+        ]).then(()=>{Utils.safeApply($scope)});
     }
     $scope.switchTab= function(current: string){
         $scope.currentTab=current;

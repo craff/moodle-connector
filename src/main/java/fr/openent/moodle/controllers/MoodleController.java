@@ -29,6 +29,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.*;
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -327,7 +328,7 @@ public class MoodleController extends ControllerHelper {
                                                         }
                                                     });
                                                     Collections.reverse(listObject);
-                                                    //listObject.stream().skip(0).limit(4).toString()
+                                                    //listObject.stream().skip(0).limit(4).collect(Collectors.toList()).toString()
                                                     List<JsonObject> ob=new ArrayList<>();
                                                     for(int i=0;i<4;i++){
                                                         ob.add(listObject.get(i));

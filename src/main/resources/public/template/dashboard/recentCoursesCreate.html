@@ -3,13 +3,13 @@
 </div>
 <div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
     <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackground bottom-margin">
-        <div class="one cell BackgroundColorActivity-dashboard" ng-if="course.type=='activity'">
+        <div class="one cell BackgroundColorActivity-dashboard" ng-if="!course.type">
             <img ng-src="[[course.image]]" class="image-dashboard"
                  ng-show="course.image!==null && course.image!==undefined"/>
             <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
                  ng-show="course.image===null || course.image===undefined"/>
         </div>
-        <div class="one cell BackgroundColorBlueParcour-dashboard" ng-if="course.type=='parcour'">
+        <div class="one cell BackgroundColorBlueParcour-dashboard" ng-if="course.type">
             <img ng-src="[[course.image]]" class="image-dashboard"
                  ng-show="course.image!==null && course.image!==undefined"/>
             <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"

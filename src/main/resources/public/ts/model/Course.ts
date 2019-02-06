@@ -19,12 +19,12 @@ export interface Course {
     role : string;
     categoryid : number;
     imageurl : string;
-     type : string;
+     type : boolean;
 }
 
 export class Course {
     constructor(){
-        this.type="activity";
+        this.type=false;
     }
     toJSON() {
         return {

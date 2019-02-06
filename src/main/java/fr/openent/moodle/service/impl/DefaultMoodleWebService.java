@@ -55,7 +55,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     public boolean getValueMoodleIdinEnt(Integer courid, JsonArray object) {
         for(int i=0;i<object.size();i++){
             JsonObject  o=object.getJsonObject(i);
-            if(o.getInteger("moodle_id")==courid){
+            if(o.getInteger("moodle_id").equals(courid)){
                 return true;
             }
         }
@@ -84,7 +84,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void countCoursesItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
-        String query = "SELECT  count(*) " +
+        String query = "SELECT  moodle_id, folder_id " +
                 "FROM " + Moodle.moodleSchema + ".course " +
                 "WHERE user_id = ? AND folder_id = ?;";
         JsonArray values = new JsonArray();
