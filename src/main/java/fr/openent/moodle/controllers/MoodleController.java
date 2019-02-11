@@ -110,9 +110,6 @@ public class MoodleController extends ControllerHelper {
                                                 "&parameters[fullname]=" + course.getString("fullname") +
                                                 "&parameters[shortname]=" + course.getString("shortname") +
                                                 "&parameters[categoryid]=" + course.getInteger("categoryid") +
-//                                                "&parameters[courseidnumber]=" + course.getInteger("courseidnumber") +
-                                                "&parameters[sumamry]=" + course.getString("description") +
-                                                "&parameters[imageurl]=" + "https://medias.liberation.fr/photo/552903--.jpg" +
                                                 "&parameters[coursetype]=" + course.getInteger("typeNumber") +
                                                 "&parameters[activity]=" + course.getString("typeA") +
                                                 "&moodlewsrestformat=" + JSON;

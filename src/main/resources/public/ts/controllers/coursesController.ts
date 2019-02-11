@@ -165,25 +165,4 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.openLightbox = false;
         Utils.safeApply($scope);
     };
-    // $scope.canManageCourse = function(course){
-    //     return course && course.myRights.contrib ;
-    // };
-    // $scope.confirmRemoveCourse = function(course, event) {
-    //     $scope.course = course;
-    //     $scope.display.confirmDeleteCourse = true;
-    //     event.stopPropagation();
-    // };
-    // $scope.cancelRemoveCourse = function() {
-    //     delete $scope.display.confirmDeleteCourse;
-    // };
-    // $scope.removeCourse = function(){
-    //     _.map($scope.courses.selection(), function(courseToRemove){
-    //         courseToRemove.delete( function(){
-    //             $scope.searchbar = _.filter($scope.searchbar, function(course){
-    //                 return course._id !== courseToRemove._id;
-    //             });
-    //         });
-    //     });
-    //     delete $scope.display.confirmDeleteCourse;
-    // };
 }]);
