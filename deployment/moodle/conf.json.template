@@ -5,7 +5,7 @@
         "port" : 8200,
         "app-name" : "Moodle",
     	"app-address" : "/moodle",
-    	"app-icon" : "Moodle-large",
+    	"app-icon" : "${host}/moodle/public/img/moodle-logo.png",
         "host": "${host}",
         "ssl" : $ssl,
         "auto-redeploy": false,
@@ -16,6 +16,6 @@
         "entcore.port" : 8009,
         "sql": true,
         "db-schema": "moodle",
-        "address_moodle": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php"
+        "address_moodle": "${moodleServer}"
       }
     }

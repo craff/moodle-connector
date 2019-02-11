@@ -219,7 +219,7 @@ public class MoodleController extends ControllerHelper {
                                 final String moodleUrl = config.getString("address_moodle") +
                                         "?wstoken=" + WSTOKEN +
                                         "&wsfunction=" + WS_GET_USERCOURSES +
-                                        "&parameters[userid]=" + "biz1234" +
+                                        "&parameters[userid]=" + user.getUserId() +
                                         "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                 final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
@@ -310,7 +310,7 @@ public class MoodleController extends ControllerHelper {
                                 final String moodleUrl = config.getString("address_moodle") +
                                         "?wstoken=" + WSTOKEN +
                                         "&wsfunction=" + WS_GET_USERCOURSES +
-                                        "&parameters[userid]=" + "biz1234" +
+                                        "&parameters[userid]=" + user.getUserId() +
                                         "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                 final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
@@ -416,7 +416,7 @@ public class MoodleController extends ControllerHelper {
                                 final String moodleUrl = config.getString("address_moodle") +
                                         "?wstoken=" + WSTOKEN +
                                         "&wsfunction=" + WS_GET_USERCOURSES +
-                                        "&parameters[userid]=" + "biz1234" +
+                                        "&parameters[userid]=" + user.getUserId() +
                                         "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                 final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
