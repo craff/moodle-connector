@@ -54,7 +54,7 @@
         <div class="row">
             <image-select class="six cell" default="/img/illustrations/image-default.svg" ng-model="course.imageurl"></image-select>
         </div>
-        <select ng-model="course.typeA">
+        <select ng-model="course.typeA" ng-if="!course.type">
             <option><i18n>quiz</i18n></option>
             <option><i18n>file</i18n></option>
             <option><i18n>page</i18n></option>

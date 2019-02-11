@@ -162,6 +162,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
      */
     $scope.createCourse = function() {
         $scope.course.create();
+        $scope.openLightbox = false;
+        Utils.safeApply($scope);
     };
     // $scope.canManageCourse = function(course){
     //     return course && course.myRights.contrib ;
