@@ -28,10 +28,8 @@ public class DefaultMoodleEventBusService extends SqlCrudService implements Mood
                 JsonObject body = message.body();
                 JsonObject results = body.getJsonObject("result");
                 String email = results.getString("email");
-                String lastName = results.getString("lastName");
-                String firstName = results.getString("firstName");
                 JsonObject info = new JsonObject();
-                info.put("email", email).put("lastname", lastName).put("firstname", firstName);
+                info.put("email", email);
                 handler.handle(new Either.Right<>(info));
             }
         }));

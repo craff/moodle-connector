@@ -18,21 +18,18 @@
 		"date": {
 			"type" : ["string","null"]
 		},
-	    "entidnumber": {
-			"type" : ["string","null"]
-		},
-		"firstname": {
-			"type" : ["string","null"]
-		},
-		"lastname": {
-			"type" : ["string","null"]
-		},
 		"role": {
 			"type" : "string"
+		},
+		"imageurl": {
+			"type" : "string"
+		},
+		"type": {
+			"type" : "boolean"
+		},
+		"typeA": {
+			"type" : "string"
 		}
-//		"imageurl": {
-//			"type" : "string"
-//		}
  	},
 	"required": [
 		"fullname",

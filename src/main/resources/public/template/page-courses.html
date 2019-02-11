@@ -31,18 +31,36 @@
     </div>
 
     <lightbox class="row" show="openLightbox == true" on-close="closePopUp()">
-        <div class="four cell">
-            <image-select default="/img/illustrations/image-default.svg"></image-select>
+        <h2 class="row twelve"><i18n>moodle.course.information</i18n></h2>
+        <div class="twelve cell row">
+            <label class="courseButton five cell" style="background: #4bafd5" ng-class="{ notSelected : !course.type }">
+                <i18n>course</i18n>
+                <input type="checkbox" ng-model="course.type" >
+            </label>
+            <label class="courseButton five cell right-magnet" style="background: #ff8500" ng-class="{ notSelected : course.type }">
+                <i18n>activity</i18n>
+                <input type="checkbox" ng-model="course.type" >
+            </label>
         </div>
+        <br/>
         <div class="eight cell horizontal-spacing">
-            <h2 class="row twelve"><i18n>moodle.course.information</i18n></h2>
             <label class="row twelve">
                 <input type="text" class="twelve" required i18n-placeholder="moodle.course.name.long" ng-model="course.fullname">
             </label>
             <label class="row twelve">
-                <input type="text" class="twelve" i18n-placeholder="moodle.course.description" ng-model="course.description">
+                <input type="text" class="twelve" i18n-placeholder="moodle.course.description" ng-model="course.summary">
             </label>
         </div>
+        <div class="row">
+            <image-select class="six cell" default="/img/illustrations/image-default.svg" ng-model="course.imageurl"></image-select>
+        </div>
+        <select ng-model="course.typeA">
+            <option><i18n>quiz</i18n></option>
+            <option><i18n>file</i18n></option>
+            <option><i18n>page</i18n></option>
+            <option><i18n>assignment</i18n></option>
+            <option></option>
+        </select>
         <div class="row">
             <div class="right-magnet">
                 <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>

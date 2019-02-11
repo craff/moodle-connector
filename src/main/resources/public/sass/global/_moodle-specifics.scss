@@ -2,4 +2,27 @@ body.moodle {
   @import 'specifics/atomic';
   @import 'specifics/switch';
   background: #F9F9F9;
+
+  .courseButton{
+  padding: 9px 18px;
+  color: #fff;
+  font-size: 15px;
+  border: 1px solid transparent;
+  -o-transition: background 250ms ease;
+  -moz-transition: background 250ms ease;
+  -webkit-transition: background 250ms ease;
+  transition: background 250ms ease;
+  font-weight: 300;
+  line-height: 20px;
+  }
+  .courseButton:hover, .courseButton:active{
+    box-shadow: 2px 2px 4px 0px $shadow-darker inset;
+  }
+  .courseButton.notSelected{
+    box-shadow: 2px 2px 1px 0px  $shadow;
+    background: grey !important;
+  }
+  .courseButton.selected:hover{
+    box-shadow: 2px 2px 1px 0px  $shadow-darker;
+  }
 }

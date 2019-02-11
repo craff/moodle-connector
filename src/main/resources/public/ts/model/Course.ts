@@ -5,21 +5,16 @@ import {Folder} from "./Folder";
 
 
 export interface Course {
-    id? : 91;
-    username : string;
-    idnumber : string;
-    email : string;
-    firstname : string;
-    lastname : string;
+    _id : 91;
     fullname : string;
-    courseid : number;
     summary : string;
     date : Date;
     author : Author;
     role : string;
     categoryid : number;
     imageurl : string;
-     type : boolean;
+    type : boolean;
+    typeA : string;
 }
 
 export class Course {
@@ -28,7 +23,6 @@ export class Course {
     }
     toJSON() {
         return {
-            courseid : this.courseid,
             fullname : this.fullname,
             categoryid : 1,
             summary: this.summary,
@@ -36,8 +30,8 @@ export class Course {
             author : this.author,
             role : this.role,
             imageurl : this.imageurl,
-            firstname :this.firstname,
-            lastname : this.lastname,
+            type : this.type,
+            typeA : this.typeA
         }
     }
 
@@ -51,7 +45,7 @@ export class Course {
     }
     async delete() {
         try {
-            await http.delete(`/moodle/course/${this.id}`);
+            await http.delete(`/moodle/course/${this._id}`);
         } catch (e) {
             notify.error("Delete function didn't work");
         }

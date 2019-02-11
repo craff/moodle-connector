@@ -13,6 +13,7 @@ import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
+import fr.wseduc.webutils.security.XssSecuredHttpServerRequest;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -63,66 +64,77 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("create a course")
     @SecuredAction("moodle.create")
 	public void create(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
-            @Override
+	    RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
+	        @Override
             public void handle(JsonObject course) {
-                JsonObject action = new JsonObject();
-                action.put("action", "getUserInfos").put("userId", course.getString("idnumber", "602a0ce2-48f8-4323-b80c-fa37090f6ebd"));
-                moodleEventBusService.getParams(action, new Handler<Either<String, JsonObject>>() {
-                    @Override
-                    public void handle(Either<String, JsonObject> event) {
-                        if (event.isRight()) {
-                            course.put("email", ((JsonObject) ((Either.Right) event).getValue()).getString("email"));
-                            course.put("username", "cabral");
-                            course.put("idnumber", "biz1234");
-                            course.put("address", config.getString("address_moodle"));
-                            course.put("firstname", ((JsonObject) ((Either.Right) event).getValue()).getString("firstname"));
-                            course.put("lastname", ((JsonObject) ((Either.Right) event).getValue()).getString("lastname"));
-                            course.put("lastname", ((JsonObject) ((Either.Right) event).getValue()).getString("lastname"));
-//                            course.put("imageurl", (config.getString("host") + course.getValue("imageurl")));
-                            final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+	            if (course.getBoolean("type") == true) {
+	                course.put("typeNumber", 1);
+                } else {
+	                course.put("typeNumber", 2);
+                }
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+	                @Override
+                    public void handle(final UserInfos user) {
+                        Calendar calendar =new GregorianCalendar();
+                        String uniqueID = UUID.randomUUID().toString();
+                        course.put("shortname", ((GregorianCalendar) calendar).toZonedDateTime().toString().substring(0, 7) +
+                                user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
+                                course.getString("fullname").substring(0, 4) + uniqueID);
+                        JsonObject action = new JsonObject();
+                        action.put("action", "getUserInfos").put("userId", user.getUserId());
+                        moodleEventBusService.getParams(action, new Handler<Either<String, JsonObject>>() {
+                            @Override
+                            public void handle(Either<String, JsonObject> event) {
+                                if (event.isRight()) {
+                                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
 
-                            URI moodleUri = null;
-                            try {
-                                final String service = config.getString("address_moodle");
-                                final String urlSeparator = service.endsWith("") ? "" : "/";
-                                moodleUri = new URI(service + urlSeparator);
-                            } catch (URISyntaxException e) {
-                                log.debug("Invalid moodle web service uri", e);
-                            }
-                            if (moodleUri != null) {
-                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                final String moodleUrl = moodleUri.toString() +
-                                        "?wstoken=" + WSTOKEN +
-                                        "&wsfunction=" + WS_CREATE_FUNCTION +
-                                        "&parameters[username]=" + course.getString("username") +
-                                        "&parameters[idnumber]=" + course.getString("idnumber") +
-                                        "&parameters[email]=" + course.getString("email") +
-                                        "&parameters[firstname]=" + course.getString("firstname") +
-                                        "&parameters[lastname]=" + course.getString("lastname") +
-                                        "&parameters[fullname]=" + course.getString("fullname") +
-                                        "&parameters[shortname]=" + "CGI001" +
-                                        "&parameters[categoryid]=" + course.getInteger("categoryid") +
-//                                        "&parameters[courseidnumber]=" + course.getInteger("courseidnumber") +
-//                                        "&parameters[sumamry]=" + course.getString("description") +
-//                                        "&parameters[imageurl]=" + course.getString("imageurl") +
-                                        "&moodlewsrestformat=" + JSON;
-                                httpClientHelper.webServiceMoodlePost(moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>> () {
-                                    @Override
-                                    public void handle(Either<String, Buffer> event) {
-                                        if (event.isRight()) {
-                                            JsonObject object = new JsonObject(event.right().getValue().toString().substring(1, event.right().toString().length()+10));
-                                            course.put("moodleid", object.getValue("courseid"));
-                                            moodleWebService.create(course, defaultResponseHandler(request));
-                                        } else {
-                                            log.debug("Post service failed");
-                                        }
+                                    URI moodleUri = null;
+                                    try {
+                                        final String service = config.getString("address_moodle");
+                                        final String urlSeparator = service.endsWith("") ? "" : "/";
+                                        moodleUri = new URI(service + urlSeparator);
+                                    } catch (URISyntaxException e) {
+                                        log.debug("Invalid moodle web service uri", e);
                                     }
-                                });
+                                    if (moodleUri != null) {
+
+                                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                        final String moodleUrl = moodleUri.toString() +
+                                                "?wstoken=" + WSTOKEN +
+                                                "&wsfunction=" + WS_CREATE_FUNCTION +
+                                                "&parameters[username]=" + user.getLogin() +
+                                                "&parameters[idnumber]=" + user.getUserId() +
+                                                "&parameters[email]=" + ((JsonObject) ((Either.Right) event).getValue()).getString("email") +
+                                                "&parameters[firstname]=" + user.getFirstName() +
+                                                "&parameters[lastname]=" + user.getLastName() +
+                                                "&parameters[fullname]=" + course.getString("fullname") +
+                                                "&parameters[shortname]=" + course.getString("shortname") +
+                                                "&parameters[categoryid]=" + course.getInteger("categoryid") +
+//                                                "&parameters[courseidnumber]=" + course.getInteger("courseidnumber") +
+//                                                "&parameters[sumamry]=" + course.getString("description") +
+                                                "&parameters[imageurl]=" + "https://medias.liberation.fr/photo/552903--.jpg" +
+                                                "&parameters[coursetype]=" + course.getInteger("typeNumber") +
+                                                "&parameters[activity]=" + course.getString("typeA") +
+                                                "&moodlewsrestformat=" + JSON;
+                                        httpClientHelper.webServiceMoodlePost(moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                                            @Override
+                                            public void handle(Either<String, Buffer> event) {
+                                                if (event.isRight()) {
+                                                    JsonObject object = new JsonObject(event.right().getValue().toString().substring(1, event.right().toString().length() + 11));
+                                                    course.put("moodleid", object.getValue("courseid"));
+                                                    course.put("userid", user.getUserId());
+                                                    moodleWebService.create(course, defaultResponseHandler(request));
+                                                } else {
+                                                    log.debug("Post service failed");
+                                                }
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    handle(new Either.Left<>("Failed to gets the http params"));
+                                }
                             }
-                        } else {
-                            handle(new Either.Left<>("Failed to gets the http params"));
-                        }
+                        });
                     }
                 });
             }
