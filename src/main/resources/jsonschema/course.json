@@ -28,11 +28,11 @@
 			"type" : "boolean"
 		},
 		"typeA": {
-			"type" : "string"
+			"type" : "number"
 		}
  	},
 	"required": [
 		"fullname",
-		"categoryid"
+		"typeA"
 	]
 }

@@ -21,5 +21,4 @@ routes.define(function($routeProvider){
     $routeProvider.otherwise({
         redirectTo: '/'
     });
-
 });

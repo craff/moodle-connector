@@ -1,5 +1,5 @@
 <div class="">
-    <span class="left-magnet"><i18n>moodle.create.courses.recent</i18n></span> <switch-toggle ng-model="printcreatecoursesrecents" > </switch-toggle>
+    <span class="left-magnet"><i18n>moodle.create.courses.recent</i18n></span> <switch ng-model="printcreatecoursesrecents" > </switch>
 </div>
 <div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
     <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackground bottom-margin">

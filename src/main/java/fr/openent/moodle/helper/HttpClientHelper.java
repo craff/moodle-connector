@@ -77,7 +77,7 @@ public class HttpClientHelper extends ControllerHelper {
                 }
             }
         });
-        httpClientRequest.headers().set("Content-Length", "50").set("Content-Type", "application/json");
+        httpClientRequest.headers();
         //Typically an unresolved Address, a timeout about connection or response
         httpClientRequest.exceptionHandler(new Handler<Throwable>() {
             @Override

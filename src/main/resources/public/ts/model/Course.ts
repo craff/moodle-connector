@@ -13,13 +13,13 @@ export interface Course {
     role : string;
     categoryid : number;
     imageurl : string;
-    type : boolean;
-    typeA : string;
+    type : string;
+    typeA : number;
 }
 
 export class Course {
     constructor(){
-        this.type=false;
+        this.type='1';
     }
     toJSON() {
         return {
@@ -51,7 +51,6 @@ export class Course {
         }
     }
 }
-
 
 export class Courses {
     allbyfolder: Course[];
@@ -86,10 +85,6 @@ export class Courses {
             throw e;
         }
     }
-
-
-
-
 }
 
 export class Author{

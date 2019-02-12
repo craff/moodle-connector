@@ -1,7 +1,26 @@
-<div ng-init="printCouresbySubFolder(currentfolderid)" ng-if="currentfolderid>=0"
-        class="five cell twelve-mobile course-article sytle-bord coursesInfoBackground bottom-margin"
-         ng-repeat="course in courses.allbyfolder track by $index">
-    <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
+<div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
+    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackground bottom-margin">
+        <div class="one cell BackgroundColorActivity-dashboard" ng-if="!course.type">
+            <img ng-src="[[course.image]]" class="image-dashboard"
+                 ng-show="course.image!==null && course.image!==undefined"/>
+            <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
+                 ng-show="course.image===null || course.image===undefined"/>
+        </div>
+        <div class="one cell BackgroundColorBlueParcour-dashboard" ng-if="course.type">
+            <img ng-src="[[course.image]]" class="image-dashboard"
+                 ng-show="course.image!==null && course.image!==undefined"/>
+            <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
+                 ng-show="course.image===null || course.image===undefined"/>
+        </div>
+        <div class="eleven cell left-margin">
+            <span class="text-font">[[course.fullname]]</span> </br>
+            <label class="size-font">
+                <i18n>modified.on</i18n>:
+                [[course.date]]
+            </label>
+            <input type="checkbox" class="right-magnet">
+        </div>
+    </div>
 </div>
 
 <div ng-if="printmenucourseShared"

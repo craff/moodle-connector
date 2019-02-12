@@ -23,7 +23,7 @@
 		<h2><i18n>share.title</i18n></h2>
 		<form name="sharePanelForm">
 			<div>
-				<button class="sharing-button right-magnet" ng-click="share()" ng-disabled="!sharingModel.changed">
+				<button class="panel-button right-magnet" ng-click="share()" ng-disabled="isSubmitDisabled()">
 					<i18n>share</i18n>
 				</button>
 				<div class="block" ng-if="varyingRights">
@@ -79,7 +79,7 @@
 
 	<div class="row bottom-spacing-twice">
 		<div class="flex-row align-center">
-			<h2>
+			<h2 class= "size-auto">
 				<span ng-if="!display.workflowAllowSharebookmarks || display.workflowAllowSharebookmarks == false">[[translate('share.search.title')]]</span>
 				<span workflow="directory.allowSharebookmarks">[[translate('share.search.sharebookmark.title')]]</span>
 			</h2>
@@ -98,7 +98,8 @@
 		<search-user class="twelve cell" 
 			ng-model="search"
 			clear-list="clearSearch()"
-			on-send="findUserOrGroup()">
+			on-send="findUserOrGroup()"
+			search-track="display.search">
 		</search-user>
 		<div class="found-users-list">
 			<div ng-repeat="item in found | orderBy:[typeSort, 'name', 'username'] | limitTo:maxResults" class="row autocomplete temp">
@@ -116,7 +117,7 @@
 					<em ng-if="item.profile" class="low-importance">[[translate(item.profile)]]</em>
 				</div>
 			</div>
-			<div class="row" ng-if="found.length === 0">
+			<div class="row" ng-if="found.length === 0 && !display.search.processing">
 				<div class="spacer-small"></div>
 				<label class="low-importance medium-importance italic-text" ng-if="search.length >= 3" user-role="ADMIN_LOCAL">
 					<i18n>portal.no.result</i18n>

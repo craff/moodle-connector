@@ -1,11 +1,11 @@
 <div class="row">
-    <div class="three cell BackgroundColorActivity" ng-if="!course.type">
+    <div class="three cell BackgroundColorActivity" ng-if="course.typeA = 1">
         <img ng-src="[[course.image]]" class="image"
              ng-show="course.image!==null && course.image!==undefined"/>
         <img skin-src="/img/illustrations/pages-default.png"  class="image"
              ng-show="course.image===null || course.image===undefined"/>
     </div>
-    <div class="three cell BackgroundColorBlueParcour" ng-if="course.type">
+    <div class="three cell BackgroundColorBlueParcour" ng-if="course.typeA = 2">
         <img ng-src="[[course.image]]" class="image"
              ng-show="course.image!==null && course.image!==undefined"/>
         <img skin-src="/img/illustrations/pages-default.png"  class="image"
