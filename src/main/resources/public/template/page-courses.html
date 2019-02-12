@@ -17,7 +17,6 @@
         <div class="twelve cell twelve-mobile">
             <div  class="two cell horizontal-spacing" ng-init="initFolders()"
                   static-include="/moodle/public/template/courses/folderItem.html">
-
             </div>
             <div class="ten cell horizontal-spacing padding-left-corp" >
                 <div  class ="row" static-include="/moodle/public/template/courses/folders.html" ng-show="printfolders">
@@ -59,12 +58,11 @@
             <option><i18n>file</i18n></option>
             <option><i18n>page</i18n></option>
             <option><i18n>assignment</i18n></option>
-            <option></option>
         </select>
         <div class="row">
             <div class="right-magnet">
                 <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
-                <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()" ng-disabled="course.fullname == undefined"/>
+                <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()" ng-disabled="course.fullname == undefined && course.typeA == undefined"/>
             </div>
         </div>
     </lightbox>

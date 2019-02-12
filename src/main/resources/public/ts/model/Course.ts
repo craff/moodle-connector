@@ -29,7 +29,7 @@ export class Course {
             date : this.date,
             author : this.author,
             role : this.role,
-            imageurl : this.imageurl,
+            imageurl : "https://medias.liberation.fr/photo/552903--.jpg",
             type : this.type,
             typeA : this.typeA
         }

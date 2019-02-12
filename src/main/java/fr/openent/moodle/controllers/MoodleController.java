@@ -19,6 +19,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.*;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
@@ -69,6 +70,7 @@ public class MoodleController extends ControllerHelper {
             public void handle(JsonObject course) {
 	            if (course.getBoolean("type") == true) {
 	                course.put("typeNumber", 1);
+                    course.put("typeA", "quiz");
                 } else {
 	                course.put("typeNumber", 2);
                 }
@@ -110,6 +112,7 @@ public class MoodleController extends ControllerHelper {
                                                 "&parameters[fullname]=" + course.getString("fullname") +
                                                 "&parameters[shortname]=" + course.getString("shortname") +
                                                 "&parameters[categoryid]=" + course.getInteger("categoryid") +
+                                                "&parameters[imageurl]=" + course.getString("imageurl") +
                                                 "&parameters[coursetype]=" + course.getInteger("typeNumber") +
                                                 "&parameters[activity]=" + course.getString("typeA") +
                                                 "&moodlewsrestformat=" + JSON;
@@ -117,7 +120,7 @@ public class MoodleController extends ControllerHelper {
                                             @Override
                                             public void handle(Either<String, Buffer> event) {
                                                 if (event.isRight()) {
-                                                    JsonObject object = new JsonObject(event.right().getValue().toString().substring(1, event.right().toString().length() + 11));
+                                                    JsonObject object = event.right().getValue().toJsonArray().getJsonObject(0);
                                                     course.put("moodleid", object.getValue("courseid"));
                                                     course.put("userid", user.getUserId());
                                                     moodleWebService.create(course, defaultResponseHandler(request));
@@ -149,8 +152,7 @@ public class MoodleController extends ControllerHelper {
                 if (user != null) {
                     long id_folder =Long.parseLong(request.params().get("id"));
                     moodleWebService.countItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-                }
-                else {
+                } else {
                     log.debug("User not found in session.");
                     unauthorized(request);
                 }
@@ -169,8 +171,7 @@ public class MoodleController extends ControllerHelper {
                 if (user != null) {
                     long id_folder =Long.parseLong(request.params().get("id"));
                     moodleWebService.countCoursesItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-                }
-                else {
+                } else {
                     log.debug("User not found in session.");
                     unauthorized(request);
                 }
@@ -188,8 +189,7 @@ public class MoodleController extends ControllerHelper {
             public void handle(final UserInfos user) {
                 if (user != null) {
                     moodleWebService.getFoldersInEnt(user.getUserId(), arrayResponseHandler(request));
-                }
-                else {
+                } else {
                     log.debug("User not found in session.");
                     unauthorized(request);
                 }
@@ -231,8 +231,8 @@ public class MoodleController extends ControllerHelper {
                                                     JsonArray mydata=new JsonArray();
                                                     JsonArray object = new JsonArray(buff.toString().substring(15, buff.toString().length()-21));
 
-                                                    for(int i=0;i<object.size();i++){
-                                                        JsonObject  o=object.getJsonObject(i);
+                                                    for(int i = 0; i < object.size(); i++){
+                                                        JsonObject  o = object.getJsonObject(i);
                                                         if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
                                                             mydata.add(o);
                                                         }
@@ -249,7 +249,6 @@ public class MoodleController extends ControllerHelper {
                                                     }
                                                 }
                                             });
-
                                         }else{
                                             log.debug(response.statusMessage());
                                             response.bodyHandler(new Handler<Buffer>() {
@@ -319,27 +318,27 @@ public class MoodleController extends ControllerHelper {
                                                 @Override
                                                 public void handle(Buffer event) {
                                                     buff.appendBuffer(event);
-                                                    JsonArray mydata=new JsonArray();
-                                                    JsonArray object = new JsonArray(buff.toString().substring(15, buff.toString().length()-21));
-                                                    for(int i=0;i<object.size();i++){
-                                                        JsonObject  o=object.getJsonObject(i);
-                                                        if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
-                                                                mydata.add(o);
+                                                    JsonArray mydata = new JsonArray();
+                                                    JsonArray object = new JsonArray(buff);
+                                                    JsonArray o = (JsonArray) object.getJsonObject(0).getValue("enrolments");
+                                                    for(int i = 0; i < object.size(); i++){
+                                                        JsonObject data = o.getJsonObject(i);
+                                                        if(moodleWebService.getValueMoodleIdinEnt(data.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
+                                                                mydata.add(data);
                                                         }
-
                                                     }
-                                                    List<JsonObject> listObject=mydata.getList();
+                                                    List<JsonObject> listObject = mydata.getList();
                                                     Collections.sort(listObject, new Comparator<JsonObject>() {
                                                         public int compare(JsonObject ob, JsonObject ob1) {
                                                             LocalDateTime ldt1=getDateString(ob.getString("date"));
                                                             LocalDateTime ldt2=getDateString(ob1.getString("date"));
-                                                            return (ldt1.compareTo(ldt2)>=0) ? 1:-1;
+                                                            return (ldt1.compareTo(ldt2) >= 0) ? 1 : -1;
                                                         }
                                                     });
                                                     Collections.reverse(listObject);
                                                     //listObject.stream().skip(0).limit(4).collect(Collectors.toList()).toString()
                                                     List<JsonObject> ob=new ArrayList<>();
-                                                    for(int i=0;i<4;i++){
+                                                    for(int i = 0; i < 4; i++){
                                                         ob.add(listObject.get(i));
                                                     }
                                                     mydata=new JsonArray(ob.toString());
@@ -372,7 +371,6 @@ public class MoodleController extends ControllerHelper {
                                     }
                                 });
                                 httpClientRequest.headers().set("Content-Length", "0");
-                                httpClientRequest.setTimeout(20001);
                                 //Typically an unresolved Address, a timeout about connection or response
                                 httpClientRequest.exceptionHandler(new Handler<Throwable>() {
                                     @Override
@@ -384,7 +382,7 @@ public class MoodleController extends ControllerHelper {
                                         }
                                     }
                                 }).end();
-                            }else{
+                            } else {
                                 handle(new Either.Left<>("Get list in Ent Base failed"));
                             }
                         }
@@ -428,10 +426,10 @@ public class MoodleController extends ControllerHelper {
                                                     JsonArray mydata=new JsonArray();
                                                     JsonArray object = new JsonArray(buff.toString().substring(15, buff.toString().length()-21));
 
-                                                    for(int i=0;i<object.size();i++){
+                                                    for(int i = 0; i < object.size(); i++){
                                                         JsonObject  o=object.getJsonObject(i);
                                                         if(!moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
-                                                            JsonArray obj=o.getJsonArray("auteur");
+                                                            JsonArray obj = o.getJsonArray("auteur");
                                                             if(!obj.getJsonObject(0).getString("entidnumber").equals(user.getUserId())){
                                                                 mydata.add(o);
                                                             }
@@ -478,7 +476,7 @@ public class MoodleController extends ControllerHelper {
                                         }
                                     }
                                 }).end();
-                            }else{
+                            } else {
                                 handle(new Either.Left<>("Get list in Ent Base failed"));
                             }
                         }
@@ -529,8 +527,9 @@ public class MoodleController extends ControllerHelper {
             }
         });
 	}
+
     public LocalDateTime getDateString(String date){
-        return LocalDateTime.parse(date.substring(0,10)+"T"+date.substring(11));
+        return LocalDateTime.parse(date.substring(0, 10) + "T" + date.substring(11));
     }
 }
 
