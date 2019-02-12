@@ -68,4 +68,19 @@
             </div>
         </div>
     </lightbox>
+
+    <lightbox class="row" show="openLightboxFolder == true" on-close="closePopUpFolder()">
+        <div class="eight cell horizontal-spacing">
+            <h2 class="row twelve"><i18n>moodle.folder.title</i18n></h2>
+            <label class="row twelve">
+                <input type="text" class="twelve" i18n-placeholder="moodle.folder.placeholder" ng-model="folder.name">
+            </label>
+        </div>
+        <div class="row">
+            <div class="right-magnet">
+                <input type="button" class="cancel" i18n-value="ANNULER" ng-click="closePopUpFolder()"/>
+                <input type="submit" class="button" i18n-value="CREER" ng-click="createFolder()" ng-disabled="folder.name == undefined"/>
+            </div>
+        </div>
+    </lightbox>
 </div>

@@ -1,5 +1,6 @@
 import http from "axios";
 import {Mix, Selectable, Selection} from 'entcore-toolkit';
+import {notify} from "entcore";
 
 export class Folder {
     id : number;
@@ -10,23 +11,32 @@ export class Folder {
     nbItems: number=0;
     subFolders : Folder[];
     printsubfolder: boolean=false;
-    toJson() {
+    toJSON() {
         return {
-            id : this.id,
             parentid : this.parent_id,
             userid : this.user_id,
             name : this.name,
-            structureid : this.structure_id
+            structureid : this.structure_id,
         }
 
     }
+    async create() {
+        try {
+            await http.post('/moodle/folder', this.toJSON());
+        } catch (e) {
+            notify.error("Save function didn't work");
+            throw e;
+        }
+    }
     async countitems () {
         try {
+            console.log('countitems', this.nbItems);
             let countsfolders = await http.get(`/moodle/folder/countsFolders/${this.id}`);
             let countscourses = await http.get(`/moodle/folder/countsCourses/${this.id}`);
 
             if(countsfolders && countscourses){
                 this.nbItems=countsfolders.data.count+countscourses.data.count;
+                console.log('countitems', this.nbItems);
             }
 
         } catch (e) {

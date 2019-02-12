@@ -6,6 +6,14 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 public interface MoodleWebService{
+
+    /**
+     * Create a folder
+     * @param folder folder to create
+     * @param handler function handler returning data
+     */
+    void createFolder (JsonObject folder, Handler<Either<String, JsonObject>> handler);
+
     /**
      * Create a course
      * @param course course to create

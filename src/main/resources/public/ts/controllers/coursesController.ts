@@ -107,7 +107,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.initFolders = async function(){
         Promise.all([
             await $scope.folders.sync()
-        ]).then(()=>{Utils.safeApply($scope);});
+        ]).then(()=>Utils.safeApply($scope));
     };
 
 
@@ -165,25 +165,24 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.openLightbox = false;
         Utils.safeApply($scope);
     };
-    // $scope.canManageCourse = function(course){
-    //     return course && course.myRights.contrib ;
-    // };
-    // $scope.confirmRemoveCourse = function(course, event) {
-    //     $scope.course = course;
-    //     $scope.display.confirmDeleteCourse = true;
-    //     event.stopPropagation();
-    // };
-    // $scope.cancelRemoveCourse = function() {
-    //     delete $scope.display.confirmDeleteCourse;
-    // };
-    // $scope.removeCourse = function(){
-    //     _.map($scope.courses.selection(), function(courseToRemove){
-    //         courseToRemove.delete( function(){
-    //             $scope.searchbar = _.filter($scope.searchbar, function(course){
-    //                 return course._id !== courseToRemove._id;
-    //             });
-    //         });
-    //     });
-    //     delete $scope.display.confirmDeleteCourse;
-    // };
+
+    $scope.openLightboxFolder = false;
+    /**
+     * Create a folder
+     */
+    $scope.openPopUpFolder = function () {
+        $scope.folder = new Folder();
+        $scope.openLightboxFolder = true;
+    };
+
+    $scope.closePopUpFolder = function () {
+        $scope.openLightboxFolder = false;
+    };
+
+    $scope.createFolder = function() {
+        $scope.folder.create();
+        $scope.openLightboxFolder = false;
+        $scope.initFolders();
+        //setTimeout (()=>$scope.initFolders(), 1000); good
+    };
 }]);

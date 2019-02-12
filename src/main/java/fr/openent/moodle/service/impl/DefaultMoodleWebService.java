@@ -17,6 +17,19 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
+    public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
+        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, etab_id, name)" +
+                " VALUES (?, ?, ?)";
+
+        JsonArray values = new JsonArray();
+        values.add(folder.getValue("userId"));
+        values.add(folder.getValue("etabId"));
+        values.add(folder.getValue("name"));
+
+        sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
     public void create(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
         String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id, folder_id, user_id)" +
                 " VALUES (?, ?, ?)";

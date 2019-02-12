@@ -18,7 +18,10 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.http.*;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
@@ -59,6 +62,30 @@ public class MoodleController extends ControllerHelper {
 	public void view(HttpServerRequest request) {
 		renderView(request);
 	}
+
+    @Post("/folder")
+    @ApiDoc("create a folder")
+    @SecuredAction("moodle.create")
+    public void createFolder(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject folder) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user){
+                        if (user != null) {
+                            folder.put("userId", user.getUserId());
+                            folder.put("etabId", user.getStructures().toString().substring(1, 36));
+                            moodleWebService.createFolder(folder, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
 
 	@Post("/course")
     @ApiDoc("create a course")

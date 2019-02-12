@@ -54,6 +54,8 @@
 
 	"moodle.folder.item" : "items",
 	"moodle.folder.new": "Créer un nouveau dossier",
+	"moodle.folder.title": "Moodle - Créer un dossier",
+	"moodle.folder.placeholder": "Nom du dossier",
 	"moodle.course.new": "Créer un cours",
 	"delete": "Supprimer",
 	"moodle.course.information": "Que voulez-vous créer ?",
