@@ -64,11 +64,11 @@ public class HttpClientHelper extends ControllerHelper {
                         }
                     });
                 } else {
-                    log.debug(response.statusMessage());
+                    log.error(response.statusMessage());
                     response.bodyHandler(new Handler<Buffer>() {
                         @Override
                         public void handle(Buffer event) {
-                            log.debug("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                            log.error("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
                             if (!responseIsSent.getAndSet(true)) {
                                 httpClient.close();
                             }
@@ -82,12 +82,12 @@ public class HttpClientHelper extends ControllerHelper {
         httpClientRequest.exceptionHandler(new Handler<Throwable>() {
             @Override
             public void handle(Throwable event) {
-                log.debug(event.getMessage(), event);
+                log.error(event.getMessage(), event);
                 if (!responseIsSent.getAndSet(true)) {
                     handle(event);
                     httpClient.close();
                 }
             }
-        }).end();
+        }).setFollowRedirects(true).end();
     }
 }
