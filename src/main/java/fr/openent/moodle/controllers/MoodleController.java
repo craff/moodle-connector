@@ -17,6 +17,7 @@ import fr.wseduc.webutils.security.XssSecuredHttpServerRequest;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.*;
 import io.vertx.core.json.Json;
@@ -90,7 +91,7 @@ public class MoodleController extends ControllerHelper {
 
                                     URI moodleUri = null;
                                     try {
-                                        final String service = config.getString("address_moodle");
+                                        final String service = (config.getString("address_moodle")+ config.getString("ws-path"));
                                         final String urlSeparator = service.endsWith("") ? "" : "/";
                                         moodleUri = new URI(service + urlSeparator);
                                     } catch (URISyntaxException e) {
@@ -156,37 +157,32 @@ public class MoodleController extends ControllerHelper {
                             if(sqlCours.isRight()){
                                 final JsonArray sqlCoursArray = sqlCours.right().getValue();
                                 final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                final String moodleUrl = config.getString("address_moodle") +
+                                final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
                                         "?wstoken=" + WSTOKEN +
                                         "&wsfunction=" + WS_GET_USERCOURSES +
                                         "&parameters[userid]=" + user.getUserId() +
                                         "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                                Buffer wsResponse = new BufferImpl();
                                 final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
                                     @Override
                                     public void handle(HttpClientResponse response) {
                                         if (response.statusCode() == 200) {
-                                            //final Buffer buff = Buffer.buffer();
-                                            response.handler(new Handler<Buffer>() {
+                                            response.handler(wsResponse::appendBuffer);
+                                            response.endHandler(new Handler<Void>() {
                                                 @Override
-                                                public void handle(Buffer event) {
-                                                    //buff.appendBuffer(event);
+                                                public void handle(Void end) {
                                                     JsonArray mydata = new JsonArray();
-                                                    JsonArray object = new JsonArray(event);
+                                                    JsonArray object = new JsonArray(wsResponse);
                                                     JsonArray coursArray = object.getJsonObject(0).getJsonArray("enrolments");
 
                                                     for(int i = 0; i < coursArray.size(); i++){
                                                         JsonObject cours = coursArray.getJsonObject(i);
                                                         if(moodleWebService.getValueMoodleIdinEnt(cours.getInteger("courseid"),sqlCoursArray)){
-                                                                mydata.add(cours);
+                                                            mydata.add(cours);
                                                         }
                                                     }
                                                     Renders.renderJson(request, mydata);
-                                                }
-                                            });
-                                            response.endHandler(new Handler<Void>() {
-                                                @Override
-                                                public void handle(Void end) {
                                                     handle(end);
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
@@ -244,7 +240,7 @@ public class MoodleController extends ControllerHelper {
                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 URI moodleDeleteUri = null;
                 try {
-                    final String service = config.getString("address_moodle");
+                    final String service = (config.getString("address_moodle")+ config.getString("ws-path"));
                     final String urlSeparator = service.endsWith("") ? "" : "/";
                     moodleDeleteUri = new URI(service + urlSeparator);
                 } catch (URISyntaxException e) {
@@ -271,6 +267,12 @@ public class MoodleController extends ControllerHelper {
             }
         });
 	}
+
+	@Get("/course/:id")
+    @ApiDoc("Redirect to Moodle")
+    public void getToMoodle (HttpServerRequest request){
+	    redirect(request, (config.getString("address_moodle") + "/course/view.php?id=" + request.getParam("id")));
+    }
 
     public LocalDateTime getDateString(String date){
         return LocalDateTime.parse(date.substring(0, 10) + "T" + date.substring(11));

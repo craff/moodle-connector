@@ -1,5 +1,5 @@
 <div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
-    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackground bottom-margin">
+    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackground bottom-margin" ng-click="course.goToMoodle()">
         <div class="one cell BackgroundColorActivity-dashboard" ng-if="!course.type">
             <img ng-src="[[course.image]]" class="image-dashboard"
                  ng-show="course.image!==null && course.image!==undefined"/>

@@ -5,7 +5,7 @@ import {Folder} from "./Folder";
 
 
 export interface Course {
-    _id : 91;
+    courseid : number;
     fullname : string;
     summary : string;
     date : Date;
@@ -45,10 +45,13 @@ export class Course {
     }
     async delete() {
         try {
-            await http.delete(`/moodle/course/${this._id}`);
+            await http.delete(`/moodle/course/${this.courseid}`);
         } catch (e) {
             notify.error("Delete function didn't work");
         }
+    }
+    async goToMoodle() {
+        window.open(`/moodle/course/${this.courseid}`);
     }
 }
 
