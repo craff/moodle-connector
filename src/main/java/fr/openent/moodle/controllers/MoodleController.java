@@ -150,7 +150,7 @@ public class MoodleController extends ControllerHelper {
                                                     JsonObject object = new JsonObject(event.right().getValue().toString().substring(1, event.right().toString().length() + 11));
                                                     course.put("moodleid", object.getValue("courseid"));
                                                     course.put("userid", user.getUserId());
-                                                    moodleWebService.create(course, defaultResponseHandler(request));
+                                                    moodleWebService.createCourse(course, defaultResponseHandler(request));
                                                 } else {
                                                     log.debug("Post service failed");
                                                 }

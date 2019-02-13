@@ -6,7 +6,7 @@
     "name": {
       "type": "string"
     },
-    "parentId": {
+    "parentid": {
       "type": "number"
     }
   },

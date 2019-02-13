@@ -19,7 +19,7 @@ public interface MoodleWebService{
      * @param course course to create
      * @param handler function handler returning data
      */
-    void create (JsonObject course, Handler<Either<String, JsonObject>> handler);
+    void createCourse (JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
      * Delete a course

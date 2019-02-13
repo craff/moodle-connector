@@ -18,23 +18,25 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
-        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
-                " VALUES (?, ?, ?,((SELECT count(*) FROM "+ Moodle.moodleSchema + ".folder)+1)";
         JsonArray values = new JsonArray();
         values.add(folder.getValue("userId"));
         values.add(folder.getValue("structureId"));
         values.add(folder.getValue("name"));
 
-        if ((int)folder.getValue(("parentId"))  != 0) {
-            values.add(folder.getValue("parentId"));
-            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" + " VALUES (?, ?, ?, ?)";
+        if((int)folder.getValue("parentid") == 0) {
+            String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
+                    " VALUES (?, ?, ?, ((SELECT  count(*) FROM "+ Moodle.moodleSchema +".folder)+1))";
+            sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
+        }else{
+            values.add(folder.getValue("parentid"));
+            String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
+                    " VALUES (?, ?, ?, ?)";
+            sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
         }
-
-        sql.prepared(createFolder, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
-    public void create(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
+    public void createCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
         String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id, folder_id, user_id)" +
                 " VALUES (?, ?, ?)";
 

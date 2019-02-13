@@ -78,7 +78,7 @@ export class Courses {
             throw e;
         }
     }
-    async getCoursesAndSheredbyFolder () {
+    async getCoursesAndSharedByFolder () {
         try {
             let courses = await http.get(`/moodle/users/coursesAndShared`);
             this.coursesShared = Mix.castArrayAs(Course, courses.data);

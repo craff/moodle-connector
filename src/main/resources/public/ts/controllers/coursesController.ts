@@ -140,20 +140,21 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
 
 		}
     });
+    $scope.openLightboxCourse = false;
 
     /**
      * Open creation course lightbox
      */
-    $scope.openPopUp = function () {
+    $scope.openPopUpCourse = function () {
         $scope.course = new Course();
-        $scope.openLightbox = true;
+        $scope.openLightboxCourse = true;
     };
 
     /**
      * Close creation course lightbox
      */
     $scope.closePopUp = function () {
-        $scope.openLightbox = false;
+        $scope.openLightboxCourse = false;
     };
 
     /**
@@ -161,7 +162,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
      */
     $scope.createCourse = function() {
         $scope.course.create();
-        $scope.openLightbox = false;
+        $scope.openLightboxCourse = false;
         Utils.safeApply($scope);
     };
 
@@ -184,5 +185,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
             await $scope.folder.create()
         ]).then(()=>$scope.initFolders());
         $scope.openLightboxFolder = false;
+        $scope.initFolders();
+        //setTimeout (()=>$scope.initFolders(), 1000); good
     };
 }]);
