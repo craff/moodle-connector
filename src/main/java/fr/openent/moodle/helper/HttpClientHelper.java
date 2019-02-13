@@ -11,6 +11,8 @@ import fr.openent.moodle.service.MoodleWebService;
 import io.vertx.core.net.ProxyOptions;
 import org.entcore.common.controller.ControllerHelper;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class HttpClientHelper extends ControllerHelper {
@@ -43,7 +45,15 @@ public class HttpClientHelper extends ControllerHelper {
     }
 
     public void webServiceMoodlePost(String moodleUrl, HttpClient httpClient, AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler) {
-        final HttpClientRequest httpClientRequest = httpClient.postAbs(moodleUrl, new Handler<HttpClientResponse>() {
+
+        URI url = null;
+        try {
+            url = new URI(moodleUrl);
+        } catch (URISyntaxException e) {
+            handler.handle(new Either.Left<>("Bad request"));
+            return;
+        }
+        final HttpClientRequest httpClientRequest = httpClient.postAbs(url.toString(), new Handler<HttpClientResponse>() {
             @Override
             public void handle(HttpClientResponse response) {
                 if (response.statusCode() == 200) {
@@ -77,7 +87,7 @@ public class HttpClientHelper extends ControllerHelper {
                 }
             }
         });
-        httpClientRequest.headers();
+        httpClientRequest.putHeader("Host", "moodle-dev.preprod-ent.fr");
         //Typically an unresolved Address, a timeout about connection or response
         httpClientRequest.exceptionHandler(new Handler<Throwable>() {
             @Override

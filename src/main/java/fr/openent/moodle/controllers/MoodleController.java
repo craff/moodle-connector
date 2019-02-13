@@ -28,6 +28,7 @@ import org.entcore.common.user.UserUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -68,8 +69,8 @@ public class MoodleController extends ControllerHelper {
 	    RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
 	        @Override
             public void handle(JsonObject course) {
-	            if (course.getString("type") == "1") {
-                    course.put("typeA", "quiz");
+	            if ("1".equals(course.getString("type"))) {
+                    course.put("typeA", "");
                 }
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 	                @Override
@@ -101,17 +102,18 @@ public class MoodleController extends ControllerHelper {
                                         final String moodleUrl = moodleUri.toString() +
                                                 "?wstoken=" + WSTOKEN +
                                                 "&wsfunction=" + WS_CREATE_FUNCTION +
-                                                "&parameters[username]=" + user.getLogin() +
-                                                "&parameters[idnumber]=" + user.getUserId() +
-                                                "&parameters[email]=" + event.right().getValue().getString("email") +
-                                                "&parameters[firstname]=" + user.getFirstName() +
-                                                "&parameters[lastname]=" + user.getLastName() +
-                                                "&parameters[fullname]=" + course.getString("fullname") +
-                                                "&parameters[shortname]=" + course.getString("shortname") +
-                                                "&parameters[categoryid]=" + course.getInteger("categoryid") +
-                                                "&parameters[imageurl]=" + course.getString("imageurl") +
-                                                "&parameters[coursetype]=" + course.getString("type") +
-                                                "&parameters[activity]=" + course.getString("typeA") +
+                                                "&parameters[username]=" + URLEncoder.encode(user.getLogin()) +
+                                                "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId()) +
+                                                "&parameters[email]=" +URLEncoder.encode( event.right().getValue().getString("email")) +
+                                                "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName()) +
+                                                "&parameters[lastname]=" + URLEncoder.encode(user.getLastName()) +
+                                                "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname")) +
+                                                "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname")) +
+                                                "&parameters[categoryid]=" + URLEncoder.encode(""+course.getInteger("categoryid")) +
+                                                "&parameters[summary]=" + URLEncoder.encode(course.getString("summary")) +
+                                                "&parameters[imageurl]=" + URLEncoder.encode(course.getString("imageurl")) +
+                                                "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type")) +
+                                                "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA")) +
                                                 "&moodlewsrestformat=" + JSON;
                                         httpClientHelper.webServiceMoodlePost(moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
                                             @Override
@@ -138,152 +140,6 @@ public class MoodleController extends ControllerHelper {
         });
 	}
 
-    @Get("/folder/countsFolders/:id")
-    @ApiDoc("Get cours in database by folder id")
-    //@SecuredAction("moodle.list")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getCountsItemInFolder(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    long id_folder =Long.parseLong(request.params().get("id"));
-                    moodleWebService.countItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-                } else {
-                    log.debug("User not found in session.");
-                    unauthorized(request);
-                }
-            }
-        });
-    }
-
-    @Get("/folder/countsCourses/:id")
-    @ApiDoc("Get cours in database by folder id")
-    //@SecuredAction("moodle.list")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getCountsItemCoursesInFolder(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    long id_folder =Long.parseLong(request.params().get("id"));
-                    moodleWebService.countCoursesItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-                } else {
-                    log.debug("User not found in session.");
-                    unauthorized(request);
-                }
-            }
-        });
-    }
-
-    @Get("/folders")
-    @ApiDoc("Get cours in database by folder id")
-    //@SecuredAction("moodle.list")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void listFoldersAndShared(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    moodleWebService.getFoldersInEnt(user.getUserId(), arrayResponseHandler(request));
-                } else {
-                    log.debug("User not found in session.");
-                    unauthorized(request);
-                }
-            }
-        });
-    }
-
-    @Get("/courses/:id")
-    @ApiDoc("Get cours in database by folder id")
-    //@SecuredAction("moodle.list")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void listCouresByFolder(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-                if(user!=null){
-                    long id_folder =Long.parseLong(request.params().get("id"));
-                    Handler<Either<String, JsonArray>> handler = arrayResponseHandler(request);
-                    moodleWebService.getCoursInEnt(id_folder, user.getUserId(), new Handler<Either<String, JsonArray>>() {
-                        @Override
-                        public void handle(Either<String, JsonArray> stringJsonArrayEither) {
-                            if(stringJsonArrayEither.isRight()){
-                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                final String moodleUrl = config.getString("address_moodle") +
-                                        "?wstoken=" + WSTOKEN +
-                                        "&wsfunction=" + WS_GET_USERCOURSES +
-                                        "&parameters[userid]=" + user.getUserId() +
-                                        "&moodlewsrestformat=" + JSON;
-                                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                                final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
-                                    @Override
-                                    public void handle(HttpClientResponse response) {
-                                        if (response.statusCode() == 200) {
-                                            final Buffer buff = Buffer.buffer();
-                                            response.handler(new Handler<Buffer>() {
-                                                @Override
-                                                public void handle(Buffer event) {
-                                                    buff.appendBuffer(event);
-                                                    JsonArray mydata=new JsonArray();
-                                                    JsonArray object = new JsonArray(buff.toString().substring(15, buff.toString().length()-21));
-
-                                                    for(int i = 0; i < object.size(); i++){
-                                                        JsonObject  o = object.getJsonObject(i);
-                                                        if(moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
-                                                            mydata.add(o);
-                                                        }
-                                                    }
-                                                    Renders.renderJson(request, mydata);
-                                                }
-                                            });
-                                            response.endHandler(new Handler<Void>() {
-                                                @Override
-                                                public void handle(Void end) {
-                                                    handle(end);
-                                                    if (!responseIsSent.getAndSet(true)) {
-                                                        httpClient.close();
-                                                    }
-                                                }
-                                            });
-                                        }else{
-                                            log.debug(response.statusMessage());
-                                            response.bodyHandler(new Handler<Buffer>() {
-                                                @Override
-                                                public void handle(Buffer event) {
-                                                    log.debug("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                                                    if (!responseIsSent.getAndSet(true)) {
-                                                        httpClient.close();
-                                                    }
-                                                }
-                                            });
-                                            handle(response);
-                                        }
-                                    }
-                                });
-                                httpClientRequest.headers();
-                                //Typically an unresolved Address, a timeout about connection or response
-                                httpClientRequest.exceptionHandler(new Handler<Throwable>() {
-                                    @Override
-                                    public void handle(Throwable event) {
-                                        log.debug(event.getMessage(), event);
-                                        if (!responseIsSent.getAndSet(true)) {
-                                            handle(event);
-                                            httpClient.close();
-                                        }
-                                    }
-                                }).end();
-                            }else{
-                                handle(new Either.Left<>("Get list in Ent Base failed"));
-                            }
-                        }
-                    });
-                } else {
-                    unauthorized(request);
-                }
-            }
-        });
-    }
     @Get("/users/courses")
     @ApiDoc("Get cours by user in database")
     //@SecuredAction("moodle.list")
@@ -342,7 +198,7 @@ public class MoodleController extends ControllerHelper {
                                             response.bodyHandler(new Handler<Buffer>() {
                                                 @Override
                                                 public void handle(Buffer event) {
-                                                    log.debug("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                                                    log.error("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
                                                     }
@@ -357,101 +213,7 @@ public class MoodleController extends ControllerHelper {
                                 httpClientRequest.exceptionHandler(new Handler<Throwable>() {
                                     @Override
                                     public void handle(Throwable event) {
-                                        log.debug(event.getMessage(), event);
-                                        if (!responseIsSent.getAndSet(true)) {
-                                            handle(event);
-                                            httpClient.close();
-                                        }
-                                    }
-                                }).end();
-                            } else {
-                                handle(new Either.Left<>("Get list in Ent Base failed"));
-                            }
-                        }
-                    });
-                } else {
-                    unauthorized(request);
-                }
-            }
-        });
-    }
-    @Get("/users/coursesAndShared")
-    @ApiDoc("Get cours in database by folder id")
-    //@SecuredAction("moodle.list")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void listCouresSharedByuser(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-                if(user!=null){
-                    Handler<Either<String, JsonArray>> handler = arrayResponseHandler(request);
-                    moodleWebService.getCoursesByUserInEnt(user.getUserId(), new Handler<Either<String, JsonArray>>() {
-                        @Override
-                        public void handle(Either<String, JsonArray> stringJsonArrayEither) {
-                            if(stringJsonArrayEither.isRight()){
-                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                final String moodleUrl = config.getString("address_moodle") +
-                                        "?wstoken=" + WSTOKEN +
-                                        "&wsfunction=" + WS_GET_USERCOURSES +
-                                        "&parameters[userid]=" + user.getUserId() +
-                                        "&moodlewsrestformat=" + JSON;
-                                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                                final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
-                                    @Override
-                                    public void handle(HttpClientResponse response) {
-                                        if (response.statusCode() == 200) {
-                                            final Buffer buff = Buffer.buffer();
-                                            response.handler(new Handler<Buffer>() {
-                                                @Override
-                                                public void handle(Buffer event) {
-                                                    buff.appendBuffer(event);
-                                                    JsonArray mydata=new JsonArray();
-                                                    JsonArray object = new JsonArray(buff.toString().substring(15, buff.toString().length()-21));
-
-                                                    for(int i = 0; i < object.size(); i++){
-                                                        JsonObject  o=object.getJsonObject(i);
-                                                        if(!moodleWebService.getValueMoodleIdinEnt(o.getInteger("courseid"),stringJsonArrayEither.right().getValue())){
-                                                            JsonArray obj = o.getJsonArray("auteur");
-                                                            if(!obj.getJsonObject(0).getString("entidnumber").equals(user.getUserId())){
-                                                                mydata.add(o);
-                                                            }
-                                                        }
-                                                    }
-                                                    Renders.renderJson(request, mydata);
-                                                }
-                                            });
-                                            response.endHandler(new Handler<Void>() {
-                                                @Override
-                                                public void handle(Void end) {
-                                                    handle(end);
-                                                    if (!responseIsSent.getAndSet(true)) {
-                                                        httpClient.close();
-                                                    }
-                                                }
-                                            });
-
-                                        }else{
-                                            log.debug(response.statusMessage());
-                                            response.bodyHandler(new Handler<Buffer>() {
-                                                @Override
-                                                public void handle(Buffer event) {
-                                                    log.debug("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                                                    if (!responseIsSent.getAndSet(true)) {
-                                                        httpClient.close();
-                                                    }
-                                                }
-                                            });
-                                            handle(response);
-                                        }
-                                    }
-                                });
-                                httpClientRequest.headers().set("Content-Length", "0");
-                                httpClientRequest.setTimeout(20001);
-                                //Typically an unresolved Address, a timeout about connection or response
-                                httpClientRequest.exceptionHandler(new Handler<Throwable>() {
-                                    @Override
-                                    public void handle(Throwable event) {
-                                        log.debug(event.getMessage(), event);
+                                        log.error(event.getMessage(), event);
                                         if (!responseIsSent.getAndSet(true)) {
                                             handle(event);
                                             httpClient.close();
