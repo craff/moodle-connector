@@ -75,7 +75,7 @@ public class MoodleController extends ControllerHelper {
                     public void handle(UserInfos user){
                         if (user != null) {
                             folder.put("userId", user.getUserId());
-                            folder.put("etabId", user.getStructures().toString().substring(1, 36));
+                            folder.put("structureId", user.getStructures().get(0));
                             moodleWebService.createFolder(folder, defaultResponseHandler(request));
                         } else {
                             log.debug("User not found in session.");

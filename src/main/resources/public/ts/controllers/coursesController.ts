@@ -107,9 +107,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.initFolders = async function(){
         Promise.all([
             await $scope.folders.sync()
-        ]).then(()=>Utils.safeApply($scope));
+        ]).then(()=>{Utils.safeApply($scope)});
     };
-
 
     $scope.getFolderParent= function (): Folder[]{
         return $scope.folders.getparentFolder();
@@ -179,10 +178,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.openLightboxFolder = false;
     };
 
-    $scope.createFolder = function() {
-        $scope.folder.create();
+    $scope.createFolder = async function() {
+        $scope.folder.parent_id = $scope.currentfolderid;
+        Promise.all([
+            await $scope.folder.create()
+        ]).then(()=>$scope.initFolders());
         $scope.openLightboxFolder = false;
-        $scope.initFolders();
-        //setTimeout (()=>$scope.initFolders(), 1000); good
     };
 }]);

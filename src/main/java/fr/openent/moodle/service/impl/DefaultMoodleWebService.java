@@ -18,15 +18,19 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
-        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, etab_id, name)" +
-                " VALUES (?, ?, ?)";
-
+        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
+                " VALUES (?, ?, ?,((SELECT count(*) FROM "+ Moodle.moodleSchema + ".folder)+1)";
         JsonArray values = new JsonArray();
         values.add(folder.getValue("userId"));
-        values.add(folder.getValue("etabId"));
+        values.add(folder.getValue("structureId"));
         values.add(folder.getValue("name"));
 
-        sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
+        if ((int)folder.getValue(("parentId"))  != 0) {
+            values.add(folder.getValue("parentId"));
+            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" + " VALUES (?, ?, ?, ?)";
+        }
+
+        sql.prepared(createFolder, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
@@ -97,7 +101,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void countCoursesItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
-        String query = "SELECT  moodle_id, folder_id " +
+        String query = "SELECT  count(*) " +
                 "FROM " + Moodle.moodleSchema + ".course " +
                 "WHERE user_id = ? AND folder_id = ?;";
         JsonArray values = new JsonArray();

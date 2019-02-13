@@ -5,6 +5,9 @@
   "properties": {
     "name": {
       "type": "string"
+    },
+    "parentId": {
+      "type": "number"
     }
   },
   "required": [

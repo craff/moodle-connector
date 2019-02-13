@@ -13,12 +13,11 @@ export class Folder {
     printsubfolder: boolean=false;
     toJSON() {
         return {
-            parentid : this.parent_id,
+            parentId : this.parent_id,
             userid : this.user_id,
             name : this.name,
             structureid : this.structure_id,
         }
-
     }
     async create() {
         try {
@@ -30,13 +29,12 @@ export class Folder {
     }
     async countitems () {
         try {
-            console.log('countitems', this.nbItems);
             let countsfolders = await http.get(`/moodle/folder/countsFolders/${this.id}`);
             let countscourses = await http.get(`/moodle/folder/countsCourses/${this.id}`);
-
             if(countsfolders && countscourses){
-                this.nbItems=countsfolders.data.count+countscourses.data.count;
-                console.log('countitems', this.nbItems);
+                let nbFolders = isNaN(countsfolders.data.count)? 0 : countsfolders.data.count;
+                let nbCourses = isNaN(countscourses.data.count)? 0 : countscourses.data.count;
+                this.nbItems=nbFolders + nbCourses;
             }
 
         } catch (e) {
