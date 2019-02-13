@@ -14,12 +14,12 @@ export interface Course {
     categoryid : number;
     imageurl : string;
     type : string;
-    typeA : number;
+    typeA : string;
 }
 
 export class Course {
     constructor(){
-        this.type='1';
+        this.type = "1";
     }
     toJSON() {
         return {

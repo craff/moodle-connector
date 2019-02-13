@@ -17,7 +17,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void create(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
+    public void createCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
         String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id, folder_id, user_id)" +
                 " VALUES (?, ?, ?)";
 

@@ -3,9 +3,6 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"courseid": {
-			"type" : "number"
-		},
 		"fullname": {
 			"type" : "string"
 		},
@@ -25,14 +22,13 @@
 			"type" : "string"
 		},
 		"type": {
-			"type" : "boolean"
+			"type" : "string"
 		},
 		"typeA": {
-			"type" : "number"
+			"type" : "string"
 		}
  	},
 	"required": [
-		"fullname",
-		"typeA"
+		"fullname"
 	]
 }

@@ -68,7 +68,7 @@ public class MoodleController extends ControllerHelper {
 	    RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
 	        @Override
             public void handle(JsonObject course) {
-	            if (course.getInteger("typeA") == 1) {
+	            if (course.getString("type") == "1") {
                     course.put("typeA", "quiz");
                 }
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -110,7 +110,7 @@ public class MoodleController extends ControllerHelper {
                                                 "&parameters[shortname]=" + course.getString("shortname") +
                                                 "&parameters[categoryid]=" + course.getInteger("categoryid") +
                                                 "&parameters[imageurl]=" + course.getString("imageurl") +
-                                                "&parameters[coursetype]=" + course.getInteger("typeNumber") +
+                                                "&parameters[coursetype]=" + course.getString("type") +
                                                 "&parameters[activity]=" + course.getString("typeA") +
                                                 "&moodlewsrestformat=" + JSON;
                                         httpClientHelper.webServiceMoodlePost(moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
@@ -120,7 +120,7 @@ public class MoodleController extends ControllerHelper {
                                                     JsonObject object = event.right().getValue().toJsonArray().getJsonObject(0);
                                                     course.put("moodleid", object.getValue("courseid"));
                                                     course.put("userid", user.getUserId());
-                                                    moodleWebService.create(course, defaultResponseHandler(request));
+                                                    moodleWebService.createCourse(course, defaultResponseHandler(request));
                                                 } else {
                                                     log.debug("Post service failed");
                                                 }
