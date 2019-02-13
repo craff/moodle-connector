@@ -270,8 +270,9 @@ public class MoodleController extends ControllerHelper {
 
 	@Get("/course/:id")
     @ApiDoc("Redirect to Moodle")
-    public void getToMoodle (HttpServerRequest request){
-	    redirect(request, (config.getString("address_moodle") + "/course/view.php?id=" + request.getParam("id")));
+    public void redirectToMoodle (HttpServerRequest request){
+	    String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
+	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" + request.getParam("id"));
     }
 
     public LocalDateTime getDateString(String date){

@@ -37,7 +37,9 @@ export class Course {
 
     async create() {
         try {
-            await http.post('/moodle/course', this.toJSON());
+            const { data } = await http.post('/moodle/course', this.toJSON());
+            this.courseid = data.id;
+            this.goTo('edit');
         } catch (e) {
             notify.error("Save function didn't work");
             throw e;
@@ -50,8 +52,8 @@ export class Course {
             notify.error("Delete function didn't work");
         }
     }
-    async goToMoodle() {
-        window.open(`/moodle/course/${this.courseid}`);
+    async goTo(scope: string = 'view') {
+        window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
     }
 }
 
