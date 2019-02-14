@@ -279,4 +279,3 @@ public class MoodleController extends ControllerHelper {
         return LocalDateTime.parse(date.substring(0, 10) + "T" + date.substring(11));
     }
 }
-
