@@ -23,7 +23,13 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
         JsonArray values = new JsonArray();
         values.add(course.getValue("moodleid"));
-        values.add(1);
+
+        Integer folderId = course.getInteger("folderid");
+        if(folderId == null) {
+            values.addNull();
+        } else {
+            values.add(folderId);
+        }
         values.add(course.getString("userid"));
 
         sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(handler));

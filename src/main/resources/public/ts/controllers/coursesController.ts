@@ -1,5 +1,5 @@
-import {ng, template, _} from 'entcore';
-import {Course,Courses} from "../model";
+import {ng, template} from 'entcore';
+import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
 
@@ -89,27 +89,24 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     };
 
     $scope.initCoursesbyuser = async function(){
-        Promise.all([
-            await $scope.courses.getCoursesbyUser()
-        ]).then(()=>{Utils.safeApply($scope)});
+        await $scope.courses.getCoursesbyUser();
+        Utils.safeApply($scope);
     };
+
+
 	$scope.initCouresbyFolder = async function(idfolder:number){
-        Promise.all([
-            await $scope.courses.getCoursesbyFolder(idfolder)
-        ]).then(()=>{Utils.safeApply($scope)});
+        await $scope.courses.getCoursesbyFolder(idfolder);
+        Utils.safeApply($scope);
     };
     $scope.initAllCouresbyuser = async function(){
-        Promise.all([
-            await $scope.courses.getCoursesAndSheredbyFolder()
-        ]).then(()=>{Utils.safeApply($scope)});
+        await $scope.courses.getCoursesAndSheredbyFolder();
+        Utils.safeApply($scope);
     };
 
     $scope.initFolders = async function(){
-        Promise.all([
-            await $scope.folders.sync()
-        ]).then(()=>{Utils.safeApply($scope);});
+        await $scope.folders.sync();
+        Utils.safeApply($scope);
     };
-
 
     $scope.getFolderParent= function (): Folder[]{
         return $scope.folders.getparentFolder();
@@ -119,9 +116,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     };
 
     $scope.countItems =async function (folder:Folder){
-        Promise.all([
-            await folder.countitems()
-        ]).then(()=>{Utils.safeApply($scope)});
+        await folder.countitems();
+        Utils.safeApply($scope);
     };
     $scope.switchTab= function(current: string){
         $scope.currentTab=current;
@@ -161,6 +157,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
      * Create a course
      */
     $scope.createCourse = function() {
+        // TODO get current folder id
+        $scope.course.folderid = $scope.currentfolderid;
         $scope.course.create();
         $scope.openLightbox = false;
         Utils.safeApply($scope);

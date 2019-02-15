@@ -8,7 +8,7 @@ CREATE TABLE moodle.scripts (
 
 CREATE TABLE moodle.folder (
   id bigserial NOT NULL,
-  parent_id bigserial,
+  parent_id bigint,
   user_id character varying(36) NOT NULL,
   structure_id character varying(36) NOT NULL,
   name character varying (255) NOT NULL,
@@ -21,7 +21,7 @@ CREATE TABLE moodle.folder (
 
 CREATE TABLE moodle.course (
   moodle_id bigserial NOT NULL,
-  folder_id bigserial,
+  folder_id bigint,
   user_id character varying(36) NOT NULL,
   CONSTRAINT course_pkey PRIMARY KEY (moodle_id)
 );

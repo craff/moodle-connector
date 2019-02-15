@@ -1,5 +1,5 @@
 import http from "axios";
-import {Mix, Selectable, Selection} from 'entcore-toolkit';
+import {Mix} from 'entcore-toolkit';
 
 export class Folder {
     id : number;

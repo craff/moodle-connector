@@ -1,7 +1,6 @@
-import { notify, model, } from 'entcore';
+import {notify,} from 'entcore';
 import http from 'axios';
-import {Mix, Selectable, Selection} from 'entcore-toolkit';
-import {Folder} from "./Folder";
+import {Mix} from 'entcore-toolkit';
 
 
 export interface Course {
@@ -12,6 +11,7 @@ export interface Course {
     author : Author;
     role : string;
     categoryid : number;
+    folderid : number;
     imageurl : string;
     type : string;
     typeA : string;

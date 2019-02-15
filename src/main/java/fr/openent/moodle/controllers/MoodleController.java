@@ -6,21 +6,24 @@ import fr.openent.moodle.service.MoodleEventBusService;
 import fr.openent.moodle.service.MoodleWebService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBusService;
 import fr.openent.moodle.service.impl.DefaultMoodleWebService;
-import fr.wseduc.rs.*;
+import fr.wseduc.rs.ApiDoc;
+import fr.wseduc.rs.Delete;
+import fr.wseduc.rs.Get;
+import fr.wseduc.rs.Post;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Renders;
-import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
-import fr.wseduc.webutils.security.XssSecuredHttpServerRequest;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.http.*;
-import io.vertx.core.json.Json;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
@@ -31,9 +34,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.*;
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -176,13 +180,13 @@ public class MoodleController extends ControllerHelper {
                                                     JsonArray object = new JsonArray(wsResponse);
                                                     JsonArray coursArray = object.getJsonObject(0).getJsonArray("enrolments");
 
-                                                    for(int i = 0; i < coursArray.size(); i++){
+                                                    /*for(int i = 0; i < coursArray.size(); i++){
                                                         JsonObject cours = coursArray.getJsonObject(i);
                                                         if(moodleWebService.getValueMoodleIdinEnt(cours.getInteger("courseid"),sqlCoursArray)){
                                                             mydata.add(cours);
                                                         }
-                                                    }
-                                                    Renders.renderJson(request, mydata);
+                                                    }*/
+                                                    Renders.renderJson(request, coursArray);
                                                     handle(end);
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
