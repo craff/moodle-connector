@@ -1,5 +1,5 @@
 <div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
-    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackground bottom-margin">
+    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackgroundList">
         <div class="one cell BackgroundColorActivity-dashboard" ng-if="!course.type" ng-click="course.goTo()">
             <img ng-src="[[course.image]]" class="image-dashboard"
                  ng-show="course.image!==null && course.image!==undefined"/>
@@ -12,15 +12,16 @@
             <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
                  ng-show="course.image===null || course.image===undefined"/>
         </div>
-        <div class="eleven cell left-margin" ng-click="course.goTo()">
-            <span class="text-font">[[course.fullname]]</span> </br>
+        <div class="eleven coursesText cell left-margin" ng-click="course.goTo()">
+            <span class="ellipsis text-font">[[course.fullname]]</span> </br>
+            <span class="ellipsis summary size-font">[[course.summary]]</span> </br>
             <label class="size-font">
                 <i18n>modified.on</i18n>:
                 [[course.date]]
             </label>
         </div>
-        <label class="checkbox">
-            <input type="checkbox" class="right-magnet">
+        <label class="checkbox right-magnet">
+            <input type="checkbox">
             <span></span>
         </label>
     </div>

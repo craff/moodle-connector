@@ -165,4 +165,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.openLightbox = false;
         Utils.safeApply($scope);
     };
+
+    $scope.deleteCourse = function () {
+        $scope.course.delete();
+        Utils.safeApply($scope);
+    }
 }]);
