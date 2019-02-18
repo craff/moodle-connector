@@ -1,0 +1,22 @@
+<section class="toggle-buttons" ng-if="oneOrMoreFolderSelected()">
+    <div class="toggle">
+        <div class="row">
+            <button ng-click="showFolderProperties()" class="cell">
+                <i18n>moodle.toaster.properties</i18n>
+            </button>
+
+            <button ng-click="copyFolder()" class="cell">
+                <i18n>moodle.toaster.copy</i18n>
+            </button>
+
+            <button ng-click="openPopUpMoveFolder()" class="cell">
+                <i18n>moodle.toaster.move</i18n>
+            </button>
+
+            <button ng-click="deleteFolder()" class="cell">
+                <i18n>moodle.toaster.delete</i18n>
+            </button>
+
+        </div>
+    </div>
+</section>

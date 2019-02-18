@@ -11,6 +11,8 @@ export class Folder {
     nbItems: number=0;
     subFolders : Folder[];
     printsubfolder: boolean=false;
+    printTargetsubfolder: boolean=false;
+    selected: boolean=false;
     toJSON() {
         return {
             parentid : this.parent_id,
@@ -27,6 +29,7 @@ export class Folder {
             throw e;
         }
     }
+
     async countitems () {
         try {
             let countsfolders = await http.get(`/moodle/folder/countsFolders/${this.id}`);
@@ -43,8 +46,18 @@ export class Folder {
 
 export class Folders {
     all: Folder[];
+    selectedFolders: number[];
+    listSelectedFolders: Folder[];
+    toJSON() {
+        return {
+            selectedFolders : this.selectedFolders,
+        }
+    }
+
     constructor() {
         this.all = [];
+        this.selectedFolders = [];
+        this.listSelectedFolders = [];
     }
     async sync () {
         try {
@@ -62,8 +75,17 @@ export class Folders {
     }
     getparentFolder(): Folder[]  {
         if(this.all){
-            return this.all.filter(folder=>folder.id!=0 && folder.parent_id == folder.id);
+            return this.all.filter(folder=> folder.parent_id == 0);
         }
         return [];
     }
+
+    async moveFolders (targetFolderId:number) {
+        try {
+            await http.put(`/moodle/folders/move/${targetFolderId}`, this.toJSON());
+        } catch (e) {
+            throw e;
+        }
+    }
+
 }

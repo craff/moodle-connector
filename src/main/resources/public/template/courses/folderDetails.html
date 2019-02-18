@@ -6,4 +6,4 @@
 <label ng-init="countItems(folder)">
     [[folder.nbItems]] <i18n>moodle.folder.item</i18n>:
 </label>
-<input type="checkbox" class="right-magnet">
+<input type="checkbox" ng-model="folder.selected" class="right-magnet">

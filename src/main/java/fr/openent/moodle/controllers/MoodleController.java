@@ -87,6 +87,30 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
+    @Put("/folders/move/:targetId")
+    @ApiDoc("move a folder")
+    //@SecuredAction("moodle.modify")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void moveFolder(final HttpServerRequest request){
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject folders) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            long id_targetFolder = Long.parseLong(request.params().get("targetId"));
+                            moodleWebService.moveFolder(folders, id_targetFolder, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
 	@Post("/course")
     @ApiDoc("create a course")
     @SecuredAction("moodle.create")

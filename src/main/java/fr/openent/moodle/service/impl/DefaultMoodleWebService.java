@@ -6,11 +6,16 @@ import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
+import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMoodleWebService.class);
 
     public DefaultMoodleWebService(String schema, String table) {
         super(schema, table);
@@ -22,17 +27,26 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         values.add(folder.getValue("userId"));
         values.add(folder.getValue("structureId"));
         values.add(folder.getValue("name"));
+        values.add(folder.getValue("parentid"));
 
-        if((int)folder.getValue("parentid") == 0) {
-            String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
-                    " VALUES (?, ?, ?, ((SELECT  count(*) FROM "+ Moodle.moodleSchema +".folder)+1))";
-            sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
-        }else{
-            values.add(folder.getValue("parentid"));
-            String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
+        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
                     " VALUES (?, ?, ?, ?)";
             sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void moveFolder(final JsonObject folder, final long id_targetFolder, final Handler<Either<String, JsonObject>> handler){
+        JsonArray values = new JsonArray();
+        JsonArray folders = folder.getJsonArray("selectedFolders");
+        values.add(id_targetFolder);
+
+        for (int i = 0;i<folders.size();i++){
+            values.add(folders.getValue(i));
         }
+
+        String moveFolder = "UPDATE " + Moodle.moodleSchema + ".folder SET parent_id = ? WHERE id IN " + Sql.listPrepared(folders.getList());
+
+        sql.prepared(moveFolder,values , SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override

@@ -85,4 +85,30 @@
             </div>
         </div>
     </lightbox>
+
+    <lightbox class="row" show="openLightboxMove == true" on-close="closePopUpMoveFolder()">
+        <div class="eight cell horizontal-spacing">
+            <h2 class="row twelve"><i18n>moodle.toaster.text.title.move</i18n></h2>
+            <i18n ng-if="oneOrMoreFolderSelected()">moodle.toaster.text.name.moves</i18n>
+            <i18n ng-if="!(oneOrMoreFolderSelected())">moodle.toaster.text.name.move</i18n>
+            <span ng-repeat="folder in folders.listSelectedFolders">
+                <b>[[folder.name]], </b>
+            </span>
+            <div class="row">
+                <i18n>moodle.toaster.text.target.move</i18n>
+                </br>
+                <div  class="six cell horizontal-spacing" ng-init="initFolders()"
+                      static-include="/moodle/public/template/courses/folderTargetTree.html">
+                </div>
+                <hr />
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="right-magnet">
+                <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUpMoveFolder()"/>
+                <input type="submit" class="button" i18n-value="move" ng-click="moveFolder()" ng-disabled="targetFolder == undefined"/>
+            </div>
+        </div>
+    </lightbox>
 </div>

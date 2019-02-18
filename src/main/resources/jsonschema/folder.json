@@ -8,9 +8,9 @@
     },
     "parentid": {
       "type": "number"
+    },
+    "selectedFolders": {
+      "type": "array"
     }
-  },
-  "required": [
-    "name"
-  ]
+  }
 }

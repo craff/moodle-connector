@@ -40,6 +40,7 @@
 	"from": "De",
 	"date": "Date",
 	"cancel": "Annuler",
+	"move": "Déplacer",
 	"validate": "Créer",
 	"share.search.title": "Rechercher des utilisateurs et des groupes",
 	"tuto.title": "Naviguez au sein de vos documents en vue vignettes : ",
@@ -74,6 +75,14 @@
 	"quiz" : "Quiz",
 	"file" : "Fichier",
 	"page" : "Page",
-	"test" : "Devoir"
+	"test" : "Devoir",
 
+	"moodle.toaster.properties": "Propriétés",
+	"moodle.toaster.copy": "Copier",
+	"moodle.toaster.move": "Déplacer",
+	"moodle.toaster.delete": "Supprimer",
+	"moodle.toaster.text.title.move": "Déplacer la sélection ",
+    "moodle.toaster.text.name.move": "Déplacer le dossier ",
+	"moodle.toaster.text.name.moves": "Déplacer les dossiers ",
+    "moodle.toaster.text.target.move": " dans le dossier cible : "
 }
