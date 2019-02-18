@@ -5,6 +5,56 @@ import {Utils} from "../utils/Utils";
 
 export const mainController = ng.controller('MoodleController', ['$scope', 'route','$rootScope',($scope, route,$rootScope) => {
 
+    route({
+        dashboard: function(params){
+            $scope.initDashBoardTab();
+        },
+        courses: function(params){
+            $scope.initCoursesTab();
+        }
+    });
+
+    $scope.switchTab= function(current: string){
+        $scope.currentTab=current;
+        if($scope.currentTab=='courses'){
+            $scope.initCoursesTab();
+        }else if($scope.currentTab=='dashboard'){
+            $scope.initDashBoardTab();
+        }else if($scope.currentTab=='library'){
+            template.open('main', 'page-library');
+        } else {
+            $scope.initDashBoardTab();
+        }
+        Utils.safeApply($scope);
+    };
+
+    $scope.initDashBoardTab = async function(){
+        // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
+        $scope.printcreatecoursesrecents=true;
+        $scope.initCoursesbyuser();
+
+
+        template.open('main', 'dashboard/dashboard_home');
+        Utils.safeApply($scope);
+    };
+
+    $scope.initCoursesbyuser = async function(){
+        await $scope.courses.getCoursesbyUser();
+        Utils.safeApply($scope);
+    };
+
+
+    $scope.initCoursesTab = async function(){
+
+        // TODO ne charger que si besoin
+        await $scope.courses.getCoursesbyUser();
+
+        template.open('main', 'page-courses');
+        Utils.safeApply($scope);
+    };
+
+
+
     $scope.lightboxes = {};
 	$scope.params = {};
 	$scope.currentTab='dashboard';
@@ -13,7 +63,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.currentfolderid=null;
     $scope.printcours=false;
     $scope.printfolders=false;
-    $scope.printcreatecoursesrecents=true;
 	$scope.courses= new Courses();
     $scope.folders=new Folders();
     $scope.showToaster = false;
@@ -88,11 +137,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
 
     };
 
-    $scope.initCoursesbyuser = async function(){
-        await $scope.courses.getCoursesbyUser();
-        Utils.safeApply($scope);
-    };
-
 
 	$scope.initCouresbyFolder = async function(idfolder:number){
         await $scope.courses.getCoursesbyFolder(idfolder);
@@ -119,24 +163,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         await folder.countitems();
         Utils.safeApply($scope);
     };
-    $scope.switchTab= function(current: string){
-        $scope.currentTab=current;
-        if($scope.currentTab=='courses'){
-            template.open('main', 'page-courses');
-        }else if($scope.currentTab=='dashboard'){
-            template.open('main', 'main');
-        }else{
-            template.open('main', 'page-library');
-        }
-        Utils.safeApply($scope);
-    };
-	route({
-        view: function(params){
-		    template.open('main', 'main');
-            Utils.safeApply($scope);
 
-		}
-    });
 
     /**
      * Open creation course lightbox

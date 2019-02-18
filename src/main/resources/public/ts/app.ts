@@ -1,4 +1,4 @@
-import { ng, routes } from 'entcore';
+import {ng, routes} from 'entcore';
 import * as controllers from './controllers';
 import * as directives from './directives';
 
@@ -12,13 +12,18 @@ for(let controller in controllers){
 routes.define(function($routeProvider){
 	$routeProvider
         .when('/dashboard', {
-            action: 'view'
+            action: 'dashboard'
         })
 		.when('/', {
-			action: 'view'
+			action: 'dashboard'
 		})
-
-    $routeProvider.otherwise({
+        .when('/courses', {
+            action: 'courses'
+        })
+        .when('/library', {
+            action: 'library'
+        })
+        .otherwise({
         redirectTo: '/'
     });
 });
