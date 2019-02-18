@@ -1,4 +1,4 @@
-<div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
+<div ng-if="printcreatecoursesrecents">
     <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackgroundList">
         <div class="one cell BackgroundColorActivity-dashboard" ng-if="!course.type" ng-click="course.goTo()">
             <img ng-src="[[course.image]]" class="image-dashboard"

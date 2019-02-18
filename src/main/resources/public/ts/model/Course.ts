@@ -1,4 +1,4 @@
-import {notify,} from 'entcore';
+import {_, notify,} from 'entcore';
 import http from 'axios';
 import {Mix} from 'entcore-toolkit';
 
@@ -59,37 +59,53 @@ export class Course {
 
 export class Courses {
     allbyfolder: Course[];
+
+
+    allCourses: Course[];
     coursesShared: Course[];
     coursesByUser: Course[];
+    isSynchronized: Boolean;
+
     constructor() {
         this.allbyfolder = [];
+
+        this.allCourses = [];
         this.coursesShared = [];
         this.coursesByUser = [];
+        this.isSynchronized = false;
     }
-    async getCoursesbyFolder (folder_id: number) {
+    /*async getCoursesbyFolder (folder_id: number) {
         try {
             let courses = await http.get(`/moodle/courses/${folder_id}`);
             this.allbyfolder = Mix.castArrayAs(Course, courses.data);
         } catch (e) {
             throw e;
         }
-    }
-    async getCoursesbyUser () {
+    }*/
+
+    async getCoursesbyUser (userId: string) {
         try {
             let courses = await http.get(`/moodle/users/courses`);
-            this.coursesByUser = Mix.castArrayAs(Course, courses.data);
+            let allCourses = Mix.castArrayAs(Course, courses.data);
+
+            this.allCourses = allCourses;
+            this.coursesByUser = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
+            this.coursesShared = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
+
+            this.isSynchronized = true;
         } catch (e) {
+            this.isSynchronized = false;
             throw e;
         }
     }
-    async getCoursesAndSheredbyFolder () {
+    /*async getCoursesAndSheredbyFolder () {
         try {
             let courses = await http.get(`/moodle/users/coursesAndShared`);
             this.coursesShared = Mix.castArrayAs(Course, courses.data);
         } catch (e) {
             throw e;
         }
-    }
+    }*/
 }
 
 export class Author{

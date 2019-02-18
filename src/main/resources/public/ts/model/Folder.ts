@@ -37,14 +37,21 @@ export class Folder {
 
 export class Folders {
     all: Folder[];
+    isSynchronized: Boolean;
     constructor() {
         this.all = [];
+        this.isSynchronized = false;
     }
+
+
+
     async sync () {
         try {
             let folders = await http.get(`/moodle/folders`);
             this.all = Mix.castArrayAs(Folder, folders.data);
+            this.isSynchronized = true;
         } catch (e) {
+            this.isSynchronized = false;
             throw e;
         }
     }

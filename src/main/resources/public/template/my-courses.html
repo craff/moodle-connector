@@ -1,0 +1,73 @@
+<div class="row coursesBackground">
+    <div class="twelve twelve-mobile">
+        <div class="cell two horizontal-spacing">
+            <p>
+                <label class="vertical-spacing">
+                    <i18n>moodle.folders</i18n>
+                    <input type="text" class="twelve twelve-mobile "/>
+                </label>
+            </p>
+
+            <div class="horizontal-spacing" static-include="/moodle/public/template/courses/folderItem.html">
+            </div>
+        </div>
+
+        <div class="ten cell horizontal-spacing padding-left-corp" >
+            <div class="row horizontal-spacing">
+                <input type="submit" i18n-value="moodle.course.new" ng-click="openPopUp()" class="vertical-spacing">
+            </div>
+
+            <div class="row" static-include="/moodle/public/template/courses/folders.html" ng-show="printfolders"></div>
+            <div class="row" static-include="/moodle/public/template/courses/courses.html" ng-if="printcours" ></div>
+        </div>
+    </div>
+</div>
+
+<lightbox class="row" show="openLightbox == true" on-close="closePopUp()">
+    <h2 class="row twelve"><i18n>moodle.course.information</i18n></h2>
+    <div class="twelve cell row select-type-buttons">
+        <div class="cell six horizontal-spacing">
+            <label class="courseButton course twelve" ng-class="{ selected: course.type == '1' }">
+                <i18n>course</i18n>
+                <input type="radio" value="1" name="courseType" class="zero-desktop zero-mobile" ng-model="course.type">
+            </label>
+        </div>
+        <div class="cell six horizontal-spacing">
+            <label class="courseButton activity twelve" ng-class="{ selected: course.type == '2' }">
+                <i18n>activity</i18n>
+                <input type="radio" value="2" name="courseType" class="zero-desktop zero-mobile" ng-model="course.type">
+            </label>
+        </div>
+    </div>
+    <div class="horizontal-spacing seven vertical-spacing">
+        <label class="row twelve">
+            <span class="row label-input-row"><i18n>moodle.course.name.long</i18n>*</span>
+            <input type="text" class="twelve" required i18n-placeholder="write.here" ng-model="course.fullname">
+        </label>
+        <label class="row twelve">
+            <span class="row label-input-row"><i18n>moodle.course.description</i18n></span>
+            <input type="text" class="twelve" i18n-placeholder="write.here" ng-model="course.summary">
+        </label>
+    </div>
+    <div class="row horizontal-spacing">
+        <span class="row label-input-row"><i18n>moodle.course.image</i18n></span>
+        <image-select class="three cell" default="/img/illustrations/image-default.svg" ng-model="course.imageurl"></image-select>
+    </div>
+    <div class="row horizontal-spacing" ng-if="course.type == 2">
+        <label>
+            <span class="row label-input-row"><i18n>moodle.activity.type</i18n>*</span>
+        </label>
+        <select ng-model="course.typeA" ng-required="course.type == 2">
+            <option>quiz</option>
+            <option>file</option>
+            <option>page</option>
+            <option>assignment</option>
+        </select>
+    </div>
+    <div class="row">
+        <div class="right-magnet">
+            <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
+            <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()" ng-disabled="course.fullname == undefined"/>
+        </div>
+    </div>
+</lightbox>

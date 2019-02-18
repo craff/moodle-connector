@@ -1,17 +1,24 @@
-import {ng, template} from 'entcore';
+import {model, ng, template} from 'entcore';
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
 
 export const mainController = ng.controller('MoodleController', ['$scope', 'route','$rootScope',($scope, route,$rootScope) => {
 
-    route({
+     route({
         dashboard: function(params){
+            $scope.initController();
             $scope.initDashBoardTab();
         },
         courses: function(params){
+            $scope.initController();
             $scope.initCoursesTab();
-        }
+        },
+         library: function(params){
+             $scope.initController();
+             $scope.initLibraryTab();
+         }
+
     });
 
     $scope.switchTab= function(current: string){
@@ -21,53 +28,66 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         }else if($scope.currentTab=='dashboard'){
             $scope.initDashBoardTab();
         }else if($scope.currentTab=='library'){
-            template.open('main', 'page-library');
+            $scope.initLibraryTab();
         } else {
             $scope.initDashBoardTab();
         }
-        Utils.safeApply($scope);
     };
 
     $scope.initDashBoardTab = async function(){
+        $scope.currentTab='dashboard';
         // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
         $scope.printcreatecoursesrecents=true;
-        $scope.initCoursesbyuser();
 
+
+        if($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
+            await $scope.courses.getCoursesbyUser(model.me.userId);
+        }
 
         template.open('main', 'dashboard/dashboard_home');
         Utils.safeApply($scope);
     };
 
-    $scope.initCoursesbyuser = async function(){
-        await $scope.courses.getCoursesbyUser();
-        Utils.safeApply($scope);
-    };
-
-
     $scope.initCoursesTab = async function(){
-
+        $scope.currentTab='courses';
         // TODO ne charger que si besoin
-        await $scope.courses.getCoursesbyUser();
+        if($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
+            await $scope.courses.getCoursesbyUser(model.me.userId);
+        }
 
-        template.open('main', 'page-courses');
+        // TODO gestion des dossiers
+        // if($scope.folders.isSynchronized === undefined || $scope.folders.isSynchronized === false) {
+        //     $scope.initFolders();
+        // }
+
+        template.open('main', 'my-courses');
         Utils.safeApply($scope);
     };
 
+    $scope.initLibraryTab = async function() {
+        $scope.currentTab = 'library';
+        template.open('main', 'page-library');
+        Utils.safeApply($scope);
+    };
+
+    $scope.initController = async function () {
+        $scope.courses= new Courses();
+        $scope.currentTab='dashboard';
+        $scope.lightboxes = {};
+        $scope.params = {};
+        $scope.printmenufolder=false;
+        $scope.printmenucourseShared=false;
+        $scope.currentfolderid=null;
+        $scope.printcours=false;
+        $scope.printfolders=false;
+
+        $scope.folders=new Folders();
+        $scope.showToaster = false;
+        $scope.openLightbox = false;
+        $scope.searchbar = {};
+    };
 
 
-    $scope.lightboxes = {};
-	$scope.params = {};
-	$scope.currentTab='dashboard';
-	$scope.printmenufolder=false;
-    $scope.printmenucourseShared=false;
-    $scope.currentfolderid=null;
-    $scope.printcours=false;
-    $scope.printfolders=false;
-	$scope.courses= new Courses();
-    $scope.folders=new Folders();
-    $scope.showToaster = false;
-    $scope.openLightbox = false;
-    $scope.searchbar = {};
 
     $scope.isPrintMenuFolder= function(){
         $scope.printmenufolder=!$scope.printmenufolder;
@@ -142,12 +162,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         await $scope.courses.getCoursesbyFolder(idfolder);
         Utils.safeApply($scope);
     };
-    $scope.initAllCouresbyuser = async function(){
+
+	/*$scope.initAllCouresbyuser = async function(){
         await $scope.courses.getCoursesAndSheredbyFolder();
         Utils.safeApply($scope);
-    };
+    };*/
 
     $scope.initFolders = async function(){
+        $scope.folders = new Folders();
         await $scope.folders.sync();
         Utils.safeApply($scope);
     };
