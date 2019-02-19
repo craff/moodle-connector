@@ -1,18 +1,19 @@
-<div class="row">
-    <div class="three cell" ng-class="{ orangeActivity : course.course_type == 'singleactivity',
-                  blueCourse : course.course_type == 'topics' }">
-        <img ng-src="[[course.image]]" class="image"
-             ng-show="course.image !== null && course.image !== undefined"/>
-        <img skin-src="/img/illustrations/pages-default.png"  class="image"
-             ng-show="course.image === null || course.image === undefined"/>
-    </div>
-    <div class="nine cell">
-        <span class="summary text-font">[[course.summary]]</span>
-        </br>
-        <label >
-            <i18n>modified.on</i18n>:
-            [[course.date]]
-        </label>
-        <input type="checkbox" class="right-magnet">
-    </div>
+<div class="one cell BackgroundColorActivity-dashboard" ng-class="{ orangeActivity : course.course_type == 'singleactivity',
+                  blueCourse : course.course_type == 'topics' }" ng-click="course.goTo()">
+    <img ng-src="[[course.image]]" class="image-dashboard"
+         ng-show="course.image !== null && course.image !== undefined"/>
+    <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
+         ng-show="course.image === null || course.image === undefined"/>
 </div>
+<div class="eleven coursesText cell left-margin" ng-click="course.goTo()">
+    <span class="text-font">[[course.fullname]]</span> </br>
+    <span class="summary-list size-font">[[course.summary]]</span> </br>
+    <label class="size-font">
+        <i18n>modified.on</i18n>:
+        [[course.date]]
+    </label>
+</div>
+<label class="checkbox right-magnet">
+    <input type="checkbox">
+    <span></span>
+</label>

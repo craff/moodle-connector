@@ -60,6 +60,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         //     $scope.initFolders();
         // }
 
+        $scope.printcreatecoursesrecents=false;
         template.open('main', 'my-courses');
         Utils.safeApply($scope);
     };
@@ -228,7 +229,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     }
 
     $scope.showCourse = function(courseType:string) {
-        console.log(courseType);
         if(courseType == "topics")
             return $scope.typeFilter[0];
         else
