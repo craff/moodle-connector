@@ -1,6 +1,21 @@
 body.moodle {
   @import 'specifics/atomic';
 
+  .filter-domaine {
+    width: 97% !important;
+    .drop-down-block,.drop-down-block .drop-down-label {
+      margin-bottom: 0px;
+    }
+    .checkbox-domaine {
+      background-color: $medium-grey !important;
+      margin-right: 0px !important;
+    }
+    label.chip.checkbox-domaine.selected {
+      background-color: $orange !important;
+    }
+  }
+
+
   .select-type-buttons {
     margin: 30px 0;
   }

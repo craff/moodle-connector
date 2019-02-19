@@ -85,6 +85,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.showToaster = false;
         $scope.openLightbox = false;
         $scope.searchbar = {};
+        $scope.typeFilter = [true, true];
     };
 
 
@@ -217,4 +218,21 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.course.delete();
         Utils.safeApply($scope);
     }
+
+    /**
+     * Filter Type
+     */
+
+    $scope.checkTypeFilterSelected = function(id:number) {
+        $scope.typeFilter[id] = !$scope.typeFilter[id];
+    }
+
+    $scope.showCourse = function(courseType:string) {
+        console.log(courseType);
+        if(courseType == "topics")
+            return $scope.typeFilter[0];
+        else
+            return $scope.typeFilter[1];
+    }
+
 }]);
