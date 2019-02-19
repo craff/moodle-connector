@@ -1,24 +1,27 @@
-<br/>
-<div class="filter-domaine">
-    <div class="row drop-down-block slided" ng-class="{slided: displayFilterDomaine}">
-        <div class="drop-down-label" ng-click="displayFilterDomaine = !displayFilterDomaine">
+<span></span>
+<div class="row filter-course">
+    <div class="drop-down-block" ng-class="{slided: displayFilterCourse}">
+        <div class="drop-down-label" ng-click="displayFilterCourse = !displayFilterCourse">
             <div class="twelve cell">
                 <i class="arrow"></i>
-                <label>
-                    <i18n><span class="no-style ng-scope">Filtre</span></i18n>
-                </label>
+                <span>
+                    <i18n>filter</i18n>
+                </span>
             </div>
         </div>
     </div>
-    <div ng-hide="!displayFilterDomaine" class="">
-        <label class="chip margin-left checkbox-domaine" ng-class="{ selected: typeFilter[0]}">
-            <span><i18n><span class="no-style ng-scope">Parcours</span></i18n></span>
+    <div ng-hide="!displayFilterCourse">
+        <label class="chip margin-left checkbox-course" ng-class="{ selected: typeFilter[0]}">
+            <span>
+                <i18n>course</i18n>
+            </span>
             <input type="checkbox" ng-click="checkTypeFilterSelected(0)">
         </label>
-        <label class="chip margin-left checkbox-domaine" ng-class="{ selected: typeFilter[1]}">
-            <span><i18n><span class="no-style ng-scope">Activités</span></i18n></span>
+        <label class="chip margin-left checkbox-course" ng-class="{ selected: typeFilter[1]}">
+            <span>
+                <i18n>activity</i18n>
+            </span>
             <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
         </label>
     </div>
 </div>
-<br/>

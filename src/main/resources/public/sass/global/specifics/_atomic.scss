@@ -1,7 +1,8 @@
 .course-article{
-  width: 450px;
-  height: 120px;
-  margin-right: 10px;
+  width: 48%;
+  height: auto;
+  margin-right: 15px;
+  margin-top: 15px;
 }
 .folder-article{
   width: 450px;
@@ -43,13 +44,13 @@
   width: 85px;
   padding-left: 10px;
 }
-.orangeActivity{
+.activityPictureBackground{
   @include pictureSize();
   background-color: #ff8500;
 }
-.blueCourse{
+.coursePictureBackground{
   @include pictureSize();
-  background-color: #4bafd5;
+  background-color: #e20037;
 }
 i.sort-desc::before {
   content: "\e925";
@@ -75,25 +76,21 @@ i.sort-desc::before {
 .left-padding{
   padding-left: 15px;
 }
-
 .left-border-menu{
   border-left-color: #ff8500;
   border-left-style: outset;
   padding-left: 5px;
 }
-
-.colorfolder{
+.colorActivity{
    color: #ff8500;
  }
-
-.colorSubfolder{
-   color: #4bafd5;
- }
-.colorbutton{
-  color: #4bafd5;
+.colorCourse{
+   color: #e20037;
+}
+.colorButton{
+  color: #e20037;
   background: $white ;
 }
-
 .coursesBackground{
   background: #eee;
 }

@@ -1,13 +1,13 @@
 <div class="vertical-spacing left-border-menu">
-    <div ng-click="isPrintMenuFolder()" class="colorfolder">
+    <div ng-click="isPrintMenuFolder()" class="colorActivity">
         <i class="sort-desc" ng-if="printmenufolder"></i>
         <i class="icon-play" ng-if="!printmenufolder"></i>
         <i18n>moodle.courses</i18n></br>
     </div>
-    <div class="colorfolder" ng-repeat="folder in getFolderParent()" ng-if="printfolders">
-        <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding colorSubfolder"
+    <div class="colorActivity" ng-repeat="folder in getFolderParent()" ng-if="printfolders">
+        <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding colorCourse"
               ng-click="isPrintSubFolder(folder)">
-            <i  class="icon-play" ng-if="!folder.printsubfolder"></i>
+            <i class="icon-play" ng-if="!folder.printsubfolder"></i>
             <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
         </span>
         <div ng-if="folder.subFolders && folder.subFolders.length && folder.printsubfolder" class="left-padding"
@@ -15,7 +15,7 @@
     </div>
 
 
-    <div ng-click="isPrintMenuCoursesShared()" class="colorfolder">
+    <div ng-click="isPrintMenuCoursesShared()" class="colorActivity">
         <i class="icon-play" ng-if="!printmenucourseShared"></i>
         <i class="sort-desc" ng-if="printmenucourseShared"></i>
          <i18n>moodle.courses.shared</i18n></br>
@@ -28,9 +28,9 @@
 
 <script type="text/ng-template"  id="tree_item_renderer.html">
     <div ng-repeat="folder in folder.subFolders">
-            <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding colorSubfolder"
+            <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding colorCourse"
                   ng-click="isPrintSubFolder(folder)">
-                <i  class="icon-play" ng-if="!folder.printsubfolder"></i>
+                <i class="icon-play" ng-if="!folder.printsubfolder"></i>
                 <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
             </span>
         <div ng-if="folder.subFolders && folder.subFolders.length && folder.printsubfolder"

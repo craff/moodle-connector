@@ -218,15 +218,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.deleteCourse = function () {
         $scope.course.delete();
         Utils.safeApply($scope);
-    }
+    };
 
     /**
      * Filter Type
      */
-
     $scope.checkTypeFilterSelected = function(id:number) {
         $scope.typeFilter[id] = !$scope.typeFilter[id];
-    }
+    };
 
     $scope.showCourse = function(courseType:string) {
         if(courseType == "topics")
@@ -234,5 +233,4 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         else
             return $scope.typeFilter[1];
     }
-
 }]);

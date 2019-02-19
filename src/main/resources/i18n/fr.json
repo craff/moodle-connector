@@ -64,11 +64,13 @@
 	"moodle.activity.type": "Type d'activité",
 	"share" : "Partager",
 	"modify" : "Modifier",
-	"course" : "PARCOURS",
-	"activity" : "ACTIVITÉ",
+	"COURSE" : "PARCOURS",
+	"ACTIVITY" : "ACTIVITÉ",
 	"quiz" : "Quiz",
 	"file" : "Fichier",
 	"page" : "Page",
-	"test" : "Devoir"
-
+	"test" : "Devoir",
+	"course" : "Parcours",
+	"activity" : "Activités",
+	"filter" : "Filtre"
 }
