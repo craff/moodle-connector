@@ -1,20 +1,15 @@
-<div ng-if="printcreatecoursesrecents">
-    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackgroundList" ng-if="showCourse(course.course_type)">
-        <div class="one cell BackgroundColorActivity-dashboard" ng-if="!course.type" ng-click="course.goTo()">
+<div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
+    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackgroundList">
+        <div class="one cell BackgroundColorActivity-dashboard" ng-class="{ orangeActivity : course.course_type == 'singleactivity',
+                  blueCourse : course.course_type == 'topics' }" ng-click="course.goTo()">
             <img ng-src="[[course.image]]" class="image-dashboard"
-                 ng-show="course.image!==null && course.image!==undefined"/>
+                 ng-show="course.image !== null && course.image !== undefined"/>
             <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
-                 ng-show="course.image===null || course.image===undefined"/>
-        </div>
-        <div class="one cell BackgroundColorBlueParcour-dashboard" ng-if="course.type" ng-click="course.goTo()">
-            <img ng-src="[[course.image]]" class="image-dashboard"
-                 ng-show="course.image!==null && course.image!==undefined"/>
-            <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
-                 ng-show="course.image===null || course.image===undefined"/>
+                 ng-show="course.image === null || course.image === undefined"/>
         </div>
         <div class="eleven coursesText cell left-margin" ng-click="course.goTo()">
-            <span class="ellipsis text-font">[[course.fullname]]</span> </br>
-            <span class="ellipsis summary size-font">[[course.summary]]</span> </br>
+            <span class="text-font">[[course.fullname]]</span> </br>
+            <span class="summary-list size-font">[[course.summary]]</span> </br>
             <label class="size-font">
                 <i18n>modified.on</i18n>:
                 [[course.date]]

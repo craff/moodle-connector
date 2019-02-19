@@ -77,6 +77,9 @@ public class MoodleController extends ControllerHelper {
 	            if ("1".equals(course.getString("type"))) {
                     course.put("typeA", "");
                 }
+                if (course.getString("summary") == null) {
+	                course.put("summary", "");
+	            }
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
 	                @Override
                     public void handle(final UserInfos user) {
@@ -261,7 +264,7 @@ public class MoodleController extends ControllerHelper {
                         @Override
                         public void handle(Either<String, Buffer> event) {
                             if (event.isRight()) {
-                                moodleWebService.delete(course, defaultResponseHandler(request));
+                                moodleWebService.deleteCourse(course, defaultResponseHandler(request));
                             } else {
                                 log.debug("Post service failed");
                             }

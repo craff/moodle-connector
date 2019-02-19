@@ -31,7 +31,8 @@ export class Course {
             role : this.role,
             imageurl : "https://medias.liberation.fr/photo/552903--.jpg",
             type : this.type,
-            typeA : this.typeA
+            typeA : this.typeA,
+            folderid : this.folderid
         }
     }
 

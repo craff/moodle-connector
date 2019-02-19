@@ -26,6 +26,9 @@
 		},
 		"typeA": {
 			"type" : "string"
+		},
+		"folderid": {
+			"type" : ["number", "null"]
 		}
  	},
 	"required": [
