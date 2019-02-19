@@ -11,3 +11,10 @@
 node_modules
 src/main/resources/public/dist
 rev-manifest.json
+/src/main/resources/public/template/entcore/
+package-lock.json
+/src/main/resources/view/
+/src/main/resources/view/moodle.html
+/src/main/resources/public/js/
+/build.sh
+/docker-compose.yml
