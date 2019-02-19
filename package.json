@@ -36,6 +36,6 @@
     "entcore-toolkit": "^1.0.1"
   },
   "devDependencies": {
-     "@types/jquery": "^2.0.34"
+    "@types/jquery": "^2.0.34"
   }
 }
