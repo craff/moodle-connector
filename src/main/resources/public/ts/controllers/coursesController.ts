@@ -57,8 +57,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
 
-        $scope.courses.setChoice();
-
         // TODO gestion des dossiers
         // if($scope.folders.isSynchronized === undefined || $scope.folders.isSynchronized === false) {
         //     $scope.initFolders();
@@ -73,7 +71,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         template.open('main', 'page-library');
         Utils.safeApply($scope);
 
-        $scope.courses.setChoice();
     };
 
     $scope.initController = async function () {

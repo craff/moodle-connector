@@ -3,7 +3,7 @@
         <span class="left-magnet bottom-margin">
             <i18n>moodle.create.courses.recent</i18n>
         </span>
-        <switch ng-model="courses.printcreatecoursesrecents"></switch>
+        <switch ng-model="courses.printcreatecoursesrecents" ng-click="courses.setChoice()"></switch>
     </div>
 
     <div ng-if="courses.printcreatecoursesrecents">
