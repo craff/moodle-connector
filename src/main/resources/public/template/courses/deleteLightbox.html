@@ -1,0 +1,23 @@
+<!-- alert for delete folders and courses -->
+<form ng-submit="deleteElements()">
+    <div class="eight cell horizontal-spacing">
+        <h2 class="row twelve"><i18n>moodle.lightBox.delete.title</i18n></h2>
+        <br>
+        <p><i18n>moodle.lightBox.delete.content</i18n></p>
+        <ul>
+            <li ng-repeat="folderList in getAllFolders()" ng-if="folderList.select">
+                [[folderList.name]]
+            </li>
+            <li ng-repeat="courseList in courses.allCourses" ng-if="courseList.select">
+                [[courseList.fullname]]
+            </li>
+        </ul>
+    </div>
+    <br>
+    <div class="row">
+        <div class="right-magnet">
+            <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
+            <input type="submit" class="button" i18n-value="moodle.lightBox.delete.submit" />
+        </div>
+    </div>
+</form>

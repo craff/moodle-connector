@@ -65,12 +65,7 @@
 	"moodle.toaster.delete": "supprimer",
 	"moodle.toaster.title": "Déplacer la sélection",
 	"moodle.toaster.folderSelected": "Déplacer le dossier",
-	"moodle.toaster.foldersSelected": "Déplacer les dossiers",
 	"moodle.toaster.folderDirection": "dans le dossier cible",
-	"moodle.folder.deleteTextConfirm": "Etes-vous sûr de vouloir supprimer ce dossier",
-	"moodle.folder.deleteTextConfirmSuccess": "Le dossier a bien été supprimé",
-	"moodle.folders.deleteTextConfirm": "Etes-vous sûr de vouloir supprimer ces dossiers",
-	"moodle.folders.deleteTextConfirmSuccess": "Les dossiers ont bien été supprimés",
 	"moodle.course.new": "Créer un cours",
 	"moodle.course.delete": "Supprimer un cours",
 	"moodle.folder.delete": "Supprimer un dossier",
@@ -92,5 +87,9 @@
 	"test" : "Devoir",
 	"course" : "Parcours",
 	"activity" : "Activités",
-	"filter" : "Filtre"
+	"filter" : "Filtre",
+	"moodle.info.deleteTextConfirmSuccess": "La sélection a bien été supprimée",
+	"moodle.lightBox.delete.title": "Supprimer la sélection",
+	"moodle.lightBox.delete.submit": "supprimer la selection",
+	"moodle.lightBox.delete.content": "Confirmez-vous la suppression de la sélection?"
 }

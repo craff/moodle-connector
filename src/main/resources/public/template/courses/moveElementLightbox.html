@@ -1,0 +1,32 @@
+<!-- popup for move folders -->
+
+    <form ng-submit="foldersMove()">
+        <div class="eight cell horizontal-spacing">
+            <h2 class="row twelve"><i18n>moodle.toaster.title</i18n></h2>
+            <br>
+            <p>
+                <i18n>moodle.toaster.folderSelected</i18n>
+            <ul>
+                <li ng-repeat="folder in getAllFolders()" ng-if="folder.select" >[[folder.name]]</li>
+            </ul>
+            </p>
+            <p>
+                <i18n>moodle.toaster.folderDirection</i18n>
+                <select ng-model="folders.folderIdMoveIn" ng-change="selectFolder()" >
+                    <option value="" disabled selected hidden>Sélectionner un dossier</option>
+                    <option value=0>Mes cours</option>
+                    <option ng-repeat="folderList in getAllFolders()" ng-if="!folderList.select" value=[[folderList.id]]>
+                        [[folderList.name]]
+                    </option>
+                </select>
+            </p>
+
+        </div>
+        <br>
+        <div class="row">
+            <div class="right-magnet">
+                <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
+                <input type="submit" class="button" i18n-value="move" ng-disabled="folders.folderIdMoveIn === undefined"/>
+            </div>
+        </div>
+    </form>

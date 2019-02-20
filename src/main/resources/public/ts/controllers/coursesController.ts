@@ -93,9 +93,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.searchbar = {};
         $scope.openLightboxFolder = false;
         $scope.lightboxFolderMove = false;
-        $scope.lightboxFolderDelete = false;
-        $scope.successDeleteFolder = false;
-        $scope.nbFoldersSelect = 0;
+        $scope.successDelete = false;
         $scope.typeFilter = [true, true];
     };
 
@@ -194,7 +192,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.initFolders = async function(){
         $scope.folders = new Folders();
         await $scope.folders.sync();
-        $scope.resetFolderSelect();
+        $scope.resetSelect();
         $scope.toasterShow = false;
         Utils.safeApply($scope);
     };
@@ -217,10 +215,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.openPopUp = function () {
         $scope.course = new Course();
+        template.open('ligthBoxContainer', 'courses/createCourseLightbox');
         $scope.openLightbox = true;
     };
     /**
-     * Close creation course lightbox
+     * Close lightbox
      */
     $scope.closePopUp = function () {
         $scope.openLightbox = false;
@@ -259,69 +258,65 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.getAllFolders = function (){
         return $scope.folders.getAllFoldersModel();
     };
-    $scope.resetFolderSelect = function (){
+    $scope.resetSelect = function (){
         $scope.folders.all.map(folder => folder.select= false );
+        $scope.courses.allCourses.map(course => course.select= false );
     };
     /**
      * toaster show
      * */
-    template.open('toaster', 'toaster');
-
     $scope.showToaster = function (){
+        template.open('toaster', 'toaster');
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
-        $scope.nbFoldersSelect = $scope.folders.all.filter(folder => folder.select).length;
     };
     /**
      * create folder
      * */
     $scope.openPopUpFolder = function () {
         $scope.folder = new Folder();
-        $scope.openLightboxFolder = true;
+        template.open('ligthBoxContainer', 'courses/createFolderLightbox');
+        $scope.openLightbox = true;
     };
-    $scope.closePopUpFolder = function () {
-        $scope.openLightboxFolder = false;
-    };
+
     $scope.createFolder = async function() {
         $scope.folder.parent_id = $scope.currentfolderid;
         await $scope.folder.create();
         $scope.initFolders();
-        $scope.openLightboxFolder = false;
+        $scope.openLightbox = false;
     };
     /**
-    * delete folders
+    * delete elements
     * */
-    $scope.openPopUpFolderDelete = function () {
-        $scope.lightboxFolderDelete = true;
+
+    $scope.openPopUpDelete = function () {
+        template.open('ligthBoxContainer', 'courses/deleteLightbox');
+        $scope.openLightbox = true;
     };
 
-    $scope.closePopUpFolderDelete = function () {
-        $scope.lightboxFolderDelete = false;
-    };
     $scope.hideSuccessDelete = function(){
-        $scope.successDeleteFolder = false
+        $scope.successDelete = false;
     };
-    $scope.deleteFolders = async function (){
-        await $scope.folders.foldersDelete();
-        $scope.lightboxFolderDelete = false;
-        $scope.successDeleteFolder = true;
+    $scope.deleteElements = async function (){
+        //await $scope.folders.foldersDelete();
+        console.log("delete");
+        $scope.openLightbox = false;
+        $scope.successDelete = true;
         $timeout(function () {
-            $scope.successDeleteFolder = false;
+            $scope.successDelete = false;
         }, 3000);
         $scope.initFolders();
     };
     /**
      * move folders
      * */
+    $scope.openPopUpFolderMove = function () {
+        template.open('ligthBoxContainer', 'courses/moveElementLightbox');
+        $scope.openLightbox = true;
+    };
     $scope.foldersMove = async function (){
         await $scope.folders.moveFolders();
         $scope.initFolders();
-        $scope.lightboxFolderMove = false;
-    };
-    $scope.openPopUpFolderMove = function () {
-        $scope.lightboxFolderMove = true;
+        $scope.openLightbox = false;
     };
 
-    $scope.closePopUpFolderMove = function () {
-        $scope.lightboxFolderMove = false;
-    };
 }]);
