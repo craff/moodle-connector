@@ -12,7 +12,10 @@ export class Folder {
     subFolders : Folder[];
     printsubfolder : boolean=false;
     select: boolean=false;
-    toJSON() {
+    constructor() {
+        this.parent_id = 0;
+    }
+    toJson() {
         return {
             parentId : this.parent_id,
             userId : this.user_id,
@@ -22,7 +25,7 @@ export class Folder {
     }
     async create() {
         try {
-            await http.post('/moodle/folder', this.toJSON());
+            await http.post('/moodle/folder', this.toJson());
         } catch (e) {
             notify.error("Save function didn't work");
             throw e;

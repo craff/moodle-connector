@@ -112,7 +112,7 @@ public class MoodleController extends ControllerHelper {
 
     @Post("/folder")
     @ApiDoc("create a folder")
-    @SecuredAction("moodle.create")
+    //@SecuredAction("moodle.create")
     public void createFolder(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
             @Override

@@ -84,7 +84,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.params = {};
         $scope.printmenufolder=false;
         $scope.printmenucourseShared=false;
-        $scope.currentfolderid=null;
+        $scope.currentfolderid=0;
         $scope.printcours=false;
         $scope.printfolders=false;
         $scope.folders=new Folders();
@@ -110,7 +110,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }else{
             $scope.printfolders=false;
             $scope.printcours=false;
-            $scope.currentfolderid=null;
+            $scope.currentfolderid=0;
             $scope.setprintsubfolderValue();
         }
     };
@@ -118,7 +118,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.printmenucourseShared=!$scope.printmenucourseShared;
         $scope.printmenufolder=false;
         $scope.printfolders=false;
-        $scope.currentfolderid=null;
+        $scope.currentfolderid=0;
         if($scope.printmenucourseShared){
             $scope.printcours = true;
             $scope.initAllCouresbyuser();
