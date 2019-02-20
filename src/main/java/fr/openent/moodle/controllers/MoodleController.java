@@ -6,10 +6,7 @@ import fr.openent.moodle.service.MoodleEventBusService;
 import fr.openent.moodle.service.MoodleWebService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBusService;
 import fr.openent.moodle.service.impl.DefaultMoodleWebService;
-import fr.wseduc.rs.ApiDoc;
-import fr.wseduc.rs.Delete;
-import fr.wseduc.rs.Get;
-import fr.wseduc.rs.Post;
+import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
@@ -29,6 +26,7 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
+import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -66,6 +64,74 @@ public class MoodleController extends ControllerHelper {
 	public void view(HttpServerRequest request) {
 		renderView(request);
 	}
+
+    @Put("/folder/move")
+    @ApiDoc("move a folder")
+    //@SecuredAction("moodle.put")
+    public void moveFolder(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject folder) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            moodleWebService.moveFolder(folder, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Delete("/folder")
+    @ApiDoc("delete a folder")
+    //@SecuredAction("moodle.delete")
+    public void deleteFolder(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject folder) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            moodleWebService.deleteFolders(folder, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Post("/folder")
+    @ApiDoc("create a folder")
+    @SecuredAction("moodle.create")
+    public void createFolder(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject folder) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user){
+                        if (user != null) {
+                            folder.put("userId", user.getUserId());
+                            folder.put("structureId", user.getStructures().get(0));
+                            moodleWebService.createFolder(folder, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
 
 	@Post("/course")
     @ApiDoc("create a course")
@@ -147,6 +213,67 @@ public class MoodleController extends ControllerHelper {
             }
         });
 	}
+
+    @Get("/folder/countsFolders/:id")
+    @ApiDoc("Get count fodlers in course by id")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getCountsItemInFolder(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    long id_folder =Long.parseLong(request.params().get("id"));
+                    moodleWebService.countItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
+                }
+                else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
+
+    @Get("/folder/countsCourses/:id")
+    @ApiDoc("Get count courses in folder by id")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getCountsItemCoursesInFolder(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    long id_folder =Long.parseLong(request.params().get("id"));
+                    moodleWebService.countCoursesItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
+                }
+                else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
+
+    @Get("/folders")
+    @ApiDoc("Get folder in database")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void listFoldersAndShared(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    moodleWebService.getFoldersInEnt(user.getUserId(), arrayResponseHandler(request));
+                }
+                else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
+
+
 
     @Get("/users/courses")
     @ApiDoc("Get cours by user in database")

@@ -80,7 +80,11 @@
                     </div>
                 </div>
             </lightbox>
+			<!--info pour confirmer la surppression d'un dossier-->
+			<div ng-show="successDeleteFolder && nbFoldersSelect === 1" class="info"><i18n>moodle.folder.deleteTextConfirmSuccess</i18n></div>
+			<div ng-show="successDeleteFolder && nbFoldersSelect > 1" class="info"><i18n>moodle.folders.deleteTextConfirmSuccess</i18n></div>
 			<container template="main"></container>
+			<container template="toaster"></container>
 		</portal>
 	</body>
 </html>

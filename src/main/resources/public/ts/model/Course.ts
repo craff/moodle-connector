@@ -60,9 +60,6 @@ export class Course {
 
 export class Courses {
     allbyfolder: Course[];
-
-
-    allCourses: Course[];
     coursesShared: Course[];
     coursesByUser: Course[];
     isSynchronized: Boolean;

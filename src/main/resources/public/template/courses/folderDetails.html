@@ -1,9 +1,11 @@
 <i class="foldericon"></i>
 
-<label ng-click="isPrintSubFolder(folder)">
+<label ng-click="isPrintSubFolder(folder)" >
     <span class="summary">[[folder.name]]</span>
 </label></br>
 <label ng-init="countItems(folder)">
-    [[folder.nbItems]] <i18n>moodle.folder.item</i18n>:
+    <i18n>moodle.folder.item</i18n>:
+    [[folder.nbItems]]
 </label>
-<input type="checkbox" class="right-magnet">
+<input type="checkbox" ng-change="showToaster()" ng-model="folder.select" class="right-magnet">
+

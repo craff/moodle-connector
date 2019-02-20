@@ -3,7 +3,8 @@ import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
 
-export const mainController = ng.controller('MoodleController', ['$scope', 'route','$rootScope',($scope, route,$rootScope) => {
+export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route','$rootScope', ($scope, $timeout, route,$rootScope) => {
+
 
      route({
         dashboard: function(params){
@@ -81,15 +82,17 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.currentfolderid=null;
         $scope.printcours=false;
         $scope.printfolders=false;
-
         $scope.folders=new Folders();
-        $scope.showToaster = false;
+        $scope.toasterShow = false;
         $scope.openLightbox = false;
         $scope.searchbar = {};
+        $scope.openLightboxFolder = false;
+        $scope.lightboxFolderMove = false;
+        $scope.lightboxFolderDelete = false;
+        $scope.successDeleteFolder = false;
+        $scope.nbFoldersSelect = 0;
         $scope.typeFilter = [true, true];
     };
-
-
 
     $scope.isPrintMenuFolder= function(){
         $scope.printmenufolder=!$scope.printmenufolder;
@@ -125,11 +128,21 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         });
         Utils.safeApply($scope);
     };
-    $scope.setprintsubfolderValuebyFolder = function (folder:Folder){
+    $scope.setprintsubfolderValuebyFolder = function (folder:Folder, printsubfolder: boolean){
         $scope.folders.all.forEach(function (e) {
             if(e.id!=folder.parent_id && e.id!=folder.id && e.id!=0)
             e.printsubfolder=false;
         });
+        folder.printsubfolder=printsubfolder;
+        $scope.parent= folder.parent_id;
+        while ($scope.parent != 0){
+            $scope.folders.all.forEach(function (e) {
+                if(e.id == $scope.parent) {
+                    e.printsubfolder = true;
+                    $scope.parent = e.parent_id;
+                }
+            });
+        }
         Utils.safeApply($scope);
     };
     $scope.isPrintSubFolder= function(folder:Folder){
@@ -148,7 +161,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
            (folder.parent_id!=folder.id)? $scope.currentfolderid=folder.parent_id :$scope.currentfolderid=0;
            $scope.printCouresbySubFolder($scope.currentfolderid);
        }
-       $scope.setprintsubfolderValuebyFolder(folder);
+        $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
 
     };
 
@@ -159,9 +172,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
 
     };
 
-
+    $scope.initCoursesbyuser = async function(){
+        await $scope.courses.getCoursesbyUser();
+        Utils.safeApply($scope);
+    };
 	$scope.initCouresbyFolder = async function(idfolder:number){
-        await $scope.courses.getCoursesbyFolder(idfolder);
+	    await $scope.courses.getCoursesbyFolder(idfolder);
         Utils.safeApply($scope);
     };
 
@@ -173,6 +189,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
     $scope.initFolders = async function(){
         $scope.folders = new Folders();
         await $scope.folders.sync();
+        $scope.resetFolderSelect();
+        $scope.toasterShow = false;
         Utils.safeApply($scope);
     };
 
@@ -196,7 +214,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         $scope.course = new Course();
         $scope.openLightbox = true;
     };
-
     /**
      * Close creation course lightbox
      */
@@ -233,4 +250,73 @@ export const mainController = ng.controller('MoodleController', ['$scope', 'rout
         else
             return $scope.typeFilter[1];
     }
+
+    $scope.getAllFolders = function (){
+        return $scope.folders.getAllFoldersModel();
+    };
+    $scope.resetFolderSelect = function (){
+        $scope.folders.all.map(folder => folder.select= false );
+    };
+    /**
+     * toaster show
+     * */
+    template.open('toaster', 'toaster');
+
+    $scope.showToaster = function (){
+        $scope.toasterShow = !!$scope.folders.all.some(folder => folder.select);
+        $scope.nbFoldersSelect = $scope.folders.all.filter(folder => folder.select).length;
+    };
+    /**
+     * create folder
+     * */
+    $scope.openPopUpFolder = function () {
+        $scope.folder = new Folder();
+        $scope.openLightboxFolder = true;
+    };
+    $scope.closePopUpFolder = function () {
+        $scope.openLightboxFolder = false;
+    };
+    $scope.createFolder = async function() {
+        $scope.folder.parent_id = $scope.currentfolderid;
+        await $scope.folder.create();
+        $scope.initFolders();
+        $scope.openLightboxFolder = false;
+    };
+    /**
+    * delete folders
+    * */
+    $scope.openPopUpFolderDelete = function () {
+        $scope.lightboxFolderDelete = true;
+    };
+
+    $scope.closePopUpFolderDelete = function () {
+        $scope.lightboxFolderDelete = false;
+    };
+    $scope.hideSuccessDelete = function(){
+        $scope.successDeleteFolder = false
+    };
+    $scope.deleteFolders = async function (){
+        await $scope.folders.foldersDelete();
+        $scope.lightboxFolderDelete = false;
+        $scope.successDeleteFolder = true;
+        $timeout(function () {
+            $scope.successDeleteFolder = false;
+        }, 3000);
+        $scope.initFolders();
+    };
+    /**
+     * move folders
+     * */
+    $scope.foldersMove = async function (){
+        await $scope.folders.moveFolders();
+        $scope.initFolders();
+        $scope.lightboxFolderMove = false;
+    };
+    $scope.openPopUpFolderMove = function () {
+        $scope.lightboxFolderMove = true;
+    };
+
+    $scope.closePopUpFolderMove = function () {
+        $scope.lightboxFolderMove = false;
+    };
 }]);

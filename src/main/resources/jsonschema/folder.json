@@ -3,25 +3,14 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "folderid": {
-      "type": "number"
-    },
-    "parentid": {
-      "type": "number"
-    },
-    "userid":{
-      "type" : "string"
-    },
     "name": {
       "type": "string"
     },
-    "structureid":{
-      "type" : "string"
+    "foldersId": {
+      "type": "array"
+    },
+    "parentId": {
+      "type": "number"
     }
-  },
-  "required": [
-    "folderid",
-    "parentid",
-    "userid"
-  ]
+  }
 }
