@@ -207,7 +207,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.countItems =async function (folder:Folder){
-        await folder.countitems();
+        await folder.countItemsModel();
         Utils.safeApply($scope);
     };
 
@@ -254,7 +254,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             return $scope.typeFilter[0];
         else
             return $scope.typeFilter[1];
-    }
+    };
 
     $scope.getAllFolders = function (){
         return $scope.folders.getAllFoldersModel();
@@ -268,7 +268,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     template.open('toaster', 'toaster');
 
     $scope.showToaster = function (){
-        $scope.toasterShow = !!$scope.folders.all.some(folder => folder.select);
+        $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         $scope.nbFoldersSelect = $scope.folders.all.filter(folder => folder.select).length;
     };
     /**

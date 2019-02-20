@@ -15,12 +15,13 @@ export interface Course {
     imageurl : string;
     type : string;
     typeA : string;
-
+    select: boolean;
 }
 
 export class Course {
     constructor(){
         this.type = "1";
+        this.select = false;
     }
     toJSON() {
         return {
@@ -64,6 +65,7 @@ export class Courses {
     coursesShared: Course[];
     coursesByUser: Course[];
     isSynchronized: Boolean;
+    allCourses: Course[];
     printcreatecoursesrecents : boolean;
 
     constructor() {
