@@ -25,3 +25,10 @@ CREATE TABLE moodle.course (
   user_id character varying(36) NOT NULL,
   CONSTRAINT course_pkey PRIMARY KEY (moodle_id)
 );
+
+CREATE TABLE moodle.choices (
+                              view character varying (255) NOT NULL,
+                              choice boolean,
+                              user_id character varying(36) NOT NULL
+
+);

@@ -38,12 +38,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.initDashBoardTab = async function(){
         $scope.currentTab='dashboard';
         // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
-        $scope.printcreatecoursesrecents=true;
 
 
         if($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
+
+        await $scope.courses.getChoice();
 
         template.open('main', 'dashboard/dashboard_home');
         Utils.safeApply($scope);
@@ -56,12 +57,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
 
+        $scope.courses.setChoice();
+
         // TODO gestion des dossiers
         // if($scope.folders.isSynchronized === undefined || $scope.folders.isSynchronized === false) {
         //     $scope.initFolders();
         // }
 
-        $scope.printcreatecoursesrecents=false;
         template.open('main', 'my-courses');
         Utils.safeApply($scope);
     };
@@ -70,6 +72,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.currentTab = 'library';
         template.open('main', 'page-library');
         Utils.safeApply($scope);
+
+        $scope.courses.setChoice();
+
     };
 
     $scope.initController = async function () {

@@ -87,4 +87,21 @@ public interface MoodleWebService{
      */
     void getCoursesByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler);
 
+    /**
+     * get choice of user in a specific view
+     * @param userId
+     * @param view
+     * @param handler
+     */
+    void getChoice(String userId , String view, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * set choice of user in a specific view in the DataBase
+     * @param courses where the choice is stock
+     * @param view
+     * @param handler
+     */
+    void setChoice(JsonObject courses, String view, Handler<Either<String, JsonObject>> handler);
+
+
 }

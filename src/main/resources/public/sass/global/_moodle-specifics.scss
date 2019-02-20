@@ -11,7 +11,14 @@ body.moodle {
       margin-right: 0px;
     }
     label.chip.checkbox-course.selected {
-      background-color: $orange;
+      background-color: #e20037;
+    }
+    .checkbox-activity {
+      background-color: $medium-grey;
+      margin-right: 0px;
+    }
+    label.chip.checkbox-activity.selected {
+      background-color: $accent;
     }
   }
 

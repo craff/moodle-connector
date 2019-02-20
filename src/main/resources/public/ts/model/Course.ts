@@ -15,6 +15,7 @@ export interface Course {
     imageurl : string;
     type : string;
     typeA : string;
+
 }
 
 export class Course {
@@ -63,6 +64,7 @@ export class Courses {
     coursesShared: Course[];
     coursesByUser: Course[];
     isSynchronized: Boolean;
+    printcreatecoursesrecents : boolean;
 
     constructor() {
         this.allbyfolder = [];
@@ -71,6 +73,12 @@ export class Courses {
         this.coursesShared = [];
         this.coursesByUser = [];
         this.isSynchronized = false;
+        this.getChoice();
+    }
+    toJSON() {
+        return {
+            printcreatecoursesrecents : this.printcreatecoursesrecents
+        }
     }
     /*async getCoursesbyFolder (folder_id: number) {
         try {
@@ -89,6 +97,14 @@ export class Courses {
             this.allCourses = allCourses;
             this.coursesByUser = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
             this.coursesShared = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
+            this.coursesByUser = this.coursesByUser.sort(
+                function compare(a, b) {
+                    if (a.date < b.date)
+                        return 1;
+                    if (a.date > b.date)
+                        return -1;
+                }
+            );
 
             this.isSynchronized = true;
         } catch (e) {
@@ -104,6 +120,20 @@ export class Courses {
             throw e;
         }
     }*/
+
+    async getChoice(){
+        try {
+            let {data} = await http.get('/moodle/choices/lastCreation');
+            console.log(data);
+            this.printcreatecoursesrecents = data.choice;
+        } catch (e) {
+            notify.error("Get Choice function didn't work");
+        }
+    }
+
+    async setChoice(){
+        await http.put(`/moodle/choices/lastCreation`, this.toJSON());
+    }
 }
 
 export class Author{

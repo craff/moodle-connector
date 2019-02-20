@@ -150,4 +150,28 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         values.add(userId);
         sql.prepared(query, values, SqlResult.validResultHandler(eitherHandler));
     }
+
+    @Override
+    public void getChoice(String userId, String view, final Handler<Either<String, JsonObject>> handler) {
+        String query = "SELECT choice " +
+                "FROM " + Moodle.moodleSchema + ".choices " +
+                "WHERE user_id = ? AND view = ?;";
+
+        JsonArray values = new JsonArray();
+        values.add(userId);
+        values.add(view);
+        sql.prepared(query, values,SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void setChoice(final JsonObject courses, String view, Handler<Either<String, JsonObject>> handler) {
+        String query = "UPDATE " + Moodle.moodleSchema + ".choices " +
+                "SET choice = ? WHERE user_id = ? AND view = ?;";
+
+        JsonArray values = new JsonArray();
+        values.add(courses.getBoolean("printcreatecoursesrecents"));
+        values.add(courses.getString("userId"));
+        values.add(view);
+        sql.prepared(query, values,SqlResult.validUniqueResultHandler(handler));
+    }
 }

@@ -3,29 +3,11 @@
         <span class="left-magnet" style="margin-bottom: 10px">
             <i18n>moodle.create.courses.recent</i18n>
         </span>
-        <switch ng-model="printcreatecoursesrecents"></switch>
+        <switch ng-model="courses.printcreatecoursesrecents"></switch>
     </div>
-    <div ng-if="printcreatecoursesrecents">
-        <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackground">
-            <div class="cell" ng-class="{ activityPictureBackground : course.course_type == 'singleactivity',
-                  coursePictureBackground : course.course_type == 'topics' }" ng-click="course.goTo()">
-                <img ng-src="[[course.image]]" class="image-dashboard"
-                     ng-show="course.image !== null && course.image !== undefined"/>
-                <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
-                     ng-show="course.image === null || course.image === undefined"/>
-            </div>
-            <div class="eleven cell left-margin" ng-click="course.goTo()">
-                <span class="text-font">[[course.fullname]]</span></br>
-                <span class="summary-dashboard size-font">[[course.summary]]</span></br>
-                <label class="size-font">
-                    <i18n>modified.on</i18n>:
-                    [[course.date]]
-                </label>
-            </div>
-            <label class="checkbox right-magnet">
-                <input type="checkbox" ng-model="course.selected" >
-                <span></span>
-            </label>
+    <div ng-if="courses.printcreatecoursesrecents">
+        <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="twelve cell sytle-bord coursesInfoBackground">
+            <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
         </div>
     </div>
 

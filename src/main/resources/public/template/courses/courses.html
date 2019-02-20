@@ -1,9 +1,3 @@
-<div ng-init="initCoursesbyuser()" ng-if="printcreatecoursesrecents">
-    <div ng-repeat="course in courses.coursesByUser" class="twelve cell sytle-bord coursesInfoBackgroundList">
-        <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
-    </div>
-</div>
-
 <div ng-if="printmenufolder && showCourse(course.course_type)"
      class="five cell twelve-mobile course-article sytle-bord coursesInfoBackground bottom-margin"
      ng-repeat="course in courses.coursesByUser">

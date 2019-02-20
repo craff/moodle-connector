@@ -11,6 +11,7 @@ import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Renders;
+import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -408,6 +409,52 @@ public class MoodleController extends ControllerHelper {
 	    String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
 	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" + request.getParam("id"));
     }
+
+    @Get("/choices/:view")
+    @ApiDoc("get a choice")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getChoice (final HttpServerRequest request) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            String userId = user.getUserId();
+                            String view = request.getParam("view");
+                            moodleWebService.getChoice(userId, view, DefaultResponseHandler.defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+
+    @Put("/choices/:view")
+    @ApiDoc("set a choice")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void setChoice (final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "courses", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject courses) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            courses.put("userId", user.getUserId());
+                            String view = request.getParam("view");
+                            moodleWebService.setChoice(courses, view, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
 
     public LocalDateTime getDateString(String date){
         return LocalDateTime.parse(date.substring(0, 10) + "T" + date.substring(11));
