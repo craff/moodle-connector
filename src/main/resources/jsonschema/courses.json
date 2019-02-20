@@ -5,6 +5,12 @@
 	"properties": {
 		"printcreatecoursesrecents": {
 			"type" : ["boolean"]
+		},
+		"printcoursestodo": {
+			"type" : ["boolean"]
+		},
+		"printcoursestocome": {
+			"type" : ["boolean"]
 		}
 	}
 }

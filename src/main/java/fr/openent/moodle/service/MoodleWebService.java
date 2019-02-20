@@ -90,10 +90,9 @@ public interface MoodleWebService{
     /**
      * get choice of user in a specific view
      * @param userId
-     * @param view
-     * @param handler
+     * @param eitherHandler
      */
-    void getChoice(String userId , String view, Handler<Either<String, JsonObject>> handler);
+    void getChoices(String userId, Handler<Either<String, JsonArray>> eitherHandler);
 
     /**
      * set choice of user in a specific view in the DataBase

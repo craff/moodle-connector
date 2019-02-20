@@ -94,6 +94,7 @@ i.sort-desc::before {
 }
 .coursesBackground{
   background: #eee;
+  padding: 15px 60px;
 }
 .coursesInfoBackgroundList{
   background: #ffffff;
@@ -127,4 +128,7 @@ i.sort-desc::before {
 
 .left-magnet{
   float: left;
+  color: #555;
+  font-weight: bold;
+  font-size: 20px;
 }

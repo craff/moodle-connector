@@ -410,25 +410,24 @@ public class MoodleController extends ControllerHelper {
 	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" + request.getParam("id"));
     }
 
-    @Get("/choices/:view")
+    @Get("/choices")
     @ApiDoc("get a choice")
     //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getChoice (final HttpServerRequest request) {
-	    UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-	        @Override
-            public void handle(UserInfos user) {
-	            if (user != null) {
-	                String userId = user.getUserId();
-	                String view = request.getParam("view");
-	                moodleWebService.getChoice(userId, view, DefaultResponseHandler.defaultResponseHandler(request));
-	            } else {
-	                log.debug("User not found in session.");
-	                unauthorized(request);
-	            }
-	        }
-	    });
-	}
+    public void getChoices (final HttpServerRequest request) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            String userId = user.getUserId();
+                            moodleWebService.getChoices(userId, arrayResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
 
     @Put("/choices/:view")
     @ApiDoc("set a choice")

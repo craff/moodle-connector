@@ -167,15 +167,14 @@ ___________________delete courses à tester______________
     }
 
     @Override
-    public void getChoice(String userId, String view, final Handler<Either<String, JsonObject>> handler) {
-        String query = "SELECT choice " +
+    public void getChoices(String userId, final Handler<Either<String, JsonArray>> eitherHandler) {
+        String query = "SELECT view, choice " +
                 "FROM " + Moodle.moodleSchema + ".choices " +
-                "WHERE user_id = ? AND view = ?;";
+                "WHERE user_id = ?;";
 
         JsonArray values = new JsonArray();
         values.add(userId);
-        values.add(view);
-        sql.prepared(query, values,SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(query, values,SqlResult.validResultHandler(eitherHandler));
     }
 
     @Override
@@ -184,7 +183,12 @@ ___________________delete courses à tester______________
                 "SET choice = ? WHERE user_id = ? AND view = ?;";
 
         JsonArray values = new JsonArray();
-        values.add(courses.getBoolean("printcreatecoursesrecents"));
+        if(view.equals("lastCreation"))
+            values.add(courses.getBoolean("printcreatecoursesrecents"));
+        else if (view.equals("toDo"))
+            values.add(courses.getBoolean("printcoursestodo"));
+        else if (view.equals("toCome"))
+            values.add(courses.getBoolean("printcoursestocome"));
         values.add(courses.getString("userId"));
         values.add(view);
         sql.prepared(query, values,SqlResult.validUniqueResultHandler(handler));

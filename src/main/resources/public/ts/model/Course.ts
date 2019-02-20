@@ -62,6 +62,8 @@ export class Courses {
     isSynchronized: Boolean;
     allCourses: Course[];
     printcreatecoursesrecents : boolean;
+    printcoursestodo : boolean;
+    printcoursestocome : boolean;
 
     constructor() {
         this.allbyfolder = [];
@@ -99,7 +101,9 @@ export class Courses {
     */
     toJSON() {
         return {
-            printcreatecoursesrecents : this.printcreatecoursesrecents
+            printcreatecoursesrecents : this.printcreatecoursesrecents,
+            printcoursestodo : this.printcoursestodo,
+            printcoursestocome : this.printcoursestocome
         }
     }
     /*async getCoursesbyFolder (folder_id: number) {
@@ -143,18 +147,37 @@ export class Courses {
         }
     }*/
 
-    async getChoice(){
-        try {
-            let {data} = await http.get('/moodle/choices/lastCreation');
-            console.log(data);
-            this.printcreatecoursesrecents = data.choice;
-        } catch (e) {
-            notify.error("Get Choice function didn't work");
-        }
+    async getChoice() {
+            try {
+                const {data} = await http.get('/moodle/choices');
+                this.printcreatecoursesrecents = data[0].choice;
+                this.printcoursestodo = data[1].choice;
+                this.printcoursestocome = data[2].choice;
+            } catch (e) {
+                notify.error("Get Choice function didn't work");
+                }
     }
 
-    async setChoice(){
-        await http.put(`/moodle/choices/lastCreation`, this.toJSON());
+    async setChoice(view:number){
+        if (view == 1){
+            try {
+                await http.put(`/moodle/choices/lastCreation`, this.toJSON());
+            } catch (e) {
+                notify.error("Set Choice lastCreation function didn't work");
+            }
+        }else if (view == 2){
+            try {
+                await http.put(`/moodle/choices/toDo`, this.toJSON());
+            } catch (e) {
+                notify.error("Set Choice toDo function didn't work");
+            }
+        }else if (view ==3){
+            try {
+                await http.put(`/moodle/choices/toCome`, this.toJSON());
+            } catch (e) {
+                notify.error("Set Choice toCome function didn't work");
+            }
+        }
     }
 }
 
