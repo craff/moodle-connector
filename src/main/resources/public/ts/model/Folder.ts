@@ -10,7 +10,7 @@ export class Folder {
     structure_id : string;
     nbItems: number=0;
     subFolders : Folder[];
-    printsubfolder: boolean=false;
+    printsubfolder : boolean=false;
     select: boolean=false;
     toJSON() {
         return {
