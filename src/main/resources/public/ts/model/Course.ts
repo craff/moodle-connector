@@ -50,13 +50,6 @@ export class Course {
             throw e;
         }
     }
-    async delete() {
-        try {
-            await http.delete(`/moodle/course/${this.courseid}`);
-        } catch (e) {
-            notify.error("Delete function didn't work");
-        }
-    }
     async goTo(scope: string = 'view') {
         window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
     }
@@ -79,6 +72,31 @@ export class Courses {
         this.isSynchronized = false;
         this.getChoice();
     }
+    toJsonForDelete(){
+        return {
+            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
+        }
+    }
+    async coursesDelete() {
+        let { coursesId } =  this.toJsonForDelete();
+            try {
+                console.log(coursesId[0])
+                let courses = await http.delete(`/moodle/course/${coursesId[0]}`);
+                this.allbyfolder = Mix.castArrayAs(Course, courses.data);
+            } catch (e) {
+                notify.error("Delete function didn't work");
+            }
+    }
+    /*
+    ___________________delete courses à tester______________
+        try {
+            await http.delete('/moodle/course', { data: this.toJsonForDelete() } );
+        } catch (e) {
+            notify.error("Delete function didn't work");
+            throw e;
+        }
+    }
+    */
     toJSON() {
         return {
             printcreatecoursesrecents : this.printcreatecoursesrecents

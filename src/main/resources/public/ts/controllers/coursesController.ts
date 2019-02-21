@@ -206,8 +206,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         return $scope.folders.getSubFolder(folder.id);
     };
 
-    $scope.countItems = async function (folder:Folder){
-        await folder.countItemsModel();
+    $scope.countItems =async function (folder:Folder){
+        if(folder){
+            await folder.countItemsModel();
+        }
     };
 
     /**
@@ -313,13 +315,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.folders.foldersDelete();
         }
         if($scope.courses.allCourses.some(course => course.selectConfirm)){
-            console.log($scope.courses.allCourses.filter(course => course.select));
+            await $scope.courses.coursesDelete();
         }
         $scope.openLightbox = false;
         $scope.successDelete = true;
-        $timeout(function () {
-            $scope.successDelete = false;
-        }, 3000);
+        $timeout(()=>
+            $scope.successDelete = false
+        , 3000);
         $scope.initFolders();
     };
     /**

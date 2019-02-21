@@ -6,11 +6,11 @@
         <p><i18n>moodle.lightBox.delete.content</i18n></p>
         <ul>
             <li ng-repeat="folderList in getAllFolders()" ng-if="folderList.select">
-                <input id="folders" type="checkbox" ng-change="confirmDeleteSend()" checked  ng-model="folderList.selectConfirm" class="">
+                <input id="folders" type="checkbox" ng-change="confirmDeleteSend()" checked  ng-model="folderList.selectConfirm" class="checkbox ">
                 <label for="folders">[[folderList.name]]</label>
             </li>
             <li ng-repeat="courseList in courses.allCourses" ng-if="courseList.select">
-                <input id="courses" type="checkbox" ng-change="confirmDeleteSend()" checked  ng-model="courseList.selectConfirm" class="">
+                <input id="courses" type="checkbox" ng-change="confirmDeleteSend()" checked  ng-model="courseList.selectConfirm" class="checkbox ">
                 <label for="courses">[[courseList.fullname]]</label>
             </li>
         </ul>

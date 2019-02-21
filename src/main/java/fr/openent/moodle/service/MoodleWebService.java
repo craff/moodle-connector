@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 public interface MoodleWebService{
 
     /**
-     * delete a folder
+     * delete folders
      * @param folder folder to delete
      * @param handler function handler returning data
      */
@@ -37,7 +37,7 @@ public interface MoodleWebService{
     void createCourse (JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * Delete a course
+     * Delete courses
      * @param course course to delete
      * @param handler function handler returning data
      */

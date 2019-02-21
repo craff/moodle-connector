@@ -86,7 +86,22 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
         sql.prepared(deleteCourse, values, SqlResult.validUniqueResultHandler(handler));
     }
+/*
+___________________delete courses à tester______________
+@Override
+    public void deleteCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
+        JsonArray values = new JsonArray();
+        JsonArray courses = course.getJsonArray("coursesId");
 
+        for (int i = 0; i < courses.size(); i++) {
+            values.add(courses.getValue(i));
+        }
+
+        String deleteCourse = "DELETE FROM " + Moodle.moodleSchema + ".course" + " WHERE moodle_id IN " + Sql.listPrepared(courses.getList());
+
+        sql.prepared(deleteCourse, values, SqlResult.validUniqueResultHandler(handler));
+    }
+ */
     @Override
     public void getCoursInEnt(final long id_folder, String id_user, final Handler<Either<String, JsonArray>> handler) {
         String query = "SELECT moodle_id, folder_id  " +

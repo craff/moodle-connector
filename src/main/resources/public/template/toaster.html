@@ -16,7 +16,7 @@
             <button  ng-click="" class="cell">
                 <i18n>moodle.toaster.move</i18n>
             </button>
-            <button  ng-click="openPopUpDelete()" class="cell">
+            <button ng-show="(nbFoldersSelect > 0 && nbCoursesSelect <= 1) || (nbCoursesSelect === 1)"  ng-click="openPopUpDelete()" class="cell">
                 <i18n>moodle.toaster.delete</i18n>
             </button>
             <button  ng-click="" class="cell">
