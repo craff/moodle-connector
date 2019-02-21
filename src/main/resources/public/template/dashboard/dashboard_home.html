@@ -1,10 +1,11 @@
 <div class="coursesBackground">
     <div>
-        <span class="left-magnet" style="margin-bottom: 10px">
+        <span class="left-magnet bottom-margin">
             <i18n>moodle.create.courses.recent</i18n>
         </span>
         <switch ng-model="courses.printcreatecoursesrecents"></switch>
     </div>
+
     <div ng-if="courses.printcreatecoursesrecents">
         <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="twelve cell style-bord infoBackground">
             <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
@@ -12,12 +13,10 @@
     </div>
 
     <section class="toggle-buttons" ng-show="courses.selection().length > 0">
-        <div class="toggle">
-            <div class="row">
-                <button>
-                    <i18n>modify</i18n>
-                </button>
-            </div>
+        <div class="toggle row">
+            <button>
+                <i18n>modify</i18n>
+            </button>
         </div>
     </section>
 </div>

@@ -371,6 +371,7 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 JsonObject course = new JsonObject();
+                course.put("courseid", Integer.parseInt(request.getParam("id")));
                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 URI moodleDeleteUri = null;
                 try {
@@ -385,7 +386,7 @@ public class MoodleController extends ControllerHelper {
                     final String moodleDeleteUrl = moodleDeleteUri.toString() +
                             "?wstoken=" + WSTOKEN +
                             "&wsfunction=" + WS_DELETE_FUNCTION +
-                            "&courseids[0]=" + course.getInteger("courseids") +
+                            "&courseids[0]=" +course.getInteger("courseid") +
                             "&moodlewsrestformat=" + JSON;
                     httpClientHelper.webServiceMoodlePost(moodleDeleteUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>> () {
                         @Override
@@ -414,20 +415,20 @@ public class MoodleController extends ControllerHelper {
     //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void getChoice (final HttpServerRequest request) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        if (user != null) {
-                            String userId = user.getUserId();
-                            String view = request.getParam("view");
-                            moodleWebService.getChoice(userId, view, DefaultResponseHandler.defaultResponseHandler(request));
-                        } else {
-                            log.debug("User not found in session.");
-                            unauthorized(request);
-                        }
-                    }
-                });
-            }
+	    UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+	        @Override
+            public void handle(UserInfos user) {
+	            if (user != null) {
+	                String userId = user.getUserId();
+	                String view = request.getParam("view");
+	                moodleWebService.getChoice(userId, view, DefaultResponseHandler.defaultResponseHandler(request));
+	            } else {
+	                log.debug("User not found in session.");
+	                unauthorized(request);
+	            }
+	        }
+	    });
+	}
 
     @Put("/choices/:view")
     @ApiDoc("set a choice")

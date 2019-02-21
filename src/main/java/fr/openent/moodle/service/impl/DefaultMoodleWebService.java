@@ -82,7 +82,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         String deleteCourse = "DELETE FROM " + Moodle.moodleSchema + ".course WHERE moodle_id = ?;";
 
         JsonArray values = new JsonArray();
-        values.add(course.getValue("courseids"));
+        values.add(course.getValue("courseid"));
 
         sql.prepared(deleteCourse, values, SqlResult.validUniqueResultHandler(handler));
     }
