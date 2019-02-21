@@ -1,18 +1,7 @@
 <div class="coursesBackground">
-    <div>
-        <span class="left-magnet bottom-margin">
-            <i18n>moodle.create.courses.recent</i18n>
-        </span>
-        <switch ng-model="courses.printcreatecoursesrecents" ng-click="courses.setChoice()"></switch>
-    </div>
-
-    <div ng-if="courses.printcreatecoursesrecents">
-        <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="twelve cell style-bord infoBackground">
-            <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
-
     <div class="row">
         <div>
-            <span class="left-magnet" style="margin-bottom: 10px">
+            <span class="left-magnet" style="margin: 0px 10px 20px 0px">
                 <i18n>moodle.create.courses.recent</i18n>
             </span>
             <switch ng-model="courses.printcreatecoursesrecents" ng-click="courses.setChoice(1)"></switch>
@@ -23,31 +12,72 @@
             </div>
         </div>
     </div>
-    <span></span>
+    <br/>
     <div class="row">
-        <div>
-            <span class="left-magnet" style="margin-bottom: 10px">
-                <i18n>moodle.todo.courses</i18n>
-            </span>
-            <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
+        <span class="left-magnet" style="margin: 0px 10px 20px 0px">
+            <i18n>moodle.todo.courses</i18n>
+        </span>
+        <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
+    </div>
+    <div ng-if="courses.printcoursestodo">
+        <div class=row">
+            <select class="cell left-magnet" style="margin-bottom: 30px" ng-model="showToDoCourses"
+                    ng-options="libelle for libelle in typeShowCourses"
+                    ng-change="changeShowCoursesToDo()">
+            </select>
+            <div class="cell right-magnet" style="margin-right: 10px">
+                <i class="show-list" ng-class="{ selected: isViewMode('list') }" ng-click="changeViewMode('list')"></i>
+            </div>
+            <span> </span>
+            <div class="cell right-magnet">
+                <i class="show-icons" ng-class="{ selected: isViewMode('icons') }" ng-click="changeViewMode('icons')"></i>
+            </div>
         </div>
-        <div ng-if="courses.printcoursestodo">
-            <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="twelve cell sytle-bord coursesInfoBackground">
-                <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
+        <br/>
+        <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="twelve cell sytle-bord coursesInfoBackground">
+            <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
+        </div>
+        <div class="row">
+            <div class="cell right-magnet">
+                <li class="changeWeekButton">
+                    <button  class="changeWeekButtonBack" ng-click="previousCoursesToDoButton()" ng-disabled="firstCoursesToDo == 0">&#8592;</button>
+                    <button class="changeWeekButtonNext" ng-click="nextCoursesToDoButton()" ng-disabled="lastCoursesToDo >= courses.coursesByUser.length">&#8594;</button>
+                </li>
             </div>
         </div>
     </div>
-    <span></span>
+    <br/>
     <div class="row">
-        <div>
-            <span class="left-magnet" style="margin-bottom: 10px">
-                <i18n>moodle.tocome.courses</i18n>
-            </span>
-            <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
+        <span class="left-magnet" style="margin: 0px 10px 20px 0px">
+            <i18n>moodle.tocome.courses</i18n>
+        </span>
+
+        <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
+    </div>
+    <div ng-if="courses.printcoursestocome">
+        <div class=row">
+            <select class="cell left-magnet" style="margin-bottom: 30px" ng-model="showToComeCourses"
+                    ng-options="libelle for libelle in typeShowCourses"
+                    ng-change="changeShowCoursesToCome()">
+            </select>
+            <div class="cell right-magnet" style="margin-right: 10px">
+                <i class="show-list" ng-class="{ selected: isViewMode('list') }" ng-click="changeViewMode('list')"></i>
+            </div>
+            <span> </span>
+            <div class="cell right-magnet">
+                <i class="show-icons" ng-class="{ selected: isViewMode('icons') }" ng-click="changeViewMode('icons')"></i>
+            </div>
         </div>
-        <div ng-if="courses.printcoursestocome">
-            <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="twelve cell sytle-bord coursesInfoBackground">
-                <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
+        <br/>
+        <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" class="twelve cell sytle-bord coursesInfoBackground">
+            <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
+        </div>
+        <div class="row">
+            <div class="cell right-magnet">
+                <li class="changeWeekButton">
+                    <button  class="changeWeekButtonBack" ng-click="previousCoursesToComeButton()" ng-disabled="firstCoursesToCome == 0">&#8592;</button>
+                    <button class="changeWeekButtonNext" ng-click="nextCoursesToComeButton()" ng-disabled="lastCoursesToCome >= courses.coursesByUser.length">&#8594;</button>
+                </li>
             </div>
         </div>
     </div>

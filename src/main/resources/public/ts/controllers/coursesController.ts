@@ -94,6 +94,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.nbFoldersSelect = 0;
         $scope.nbCoursesSelect = 0;
         $scope.disableDeleteSend = true;
+        $scope.typeShowCourses = ["Tout","Autres"];
+        $scope.firstCoursesToDo = 0;
+        $scope.lastCoursesToDo = 5;
+        $scope.firstCoursesToCome = 0;
+        $scope.lastCoursesToCome = 5;
+        $scope.showToDoCourses = $scope.typeShowCourses[0];
+        $scope.showToComeCourses = $scope.typeShowCourses[0];
     };
 
     $scope.isPrintMenuFolder = function() {
@@ -339,4 +346,28 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.confirmDeleteSend = function (){
          $scope.disableDeleteSend = !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
     };
+
+    /**
+     * next and previous button to show courses
+     * */
+
+    $scope.previousCoursesToDoButton = function () {
+        $scope.firstCoursesToDo -=5;
+        $scope.lastCoursesToDo -=5;
+    };
+    $scope.nextCoursesToDoButton = function () {
+        $scope.firstCoursesToDo +=5;
+        $scope.lastCoursesToDo +=5;
+    };
+
+    $scope.previousCoursesToComeButton = function () {
+        $scope.firstCoursesToCome -=5;
+        $scope.lastCoursesToCome -=5;
+    };
+
+    $scope.nextCoursesToComeButton = function () {
+        $scope.firstCoursesToCome +=5;
+        $scope.lastCoursesToCome +=5;
+    };
+
 }]);

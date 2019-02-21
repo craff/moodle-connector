@@ -32,6 +32,38 @@ body.moodle {
     font-size: 12px;
   }
 
+  .show-icons {
+    height: 24px;
+    width: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    opacity: 0.2;
+  }
+  .show-list {
+    height: 24px;
+    width: 24px;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+    opacity: 0.2;
+    background-size: 100% 93%;
+  }
+  .show-icons.selected {
+    opacity: 0.6;
+  }
+  .show-list.selected {
+    opacity: 0.6;
+  }
+
+  .changeWeekButton{
+    list-style: none;
+  }
+
   .courseButton {
     display: block;
     height: 100px;
