@@ -6,10 +6,12 @@
         <p><i18n>moodle.lightBox.delete.content</i18n></p>
         <ul>
             <li ng-repeat="folderList in getAllFolders()" ng-if="folderList.select">
-                [[folderList.name]]
+                <input id="folders" type="checkbox" ng-change="confirmDeleteSend()" checked  ng-model="folderList.selectConfirm" class="">
+                <label for="folders">[[folderList.name]]</label>
             </li>
             <li ng-repeat="courseList in courses.allCourses" ng-if="courseList.select">
-                [[courseList.fullname]]
+                <input id="courses" type="checkbox" ng-change="confirmDeleteSend()" checked  ng-model="courseList.selectConfirm" class="">
+                <label for="courses">[[courseList.fullname]]</label>
             </li>
         </ul>
     </div>
@@ -17,7 +19,7 @@
     <div class="row">
         <div class="right-magnet">
             <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
-            <input type="submit" class="button" i18n-value="moodle.lightBox.delete.submit" />
+            <input type="submit" class="button" i18n-value="moodle.lightBox.delete.submit" ng-disabled="!disableDeleteSend"/>
         </div>
     </div>
 </form>

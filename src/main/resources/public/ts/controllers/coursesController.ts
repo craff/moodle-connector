@@ -95,6 +95,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.lightboxFolderMove = false;
         $scope.successDelete = false;
         $scope.typeFilter = [true, true];
+        $scope.nbFoldersSelect = 0;
+        $scope.nbCoursesSelect = 0;
+        $scope.disableDeleteSend = true;
     };
 
     $scope.isPrintMenuFolder= function(){
@@ -193,6 +196,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.folders = new Folders();
         await $scope.folders.sync();
         $scope.resetSelect();
+        $scope.countItems();
         $scope.toasterShow = false;
         Utils.safeApply($scope);
     };
@@ -206,7 +210,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.countItems =async function (folder:Folder){
         await folder.countItemsModel();
-        Utils.safeApply($scope);
     };
 
 
@@ -223,6 +226,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.closePopUp = function () {
         $scope.openLightbox = false;
+        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm= false );
+        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm= false );
     };
 
     /**
@@ -268,6 +273,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.showToaster = function (){
         template.open('toaster', 'toaster');
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
+        $scope.countFoldersCourses();
+    };
+    /**
+     * count folders and courses select
+     * */
+    $scope.countFoldersCourses = function (){
+        $scope.nbFoldersSelect = $scope.folders.all.filter(folder => folder.select).length;
+        $scope.nbCoursesSelect = $scope.courses.allCourses.filter(course => course.select).length;
+
     };
     /**
      * create folder
@@ -290,15 +304,20 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.openPopUpDelete = function () {
         template.open('ligthBoxContainer', 'courses/deleteLightbox');
+        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm= true );
+        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm= true );
         $scope.openLightbox = true;
     };
-
     $scope.hideSuccessDelete = function(){
         $scope.successDelete = false;
     };
     $scope.deleteElements = async function (){
-        //await $scope.folders.foldersDelete();
-        console.log("delete");
+        if($scope.folders.all.some(folder => folder.selectConfirm)){
+            await $scope.folders.foldersDelete();
+        }
+        if($scope.courses.allCourses.some(course => course.selectConfirm)){
+            console.log($scope.courses.allCourses.filter(course => course.select));
+        }
         $scope.openLightbox = false;
         $scope.successDelete = true;
         $timeout(function () {
@@ -318,5 +337,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.initFolders();
         $scope.openLightbox = false;
     };
-
+    /**
+     * confirm delete
+     * */
+    $scope.confirmDeleteSend = function (){
+         $scope.disableDeleteSend = !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
+    };
 }]);

@@ -16,12 +16,14 @@ export interface Course {
     type : string;
     typeA : string;
     select: boolean;
+    selectConfirm: boolean;
 }
 
 export class Course {
     constructor(){
         this.type = "1";
         this.select = false;
+        this.selectConfirm = false;
     }
     toJSON() {
         return {

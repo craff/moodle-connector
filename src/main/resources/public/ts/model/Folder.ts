@@ -12,8 +12,10 @@ export class Folder {
     subFolders : Folder[];
     printsubfolder : boolean=false;
     select: boolean=false;
+    selectConfirm: boolean;
     constructor() {
         this.parent_id = 0;
+        this.selectConfirm=false;
     }
     toJson() {
         return {
@@ -68,7 +70,7 @@ export class Folders {
     }
     toJsonForDelete(){
         return {
-            foldersId: this.all.filter(folder => folder.select).map(folder => folder.id ),
+            foldersId: this.all.filter(folder => folder.selectConfirm).map(folder => folder.id ),
         }
     }
     async foldersDelete() {
