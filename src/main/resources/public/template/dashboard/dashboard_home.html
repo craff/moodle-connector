@@ -6,7 +6,7 @@
         <switch ng-model="courses.printcreatecoursesrecents"></switch>
     </div>
     <div ng-if="courses.printcreatecoursesrecents">
-        <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="twelve cell sytle-bord coursesInfoBackground">
+        <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="twelve cell style-bord infoBackground">
             <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
         </div>
     </div>

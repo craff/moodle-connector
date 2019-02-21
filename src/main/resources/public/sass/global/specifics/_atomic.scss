@@ -5,9 +5,10 @@
   margin-top: 15px;
 }
 .folder-article{
-  width: 450px;
-  height: 80px;
-  margin-right: 10px;
+  width: 48%;
+  height: auto;
+  margin-right: 15px;
+  margin-top: 15px;
 }
 .summary-list{
   border-bottom-right-radius: 6%;
@@ -28,7 +29,7 @@
    width: 70px;
    height: 70px;
  }
-.sytle-bord{
+.style-bord{
   box-shadow: 0 1px 3px rgba(0,0,0,0.26);
   border-radius: 2px;
 }
@@ -100,9 +101,9 @@ i.sort-desc::before {
   margin-right: 15px;
   margin-bottom: 15px;
 }
-.coursesInfoBackground{
+.infoBackground{
   background: #ffffff;
-  margin-bottom: 15px;
+  margin-top: 15px;
 }
 .coursesText{
  width: 78%;

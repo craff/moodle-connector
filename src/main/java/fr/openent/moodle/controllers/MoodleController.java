@@ -371,7 +371,6 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 JsonObject course = new JsonObject();
-                course.put("courseids", 111);
                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 URI moodleDeleteUri = null;
                 try {

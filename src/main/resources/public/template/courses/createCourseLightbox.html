@@ -15,7 +15,7 @@
             </label>
         </div>
     </div>
-    <div class="horizontal-spacing seven vertical-spacing">
+    <div class="horizontal-spacing row seven vertical-spacing">
         <label class="row twelve">
             <span class="row label-input-row"><i18n>moodle.course.name.long</i18n>*</span>
             <input type="text" class="twelve" required i18n-placeholder="write.here" ng-model="course.fullname">
@@ -32,13 +32,13 @@
     <div class="row horizontal-spacing" ng-if="course.type == 2">
         <label>
             <span class="row label-input-row"><i18n>moodle.activity.type</i18n>*</span>
+            <select ng-model="course.typeA" ng-required="course.type == 2">
+                <option>quiz</option>
+                <option>file</option>
+                <option>page</option>
+                <option>assignment</option>
+            </select>
         </label>
-        <select ng-model="course.typeA" ng-required="course.type == 2">
-            <option>quiz</option>
-            <option>file</option>
-            <option>page</option>
-            <option>assignment</option>
-        </select>
     </div>
     <div class="row">
         <div class="right-magnet">

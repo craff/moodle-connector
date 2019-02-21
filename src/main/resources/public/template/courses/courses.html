@@ -1,11 +1,11 @@
 <div ng-if="printmenufolder && showCourse(course.course_type)"
-     class="five cell twelve-mobile course-article sytle-bord coursesInfoBackground bottom-margin"
+     class="five cell twelve-mobile course-article style-bord infoBackground bottom-margin"
      ng-repeat="course in courses.coursesByUser">
     <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
 </div>
 
 <div ng-if="printmenucourseShared && showCourse(course.course_type)"
-         class="five cell twelve-mobile course-article sytle-bord coursesInfoBackground bottom-margin"
+         class="five cell twelve-mobile course-article style-bord infoBackground bottom-margin"
          ng-repeat="course in courses.coursesShared">
     <div static-include="/moodle/public/template/courses/coursesItem.html"></div>
 </div>

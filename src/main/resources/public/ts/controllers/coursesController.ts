@@ -22,13 +22,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     });
 
-    $scope.switchTab= function(current: string){
-        $scope.currentTab=current;
-        if($scope.currentTab=='courses'){
+    $scope.switchTab = function(current: string){
+        $scope.currentTab = current;
+        if($scope.currentTab == 'courses'){
             $scope.initCoursesTab();
-        }else if($scope.currentTab=='dashboard'){
+        }else if($scope.currentTab == 'dashboard'){
             $scope.initDashBoardTab();
-        }else if($scope.currentTab=='library'){
+        }else if($scope.currentTab == 'library'){
             $scope.initLibraryTab();
         } else {
             $scope.initDashBoardTab();
@@ -36,7 +36,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.initDashBoardTab = async function(){
-        $scope.currentTab='dashboard';
+        $scope.currentTab = 'dashboard';
         // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
 
 
@@ -51,7 +51,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.initCoursesTab = async function(){
-        $scope.currentTab='courses';
+        $scope.currentTab ='courses';
         // TODO ne charger que si besoin
         if($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             await $scope.courses.getCoursesbyUser(model.me.userId);
@@ -74,20 +74,19 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
 
         $scope.courses.setChoice();
-
     };
 
     $scope.initController = async function () {
-        $scope.courses= new Courses();
-        $scope.currentTab='dashboard';
+        $scope.courses = new Courses();
+        $scope.currentTab ='dashboard';
         $scope.lightboxes = {};
         $scope.params = {};
-        $scope.printmenufolder=false;
-        $scope.printmenucourseShared=false;
-        $scope.currentfolderid=0;
-        $scope.printcours=false;
-        $scope.printfolders=false;
-        $scope.folders=new Folders();
+        $scope.printmenufolder = false;
+        $scope.printmenucourseShared =false;
+        $scope.currentfolderid = 0;
+        $scope.printcours = false;
+        $scope.printfolders = false;
+        $scope.folders = new Folders();
         $scope.toasterShow = false;
         $scope.openLightbox = false;
         $scope.searchbar = {};
@@ -100,50 +99,50 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.disableDeleteSend = true;
     };
 
-    $scope.isPrintMenuFolder= function(){
-        $scope.printmenufolder=!$scope.printmenufolder;
-        $scope.printmenucourseShared=false;
-        if($scope.printmenufolder){
-            $scope.printfolders=true;
-            $scope.printcours=true;
-            $scope.currentfolderid=0;
+    $scope.isPrintMenuFolder = function() {
+        $scope.printmenufolder = !$scope.printmenufolder;
+        $scope.printmenucourseShared = false;
+        if ($scope.printmenufolder) {
+            $scope.printfolders = true;
+            $scope.printcours = true;
+            $scope.currentfolderid = 0;
             $scope.printCouresbySubFolder($scope.currentfolderid);
-        }else{
-            $scope.printfolders=false;
-            $scope.printcours=false;
-            $scope.currentfolderid=0;
+        } else {
+            $scope.printfolders = false;
+            $scope.printcours = false;
+            $scope.currentfolderid = 0;
             $scope.setprintsubfolderValue();
         }
     };
-    $scope.isPrintMenuCoursesShared = function(){
-        $scope.printmenucourseShared=!$scope.printmenucourseShared;
-        $scope.printmenufolder=false;
-        $scope.printfolders=false;
-        $scope.currentfolderid=0;
-        if($scope.printmenucourseShared){
+    $scope.isPrintMenuCoursesShared = function() {
+        $scope.printmenucourseShared = !$scope.printmenucourseShared;
+        $scope.printmenufolder = false;
+        $scope.printfolders = false;
+        $scope.currentfolderid = 0;
+        if ($scope.printmenucourseShared) {
             $scope.printcours = true;
             $scope.initAllCouresbyuser();
-        }else{
+        } else {
             $scope.printcours = false;
         }
         $scope.setprintsubfolderValue();
     };
-    $scope.setprintsubfolderValue = function (){
-        $scope.folders.all.forEach(function (e) {
-                e.printsubfolder=false;
+    $scope.setprintsubfolderValue = function() {
+        $scope.folders.all.forEach(function(e) {
+                e.printsubfolder = false;
         });
         Utils.safeApply($scope);
     };
-    $scope.setprintsubfolderValuebyFolder = function (folder:Folder, printsubfolder: boolean){
-        $scope.folders.all.forEach(function (e) {
-            if(e.id!=folder.parent_id && e.id!=folder.id && e.id!=0)
+    $scope.setprintsubfolderValuebyFolder = function(folder:Folder, printsubfolder: boolean) {
+        $scope.folders.all.forEach(function(e) {
+            if(e.id != folder.parent_id && e.id != folder.id && e.id != 0)
             e.printsubfolder=false;
         });
-        folder.printsubfolder=printsubfolder;
+        folder.printsubfolder = printsubfolder;
         $scope.parent= folder.parent_id;
-        while ($scope.parent != 0){
-            $scope.folders.all.forEach(function (e) {
-                if(e.id == $scope.parent) {
+        while ($scope.parent != 0) {
+            $scope.folders.all.forEach(function(e) {
+                if (e.id == $scope.parent) {
                     e.printsubfolder = true;
                     $scope.parent = e.parent_id;
                 }
@@ -151,30 +150,29 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
         Utils.safeApply($scope);
     };
-    $scope.isPrintSubFolder= function(folder:Folder){
+    $scope.isPrintSubFolder = function(folder:Folder){
        $scope.folders.all.forEach(function (e) {
-           if(e.id==folder.id){
-               e.printsubfolder=!e.printsubfolder;
-               folder.printsubfolder=e.printsubfolder;
+           if(e.id == folder.id){
+               e.printsubfolder = !e.printsubfolder;
+               folder.printsubfolder = e.printsubfolder;
            }
        });
 
        if(folder.printsubfolder){
-            $scope.currentfolderid=folder.id;
-            $scope.printcours=true;
+            $scope.currentfolderid = folder.id;
+            $scope.printcours = true;
            $scope.printCouresbySubFolder(folder.id);
        }else{
-           (folder.parent_id!=folder.id)? $scope.currentfolderid=folder.parent_id :$scope.currentfolderid=0;
+           (folder.parent_id != folder.id) ? $scope.currentfolderid = folder.parent_id : $scope.currentfolderid=0;
            $scope.printCouresbySubFolder($scope.currentfolderid);
        }
         $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
-
     };
 
-    $scope.printCouresbySubFolder= function(idfolder:number){
+    $scope.printCouresbySubFolder = function(idfolder:number){
         $scope.initCouresbyFolder(idfolder);
-        $scope.printcours=true;
-        $scope.printfolders=true;
+        $scope.printcours = true;
+        $scope.printfolders = true;
 
     };
 
@@ -201,17 +199,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
-    $scope.getFolderParent= function (): Folder[]{
+    $scope.getFolderParent = function (): Folder[]{
         return $scope.folders.getparentFolder();
     };
-    $scope.getSubFolder= function (folder:Folder): Folder[]{
+    $scope.getSubFolder = function (folder:Folder): Folder[]{
         return $scope.folders.getSubFolder(folder.id);
     };
 
-    $scope.countItems =async function (folder:Folder){
+    $scope.countItems = async function (folder:Folder){
         await folder.countItemsModel();
     };
-
 
     /**
      * Open creation course lightbox
