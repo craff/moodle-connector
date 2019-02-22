@@ -121,6 +121,9 @@ export class Courses {
             let allCourses = Mix.castArrayAs(Course, courses.data);
 
             this.allCourses = allCourses;
+            /*this.allCourses.forEach(function(course) {
+                course.date = new Date((new Date((course.date).toString())).toLocaleDateString());
+            });*/
             this.coursesByUser = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
             this.coursesShared = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
             this.coursesByUser = this.coursesByUser.sort(

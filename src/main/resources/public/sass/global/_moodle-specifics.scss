@@ -64,6 +64,31 @@ body.moodle {
     list-style: none;
   }
 
+  .title-dashboard{
+    margin: 0px 10px 20px 0px;
+  }
+
+  .list-dashboard {
+    margin-bottom: 30px;
+  }
+
+  .icons-dashboard {
+    margin-right: 10px;
+  }
+
+  .coursesBackground-dashboard{
+    background: #eee;
+    padding: 15px 60px;
+  }
+
+  .right-margin{
+    text-align: right;
+  }
+
+  .next-previous-courses{
+    margin-top: 15px;
+  }
+
   .courseButton {
     display: block;
     height: 100px;

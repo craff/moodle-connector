@@ -45,6 +45,26 @@
   width: 85px;
   padding-left: 10px;
 }
+
+.activitySmallPicture{
+  height: 50px;
+  width: 60px;
+  padding-left: 10px;
+  background-color: #ff8500;
+}
+
+.courseSmallPicture{
+  height: 50px;
+  width: 60px;
+  padding-left: 10px;
+  background-color: #e20037;
+}
+
+.smallImage{
+  width: 50px;
+  height: 50px;
+}
+
 .activityPictureBackground{
   @include pictureSize();
   background-color: #ff8500;
@@ -94,7 +114,6 @@ i.sort-desc::before {
 }
 .coursesBackground{
   background: #eee;
-  padding: 15px 60px;
 }
 .coursesInfoBackgroundList{
   background: #ffffff;
@@ -131,4 +150,8 @@ i.sort-desc::before {
   color: #555;
   font-weight: bold;
   font-size: 20px;
+}
+
+.all-width{
+  width: 100%;
 }

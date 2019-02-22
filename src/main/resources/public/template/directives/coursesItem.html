@@ -1,0 +1,24 @@
+<div class="cell" ng-class="{ activitySmallPicture : place == 'coursesRecent' && course.course_type == 'singleactivity',
+                                activityPictureBackground : place != 'coursesRecent' && course.course_type == 'singleactivity',
+                                courseSmallPicture : place == 'coursesRecent' && course.course_type == 'topics',
+                                coursePictureBackground : place != 'coursesRecent' && course.course_type == 'topics'}" ng-click="course.goTo()">
+    <img ng-src="[[course.image]]" class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent'}"
+         ng-show="course.image !== null && course.image !== undefined"/>
+    <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent'}"
+         ng-show="course.image === null || course.image === undefined"/>
+</div>
+<div class="eleven cell" ng-class="{ 'left-margin' : (place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'),
+                  'right-margin' : (place == 'coursesToDo' || place == 'coursesToCome')}" ng-click="course.goTo()">
+    <span class="text-font">[[course.fullname]]</span> </br>
+    <div ng-if="place != 'coursesRecent'">
+        <span class="summary-list size-font">[[course.summary]]</span></br>
+    </div>
+    <label class="size-font">
+        <i18n>modified.on</i18n>:
+        <span class="date">[[ course.date ]]</span>
+    </label>
+</div>
+<label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'">
+    <input type="checkbox" ng-change="checkCourse()" ng-model="course.select">
+    <span></span>
+</label>

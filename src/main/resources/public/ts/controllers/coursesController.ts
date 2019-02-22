@@ -185,7 +185,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 	$scope.initCouresbyFolder = async function(idfolder:number){
-	    await $scope.courses.getCoursesbyFolder(idfolder);
+	    //await $scope.courses.getCoursesbyFolder(idfolder);
         Utils.safeApply($scope);
     };
 
