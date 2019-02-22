@@ -236,7 +236,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * Create a course
      */
-    $scope.createCourse = function() {
+    $scope.createCourse = async function() {
         // TODO get current folder id
         $scope.course.folderid = $scope.currentfolderid;
         $scope.course.create();
@@ -315,18 +315,19 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.successDelete = false;
     };
     $scope.deleteElements = async function (){
-        if($scope.folders.all.some(folder => folder.selectConfirm)){
-            await $scope.folders.foldersDelete();
-        }
-        if($scope.courses.allCourses.some(course => course.selectConfirm)){
-            await $scope.courses.coursesDelete();
-        }
-        $scope.openLightbox = false;
-        $scope.successDelete = true;
-        $timeout(()=>
-            $scope.successDelete = false
-        , 3000);
-        $scope.initFolders();
+            if($scope.folders.all.some(folder => folder.selectConfirm)){
+                await $scope.folders.foldersDelete();
+            }
+            if($scope.courses.allCourses.some(course => course.selectConfirm)){
+                await $scope.courses.coursesDelete();
+                await $scope.courses.getCoursesbyUser(model.me.userId);
+            }
+            $scope.openLightbox = false;
+            $scope.successDelete = true;
+            $timeout(()=>
+                    $scope.successDelete = false
+                , 3000);
+            $scope.initFolders();
     };
     /**
      * move folders

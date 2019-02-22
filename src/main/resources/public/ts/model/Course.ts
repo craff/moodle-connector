@@ -82,9 +82,7 @@ export class Courses {
     async coursesDelete() {
         let { coursesId } =  this.toJsonForDelete();
             try {
-                console.log(coursesId[0])
-                let courses = await http.delete(`/moodle/course/${coursesId[0]}`);
-                this.allbyfolder = Mix.castArrayAs(Course, courses.data);
+                await http.delete(`/moodle/course/${coursesId[0]}`);
             } catch (e) {
                 notify.error("Delete function didn't work");
             }
