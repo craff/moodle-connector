@@ -363,43 +363,54 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-	@Delete("/course/:id")
+
+	@Delete("/course")
     @ApiDoc("Delete a course")
     @SecuredAction("moodle.delete")
     public void delete (final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+        RequestUtils.bodyToJson(request, pathPrefix + "courses", new Handler<JsonObject>() {
             @Override
-            public void handle(UserInfos user) {
-                JsonObject course = new JsonObject();
-                course.put("courseid", Integer.parseInt(request.getParam("id")));
-                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                URI moodleDeleteUri = null;
-                try {
-                    final String service = (config.getString("address_moodle")+ config.getString("ws-path"));
-                    final String urlSeparator = service.endsWith("") ? "" : "/";
-                    moodleDeleteUri = new URI(service + urlSeparator);
-                } catch (URISyntaxException e) {
-                    log.debug("Invalid moodle web service uri", e);
-                }
-                if (moodleDeleteUri != null) {
-                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                    final String moodleDeleteUrl = moodleDeleteUri.toString() +
-                            "?wstoken=" + WSTOKEN +
-                            "&wsfunction=" + WS_DELETE_FUNCTION +
-                            "&courseids[0]=" +course.getInteger("courseid") +
-                            "&moodlewsrestformat=" + JSON;
-                    httpClientHelper.webServiceMoodlePost(moodleDeleteUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>> () {
-                        @Override
-                        public void handle(Either<String, Buffer> event) {
-                            if (event.isRight()) {
-                                moodleWebService.deleteCourse(course, defaultResponseHandler(request));
-                            } else {
-                                log.debug("Post service failed");
-                            }
+            public void handle(JsonObject courses) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        JsonArray coursesIds = courses.getJsonArray("coursesId");
+                        String idsDeletes = "";
+                        for (int i = 0; i < coursesIds.size(); i++) {
+                            idsDeletes += "&courseids[" + i + "]=" + coursesIds.getValue(i);
                         }
-                    });
-                }
+                        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                        URI moodleDeleteUri = null;
+                        try {
+                            final String service = (config.getString("address_moodle") + config.getString("ws-path"));
+                            final String urlSeparator = service.endsWith("") ? "" : "/";
+                            moodleDeleteUri = new URI(service + urlSeparator);
+                        } catch (URISyntaxException e) {
+                            log.debug("Invalid moodle web service uri", e);
+                        }
+                        if (moodleDeleteUri != null) {
+                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                            final String moodleDeleteUrl = moodleDeleteUri.toString() +
+                                    "?wstoken=" + WSTOKEN +
+                                    "&wsfunction=" + WS_DELETE_FUNCTION +
+                                     idsDeletes +
+                                    "&moodlewsrestformat=" + JSON;
+                            httpClientHelper.webServiceMoodlePost(moodleDeleteUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                                @Override
+                                public void handle(Either<String, Buffer> event) {
+                                    if (event.isRight()) {
+                                        moodleWebService.deleteCourse(courses, defaultResponseHandler(request));
+                                    } else {
+                                        log.debug("Post service failed");
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
             }
+
+
         });
 	}
 

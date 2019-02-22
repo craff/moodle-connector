@@ -11,6 +11,9 @@
 		},
 		"printcoursestocome": {
 			"type" : ["boolean"]
+		},
+		"coursesId": {
+			"type" : "array"
 		}
 	}
 }

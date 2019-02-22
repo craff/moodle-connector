@@ -80,15 +80,6 @@ export class Courses {
         }
     }
     async coursesDelete() {
-        let { coursesId } =  this.toJsonForDelete();
-            try {
-                await http.delete(`/moodle/course/${coursesId[0]}`);
-            } catch (e) {
-                notify.error("Delete function didn't work");
-            }
-    }
-    /*
-    ___________________delete courses à tester______________
         try {
             await http.delete('/moodle/course', { data: this.toJsonForDelete() } );
         } catch (e) {
@@ -96,7 +87,7 @@ export class Courses {
             throw e;
         }
     }
-    */
+
     toJSON() {
         return {
             printcreatecoursesrecents : this.printcreatecoursesrecents,
