@@ -309,6 +309,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         template.open('ligthBoxContainer', 'courses/deleteLightbox');
         $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm= true );
         $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm= true );
+        $scope.confirmDeleteSend();
         $scope.openLightbox = true;
     };
     $scope.hideSuccessDelete = function(){
