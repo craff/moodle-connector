@@ -372,4 +372,19 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.lastCoursesToCome +=5;
     };
 
+    $scope.printRightFormatDate = function (course:Course, spec:number) {
+            if(spec == 1) {
+                let date = (new Date((course.date).toString())).toLocaleString('fr-FR', {hour12: false});
+                return date;
+            }else if(spec==2){
+                let date = (new Date((course.enddate).toString())).toLocaleString('fr-FR', {hour12: false}).substring(0,10);
+                return date;
+            }
+    }
+
+    $scope.printRightFormatAuthor = function (course:Course) {
+        let author = course.auteur[0].firstname[0]+". "+course.auteur[0].lastname[0].toUpperCase()+course.auteur[0].lastname.slice(1).toLowerCase();
+        return author;
+    }
+
 }]);

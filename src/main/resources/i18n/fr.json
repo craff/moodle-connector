@@ -99,5 +99,8 @@
 	"moodle.lightBox.delete.content": "Confirmez-vous la suppression de la sélection?",
 
 	"moodle.all.courses": "Tout",
-	"moodle.others.courses": "Autres"
+	"moodle.others.courses": "Autres",
+
+	"toDo.before": "À faire avant le ",
+	"toBegin.at": "À PARTIR DU "
 }

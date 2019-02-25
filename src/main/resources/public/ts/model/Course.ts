@@ -61,7 +61,7 @@ export class Courses {
     coursesByUser: Course[];
     isSynchronized: Boolean;
     allCourses: Course[];
-    printcreatecoursesrecents : boolean;
+    printcourseslastcreation : boolean;
     printcoursestodo : boolean;
     printcoursestocome : boolean;
 
@@ -90,7 +90,7 @@ export class Courses {
 
     toJSON() {
         return {
-            printcreatecoursesrecents : this.printcreatecoursesrecents,
+            printcourseslastcreation : this.printcourseslastcreation,
             printcoursestodo : this.printcoursestodo,
             printcoursestocome : this.printcoursestocome
         }
@@ -110,9 +110,6 @@ export class Courses {
             let allCourses = Mix.castArrayAs(Course, courses.data);
 
             this.allCourses = allCourses;
-            /*this.allCourses.forEach(function(course) {
-                course.date = new Date((new Date((course.date).toString())).toLocaleDateString());
-            });*/
             this.coursesByUser = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
             this.coursesShared = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
             this.coursesByUser = this.coursesByUser.sort(
@@ -142,9 +139,18 @@ export class Courses {
     async getChoice() {
             try {
                 const {data} = await http.get('/moodle/choices');
-                this.printcreatecoursesrecents = data[0].choice;
-                this.printcoursestodo = data[1].choice;
-                this.printcoursestocome = data[2].choice;
+                console.log(data);
+                if(data[0].length != 0) {
+                    this.printcourseslastcreation = data[0].lastcreation;
+                    this.printcoursestodo = data[0].todo;
+                    this.printcoursestocome = data[0].tocome;
+                }
+                else
+                {
+                    this.printcourseslastcreation = true;
+                    this.printcoursestodo = true;
+                    this.printcoursestocome = true;
+                }
             } catch (e) {
                 notify.error("Get Choice function didn't work");
                 }
@@ -153,19 +159,19 @@ export class Courses {
     async setChoice(view:number){
         if (view == 1){
             try {
-                await http.put(`/moodle/choices/lastCreation`, this.toJSON());
+                await http.put(`/moodle/choices/lastcreation`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice lastCreation function didn't work");
             }
         }else if (view == 2){
             try {
-                await http.put(`/moodle/choices/toDo`, this.toJSON());
+                await http.put(`/moodle/choices/todo`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice toDo function didn't work");
             }
         }else if (view ==3){
             try {
-                await http.put(`/moodle/choices/toCome`, this.toJSON());
+                await http.put(`/moodle/choices/tocome`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice toCome function didn't work");
             }

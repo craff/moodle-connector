@@ -4,11 +4,11 @@
             <span class="left-magnet title-dashboard">
                 <i18n>moodle.create.courses.recent</i18n>
             </span>
-            <switch ng-model="courses.printcreatecoursesrecents" ng-click="courses.setChoice(1)"></switch>
+            <switch ng-model="courses.printcourseslastcreation" ng-click="courses.setChoice(1)"></switch>
         </div>
-        <div ng-if="courses.printcreatecoursesrecents" class="row">
+        <div ng-if="courses.printcourseslastcreation" class="row">
             <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="cell twelve-mobile all-width style-bord infoBackground bottom-margin">
-                <courses-item course="course" place="'coursesRecent'" check="showToaster"></courses-item>
+                <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>
     </div>
@@ -20,8 +20,8 @@
         <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
     </div>
     <div ng-if="courses.printcoursestodo">
-        <div class=row">
-            <select class="cell left-magnet list-dashboard" ng-model="showToDoCourses"
+        <div class="row list-dashboard">
+            <select class="cell left-magnet" ng-model="showToDoCourses"
                     ng-options="libelle for libelle in typeShowCourses"
                     ng-change="changeShowCoursesToDo()">
             </select>
@@ -33,10 +33,9 @@
                 <i class="show-icons" ng-class="{ selected: isViewMode('icons') }" ng-click="changeViewMode('icons')"></i>
             </div>
         </div>
-        <br/>
         <div class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="cell all-width twelve-mobile style-bord infoBackground bottom-margin">
-                <courses-item course="course" place="'coursesToDo'" check="showToaster"></courses-item>
+            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="three cell course-article twelve-mobile style-bord infoBackground bottom-margin">
+                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>
         <div class="row next-previous-courses">
@@ -57,8 +56,8 @@
         <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
     </div>
     <div ng-if="courses.printcoursestocome">
-        <div class=row">
-            <select class="cell left-magnet list-dashboard" ng-model="showToComeCourses"
+        <div class="row  list-dashboard">
+            <select class="cell left-magnet" ng-model="showToComeCourses"
                     ng-options="libelle for libelle in typeShowCourses"
                     ng-change="changeShowCoursesToCome()">
             </select>
@@ -70,10 +69,9 @@
                 <i class="show-icons" ng-class="{ selected: isViewMode('icons') }" ng-click="changeViewMode('icons')"></i>
             </div>
         </div>
-        <br/>
         <div class="row">
             <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" class="cell all-width twelve-mobile style-bord infoBackground bottom-margin">
-                <courses-item course="course" place="'coursesToCome'" check="showToaster"></courses-item>
+                <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>
         <div class="row next-previous-courses">

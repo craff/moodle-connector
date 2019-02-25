@@ -27,9 +27,9 @@ CREATE TABLE moodle.course (
 );
 
 CREATE TABLE moodle.choices (
-  choice_id bigserial NOT NULL,
-  view character varying (255) NOT NULL,
-  choice boolean,
   user_id character varying(36) NOT NULL,
-  CONSTRAINT choices_pkey PRIMARY KEY (choice_id)
+  lastCreation boolean,
+  toDo boolean,
+  toCome boolean,
+  CONSTRAINT choices_pkey PRIMARY KEY (user_id)
 );

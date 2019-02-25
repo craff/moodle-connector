@@ -158,7 +158,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void getChoices(String userId, final Handler<Either<String, JsonArray>> eitherHandler) {
-        String query = "SELECT view, choice " +
+        String query = "SELECT lastcreation, todo, tocome " +
                 "FROM " + Moodle.moodleSchema + ".choices " +
                 "WHERE user_id = ?;";
 
@@ -169,18 +169,15 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void setChoice(final JsonObject courses, String view, Handler<Either<String, JsonObject>> handler) {
-        String query = "UPDATE " + Moodle.moodleSchema + ".choices " +
-                "SET choice = ? WHERE user_id = ? AND view = ?;";
+        String query = "INSERT INTO " + Moodle.moodleSchema + ".choices (user_id, lastcreation, todo, tocome)" +
+                " VALUES (?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET "+view+"="+courses.getBoolean("printcourses"+view)+";";
 
         JsonArray values = new JsonArray();
-        if(view.equals("lastCreation"))
-            values.add(courses.getBoolean("printcreatecoursesrecents"));
-        else if (view.equals("toDo"))
-            values.add(courses.getBoolean("printcoursestodo"));
-        else if (view.equals("toCome"))
-            values.add(courses.getBoolean("printcoursestocome"));
         values.add(courses.getString("userId"));
-        values.add(view);
+        values.add(courses.getBoolean("printcourseslastcreation"));
+        values.add(courses.getBoolean("printcoursestodo"));
+        values.add(courses.getBoolean("printcoursestocome"));
+
         sql.prepared(query, values,SqlResult.validUniqueResultHandler(handler));
     }
 }

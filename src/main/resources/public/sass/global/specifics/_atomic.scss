@@ -13,14 +13,10 @@
 .summary-list{
   border-bottom-right-radius: 6%;
   border-bottom-left-radius: 6%;
-  padding: 3%;
   height: 100px;
 }
-.summary-dashboard{
-  border-bottom-right-radius: 6%;
-  border-bottom-left-radius: 6%;
-  padding: 1%;
-  height: 100px;
+.summary-color{
+
 }
 .image{
    display: block;
@@ -48,21 +44,46 @@
 
 .activitySmallPicture{
   height: 50px;
-  width: 60px;
-  padding-left: 10px;
+  width: 55px;
+  padding-left: 5px;
   background-color: #ff8500;
 }
 
 .courseSmallPicture{
   height: 50px;
-  width: 60px;
+  width: 55px;
+  padding-left: 5px;
+  background-color: #e20037;
+}
+
+.activityBigPicture{
+  height: 150px;
+  padding-left: 10px;
+  background-color: #ff8500;
+}
+
+.courseBigPicture{
+  height: 150px;
   padding-left: 10px;
   background-color: #e20037;
+}
+
+.courseSmallWidthPicture{
+  width: 10px;
+}
+
+.courseBigWidthPicture{
+  width: 160px;
 }
 
 .smallImage{
   width: 50px;
   height: 50px;
+}
+
+.BigImage{
+  width: 150px;
+  height: 150px;
 }
 
 .activityPictureBackground{
@@ -139,7 +160,7 @@ i.sort-desc::before {
   padding-left: 50px;
 }
 .left-margin{
-  margin-left: 10px;
+  margin: 0px 15px;
 }
 .bottom-margin{
   margin-bottom: 5px;

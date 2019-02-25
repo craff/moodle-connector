@@ -3,7 +3,7 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"printcreatecoursesrecents": {
+		"printcourseslastcreation": {
 			"type" : ["boolean"]
 		},
 		"printcoursestodo": {

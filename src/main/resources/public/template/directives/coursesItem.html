@@ -1,23 +1,50 @@
 <div class="cell" ng-class="{ activitySmallPicture : place == 'coursesRecent' && course.course_type == 'singleactivity',
-                                activityPictureBackground : place != 'coursesRecent' && course.course_type == 'singleactivity',
+                                activityBigPicture : place == 'coursesToDo' && course.course_type == 'singleactivity',
+                                activityPictureBackground : place != 'coursesRecent' && place != 'coursesToDo' && course.course_type == 'singleactivity',
                                 courseSmallPicture : place == 'coursesRecent' && course.course_type == 'topics',
-                                coursePictureBackground : place != 'coursesRecent' && course.course_type == 'topics'}" ng-click="course.goTo()">
-    <img ng-src="[[course.image]]" class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent'}"
+                                courseBigPicture : place == 'coursesToDo' && course.course_type == 'topics',
+                                courseSmallWidthPicture : place == 'coursesToDo' && course.image === undefined,
+                                courseBigWidthPicture : place == 'coursesToDo' && course.image !== undefined,
+                                coursePictureBackground : place != 'coursesRecent' && place != 'coursesToDo' && course.course_type == 'topics'}"
+                                ng-click="course.goTo()">
+    <img ng-src="[[course.image]]" class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent', BigImage : place == 'coursesToDo'}"
          ng-show="course.image !== null && course.image !== undefined"/>
     <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent'}"
-         ng-show="course.image === null || course.image === undefined"/>
+         ng-show="course.image === null || course.image === undefined" ng-if="place != 'coursesToDo'"/>
 </div>
-<div class="eleven cell" ng-class="{ 'left-margin' : (place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'),
-                  'right-margin' : (place == 'coursesToDo' || place == 'coursesToCome')}" ng-click="course.goTo()">
+<div ng-class="{ 'left-margin' : (place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'),
+                  'right-margin' : (place == 'coursesToDo' || place == 'coursesToCome'),
+                   'eleven cell' : (place != 'coursesShared' && place != 'coursesRecent')}"
+     ng-click="course.goTo()">
+    <label class="text-font" ng-if="place == 'coursesToCome'">
+        <i18n>toBegin.at</i18n>:
+        <span class="date"> ? ? </span>
+    </label></br>
     <span class="text-font">[[course.fullname]]</span> </br>
     <div ng-if="place != 'coursesRecent'">
-        <span class="summary-list size-font">[[course.summary]]</span></br>
+        <span class="summary-list size-font">[[ printAuthor(course) ]]</span></br>
     </div>
-    <label class="size-font">
+    <div ng-if="place != 'coursesRecent' || place != 'coursesToCome'">
+        <span class="summary-list summary-color size-font">[[course.summary]]</span></br>
+    </div>
+    <label class="size-font" ng-if="place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'">
         <i18n>modified.on</i18n>:
-        <span class="date">[[ course.date ]]</span>
+        <span class="date">[[ printDate(course,1) ]]</span>
     </label>
 </div>
+<div class="left-margin" ng-if="place == 'coursesToDo'" ng-click="course.goTo()">
+    <label class="size-font">
+        <i18n>toDo.before</i18n>
+        <span class="date">[[ printDate(course,2) ]]</span>
+    </label>
+    <div class="row">
+        <progress-bar filled="course.progress"></progress-bar>
+        <div class="cell right-magnet">
+            <i class="show-icons" ng-if="place == 'coursesToCome' || place == 'coursesToDo'"></i>
+        </div>
+    </div>
+</div>
+
 <label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'">
     <input type="checkbox" ng-change="checkCourse()" ng-model="course.select">
     <span></span>
