@@ -102,5 +102,11 @@
 	"moodle.others.courses": "Autres",
 
 	"toDo.before": "À faire avant le ",
-	"toBegin.at": "À PARTIR DU "
+	"toBegin.at": "À PARTIR DU ",
+
+	"course.mask": "Masquer",
+	"course.demask": "Ne plus cacher",
+	"course.favoris": "Favoris",
+	"course.defavoris": "Enlever de mes favoris"
+
 }

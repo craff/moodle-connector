@@ -7,7 +7,7 @@
             <switch ng-model="courses.printcourseslastcreation" ng-click="courses.setChoice(1)"></switch>
         </div>
         <div ng-if="courses.printcourseslastcreation" class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="cell twelve-mobile all-width style-bord infoBackground bottom-margin">
+            <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>
@@ -34,7 +34,7 @@
             </div>
         </div>
         <div class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="three cell course-article twelve-mobile style-bord infoBackground bottom-margin">
+            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="specific-small-toDo-width cell twelve-mobile style-bord infoBackground bottom-margin right-course-margin">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>
@@ -70,7 +70,7 @@
             </div>
         </div>
         <div class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" class="cell all-width twelve-mobile style-bord infoBackground bottom-margin">
+            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>

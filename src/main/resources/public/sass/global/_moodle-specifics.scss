@@ -45,6 +45,7 @@ body.moodle {
   .show-list {
     height: 24px;
     width: 24px;
+    margin-left: 15px;
     background-repeat: no-repeat;
     background-position: center;
     display: inline-block;
@@ -83,11 +84,100 @@ body.moodle {
 
   .right-margin{
     text-align: right;
-    margin-top: 10px;
+    margin: 10px 0px 0px 10px;
+  }
+
+  .specific-small-toDo-width{
+    width: 23.705%;
+  }
+
+  .specific-all-toCome-width{
+    width: 88.333%;
+  }
+
+  .all-width{
+    width: 100%;
+  }
+
+  .big-right-margin{
+    margin-left: 100px;
+  }
+
+  .inside-margin-left{
+    margin-left: 70px;
   }
 
   .next-previous-courses{
     margin-top: 15px;
+  }
+
+  .course-progress{
+    width: 75%;
+    display:inline-block;
+  }
+
+  dots-menu {
+    vertical-align: top;
+    margin-bottom: 15px;
+
+    .options {
+
+      right: 0px;
+      left: 20px;
+      background:  #fff;
+
+      opt:hover {
+        background: #FF8500;
+        color: #fff;
+      }
+
+      opt{
+        color:#555;
+        border-bottom: none;
+      }
+    }
+  }
+
+  dots-menu.opened .options {
+    width: 110px;
+  }
+
+  .progress-bar{
+    border: none;
+    height: 8px;
+    background: #EE6687;
+    .filled {
+      height: 8px;
+      background: #e20037;
+      padding-right: unset;
+      padding-left: unset;
+    }
+  }
+
+  .courseProgress{
+    background: #EE6687;
+    .filled {
+      background: #e20037;
+    }
+  }
+
+  .activityProgress{
+    background: #FFC27F;
+    .filled {
+      background: #FF8500;
+    }
+  }
+
+  .switch input[type=checkbox]:checked+.tick {
+    background: #e20037;
+  }
+
+  .switch input[type=checkbox]:checked+.tick:before {
+    background: #EE6687;
+  }
+
+  .move-up{
+    margin-top: -13px;
   }
 
   .courseButton {

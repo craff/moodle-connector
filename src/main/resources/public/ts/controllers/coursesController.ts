@@ -96,7 +96,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.disableDeleteSend = true;
         $scope.typeShowCourses = ["Tout","Autres"];
         $scope.firstCoursesToDo = 0;
-        $scope.lastCoursesToDo = 5;
+        $scope.lastCoursesToDo = 8;
         $scope.firstCoursesToCome = 0;
         $scope.lastCoursesToCome = 5;
         $scope.showToDoCourses = $scope.typeShowCourses[0];
@@ -354,12 +354,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * */
 
     $scope.previousCoursesToDoButton = function () {
-        $scope.firstCoursesToDo -=5;
-        $scope.lastCoursesToDo -=5;
+        $scope.firstCoursesToDo -=8;
+        $scope.lastCoursesToDo -=8;
     };
     $scope.nextCoursesToDoButton = function () {
-        $scope.firstCoursesToDo +=5;
-        $scope.lastCoursesToDo +=5;
+        $scope.firstCoursesToDo +=8;
+        $scope.lastCoursesToDo +=8;
     };
 
     $scope.previousCoursesToComeButton = function () {
@@ -372,12 +372,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.lastCoursesToCome +=5;
     };
 
-    $scope.printRightFormatDate = function (course:Course, spec:number) {
-            if(spec == 1) {
+    $scope.printRightFormatDate = function (course:Course, spec:string) {
+            if(spec == "modified") {
                 let date = (new Date((course.date).toString())).toLocaleString('fr-FR', {hour12: false});
                 return date;
-            }else if(spec==2){
+            }else if(spec=="enddate"){
                 let date = (new Date((course.enddate).toString())).toLocaleString('fr-FR', {hour12: false}).substring(0,10);
+                return date;
+            }else if(spec=="begindate"){
+                var options = {month: "long", day: "2-digit"};
+                let date = (new Date((course.startdate).toString())).toLocaleString('fr-FR', options);
                 return date;
             }
     }

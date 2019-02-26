@@ -16,8 +16,9 @@
   height: 100px;
 }
 .summary-color{
-
+    color: #757575;
 }
+
 .image{
    display: block;
    margin-left: auto;
@@ -49,10 +50,24 @@
   background-color: #ff8500;
 }
 
+.activityToComePicture{
+  height: 125px;
+  width: 125px;
+  padding-left: 10px;
+  background-color: #ff8500;
+}
+
 .courseSmallPicture{
   height: 50px;
   width: 55px;
   padding-left: 5px;
+  background-color: #e20037;
+}
+
+.courseToComePicture{
+  height: 125px;
+  width: 125px;
+  padding-left: 10px;
   background-color: #e20037;
 }
 
@@ -81,9 +96,14 @@
   height: 50px;
 }
 
-.BigImage{
+.bigImage{
   width: 150px;
   height: 150px;
+}
+
+.toComeImage{
+  width: 125px;
+  height: 125px;
 }
 
 .activityPictureBackground{
@@ -115,6 +135,23 @@ i.sort-desc::before {
   -moz-osx-font-smoothing:grayscale;
   background-image:none;
 }
+
+i.eye-slash::before {
+  content: '\e904';
+}
+
+i.eye-open::before {
+  content: '\e873';
+}
+
+i.favoris::before {
+  content: '\e9d9';
+}
+
+i.defavoris::before {
+  content: '\e9d7';
+}
+
 .left-padding{
   padding-left: 15px;
 }
@@ -160,10 +197,14 @@ i.sort-desc::before {
   padding-left: 50px;
 }
 .left-margin{
-  margin: 0px 15px;
+  margin-left: 15px;
 }
 .bottom-margin{
   margin-bottom: 5px;
+}
+
+.right-course-margin{
+  margin-right:15px;
 }
 
 .left-magnet{
@@ -171,8 +212,4 @@ i.sort-desc::before {
   color: #555;
   font-weight: bold;
   font-size: 20px;
-}
-
-.all-width{
-  width: 100%;
 }
