@@ -102,5 +102,11 @@ public interface MoodleWebService{
      */
     void setChoice(JsonObject courses, String view, Handler<Either<String, JsonObject>> handler);
 
+    /**
+     * get groups and users
+     * @param userGroupIds
+     * @param handler
+     */
+    void getUsersGroups(JsonObject userGroupIds, Handler<Either<String, JsonArray>> handler);
 
 }

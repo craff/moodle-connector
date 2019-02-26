@@ -6,6 +6,8 @@ import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import org.entcore.common.neo4j.Neo4j;
+import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
@@ -179,5 +181,40 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         values.add(courses.getBoolean("printcoursestocome"));
 
         sql.prepared(query, values,SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void getUsersGroups (final JsonObject userGroupIds, Handler<Either<String, JsonArray>> handler){
+        JsonArray usersIds = new JsonArray()
+        .add("659890d3-e652-46f5-bd14-3fd55daf4022")
+        .add("5843e3dc-c1ba-4f07-82b2-120964ecba61");
+
+        JsonArray groupsIds = new JsonArray()
+        .add("1761599-1535020399757")
+        .add("560-1468756944356");
+
+        JsonObject params = new JsonObject()
+                .put("usersIds", usersIds)
+                .put("groupsIds", groupsIds);
+
+        String queryNeo4j = "MATCH (u:User) " +
+                "WHERE u.id " +
+                "IN {usersIds}" +
+                " WITH COLLECT(" +
+                "DISTINCT {email: u.email, lastname: u.lastName, firstname: u.firstName, username: u.login}) " +
+                "AS users return {users: (users)}  " +
+                "AS groups_users " +
+                "UNION MATCH (g:Group)-[:IN]-(ug:User) " +
+                "WHERE g.id " +
+                "IN {groupsIds}" +
+                " WITH g, collect(" +
+                "DISTINCT{email: ug.email, lastname: ug.lastName, firstname: ug.firstName, username: ug.login}) " +
+                "AS users WITH " +
+                "DISTINCT{id:\"GR_\"+g.id, name:g.name, users: users} " +
+                "AS group return " +
+                "DISTINCT{groups: collect(group)} " +
+                "AS groups_users;";
+
+        Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
     }
 }
