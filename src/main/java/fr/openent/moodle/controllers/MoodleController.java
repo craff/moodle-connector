@@ -27,6 +27,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
@@ -46,10 +47,13 @@ public class MoodleController extends ControllerHelper {
 	private final MoodleWebService moodleWebService;
 	private final MoodleEventBus moodleEventBus;
 	private final HttpClientHelper httpClientHelper;
+    private final Storage storage;
 
-    public MoodleController(Vertx vertx, EventBus eb) {
+    public MoodleController(final Storage storage, EventBus eb) {
 		super();
         this.eb = eb;
+        this.storage = storage;
+
 		this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
 		this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
 		this.httpClientHelper = new HttpClientHelper();
@@ -467,11 +471,32 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
+    @Get("/share/json/:id")
+    @ApiDoc("Lists rights for a given subject.")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void share(final HttpServerRequest request) {
+        super.shareJson(request, false);
+        /*final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
+        JsonObject shares = new JsonObject();
+
+        JsonObject users = new JsonObject();
+        users.put("visibles", new JsonArray());
+
+        JsonObject groups = new JsonObject();
+        groups.put("visibles", new JsonArray());
+
+        shares.put("users", users);
+        shares.put("groups", groups);
+
+        handler.handle(new Either.Right<String, JsonObject>(shares));*/
+    }
+
+
     @Put("/course")
     @ApiDoc("Share a course")
     @SecuredAction("moodle.share")
     public void share(final HttpServerRequest request) {
-	    RequestUtils.bodyToJson(request, pathPrefix + "share", new Handler<JsonObject>() {
+        RequestUtils.bodyToJson(request, pathPrefix + "share", new Handler<JsonObject>() {
             @Override
             public void handle(JsonObject shareCourse) {
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {

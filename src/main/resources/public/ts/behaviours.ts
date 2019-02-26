@@ -1,19 +1,31 @@
-import { Behaviours } from 'entcore';
-import http from 'axios';
+import {Behaviours} from "entcore";
+
+console.log('moodle behaviours loaded');
 
 Behaviours.register('moodle', {
 	rights: {
 		workflow: {
 			view: 'fr.openent.moodle.controllers.MoodleController|view',
-			create: 'fr.openent.moodle.controllers.MoodleController|createMoodle'
+			delete: 'fr.openent.moodle.controllers.MoodleController|delete',
+			create: 'fr.openent.moodle.controllers.MoodleController|create'
 		},
 		resource: {
-			read: "fr-openent-moodle-controllers-MoodleController|getMoodle",
-			contrib: "fr-openent-moodle-controllers-MoodleController|updateMoodle",
-			manager: "fr-openent-moodle-controllers-MoodleController|addRights"
+			manager: {
+				right: 'fr-openent-moodle-controllers-MoodleController|create'
+			},
+			contrib: {
+				right: 'fr-openent-moodle-controllers-MoodleController|delete',
+			},
+			read: {
+				right: 'fr-openent-moodle-controllers-MoodleController|view'
+			}
 		}
 	},
-	loadResources: async function(callback){
+	dependencies: {},
+
+	loadResources: function (callback) { }
+
+	/*loadResources: async function(callback){
 		const response = await http.get('/moodle/list');
 		this.resources = response.data.filter(e => e.trashed === 0).map((moodle) => {
 			moodle.icon = moodle.icon || '/img/illustrations/moodle-default.png';
@@ -26,5 +38,5 @@ Behaviours.register('moodle', {
 			};
 		});
 		return this.resources;
-	}
+	}*/
 });

@@ -1,4 +1,4 @@
-import {model, ng, template} from 'entcore';
+import {model, ng, template, Behaviours} from 'entcore';
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
@@ -59,6 +59,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
 
+        //Behaviours.findRights('moodle', $scope.courses.allCourses[0]);
+        //$scope.courses.allCourses[0].myRights.fromBehaviours("moodle");
+
         // TODO gestion des dossiers
         // if($scope.folders.isSynchronized === undefined || $scope.folders.isSynchronized === false) {
         //     $scope.initFolders();
@@ -103,6 +106,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.lastCoursesToCome = $scope.countToCome();
         $scope.showToDoCourses = $scope.typeShowCourses[0];
         $scope.showToComeCourses = $scope.typeShowCourses[0];
+        $scope.showInfoSharePanel = false;
         $scope.viewModeToDo = "icons";
         $scope.viewModeToCome = "icons";
         $scope.initFolders();
@@ -246,12 +250,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.course.folderid = $scope.currentfolderid;
         $scope.course.create();
         $scope.openLightbox = false;
-        Utils.safeApply($scope);
-    };
-
-    $scope.shareCourse = async function() {
-        $scope.course = new Course();
-        $scope.course.share();
         Utils.safeApply($scope);
     };
 
@@ -444,5 +442,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.viewModeToDo=view;
         $scope.lastCoursesToDo=$scope.firstCoursesToDo+$scope.countToDo(view);
     }
+
+    $scope.openShareWindow = function () {
+        $scope.showInfoSharePanel = true;
+    };
+
 
 }]);

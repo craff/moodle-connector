@@ -1,8 +1,15 @@
 package fr.openent.moodle;
 
 import fr.openent.moodle.controllers.MoodleController;
+import fr.openent.moodle.service.MoodleWebService;
 import io.vertx.core.eventbus.EventBus;
 import org.entcore.common.http.BaseServer;
+import org.entcore.common.service.impl.SqlCrudService;
+import org.entcore.common.share.impl.SqlShareService;
+import org.entcore.common.sql.SqlConf;
+import org.entcore.common.sql.SqlConfs;
+import org.entcore.common.storage.Storage;
+import org.entcore.common.storage.StorageFactory;
 
 public class Moodle extends BaseServer {
 
@@ -21,6 +28,19 @@ public class Moodle extends BaseServer {
 		moodleSchema = config.getString("db-schema");
 		EventBus eb = getEventBus(vertx);
 
-		addController(new MoodleController(vertx, eb));
+		final Storage storage = new StorageFactory(vertx, config, /*new ExercizerStorage()*/ null).getStorage();
+
+
+		SqlConf courseConf = SqlConfs.createConf(MoodleController.class.getName());
+		courseConf.setSchema("moodle");
+		courseConf.setTable("course");
+		courseConf.setShareTable("course_shares");
+
+
+		MoodleController moodleController = new MoodleController(storage, eb);
+		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
+		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
+
+		addController(moodleController);
 	}
 }

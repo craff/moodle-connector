@@ -1,10 +1,15 @@
-import {_, notify,} from 'entcore';
-import http from 'axios';
-import {Mix} from 'entcore-toolkit';
+import {_, notify, Shareable, Rights} from "entcore";
+import http from "axios";
+import {Mix} from "entcore-toolkit";
 
+export class Course implements Shareable{
+    shared: any;
+    owner: {userId: string; displayName: string};
+    myRights: Rights<Course>;
 
-export interface Course {
     courseid : number;
+    id:number;
+
     fullname : string;
     summary : string;
     date : Date;
@@ -23,12 +28,13 @@ export interface Course {
     favorites: boolean;
 }
 
-export class Course {
-    constructor() {
+    constructor(){
         this.type = "1";
         this.select = false;
         this.selectConfirm = false;
+        this.myRights = new Rights<Course>(this);
     }
+
 
     toJSON() {
         return {
@@ -41,7 +47,9 @@ export class Course {
             imageurl: "https://medias.liberation.fr/photo/552903--.jpg",
             type: this.type,
             typeA: this.typeA,
-            folderid: this.folderid
+            folderid: this.folderid,
+            courseid : this.courseid,
+            id: this.courseid
         }
     }
 
@@ -152,6 +160,13 @@ export class Courses {
             let allCourses = Mix.castArrayAs(Course, courses.data);
 
             this.allCourses = allCourses;
+            /*this.allCourses.forEach(function(course) {
+                course.date = new Date((new Date((course.date).toString())).toLocaleDateString());
+            });*/
+            _.each(this.allCourses,function(course) {
+               course.id = course.courseid;
+                course._id = course.courseid;
+            });
             this.coursesByUser = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
             this.coursesShared = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
             this.coursesByUser = this.coursesByUser.sort(
