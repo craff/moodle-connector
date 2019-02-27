@@ -98,9 +98,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.firstCoursesToDo = 0;
         $scope.lastCoursesToDo = 8;
         $scope.firstCoursesToCome = 0;
-        $scope.lastCoursesToCome = 5;
+        $scope.lastCoursesToCome = $scope.countToCome();
         $scope.showToDoCourses = $scope.typeShowCourses[0];
         $scope.showToComeCourses = $scope.typeShowCourses[0];
+        $scope.viewModeToDo = "icons";
+        $scope.viewModeToCome = "icons";
     };
 
     $scope.isPrintMenuFolder = function() {
@@ -354,23 +356,44 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * */
 
     $scope.previousCoursesToDoButton = function () {
-        $scope.firstCoursesToDo -=8;
-        $scope.lastCoursesToDo -=8;
+        $scope.firstCoursesToDo -= $scope.countToDo();
+        $scope.lastCoursesToDo -= $scope.countToDo();
     };
     $scope.nextCoursesToDoButton = function () {
-        $scope.firstCoursesToDo +=8;
-        $scope.lastCoursesToDo +=8;
+        $scope.firstCoursesToDo += $scope.countToDo();
+        $scope.lastCoursesToDo += $scope.countToDo();
     };
 
+    $scope.countToCome = function () {
+        if($scope.viewModeToCome == 'list'){
+            return 5;
+        }else{
+            return 4;
+        }
+    }
+
+    $scope.countToDo = function () {
+        if($scope.viewModeToCome == 'list'){
+            return 5;
+        }else{
+            //count number of defined image and deal with !
+            return 8;
+        }
+    }
+
     $scope.previousCoursesToComeButton = function () {
-        $scope.firstCoursesToCome -=5;
-        $scope.lastCoursesToCome -=5;
+            $scope.firstCoursesToCome -= $scope.countToCome();
+            $scope.lastCoursesToCome -= $scope.countToCome();
     };
 
     $scope.nextCoursesToComeButton = function () {
-        $scope.firstCoursesToCome +=5;
-        $scope.lastCoursesToCome +=5;
+        $scope.firstCoursesToCome += $scope.countToCome();
+        $scope.lastCoursesToCome += $scope.countToCome();
     };
+
+    /**
+     * print the right format of course data
+     * */
 
     $scope.printRightFormatDate = function (course:Course, spec:string) {
             if(spec == "modified") {
@@ -389,6 +412,18 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.printRightFormatAuthor = function (course:Course) {
         let author = course.auteur[0].firstname[0]+". "+course.auteur[0].lastname[0].toUpperCase()+course.auteur[0].lastname.slice(1).toLowerCase();
         return author;
+    }
+
+    /**
+     * change and get the view mode of courses to do and to come
+     * */
+
+    $scope.changeViewModeToCome = function (view:string){
+        $scope.viewModeToCome=view;
+    }
+
+    $scope.changeViewModeToDo = function (view:string){
+        $scope.viewModeToDo=view;
     }
 
 }]);

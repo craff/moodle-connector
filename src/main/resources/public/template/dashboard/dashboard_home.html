@@ -26,16 +26,18 @@
                     ng-change="changeShowCoursesToDo()">
             </select>
             <div class="cell right-magnet icons-dashboard">
-                <i class="show-list" ng-class="{ selected: isViewMode('list') }" ng-click="changeViewMode('list')"></i>
+                <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewModeToDo('list')"></i>
             </div>
             <span> </span>
             <div class="cell right-magnet">
-                <i class="show-icons" ng-class="{ selected: isViewMode('icons') }" ng-click="changeViewMode('icons')"></i>
+                <i class="show-icons" ng-class="{ selected: viewModeToDo == 'icons' }" ng-click="changeViewModeToDo('icons')"></i>
             </div>
         </div>
         <div class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="specific-small-toDo-width cell twelve-mobile style-bord infoBackground bottom-margin right-course-margin">
-                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
+            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin right-course-margin"
+            ng-class="{'undefined-image-small-toDo-width cell' : course.image == undefined && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : course.image !== undefined && viewModeToDo == 'icons',
+            'all-width cell' : viewModeToDo == 'list'}">
+                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo"></courses-item>
             </div>
         </div>
         <div class="row next-previous-courses">
@@ -62,16 +64,17 @@
                     ng-change="changeShowCoursesToCome()">
             </select>
             <div class="cell right-magnet icons-dashboard">
-                <i class="show-list" ng-class="{ selected: isViewMode('list') }" ng-click="changeViewMode('list')"></i>
+                <i class="show-list" ng-class="{ selected: viewModeToCome == 'list' }" ng-click="changeViewModeToCome('list')"></i>
             </div>
             <span> </span>
             <div class="cell right-magnet">
-                <i class="show-icons" ng-class="{ selected: isViewMode('icons') }" ng-click="changeViewMode('icons')"></i>
+                <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewModeToCome('icons')"></i>
             </div>
         </div>
         <div class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
-                <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
+            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" class="twelve-mobile style-bord infoBackground bottom-margin"
+                 ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}">
+                <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
         </div>
         <div class="row next-previous-courses">

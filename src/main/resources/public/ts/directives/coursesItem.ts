@@ -11,7 +11,8 @@ export let coursesItem = ng.directive("coursesItem", function(){
             course : '=',
             check: '=',
             dateFunction : '=',
-            authorFunction : '='
+            authorFunction : '=',
+            view : '='
         },
         templateUrl : `/${appPrefix}/public/template/directives/coursesItem.html`,
         controller : ['$scope', function($scope) {

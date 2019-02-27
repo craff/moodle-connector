@@ -87,16 +87,41 @@ body.moodle {
     margin: 10px 0px 0px 10px;
   }
 
-  .specific-small-toDo-width{
+  .undefined-image-small-toDo-width{
     width: 23.705%;
+  }
+
+  .defined-image-small-toDo-width{
+    width: 48.705%;
+  }
+
+  .small-eleven{
+    width:69.6%;
+  }
+
+  .middle-eleven{
+    width:85.333%;
+  }
+
+  .big-big{
+    width:98.333%;
   }
 
   .specific-all-toCome-width{
     width: 88.333%;
   }
 
+  .specific-small-toCome-width{
+    width: 74.333%;
+  }
+
   .all-width{
-    width: 100%;
+       width: 100%;
+     }
+
+  .small-width{
+    width : 48%;
+    margin-left:15px;
   }
 
   .big-right-margin{

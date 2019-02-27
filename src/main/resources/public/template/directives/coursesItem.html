@@ -11,17 +11,24 @@
                                 ng-click="course.goTo()">
     <img ng-src="[[course.image]]" class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent', bigImage : place == 'coursesToDo', toComeImage : place == 'coursesToCome'}"
          ng-show="course.image !== null && course.image !== undefined"/>
-    <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent', toComeImage : place == 'coursesToCome'}"
-         ng-show="course.image === null || course.image === undefined" ng-if="place != 'coursesToDo'"/>
+    <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent', bigImage : place == 'coursesToDo', toComeImage : place == 'coursesToCome'}"
+         ng-show="course.image === null || course.image === undefined" ng-if="place != coursesToDo"/>
 </div>
-<div  ng-class="{ 'eleven cell' : place == 'coursesToDo', 'specific-all-toCome-width cell' : place == 'coursesToCome'}">
-    <div ng-class="{ 'left-margin' : (place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent' || place == 'courseToCome'),
+<div  ng-class="{ 'eleven cell' : place == 'coursesToDo' && course.image == undefined && view == 'icons',
+                  'small-eleven cell' : place == 'coursesToDo' && course.image !== undefined && view == 'icons',
+
+                  'big-big cell' : place == 'coursesToDo' && course.image == undefined && view == 'list',
+                  'middle-eleven cell' : place == 'coursesToDo' && course.image !== undefined && view == 'list',
+
+                  'specific-all-toCome-width cell' : place == 'coursesToCome' && view == 'list',
+                  'specific-small-toCome-width cell' : place == 'coursesToCome' && view == 'icons'}">
+    <div ng-class="{ 'left-margin' : (place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'),
                       'right-margin' : (place == 'coursesToDo' || place == 'coursesToCome'),
                       'big-right-margin' : (place == 'coursesShared' || place == 'coursesMine'),
                       'inside-margin-left' : place == 'coursesRecent'}">
         <div ng-click="course.goTo()">
             <label class="text-font" ng-if="place == 'coursesToCome'">
-                <i18n>toBegin.at</i18n>:
+                <i18n>toBegin.at</i18n>
                 <span class="date"><!--[[ printDate(course,"begindate") ]]//--></span></br>
             </label>
             <span class="text-font">[[course.fullname]]</span> </br>
