@@ -458,6 +458,46 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
+    @Get("/sharedBookMark")
+    @ApiDoc("get a sharedBookMark")
+    //@SecuredAction("moodle.list")
+    public void getSharedBookMark (final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(UserInfos user) {
+                JsonArray sharedBookMarks = new JsonArray();
+                JsonArray sharedBookMarksIds = new JsonArray()
+                        .add("_dc188f953b8347a59b5030b7d3ed7c44")
+                        .add("_69179111ee4d424c93d8cc78b3f2d51b")
+                        .add("_ab08ca6cf5aa4b3dae254effbe76648d");
+
+                if (user != null) {
+                    JsonObject userId =  new JsonObject()
+                    .put("userId", "6e2a0750-6499-4b9e-836b-4237e8ff1428");
+                    //.put("userId", user.getUserId());
+                    if(sharedBookMarksIds.size() > 0){
+                        for (int i = 0; i < sharedBookMarksIds.size(); i++) {
+                            String sharedBookMarkId = sharedBookMarksIds.getString(i);
+                            moodleWebService.getSharedBookMark(userId, sharedBookMarkId, new Handler<Either<String, JsonArray>>(){
+                                        @Override
+                                        public void handle(Either<String, JsonArray> event){
+                                            if(event.isRight()){
+                                                sharedBookMarks.add(event.right().getValue());
+                                            } else {
+                                                log.debug("sharedBookMark " + sharedBookMarkId + " not found in Neo4J.");
+                                            }
+                                        }
+                                    }
+                            );
+                        }
+                    }
+                } else {
+                    log.debug("User " + user + " not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
 
     public LocalDateTime getDateString(String date){
         return LocalDateTime.parse(date.substring(0, 10) + "T" + date.substring(11));

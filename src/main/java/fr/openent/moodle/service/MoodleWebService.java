@@ -109,4 +109,12 @@ public interface MoodleWebService{
      */
     void getUsersGroups(JsonObject userGroupIds, Handler<Either<String, JsonArray>> handler);
 
+    /**
+     * get sharedbookmark
+     * @param userId
+     * @param groupsId
+     * @param handler
+     */
+    void getSharedBookMark(JsonObject userId, String groupsId, Handler<Either<String, JsonArray>> handler);
+
 }

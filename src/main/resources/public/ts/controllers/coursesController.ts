@@ -407,7 +407,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                 let date = (new Date((course.startdate).toString())).toLocaleString('fr-FR', options);
                 return date;
             }
-    }
+    };
 
     $scope.printRightFormatAuthor = function (course:Course) {
         let author = course.auteur[0].firstname[0]+". "+course.auteur[0].lastname[0].toUpperCase()+course.auteur[0].lastname.slice(1).toLowerCase();

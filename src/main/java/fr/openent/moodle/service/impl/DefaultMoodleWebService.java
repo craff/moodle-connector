@@ -204,11 +204,11 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                 "DISTINCT {email: u.email, lastname: u.lastName, firstname: u.firstName, username: u.login}) " +
                 "AS users return {users: (users)}  " +
                 "AS groups_users " +
-                "UNION MATCH (g:Group)-[:IN]-(ug:User) " +
+                "UNION MATCH (g:Group)<-[:IN]-(ug:User) " +
                 "WHERE g.id " +
                 "IN {groupsIds}" +
                 " WITH g, collect(" +
-                "DISTINCT{email: ug.email, lastname: ug.lastName, firstname: ug.firstName, username: ug.login}) " +
+                "DISTINCT{id: ug.id, email: ug.email, lastname: ug.lastName, firstname: ug.firstName, username: ug.login}) " +
                 "AS users WITH " +
                 "DISTINCT{id:\"GR_\"+g.id, name:g.name, users: users} " +
                 "AS group return " +
@@ -216,5 +216,27 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                 "AS groups_users;";
 
         Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void getSharedBookMark (final JsonObject userId, String groupsId, Handler<Either<String, JsonArray>> handler){
+
+        String queryNeo4j = "MATCH (u:User {id:{userId}})-[:HAS_SB]->(sb:ShareBookmark) " +
+                "UNWIND TAIL(sb." +
+                groupsId +
+                ") as vid " +
+                "MATCH (v:Visible {id : vid}) " +
+                "WHERE not(has(v.deleteDate)) " +
+                "RETURN{id: u.id, email: u.email, lastname: u.lastName, firstname: u.firstName, username: u.login ," +
+                "group: {id: \"SB\" + \"" +
+                groupsId +
+                "\", name: HEAD(sb." +
+                groupsId +
+                "), " +
+            "users: COLLECT(DISTINCT " +
+            "{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}} " +
+            "as sharedBookMark;";
+
+        Neo4j.getInstance().execute(queryNeo4j, userId, Neo4jResult.validResultHandler(handler));
     }
 }
