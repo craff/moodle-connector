@@ -10,6 +10,7 @@ import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
@@ -27,6 +28,8 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.http.filter.sql.ShareAndOwner;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -59,19 +62,28 @@ public class MoodleController extends ControllerHelper {
 		this.httpClientHelper = new HttpClientHelper();
 	}
 
+    //Permissions
+    private static final String
+            resource_read = "moodle.read",
+            resource_contrib = "moodle.contrib",
+            resource_manager = "moodle.manager",
+
+            workflow_create = "moodle.create",
+            workflow_delete = "moodle.delete",
+            workflow_view = "moodle.view";
+
 	/**
 	 * Displays the home view.
 	 * @param request Client request
 	 */
 	@Get("")
-	@SecuredAction("moodle.view")
+	@SecuredAction(workflow_view)
 	public void view(HttpServerRequest request) {
 		renderView(request);
 	}
 
     @Put("/folder/move")
     @ApiDoc("move a folder")
-    //@SecuredAction("moodle.put")
     public void moveFolder(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
             @Override
@@ -93,7 +105,6 @@ public class MoodleController extends ControllerHelper {
 
     @Delete("/folder")
     @ApiDoc("delete a folder")
-    //@SecuredAction("moodle.delete")
     public void deleteFolder(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
             @Override
@@ -115,7 +126,6 @@ public class MoodleController extends ControllerHelper {
 
     @Post("/folder")
     @ApiDoc("create a folder")
-    //@SecuredAction("moodle.create")
     public void createFolder(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
             @Override
@@ -139,7 +149,7 @@ public class MoodleController extends ControllerHelper {
 
 	@Post("/course")
     @ApiDoc("create a course")
-    @SecuredAction("moodle.create")
+    @SecuredAction(workflow_create)
 	public void create(final HttpServerRequest request) {
 	    RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
 	        @Override
@@ -218,7 +228,6 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/folder/countsFolders/:id")
     @ApiDoc("Get count fodlers in course by id")
-    //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void getCountsItemInFolder(final HttpServerRequest request){
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -238,7 +247,6 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/folder/countsCourses/:id")
     @ApiDoc("Get count courses in folder by id")
-    //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void getCountsItemCoursesInFolder(final HttpServerRequest request){
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -258,7 +266,6 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/folders")
     @ApiDoc("Get folder in database")
-    //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void listFoldersAndShared(final HttpServerRequest request){
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -279,7 +286,6 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/users/courses")
     @ApiDoc("Get cours by user in database")
-    //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void listCouresByuser(final HttpServerRequest request){
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -372,7 +378,7 @@ public class MoodleController extends ControllerHelper {
 
 	@Delete("/course")
     @ApiDoc("Delete a course")
-    @SecuredAction("moodle.delete")
+    @SecuredAction(workflow_delete)
     public void delete (final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "courses", new Handler<JsonObject>() {
             @Override
@@ -429,7 +435,6 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/choices")
     @ApiDoc("get a choice")
-    //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void getChoices (final HttpServerRequest request) {
 	    UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -448,7 +453,6 @@ public class MoodleController extends ControllerHelper {
 
     @Put("/choices/:view")
     @ApiDoc("set a choice")
-    //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void setChoice (final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "courses", new Handler<JsonObject>() {
@@ -473,7 +477,7 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/share/json/:id")
     @ApiDoc("Lists rights for a given subject.")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = resource_read, type = ActionType.AUTHENTICATED)
     public void share(final HttpServerRequest request) {
         super.shareJson(request, false);
         /*final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
@@ -489,6 +493,82 @@ public class MoodleController extends ControllerHelper {
         shares.put("groups", groups);
 
         handler.handle(new Either.Right<String, JsonObject>(shares));*/
+    }
+
+    @Put("/contrib")
+    @ApiDoc("Adds rights for a given subject.")
+    @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
+    public void contrib(final HttpServerRequest request) {
+
+    }
+
+
+    @Put("/share/resource/:id")
+    @ApiDoc("Adds rights for a given subject.")
+    @ResourceFilter(ShareAndOwner.class)
+    @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
+    public void shareSubmit(final HttpServerRequest request) {
+
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    request.pause();
+                    final String subjectId = request.params().get("id");
+                    // TODO
+                    /*subjectService.getById(subjectId, user, new Handler<Either<String,JsonObject>>() {
+                        @Override
+                        public void handle(Either<String, JsonObject> r) {
+                            request.resume();
+                            JsonObject subject  = ResourceParser.beforeAny(r.right().getValue());
+                            final String subjectName = subject.getString("title");
+
+                            JsonObject params = new fr.wseduc.webutils.collections.JsonObject();
+                            params.put("username", user.getUsername());
+                            params.put("uri", pathPrefix + "#/subject/copy/preview/perform/"+subjectId);
+                            params.put("userUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                            params.put("subjectName", subjectName);
+                            params.put("resourceUri", params.getString("uri"));
+                            JsonObject pushNotif = new JsonObject()
+                                    .put("title", "exercizer.share")
+                                    .put("body", I18n.getInstance().translate(
+                                            "exercizer.push.notif.share.body",
+                                            getHost(request),
+                                            I18n.acceptLanguage(request),
+                                            user.getUsername(),
+                                            subjectName
+                                    ));
+
+                            params.put("pushNotif", pushNotif);
+                            SubjectController.super.shareJsonSubmit(request, "exercizer.share", false, params, null);
+                        }
+                    });*/
+
+                    JsonObject params = new fr.wseduc.webutils.collections.JsonObject();
+                    params.put("username", user.getUsername());
+                    params.put("uri", pathPrefix + "#/subject/copy/preview/perform/"+subjectId);
+                    params.put("userUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
+                    params.put("subjectName", "test");
+                    params.put("resourceUri", params.getString("uri"));
+                    JsonObject pushNotif = new JsonObject()
+                            .put("title", "moodle.share")
+                            .put("body", I18n.getInstance().translate(
+                                    "exercizer.push.notif.share.body",
+                                    getHost(request),
+                                    I18n.acceptLanguage(request),
+                                    user.getUsername(),
+                                    "test"
+                            ));
+
+                    params.put("pushNotif", pushNotif);
+                    MoodleController.super.shareJsonSubmit(request, "moodle.share", false, params, null);
+                }
+                else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
     }
 
 

@@ -1,4 +1,4 @@
-import {model, ng, template, Behaviours} from 'entcore';
+import {model, ng, template} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
@@ -445,6 +445,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.openShareWindow = function () {
         $scope.showInfoSharePanel = true;
+        Utils.safeApply($scope);
     };
 
 

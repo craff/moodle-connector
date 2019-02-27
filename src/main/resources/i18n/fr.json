@@ -21,9 +21,9 @@
 	"list.title": "Mes moodles",
 	"folder.trash": "Corbeille",
 	"show": "Afficher",
-	"moodle.manager": "Gestion",
-	"moodle.contrib": "Contribution",
-	"moodle.read": "Lecture",
+	"moodle.contrib": "Apprenant",
+	"moodle.read": "Lecteur",
+	"moodle.manager": "Editeur",
 
 	"group.Teacher": "Tous les enseignants du groupe {0}.",
 	"group.Personnel": "Tous les personnels du groupe {0}.",

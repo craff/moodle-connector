@@ -166,6 +166,7 @@ export class Courses {
             _.each(this.allCourses,function(course) {
                course.id = course.courseid;
                 course._id = course.courseid;
+                course.owner = {userId: course.auteur[0].entidnumber, displayName:course.auteur[0].firstname+" "+ course.auteur[0].lastname};
             });
             this.coursesByUser = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
             this.coursesShared = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
