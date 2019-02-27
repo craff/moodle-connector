@@ -111,7 +111,7 @@ body.moodle {
     margin-top: 15px;
   }
 
-  .course-progress{
+  .progress{
     width: 75%;
     display:inline-block;
   }
@@ -142,29 +142,35 @@ body.moodle {
     width: 110px;
   }
 
-  .progress-bar{
-    border: none;
-    height: 8px;
-    background: #EE6687;
-    .filled {
+  progress-bar {
+
+    &.courseProgress{
+      .progress-bar {
+        background: #F6B3C3;
+        .filled {
+          background: #e20037;
+        }
+      }
+    }
+
+    &.activityProgress{
+      .progress-bar {
+        background: #FFC27F;
+
+        .filled {
+          background: #FF8500;
+        }
+      }
+    }
+
+    .progress-bar{
+      border: none;
       height: 8px;
-      background: #e20037;
-      padding-right: unset;
-      padding-left: unset;
-    }
-  }
-
-  .courseProgress{
-    background: #EE6687;
-    .filled {
-      background: #e20037;
-    }
-  }
-
-  .activityProgress{
-    background: #FFC27F;
-    .filled {
-      background: #FF8500;
+      .filled {
+        height: 8px;
+        padding-right: unset;
+        padding-left: unset;
+      }
     }
   }
 

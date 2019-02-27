@@ -14,7 +14,7 @@
     <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent', toComeImage : place == 'coursesToCome'}"
          ng-show="course.image === null || course.image === undefined" ng-if="place != 'coursesToDo'"/>
 </div>
-<div  ng-class="{ 'eleven cell' : place == 'coursesToDo', 'specific-all-toCome-width cell' place == 'coursesToCome')}">
+<div  ng-class="{ 'eleven cell' : place == 'coursesToDo', 'specific-all-toCome-width cell' : place == 'coursesToCome'}">
     <div ng-class="{ 'left-margin' : (place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent' || place == 'courseToCome'),
                       'right-margin' : (place == 'coursesToDo' || place == 'coursesToCome'),
                       'big-right-margin' : (place == 'coursesShared' || place == 'coursesMine'),
@@ -47,19 +47,19 @@
             <span class="date">[[ printDate(course,"enddate") ]]</span>
         </label>
         <div class="row move-up">
-            <progress-bar class="course-progress" filled="course.progress" ng-if="place == 'coursesToDo'"> <!--ng-class="{activityProgress : course.course_type == 'singleactivity',
-courseProgress : course.course_type == 'topics'}"//-->
+            <progress-bar class="progress" ng-class="{activityProgress : course.course_type == 'singleactivity',
+courseProgress : course.course_type == 'topics'}" filled="course.progress" ng-if="place == 'coursesToDo'">
             </progress-bar>
             <dots-menu class="cell right-magnet" ng-class="{'next-previous-courses' : place == 'coursesToCome'}" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
 
                 <opt  ng-if="!course.masque">
-                    <i class="eye-open">
+                    <i class="eye-slash">
                     </i>
                     &nbsp;&nbsp;<i18n>course.mask</i18n>
                 </opt>
                 <!--
                 <opt ng-if="course.masque">
-                    <i class="eye-slash">
+                    <i class="eye-open">
                     </i>
                     &nbsp;<i18n>course.demask</i18n>
                 </opt>

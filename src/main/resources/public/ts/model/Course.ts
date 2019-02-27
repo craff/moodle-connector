@@ -140,7 +140,7 @@ export class Courses {
             try {
                 const {data} = await http.get('/moodle/choices');
                 console.log(data);
-                if(data[0].length != 0) {
+                if(data.length != 0) {
                     this.printcourseslastcreation = data[0].lastcreation;
                     this.printcoursestodo = data[0].todo;
                     this.printcoursestocome = data[0].tocome;
