@@ -9,6 +9,8 @@ for(let controller in controllers){
     ng.controllers.push(controllers[controller]);
 }
 
+//declare let require: any;
+
 routes.define(function($routeProvider){
 	$routeProvider
         .when('/dashboard', {
@@ -27,3 +29,6 @@ routes.define(function($routeProvider){
         redirectTo: '/'
     });
 });
+
+//require("ng-clamp1");
+//ng.addRequiredModule('ng-clamp');

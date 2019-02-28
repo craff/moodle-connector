@@ -8,8 +8,10 @@ export interface Course {
     fullname : string;
     summary : string;
     date : Date;
-    author : Author;
+    auteur : Author;
     role : string;
+    startdate : Date;
+    enddate : Date;
     categoryid : number;
     folderid : number;
     imageurl : string;
@@ -32,7 +34,7 @@ export class Course {
             categoryid: 1,
             summary: this.summary,
             date: this.date,
-            author: this.author,
+            auteur: this.auteur,
             imageurl: "https://medias.liberation.fr/photo/552903--.jpg",
             type: this.type,
             typeA: this.typeA,

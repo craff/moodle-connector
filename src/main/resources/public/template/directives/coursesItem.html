@@ -31,11 +31,13 @@
                 <i18n>toBegin.at</i18n>
                 <span class="date"><!--[[ printDate(course,"begindate") ]]//--></span></br>
             </label>
-            <span class="text-font">[[course.fullname]]</span> </br>
+            <div class="ellipsis">
+                <span class="text-font">[[course.fullname]]</span>
+            </div>
             <div ng-if="place != 'coursesRecent' && place != 'coursesMine'">
                 <span class="summary-list size-font">[[ printAuthor(course) ]]</span></br>
             </div>
-            <div ng-if="place != 'coursesRecent' && place != 'coursesToCome'">
+            <div ng-if="place != 'coursesRecent' && place != 'coursesToCome'" class="ellipsis">
                 <span class="summary-list summary-color size-font">[[course.summary]]</span></br>
             </div>
         </div>

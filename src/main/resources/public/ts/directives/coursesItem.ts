@@ -2,6 +2,7 @@
  * Created by jolloiss on 21/02/2019.
  */
 import {ng, appPrefix, template} from 'entcore';
+//import shave from 'yaclamp';
 
 export let coursesItem = ng.directive("coursesItem", function(){
     return {
@@ -15,7 +16,7 @@ export let coursesItem = ng.directive("coursesItem", function(){
             view : '='
         },
         templateUrl : `/${appPrefix}/public/template/directives/coursesItem.html`,
-        controller : ['$scope', function($scope) {
+        controller : ['$scope', '$element', function($scope, $element) {
             $scope.checkCourse = () => {
                 $scope.check();
             };
@@ -25,6 +26,12 @@ export let coursesItem = ng.directive("coursesItem", function(){
             $scope.printAuthor = (item,number) => {
                 return $scope.authorFunction(item,number);
             }
+
+            /*const maxLineNumber = $scope.place === 'coursesToCome' ?  2 : 6;
+            const selector = $scope.place === 'coursesToCome' ? '.clamp-me' : '.big-clamp-me';
+
+            const element = $element[0].querySelector(selector);
+            shave(element, maxLineNumber,'...');*/
         }]
     };
 });

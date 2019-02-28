@@ -96,7 +96,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.disableDeleteSend = true;
         $scope.typeShowCourses = ["Tout","Autres"];
         $scope.firstCoursesToDo = 0;
-        $scope.lastCoursesToDo = 8;
+        $scope.lastCoursesToDo = $scope.countToDo();
         $scope.firstCoursesToCome = 0;
         $scope.lastCoursesToCome = $scope.countToCome();
         $scope.showToDoCourses = $scope.typeShowCourses[0];
@@ -364,6 +364,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.previousCoursesToDoButton = function () {
         $scope.firstCoursesToDo -= $scope.countToDo();
         $scope.lastCoursesToDo -= $scope.countToDo();
+        if($scope.firstCoursesToDo < 0){
+            $scope.firstCoursesToDo = 0;
+            $scope.lastCoursesToDo=$scope.countToDo($scope.viewModeToDo);
+        }
     };
     $scope.nextCoursesToDoButton = function () {
         $scope.firstCoursesToDo += $scope.countToDo();
@@ -390,6 +394,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.previousCoursesToComeButton = function () {
             $scope.firstCoursesToCome -= $scope.countToCome();
             $scope.lastCoursesToCome -= $scope.countToCome();
+            if($scope.firstCoursesToCome < 0){
+                $scope.firstCoursesToCome = 0;
+                $scope.lastCoursesToCome=$scope.countToCome($scope.viewModeToCome);
+            }
     };
 
     $scope.nextCoursesToComeButton = function () {
@@ -426,10 +434,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.changeViewModeToCome = function (view:string){
         $scope.viewModeToCome=view;
+        $scope.lastCoursesToCome=$scope.firstCoursesToCome+$scope.countToCome(view);
     };
 
     $scope.changeViewModeToDo = function (view:string){
         $scope.viewModeToDo=view;
+        $scope.lastCoursesToDo=$scope.firstCoursesToDo+$scope.countToDo(view);
     }
 
 }]);

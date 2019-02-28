@@ -132,6 +132,12 @@ body.moodle {
     margin-left: 70px;
   }
 
+  .ellipsis{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .next-previous-courses{
     margin-top: 15px;
   }
