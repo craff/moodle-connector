@@ -21,7 +21,10 @@
     </div>
 </div>
 <div class="vertical-spacing">
-    <input type="button" ng-click="openPopUpFolder()" i18n-value="moodle.folder.new" class="colorbutton">
+    <input type="button" ng-click="openPopUpFolder()" i18n-value="moodle.folder.new" class="colorButton">
+</div>
+<div class="vertical-spacing">
+    <input type="button" ng-click="shareCourse()" i18n-value="share" class="colorButton" ng-model="course.role">
 </div>
 
 <script type="text/ng-template"  id="tree_item_renderer.html">

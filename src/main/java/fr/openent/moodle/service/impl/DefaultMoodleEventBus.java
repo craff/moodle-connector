@@ -1,7 +1,7 @@
 package fr.openent.moodle.service.impl;
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.MoodleEventBusService;
+import fr.openent.moodle.service.MoodleEventBus;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
@@ -11,11 +11,11 @@ import org.entcore.common.service.impl.SqlCrudService;
 
 import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 
-public class DefaultMoodleEventBusService extends SqlCrudService implements MoodleEventBusService {
+public class DefaultMoodleEventBus extends SqlCrudService implements MoodleEventBus {
 
     private EventBus eb;
 
-    public DefaultMoodleEventBusService(String schema, String table, EventBus eb) {
+    public DefaultMoodleEventBus(String schema, String table, EventBus eb) {
         super(schema, table);
         this.eb = eb;
     }

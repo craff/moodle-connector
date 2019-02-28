@@ -20,29 +20,44 @@ export interface Course {
 }
 
 export class Course {
-    constructor(){
+    constructor() {
         this.type = "1";
         this.select = false;
         this.selectConfirm = false;
     }
+
     toJSON() {
         return {
-            fullname : this.fullname,
-            categoryid : 1,
+            fullname: this.fullname,
+            categoryid: 1,
             summary: this.summary,
-            date : this.date,
-            author : this.author,
-            role : this.role,
-            imageurl : "https://medias.liberation.fr/photo/552903--.jpg",
-            type : this.type,
-            typeA : this.typeA,
-            folderid : this.folderid
+            date: this.date,
+            author: this.author,
+            imageurl: "https://medias.liberation.fr/photo/552903--.jpg",
+            type: this.type,
+            typeA: this.typeA,
+            folderid: this.folderid
+        }
+    }
+
+    toJson() {
+        return {
+            role: "editingteacher"
+        }
+    }
+
+    async share() {
+        try {
+            await http.put('/moodle/course', this.toJson());
+        } catch (e) {
+            notify.error("Share function didn't work");
+            throw e;
         }
     }
 
     async create() {
         try {
-            const { data } = await http.post('/moodle/course', this.toJSON());
+            const {data} = await http.post('/moodle/course', this.toJSON());
             this.courseid = data.id;
             this.goTo('edit');
         } catch (e) {
@@ -50,6 +65,7 @@ export class Course {
             throw e;
         }
     }
+
     async goTo(scope: string = 'view') {
         window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
     }

@@ -4,7 +4,7 @@ import io.vertx.core.Handler;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.json.JsonObject;
 
-public interface MoodleEventBusService {
+public interface MoodleEventBus {
 
     /**
      * Create a course

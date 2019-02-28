@@ -2,6 +2,7 @@ package fr.openent.moodle.service;
 
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.impl.Handlers;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -103,12 +104,18 @@ public interface MoodleWebService{
     void setChoice(JsonObject courses, String view, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * get groups and users
-     * @param userGroupIds
+     * get users
+     * @param usersIds
      * @param handler
      */
-    void getUsersGroups(JsonObject userGroupIds, Handler<Either<String, JsonArray>> handler);
+    void getUsers(JsonArray usersIds, Handler<Either<String, JsonArray>> handler);
 
+    /**
+     * get groups
+     * @param groupsIds
+     * @param handler
+     */
+    void getGroups(JsonArray groupsIds, Handler<Either<String, JsonArray>> handler);
     /**
      * get sharedbookmark
      * @param userId

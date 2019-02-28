@@ -18,10 +18,10 @@ export let coursesItem = ng.directive("coursesItem", function(){
         controller : ['$scope', function($scope) {
             $scope.checkCourse = () => {
                 $scope.check();
-            }
+            };
             $scope.printDate = (item,number) => {
                 return $scope.dateFunction(item,number);
-            }
+            };
             $scope.printAuthor = (item,number) => {
                 return $scope.authorFunction(item,number);
             }

@@ -246,6 +246,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
+    $scope.shareCourse = async function() {
+        $scope.course = new Course();
+        $scope.course.share();
+        Utils.safeApply($scope);
+    };
+
     $scope.deleteCourse = function () {
         $scope.course.delete();
         Utils.safeApply($scope);
@@ -370,7 +376,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }else{
             return 4;
         }
-    }
+    };
 
     $scope.countToDo = function () {
         if($scope.viewModeToCome == 'list'){
@@ -379,7 +385,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             //count number of defined image and deal with !
             return 8;
         }
-    }
+    };
 
     $scope.previousCoursesToComeButton = function () {
             $scope.firstCoursesToCome -= $scope.countToCome();
@@ -412,7 +418,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.printRightFormatAuthor = function (course:Course) {
         let author = course.auteur[0].firstname[0]+". "+course.auteur[0].lastname[0].toUpperCase()+course.auteur[0].lastname.slice(1).toLowerCase();
         return author;
-    }
+    };
 
     /**
      * change and get the view mode of courses to do and to come
@@ -420,7 +426,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.changeViewModeToCome = function (view:string){
         $scope.viewModeToCome=view;
-    }
+    };
 
     $scope.changeViewModeToDo = function (view:string){
         $scope.viewModeToDo=view;

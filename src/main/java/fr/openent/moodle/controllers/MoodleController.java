@@ -2,9 +2,9 @@ package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
-import fr.openent.moodle.service.MoodleEventBusService;
+import fr.openent.moodle.service.MoodleEventBus;
 import fr.openent.moodle.service.MoodleWebService;
-import fr.openent.moodle.service.impl.DefaultMoodleEventBusService;
+import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.impl.DefaultMoodleWebService;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -45,14 +45,14 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 public class MoodleController extends ControllerHelper {
 
 	private final MoodleWebService moodleWebService;
-	private final MoodleEventBusService moodleEventBusService;
+	private final MoodleEventBus moodleEventBus;
 	private final HttpClientHelper httpClientHelper;
 
     public MoodleController(Vertx vertx, EventBus eb) {
 		super();
         this.eb = eb;
 		this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
-		this.moodleEventBusService = new DefaultMoodleEventBusService(Moodle.moodleSchema, "course", eb);
+		this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
 		this.httpClientHelper = new HttpClientHelper();
 	}
 
@@ -157,12 +157,11 @@ public class MoodleController extends ControllerHelper {
                                 course.getString("fullname").substring(0, 4) + uniqueID);
                         JsonObject action = new JsonObject();
                         action.put("action", "getUserInfos").put("userId", user.getUserId());
-                        moodleEventBusService.getParams(action, new Handler<Either<String, JsonObject>>() {
+                        moodleEventBus.getParams(action, new Handler<Either<String, JsonObject>>() {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-
                                     URI moodleUri = null;
                                     try {
                                         final String service = (config.getString("address_moodle")+ config.getString("ws-path"));
@@ -172,7 +171,6 @@ public class MoodleController extends ControllerHelper {
                                         log.debug("Invalid moodle web service uri", e);
                                     }
                                     if (moodleUri != null) {
-
                                         final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                         final String moodleUrl = moodleUri.toString() +
                                                 "?wstoken=" + WSTOKEN +
@@ -419,19 +417,19 @@ public class MoodleController extends ControllerHelper {
     //@SecuredAction("moodle.list")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void getChoices (final HttpServerRequest request) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        if (user != null) {
-                            String userId = user.getUserId();
-                            moodleWebService.getChoices(userId, arrayResponseHandler(request));
-                        } else {
-                            log.debug("User not found in session.");
-                            unauthorized(request);
-                        }
-                    }
-                });
-            }
+	    UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+	        @Override
+            public void handle(UserInfos user) {
+	            if (user != null) {
+	                String userId = user.getUserId();
+	                moodleWebService.getChoices(userId, arrayResponseHandler(request));
+	            } else {
+	                log.debug("User not found in session.");
+	                unauthorized(request);
+	            }
+	        }
+	    });
+	}
 
     @Put("/choices/:view")
     @ApiDoc("set a choice")
@@ -458,6 +456,70 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
+    @Put("/course")
+    @ApiDoc("Share a course")
+    @SecuredAction("moodle.share")
+    public void share(final HttpServerRequest request) {
+	    RequestUtils.bodyToJson(request, pathPrefix + "share", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject shareCourse) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            JsonObject share = new JsonObject();
+                            JsonArray groupsIds = new JsonArray();
+                            groupsIds.add("1761599-1535020399757");
+                            JsonArray usersIds = new JsonArray();
+                            usersIds.add(user.getUserId());
+                            usersIds.add("659890d3-e652-46f5-bd14-3fd55daf4022");
+                            moodleWebService.getUsers(usersIds, new Handler<Either<String, JsonArray>>() {
+                                @Override
+                                public void handle(Either<String, JsonArray> eventUsers) {
+                                    if (eventUsers.isRight()) {
+                                        share.put("users", eventUsers.right().getValue());
+                                        moodleWebService.getGroups(groupsIds, new Handler<Either<String, JsonArray>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonArray> eventGroups) {
+                                                if (eventGroups.isRight()) {
+                                                    share.put("groups" , eventGroups.right().getValue());
+                                                    JsonArray sharedBookMarksIds = new JsonArray()
+                                                            .add("_dc188f953b8347a59b5030b7d3ed7c44")
+                                                            .add("_69179111ee4d424c93d8cc78b3f2d51b")
+                                                            .add("_ab08ca6cf5aa4b3dae254effbe76648d");
+                                                    JsonObject userId = new JsonObject()
+                                                            .put("userId", "6e2a0750-6499-4b9e-836b-4237e8ff1428");
+                                                    if(sharedBookMarksIds.size() > 0){
+                                                        for (int i = 0; i < sharedBookMarksIds.size(); i++) {
+                                                            String sharedBookMarkId = sharedBookMarksIds.getString(i);
+                                                            moodleWebService.getSharedBookMark(userId, sharedBookMarkId, new Handler<Either<String, JsonArray>>(){
+                                                                @Override
+                                                                public void handle(Either<String, JsonArray> event){
+                                                                    if(event.isRight()){
+                                                                        share.getJsonArray("groups").add(event.right().getValue().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
+                                                                        log.error("Test");
+                                                                    } else {
+                                                                        log.debug("sharedBookMark " + sharedBookMarkId + " not found in Neo4J.");
+                                                                    }
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        } else {
+                            log.debug("User or group not found.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
     @Get("/sharedBookMark")
     @ApiDoc("get a sharedBookMark")
     //@SecuredAction("moodle.list")
@@ -465,32 +527,11 @@ public class MoodleController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
-                JsonArray sharedBookMarks = new JsonArray();
-                JsonArray sharedBookMarksIds = new JsonArray()
-                        .add("_dc188f953b8347a59b5030b7d3ed7c44")
-                        .add("_69179111ee4d424c93d8cc78b3f2d51b")
-                        .add("_ab08ca6cf5aa4b3dae254effbe76648d");
 
                 if (user != null) {
-                    JsonObject userId =  new JsonObject()
-                    .put("userId", "6e2a0750-6499-4b9e-836b-4237e8ff1428");
+
                     //.put("userId", user.getUserId());
-                    if(sharedBookMarksIds.size() > 0){
-                        for (int i = 0; i < sharedBookMarksIds.size(); i++) {
-                            String sharedBookMarkId = sharedBookMarksIds.getString(i);
-                            moodleWebService.getSharedBookMark(userId, sharedBookMarkId, new Handler<Either<String, JsonArray>>(){
-                                        @Override
-                                        public void handle(Either<String, JsonArray> event){
-                                            if(event.isRight()){
-                                                sharedBookMarks.add(event.right().getValue());
-                                            } else {
-                                                log.debug("sharedBookMark " + sharedBookMarkId + " not found in Neo4J.");
-                                            }
-                                        }
-                                    }
-                            );
-                        }
-                    }
+
                 } else {
                     log.debug("User " + user + " not found in session.");
                     unauthorized(request);

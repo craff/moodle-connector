@@ -3,11 +3,13 @@ package fr.openent.moodle.helper;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.service.impl.DefaultMoodleWebService;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.http.Renders;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import fr.openent.moodle.service.MoodleWebService;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.net.ProxyOptions;
 import org.entcore.common.controller.ControllerHelper;
 
@@ -99,5 +101,50 @@ public class HttpClientHelper extends ControllerHelper {
                 }
             }
         }).setFollowRedirects(true).end();
+    }
+
+    public void webServiceMoodleGet (String moodleUrl, Buffer wsResponse, HttpClient httpClient, AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler) {
+
+        final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
+            @Override
+            public void handle(HttpClientResponse response) {
+                if (response.statusCode() == 200) {
+                    response.handler(wsResponse::appendBuffer);
+                    response.endHandler(new Handler<Void>() {
+                        @Override
+                        public void handle(Void end) {
+                            handler.handle(new Either.Right<String, Buffer>(wsResponse));
+                            if (!responseIsSent.getAndSet(true)) {
+                                httpClient.close();
+                            }
+                        }
+                    });
+                } else {
+                    log.debug(response.statusMessage());
+                    response.bodyHandler(new Handler<Buffer>() {
+                        @Override
+                        public void handle(Buffer event) {
+                            log.error("Returning body after PT CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                            if (!responseIsSent.getAndSet(true)) {
+                                httpClient.close();
+                            }
+                        }
+                    });
+                    handle(response);
+                }
+            }
+        });
+        httpClientRequest.headers().set("Content-Length", "0");
+        //Typically an unresolved Address, a timeout about connection or response
+        httpClientRequest.exceptionHandler(new Handler<Throwable>() {
+            @Override
+            public void handle(Throwable event) {
+                log.error(event.getMessage(), event);
+                if (!responseIsSent.getAndSet(true)) {
+                    handle(event);
+                    httpClient.close();
+                }
+            }
+        }).end();
     }
 }
