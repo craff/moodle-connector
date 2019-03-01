@@ -9,10 +9,3 @@
          ng-repeat="course in courses.coursesShared">
     <courses-item course="course" place="'coursesShared'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
 </div>
-
-<lightbox show="showInfoSharePanel" on-close="showInfoSharePanel = false;">
-    <div>
-        <share-panel app-prefix="moodle" resources="courses.allCourses[0]" ></share-panel>
-    </div>
-</lightbox>
-<button ng-click="showInfoSharePanel = true"><i18n>share</i18n></button>

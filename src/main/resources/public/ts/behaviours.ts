@@ -11,7 +11,7 @@ var moodleBehaviours = {
 			right: "fr-openent-moodle-controllers-MoodleController|contrib"
 		},
 		manager: {
-			right: "fr-openent-moodle-controllers-MoodleController|edit"
+			right: "fr-openent-moodle-controllers-MoodleController|shareSubmit"
 		}
 	},
 	workflow: {
@@ -45,6 +45,18 @@ Behaviours.register('moodle', {
 		}
 		return resource;
 	},
+
+	/*resource: {
+		manager: {
+			right: 'fr-openent-moodle-controllers-MoodleController|shareSubmit'
+		},
+		contrib: {
+			right: 'fr-openent-moodle-controllers-MoodleController|contrib',
+		},
+		read: {
+			right: 'fr-openent-moodle-controllers-MoodleController|read'
+		}
+	},*/
 
 	/**
 	 * Allows to define all rights to display in the share windows. Names are

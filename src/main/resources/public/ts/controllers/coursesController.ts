@@ -1,4 +1,4 @@
-import {model, ng, template} from "entcore";
+import {_, model, ng, template} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
@@ -286,6 +286,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         template.open('toaster', 'toaster');
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         $scope.countFoldersCourses();
+        $scope.selectedCourse = _.findWhere($scope.courses.coursesByUser, {select:true});
     };
     /**
      * count folders and courses select
@@ -443,9 +444,17 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.lastCoursesToDo=$scope.firstCoursesToDo+$scope.countToDo(view);
     }
 
-    $scope.openShareWindow = function () {
-        $scope.showInfoSharePanel = true;
-        Utils.safeApply($scope);
+    $scope.getSelectedCourses = function () {
+        var selectedCourses = _.where($scope.courses.coursesByUser, {select:true});
+        return selectedCourses;
+    };
+
+    // TODO remplacer par balise authorize dans toaster.html
+    // <authorize name="manage" resource="uploads.selection()"> ...
+    $scope.showShareButton = function () {
+        // var selectedCourses = $scope.getSelectedCourses();
+        // return selectedCourses.length > 0;
+        return true;
     };
 
 

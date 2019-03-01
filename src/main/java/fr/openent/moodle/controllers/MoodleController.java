@@ -1,6 +1,7 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
+import fr.openent.moodle.filters.CanShareResoourceFilter;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.service.MoodleEventBus;
 import fr.openent.moodle.service.MoodleWebService;
@@ -475,37 +476,57 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
+
+//    @Get("/test")
+//    @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
+//    public void test(final HttpServerRequest request) {
+//
+//    }
+
+
     @Get("/share/json/:id")
-    @ApiDoc("Lists rights for a given subject.")
+    @ApiDoc("Lists rights for a given course.")
+    @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_read, type = ActionType.AUTHENTICATED)
     public void share(final HttpServerRequest request) {
-        super.shareJson(request, false);
-        /*final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
-        JsonObject shares = new JsonObject();
+        //super.shareJson(request, false);
+        final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
 
-        JsonObject users = new JsonObject();
+        String json = "{\"actions\":[{\"name\":[\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"displayName\":\"moodle.manager\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"displayName\":\"moodle.contrib\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|read\"],\"displayName\":\"moodle.read\",\"type\":\"RESOURCE\"}],\"groups\":{\"visibles\":[{\"id\":\"1761599-1535020399757\",\"name\":\"Élèves du groupe 3 A.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"1761587-1535020399755\",\"name\":\"Élèves du groupe 3 B.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\",\"name\":\"Enseignants de discipline ALLEMAND.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"782-1468756944518\",\"name\":\"Enseignants du groupe CLG-NICOLAS FOUQUET-MORMANT.\",\"groupDisplayName\":null,\"structureName\":null}],\"checked\":{\"1761587-1535020399755\":[\"fr-openent-moodle-controllers-MoodleController|read\"],\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"782-1468756944518\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"1761599-1535020399757\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}},\"users\":{\"visibles\":[{\"id\":\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\",\"login\":\"allan.ackra\",\"username\":\"ACKRA Allan\",\"lastName\":\"ACKRA\",\"firstName\":\"Allan\",\"profile\":\"Student\"},{\"id\":\"0c4bc331-fbde-47a2-87fd-ea801676612c\",\"login\":\"virginie.duponcest\",\"username\":\"DUPONCEST Virginie\",\"lastName\":\"DUPONCEST\",\"firstName\":\"Virginie\",\"profile\":\"Relative\"}],\"checked\":{\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"0c4bc331-fbde-47a2-87fd-ea801676612c\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}}}";
+
+        JsonObject shares = new JsonObject(json);
+
+        /*JsonObject users = new JsonObject();
         users.put("visibles", new JsonArray());
 
         JsonObject groups = new JsonObject();
         groups.put("visibles", new JsonArray());
 
         shares.put("users", users);
-        shares.put("groups", groups);
+        shares.put("groups", groups);*/
 
-        handler.handle(new Either.Right<String, JsonObject>(shares));*/
+
+        handler.handle(new Either.Right<String, JsonObject>(shares));
     }
 
     @Put("/contrib")
-    @ApiDoc("Adds rights for a given subject.")
+    @ApiDoc("Adds rights for a given course.")
     @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
     public void contrib(final HttpServerRequest request) {
 
     }
 
+//    @Put("/manager")
+//    @ApiDoc("Adds rights for a given course.")
+//    @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
+//    public void manager(final HttpServerRequest request) {
+//
+//    }
+
 
     @Put("/share/resource/:id")
-    @ApiDoc("Adds rights for a given subject.")
-    @ResourceFilter(ShareAndOwner.class)
+    @ApiDoc("Adds rights for a given course.")
+    @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
     public void shareSubmit(final HttpServerRequest request) {
 
@@ -514,7 +535,7 @@ public class MoodleController extends ControllerHelper {
             public void handle(final UserInfos user) {
                 if (user != null) {
                     request.pause();
-                    final String subjectId = request.params().get("id");
+                    final String courseId = request.params().get("id");
                     // TODO
                     /*subjectService.getById(subjectId, user, new Handler<Either<String,JsonObject>>() {
                         @Override
@@ -544,9 +565,14 @@ public class MoodleController extends ControllerHelper {
                         }
                     });*/
 
+
+                    //TODO appeler WS partage
+
+
+
                     JsonObject params = new fr.wseduc.webutils.collections.JsonObject();
                     params.put("username", user.getUsername());
-                    params.put("uri", pathPrefix + "#/subject/copy/preview/perform/"+subjectId);
+                    params.put("uri", pathPrefix + "#/subject/copy/preview/perform/"+courseId);
                     params.put("userUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
                     params.put("subjectName", "test");
                     params.put("resourceUri", params.getString("uri"));
