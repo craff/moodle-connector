@@ -27,15 +27,12 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static fr.openent.moodle.Moodle.*;
@@ -479,12 +476,13 @@ public class MoodleController extends ControllerHelper {
                     @Override
                     public void handle(UserInfos user) {
                         if (user != null) {
+                            Map idUsers = shareCourse.getJsonObject("users").getMap();
+                            Map idGroups = shareCourse.getJsonObject("groups").getMap();
+                            Map idBookmarks = shareCourse.getJsonObject("bookmarks").getMap();
+                            JsonArray usersIds = new JsonArray(new ArrayList(idUsers.keySet()));
+                            JsonArray groupsIds = new JsonArray(new ArrayList(idGroups.keySet()));
+                            JsonArray bookmarksIds = new JsonArray(new ArrayList(idBookmarks.keySet()));
                             JsonObject share = new JsonObject();
-                            JsonArray groupsIds = new JsonArray();
-                            groupsIds.add("1761599-1535020399757");
-                            JsonArray usersIds = new JsonArray();
-                            usersIds.add(user.getUserId());
-                            usersIds.add("659890d3-e652-46f5-bd14-3fd55daf4022");
                             moodleWebService.getUsers(usersIds, new Handler<Either<String, JsonArray>>() {
                                 @Override
                                 public void handle(Either<String, JsonArray> eventUsers) {
@@ -494,22 +492,16 @@ public class MoodleController extends ControllerHelper {
                                             @Override
                                             public void handle(Either<String, JsonArray> eventGroups) {
                                                 if (eventGroups.isRight()) {
-                                                    share.put("groups" , eventGroups.right().getValue());
-                                                    JsonArray sharedBookMarksIds = new JsonArray()
-                                                            .add("_dc188f953b8347a59b5030b7d3ed7c44")
-                                                            .add("_69179111ee4d424c93d8cc78b3f2d51b")
-                                                            .add("_ab08ca6cf5aa4b3dae254effbe76648d");
-                                                    JsonObject userId = new JsonObject()
-                                                            .put("userId", "6e2a0750-6499-4b9e-836b-4237e8ff1428");
-                                                    if(sharedBookMarksIds.size() > 0){
-                                                        for (int i = 0; i < sharedBookMarksIds.size(); i++) {
-                                                            String sharedBookMarkId = sharedBookMarksIds.getString(i);
-                                                            moodleWebService.getSharedBookMark(userId, sharedBookMarkId, new Handler<Either<String, JsonArray>>(){
+                                                    share.put("groups", eventGroups.right().getValue());
+                                                    if(bookmarksIds.size() > 0){
+                                                        for (int i = 0; i < bookmarksIds.size(); i++) {
+                                                            String sharedBookMarkId = bookmarksIds.getString(i);
+                                                            JsonArray usersParamsId = new JsonArray().add(user.getUserId());
+                                                            moodleWebService.getSharedBookMark(usersParamsId, sharedBookMarkId, new Handler<Either<String, JsonArray>>(){
                                                                 @Override
-                                                                public void handle(Either<String, JsonArray> event){
-                                                                    if(event.isRight()){
-                                                                        share.getJsonArray("groups").add(event.right().getValue().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
-                                                                        log.error("Test");
+                                                                public void handle(Either<String, JsonArray> eventBookmarks){
+                                                                    if(eventBookmarks.isRight()){
+                                                                        share.getJsonArray("groups").add(eventBookmarks.right().getValue().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
                                                                     } else {
                                                                         log.debug("sharedBookMark " + sharedBookMarkId + " not found in Neo4J.");
                                                                     }

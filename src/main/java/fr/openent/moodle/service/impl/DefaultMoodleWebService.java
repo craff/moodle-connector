@@ -220,24 +220,25 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void getSharedBookMark (final JsonObject userId, String groupsId, Handler<Either<String, JsonArray>> handler){
+    public void getSharedBookMark (final JsonArray usersParamsId, String sharedBookMarkId, Handler<Either<String, JsonArray>> handler){
+        JsonObject params = new JsonObject()
+                .put("userId", usersParamsId);
 
-        String queryNeo4j = "MATCH (u:User {id:{userId}})-[:HAS_SB]->(sb:ShareBookmark) " +
+        String queryNeo4j = "MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) " +
                 "UNWIND TAIL(sb." +
-                groupsId +
+                sharedBookMarkId +
                 ") as vid " +
                 "MATCH (v:Visible {id : vid}) " +
                 "WHERE not(has(v.deleteDate)) " +
-                "RETURN{id: u.id, email: u.email, lastname: u.lastName, firstname: u.firstName, username: u.login ," +
-                "group: {id: \"SB\" + \"" +
-                groupsId +
+                "RETURN{group: {id: \"SB\" + \"" +
+                sharedBookMarkId +
                 "\", name: HEAD(sb." +
-                groupsId +
+                sharedBookMarkId +
                 "), " +
             "users: COLLECT(DISTINCT " +
             "{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}} " +
             "as sharedBookMark;";
 
-        Neo4j.getInstance().execute(queryNeo4j, userId, Neo4jResult.validResultHandler(handler));
+        Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
     }
 }
