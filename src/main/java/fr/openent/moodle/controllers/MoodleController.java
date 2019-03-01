@@ -315,6 +315,11 @@ public class MoodleController extends ControllerHelper {
                                                             mydata.add(cours);
                                                         }
                                                     }*/
+
+
+                                                    //moodleWebService.getPreferences(user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
+
+
                                                     Renders.renderJson(request, coursArray);
                                                     handle(end);
                                                     if (!responseIsSent.getAndSet(true)) {
@@ -411,6 +416,13 @@ public class MoodleController extends ControllerHelper {
 	    String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
 	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" + request.getParam("id"));
     }
+
+    @Get("/course/preferences/:id")
+    @ApiDoc("get a course preferences (masked & favorites)")
+    public void getPreferences (final HttpServerRequest request) {
+                    long id_course =Long.parseLong(request.params().get("id"));
+                    moodleWebService.getPreferences(id_course, DefaultResponseHandler.defaultResponseHandler(request));
+                }
 
     @Get("/choices")
     @ApiDoc("get a choice")

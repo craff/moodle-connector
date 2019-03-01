@@ -89,6 +89,7 @@ body.moodle {
 
   .undefined-image-small-toDo-width{
     width: 23.705%;
+    min-width:211px;
   }
 
   .defined-image-small-toDo-width{
@@ -99,20 +100,39 @@ body.moodle {
     width:69.6%;
   }
 
+  .pseudo-eleven{
+    right:10px;
+    min-width:200px;
+    max-width: 95%;
+    position: absolute;
+  }
+
   .middle-eleven{
     width:85.333%;
   }
 
   .big-big{
-    width:98.333%;
+    right: 10px;
+    min-width: 300px;
+    max-width: 96%;
+    position: absolute;
   }
 
   .specific-all-toCome-width{
-    width: 88.333%;
+    right:10px;
+    max-width: 75%;
+    @media screen and (max-width: 700px) {
+      body {
+        max-width: 59%;
+      }
+    }
+    position:absolute;
   }
 
   .specific-small-toCome-width{
-    width: 74.333%;
+    right:10px;
+    max-width:76%;
+    position:absolute;
   }
 
   .all-width{
@@ -121,6 +141,7 @@ body.moodle {
 
   .small-width{
     width : 48%;
+    min-width:425px;
     margin-left:15px;
   }
 

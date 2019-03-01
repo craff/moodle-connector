@@ -383,7 +383,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.countToDo = function () {
-        if($scope.viewModeToCome == 'list'){
+        if($scope.viewModeToDo == 'list'){
             return 5;
         }else{
             //count number of defined image and deal with !

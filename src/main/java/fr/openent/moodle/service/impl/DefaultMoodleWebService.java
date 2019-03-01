@@ -82,6 +82,14 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
 
 @Override
+    public void getPreferences(final long id_course, final Handler<Either<String, JsonObject>> handler) {
+        String getCoursepreferences = "SELECT masked, favorites FROM " + Moodle.moodleSchema + ".course" + " WHERE moodle_id = ?;";
+        JsonArray value = new JsonArray();
+        value.add(id_course);
+        sql.prepared(getCoursepreferences, value, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
     public void deleteCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         JsonArray courses = course.getJsonArray("coursesId");
@@ -173,7 +181,8 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     @Override
     public void setChoice(final JsonObject courses, String view, Handler<Either<String, JsonObject>> handler) {
         String query = "INSERT INTO " + Moodle.moodleSchema + ".choices (user_id, lastcreation, todo, tocome)" +
-                " VALUES (?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET "+view+"="+courses.getBoolean("printcourses"+view)+";";
+                " VALUES (?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET "+view+"="+courses.getBoolean("printcourses"+view)+"; " +
+                "DELETE FROM "+ Moodle.moodleSchema + ".choices WHERE lastcreation=true AND todo=true AND tocome=true;";
 
         JsonArray values = new JsonArray();
         values.add(courses.getString("userId"));

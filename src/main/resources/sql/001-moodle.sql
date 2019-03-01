@@ -33,3 +33,13 @@ CREATE TABLE moodle.choices (
   toCome boolean,
   CONSTRAINT choices_pkey PRIMARY KEY (user_id)
 );
+
+CREATE TABLE moodle.preferences (
+   id bigserial NOT NULL,
+   moodle_id bigserial NOT NULL,
+   user_id character varying(36) NOT NULL,
+   masked boolean NOT NULL,
+   favorites boolean NOT NULL,
+   CONSTRAINT preferences_pkey PRIMARY KEY (id),
+   unique (moodle_id, user_id)
+);

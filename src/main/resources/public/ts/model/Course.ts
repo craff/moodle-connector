@@ -19,6 +19,8 @@ export interface Course {
     typeA : string;
     select: boolean;
     selectConfirm: boolean;
+    masked: boolean;
+    favorites: boolean;
 }
 
 export class Course {
@@ -30,6 +32,7 @@ export class Course {
 
     toJSON() {
         return {
+            courseid: this.courseid,
             fullname: this.fullname,
             categoryid: 1,
             summary: this.summary,
@@ -70,6 +73,27 @@ export class Course {
 
     async goTo(scope: string = 'view') {
         window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
+    }
+
+    async getCoursePreferences() {
+        if(this.courseid != null) {
+            try {
+                const {data} = await http.get(`/moodle/course/preferences/${this.courseid}`);
+                if (data.length != 0) {
+                    this.masked = data[0].masked;
+                    this.favorites = data[0].favorites;
+                } else {
+                    this.masked = false;
+                    this.favorites = false;
+                }
+            } catch (e) {
+                notify.error("Get course preferences function didn't work");
+                throw e;
+            }
+        }else{
+            this.masked = false;
+            this.favorites = false;
+        }
     }
 }
 
@@ -157,7 +181,6 @@ export class Courses {
     async getChoice() {
             try {
                 const {data} = await http.get('/moodle/choices');
-                console.log(data);
                 if(data.length != 0) {
                     this.printcourseslastcreation = data[0].lastcreation;
                     this.printcoursestodo = data[0].todo;

@@ -9,12 +9,12 @@
                                 courseBigWidthPicture : place == 'coursesToDo' && course.image !== undefined,
                                 coursePictureBackground : place != 'coursesRecent' && place != 'coursesToDo' && place != 'coursesToCome' && course.course_type == 'topics'}"
                                 ng-click="course.goTo()">
-    <img ng-src="[[course.image]]" class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent', bigImage : place == 'coursesToDo', toComeImage : place == 'coursesToCome'}"
+    <img ng-src="[[course.image]]" class="image-dashboard"
          ng-show="course.image !== null && course.image !== undefined"/>
-    <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard" ng-class="{ smallImage : place == 'coursesRecent', bigImage : place == 'coursesToDo', toComeImage : place == 'coursesToCome'}"
-         ng-show="course.image === null || course.image === undefined" ng-if="place != coursesToDo"/>
+    <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
+         ng-show="course.image === null || course.image === undefined" ng-if="place != 'coursesToDo'"/>
 </div>
-<div  ng-class="{ 'eleven cell' : place == 'coursesToDo' && course.image == undefined && view == 'icons',
+<div  ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' && course.image == undefined && view == 'icons',
                   'small-eleven cell' : place == 'coursesToDo' && course.image !== undefined && view == 'icons',
 
                   'big-big cell' : place == 'coursesToDo' && course.image == undefined && view == 'list',
@@ -61,30 +61,26 @@ courseProgress : course.course_type == 'topics'}" filled="course.progress" ng-if
             </progress-bar>
             <dots-menu class="cell right-magnet" ng-class="{'next-previous-courses' : place == 'coursesToCome'}" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
 
-                <opt  ng-if="!course.masque">
+                <opt  ng-if="!course.maskes">
                     <i class="eye-slash">
                     </i>
                     &nbsp;&nbsp;<i18n>course.mask</i18n>
                 </opt>
-                <!--
-                <opt ng-if="course.masque">
+                <opt ng-if="course.masked">
                     <i class="eye-open">
                     </i>
                     &nbsp;<i18n>course.demask</i18n>
                 </opt>
-                //-->
-                <opt  ng-if="!course.favoris">
+                <opt  ng-if="!course.favorites">
                     <i class="favoris">
                     </i>
                     &nbsp;&nbsp;<i18n>course.favoris</i18n>
                 </opt>
-                <!--
-                <opt ng-if="course.favoris">
+                <opt ng-if="course.favorites">
                     <i class="defavoris">
                     </i>
                     &nbsp;<i18n>course.defavoris</i18n>
                 </opt>
-                //-->
             </dots-menu>
 
         </div>
