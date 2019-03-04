@@ -24,6 +24,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.switchTab = function(current: string){
         $scope.currentTab = current;
+        $scope.resetSelect();
+        $scope.toasterShow = false;
         if($scope.currentTab == 'courses'){
             $scope.initCoursesTab();
         }else if($scope.currentTab == 'dashboard'){
