@@ -13,6 +13,8 @@ import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -483,36 +485,52 @@ public class MoodleController extends ControllerHelper {
                             JsonArray groupsIds = new JsonArray(new ArrayList(idGroups.keySet()));
                             JsonArray bookmarksIds = new JsonArray(new ArrayList(idBookmarks.keySet()));
                             JsonObject share = new JsonObject();
-                            moodleWebService.getUsers(usersIds, new Handler<Either<String, JsonArray>>() {
-                                @Override
-                                public void handle(Either<String, JsonArray> eventUsers) {
-                                    if (eventUsers.isRight()) {
-                                        share.put("users", eventUsers.right().getValue());
-                                        moodleWebService.getGroups(groupsIds, new Handler<Either<String, JsonArray>>() {
-                                            @Override
-                                            public void handle(Either<String, JsonArray> eventGroups) {
-                                                if (eventGroups.isRight()) {
-                                                    share.put("groups", eventGroups.right().getValue());
-                                                    if(bookmarksIds.size() > 0){
-                                                        for (int i = 0; i < bookmarksIds.size(); i++) {
-                                                            String sharedBookMarkId = bookmarksIds.getString(i);
-                                                            JsonArray usersParamsId = new JsonArray().add(user.getUserId());
-                                                            moodleWebService.getSharedBookMark(usersParamsId, sharedBookMarkId, new Handler<Either<String, JsonArray>>(){
-                                                                @Override
-                                                                public void handle(Either<String, JsonArray> eventBookmarks){
-                                                                    if(eventBookmarks.isRight()){
-                                                                        share.getJsonArray("groups").add(eventBookmarks.right().getValue().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
-                                                                    } else {
-                                                                        log.debug("sharedBookMark " + sharedBookMarkId + " not found in Neo4J.");
-                                                                    }
-                                                                }
-                                                            });
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        });
+
+                            Future<JsonArray> getUsersFuture = Future.future();
+                            Handler<Either<String, JsonArray>> getUsersHandler = finalUsers -> {
+                                if (finalUsers.isRight()) {
+                                    getUsersFuture.complete(finalUsers.right().getValue());
+                                } else {
+                                    getUsersFuture.fail( "Drinking problem");
+                                }
+                            };
+                            moodleWebService.getUsers(usersIds, getUsersHandler);
+
+                            Future<JsonArray> getGroupsFuture = Future.future();
+                            Handler<Either<String, JsonArray>> getGroupsHandler = finalGroups -> {
+                                if (finalGroups.isRight()) {
+                                    getGroupsFuture.complete(finalGroups.right().getValue());
+                                } else {
+                                    getGroupsFuture.fail( "Drinking problem");
+                                }
+                            };
+                            moodleWebService.getGroups(groupsIds, getGroupsHandler);
+
+                            Future<JsonArray> getShareGroupsFuture = Future.future();
+                            for (int i = 0; i < bookmarksIds.size(); i++) {
+                                String sharedBookMarkId = bookmarksIds.getString(i);
+                                JsonArray usersParamsId = new JsonArray().add(user.getUserId());
+                                Handler<Either<String, JsonArray>> getShareGroupsHandler = finalShareGroups -> {
+                                    if (finalShareGroups.isRight()) {
+                                        getShareGroupsFuture.complete(finalShareGroups.right().getValue());
+                                    } else {
+                                        getShareGroupsFuture.fail("Drinking problem");
                                     }
+                                };
+                                moodleWebService.getSharedBookMark(usersParamsId, sharedBookMarkId, getShareGroupsHandler);
+                            }
+
+                            // Final Response
+                            CompositeFuture.all(getUsersFuture, getGroupsFuture, getShareGroupsFuture).setHandler(event -> {
+                                if (event.succeeded()) {
+                                    JsonArray usersFuture = getUsersFuture.result(); //return object from service
+                                    JsonArray groupsFuture = getGroupsFuture.result(); //return object from service
+                                    JsonArray shareGroups = getShareGroupsFuture.result(); //return object from service
+                                    share.put("users", usersFuture)
+                                            .put("groups", groupsFuture);
+                                    share.getJsonArray("groups").add(getShareGroupsFuture.result().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
+                                } else {
+                                    badRequest(request, event.cause().getMessage());
                                 }
                             });
                         } else {
@@ -524,6 +542,7 @@ public class MoodleController extends ControllerHelper {
             }
         });
     }
+
     @Get("/sharedBookMark")
     @ApiDoc("get a sharedBookMark")
     //@SecuredAction("moodle.list")
