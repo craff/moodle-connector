@@ -286,7 +286,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         template.open('toaster', 'toaster');
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         $scope.countFoldersCourses();
-        $scope.selectedCourse = _.findWhere($scope.courses.coursesByUser, {select:true});
+        if($scope.toasterShow === true) {
+            $scope.selectedCourse = _.findWhere($scope.courses.coursesByUser, {select:true});
+        }
     };
     /**
      * count folders and courses select
@@ -442,7 +444,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.changeViewModeToDo = function (view:string){
         $scope.viewModeToDo=view;
         $scope.lastCoursesToDo=$scope.firstCoursesToDo+$scope.countToDo(view);
-    }
+    };
 
     $scope.getSelectedCourses = function () {
         var selectedCourses = _.where($scope.courses.coursesByUser, {select:true});

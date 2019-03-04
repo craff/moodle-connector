@@ -26,7 +26,6 @@ export class Course implements Shareable{
     selectConfirm: boolean;
     masked: boolean;
     favorites: boolean;
-}
 
     constructor(){
         this.type = "1";
@@ -48,7 +47,6 @@ export class Course implements Shareable{
             type: this.type,
             typeA: this.typeA,
             folderid: this.folderid,
-            courseid : this.courseid,
             id: this.courseid
         }
     }

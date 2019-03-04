@@ -11,14 +11,12 @@ import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.eventbus.EventBus;
@@ -30,7 +28,6 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
-import org.entcore.common.http.filter.sql.ShareAndOwner;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -477,17 +474,10 @@ public class MoodleController extends ControllerHelper {
     }
 
 
-//    @Get("/test")
-//    @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
-//    public void test(final HttpServerRequest request) {
-//
-//    }
-
-
     @Get("/share/json/:id")
     @ApiDoc("Lists rights for a given course.")
     @ResourceFilter(CanShareResoourceFilter.class)
-    @SecuredAction(value = resource_read, type = ActionType.AUTHENTICATED)
+    @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
     public void share(final HttpServerRequest request) {
         //super.shareJson(request, false);
         final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
@@ -496,14 +486,7 @@ public class MoodleController extends ControllerHelper {
 
         JsonObject shares = new JsonObject(json);
 
-        /*JsonObject users = new JsonObject();
-        users.put("visibles", new JsonArray());
-
-        JsonObject groups = new JsonObject();
-        groups.put("visibles", new JsonArray());
-
-        shares.put("users", users);
-        shares.put("groups", groups);*/
+        // TODO appeler WS Moodle pour recuperer les droits et construire le json au bon format
 
 
         handler.handle(new Either.Right<String, JsonObject>(shares));
@@ -511,97 +494,17 @@ public class MoodleController extends ControllerHelper {
 
     @Put("/contrib")
     @ApiDoc("Adds rights for a given course.")
+    @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
     public void contrib(final HttpServerRequest request) {
 
     }
-
-//    @Put("/manager")
-//    @ApiDoc("Adds rights for a given course.")
-//    @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
-//    public void manager(final HttpServerRequest request) {
-//
-//    }
-
 
     @Put("/share/resource/:id")
     @ApiDoc("Adds rights for a given course.")
     @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
     public void shareSubmit(final HttpServerRequest request) {
-
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    request.pause();
-                    final String courseId = request.params().get("id");
-                    // TODO
-                    /*subjectService.getById(subjectId, user, new Handler<Either<String,JsonObject>>() {
-                        @Override
-                        public void handle(Either<String, JsonObject> r) {
-                            request.resume();
-                            JsonObject subject  = ResourceParser.beforeAny(r.right().getValue());
-                            final String subjectName = subject.getString("title");
-
-                            JsonObject params = new fr.wseduc.webutils.collections.JsonObject();
-                            params.put("username", user.getUsername());
-                            params.put("uri", pathPrefix + "#/subject/copy/preview/perform/"+subjectId);
-                            params.put("userUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
-                            params.put("subjectName", subjectName);
-                            params.put("resourceUri", params.getString("uri"));
-                            JsonObject pushNotif = new JsonObject()
-                                    .put("title", "exercizer.share")
-                                    .put("body", I18n.getInstance().translate(
-                                            "exercizer.push.notif.share.body",
-                                            getHost(request),
-                                            I18n.acceptLanguage(request),
-                                            user.getUsername(),
-                                            subjectName
-                                    ));
-
-                            params.put("pushNotif", pushNotif);
-                            SubjectController.super.shareJsonSubmit(request, "exercizer.share", false, params, null);
-                        }
-                    });*/
-
-
-                    //TODO appeler WS partage
-
-
-
-                    JsonObject params = new fr.wseduc.webutils.collections.JsonObject();
-                    params.put("username", user.getUsername());
-                    params.put("uri", pathPrefix + "#/subject/copy/preview/perform/"+courseId);
-                    params.put("userUri", "/userbook/annuaire#" + user.getUserId() + "#" + user.getType());
-                    params.put("subjectName", "test");
-                    params.put("resourceUri", params.getString("uri"));
-                    JsonObject pushNotif = new JsonObject()
-                            .put("title", "moodle.share")
-                            .put("body", I18n.getInstance().translate(
-                                    "exercizer.push.notif.share.body",
-                                    getHost(request),
-                                    I18n.acceptLanguage(request),
-                                    user.getUsername(),
-                                    "test"
-                            ));
-
-                    params.put("pushNotif", pushNotif);
-                    MoodleController.super.shareJsonSubmit(request, "moodle.share", false, params, null);
-                }
-                else {
-                    log.debug("User not found in session.");
-                    unauthorized(request);
-                }
-            }
-        });
-    }
-
-
-    @Put("/course")
-    @ApiDoc("Share a course")
-    @SecuredAction("moodle.share")
-    public void share(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "share", new Handler<JsonObject>() {
             @Override
             public void handle(JsonObject shareCourse) {
@@ -670,26 +573,6 @@ public class MoodleController extends ControllerHelper {
                         }
                     }
                 });
-            }
-        });
-    }
-
-    @Get("/sharedBookMark")
-    @ApiDoc("get a sharedBookMark")
-    //@SecuredAction("moodle.list")
-    public void getSharedBookMark (final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-
-                if (user != null) {
-
-                    //.put("userId", user.getUserId());
-
-                } else {
-                    log.debug("User " + user + " not found in session.");
-                    unauthorized(request);
-                }
             }
         });
     }
