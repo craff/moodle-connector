@@ -452,9 +452,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     // TODO remplacer par balise authorize dans toaster.html
     // <authorize name="manage" resource="uploads.selection()"> ...
     $scope.showShareButton = function () {
-        // var selectedCourses = $scope.getSelectedCourses();
-        // return selectedCourses.length > 0;
-        return true;
+        var selectedCourses = $scope.getSelectedCourses();
+        return selectedCourses.length === 1;
     };
 
 
