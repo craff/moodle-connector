@@ -103,6 +103,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.showToComeCourses = $scope.typeShowCourses[0];
         $scope.viewModeToDo = "icons";
         $scope.viewModeToCome = "icons";
+        $scope.initFolders();
     };
 
     $scope.isPrintMenuFolder = function() {
@@ -201,7 +202,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         await $scope.folders.sync();
         $scope.resetSelect();
         $scope.countItems();
-        $scope.toasterShow = false;
+        $scope.showToaster();
         Utils.safeApply($scope);
     };
 

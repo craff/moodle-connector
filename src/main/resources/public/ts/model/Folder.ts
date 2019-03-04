@@ -1,19 +1,26 @@
 import http from "axios";
 import {Mix} from 'entcore-toolkit';
 import {notify} from "entcore";
+import {Author} from "./Course";
 
-export class Folder {
+export interface Folder {
     id : number;
     parent_id : number;
     user_id : string;
     name : string;
     structure_id : string;
-    nbItems: number=0;
+    nbItems: number;
     subFolders : Folder[];
-    printsubfolder : boolean=false;
-    select: boolean=false;
+    printsubfolder : boolean;
+    select: boolean;
     selectConfirm: boolean;
+}
+
+export class Folder {
     constructor() {
+        this.printsubfolder = false;
+        this.nbItems = 0;
+        this.select = false;
         this.parent_id = 0;
         this.selectConfirm=false;
     }
