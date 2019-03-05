@@ -82,11 +82,11 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
 
 @Override
-    public void getPreferences(final long id_course, final Handler<Either<String, JsonObject>> handler) {
-        String getCoursepreferences = "SELECT masked, favorites FROM " + Moodle.moodleSchema + ".course" + " WHERE moodle_id = ?;";
+    public void getPreferences( String id_user, final Handler<Either<String, JsonObject>> handler) {
+        String getCoursespreferences = "SELECT moodle_id, masked, favorites FROM " + Moodle.moodleSchema + ".preferences" + " WHERE user_id = ?;";
         JsonArray value = new JsonArray();
-        value.add(id_course);
-        sql.prepared(getCoursepreferences, value, SqlResult.validUniqueResultHandler(handler));
+        value.add(id_user);
+        sql.prepared(getCoursespreferences, value, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override

@@ -43,8 +43,12 @@
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button  class="changeWeekButtonBack" ng-click="previousCoursesToDoButton()" ng-disabled="firstCoursesToDo == 0">&#8592;</button>
-                    <button class="changeWeekButtonNext" ng-click="nextCoursesToDoButton()" ng-disabled="lastCoursesToDo >= courses.coursesByUser.length">&#8594;</button>
+                    <button ng-class="{specialDisable : firstCoursesToDo == 0}" class="" ng-click="previousCoursesToDoButton()" ng-disabled="firstCoursesToDo == 0">
+                        <i class="left-open"></i>
+                    </button>
+                    <button ng-class="{specialDisable : lastCoursesToDo >= courses.coursesByUser.length}" ng-click="nextCoursesToDoButton()" ng-disabled="lastCoursesToDo >= courses.coursesByUser.length">
+                        <i class="open-right"></i>
+                    </button>
                 </li>
             </div>
         </div>
@@ -80,8 +84,12 @@
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button  class="changeWeekButtonBack" ng-click="previousCoursesToComeButton()" ng-disabled="firstCoursesToCome == 0">&#8592;</button>
-                    <button class="changeWeekButtonNext" ng-click="nextCoursesToComeButton()" ng-disabled="lastCoursesToCome >= courses.coursesByUser.length">&#8594;</button>
+                    <button  ng-class="{specialDisable : firstCoursesToCome == 0}" ng-click="previousCoursesToComeButton()" ng-disabled="firstCoursesToCome == 0">
+                        <i class="left-open"></i>
+                    </button>
+                    <button ng-class="{specialDisable : lastCoursesToCome >= courses.coursesByUser.length}" ng-click="nextCoursesToComeButton()" ng-disabled="lastCoursesToCome >= courses.coursesByUser.length">
+                        <i class="open-right"></i>
+                    </button>
                 </li>
             </div>
         </div>

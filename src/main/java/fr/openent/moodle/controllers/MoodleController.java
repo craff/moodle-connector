@@ -321,11 +321,18 @@ public class MoodleController extends ControllerHelper {
                                                         if(moodleWebService.getValueMoodleIdinEnt(cours.getInteger("courseid"),sqlCoursArray)){
                                                             mydata.add(cours);
                                                         }
-                                                    }*/
+                                                    }
 
+                                                    moodleWebService.getPreferences(user.getUserId(), new Handler<Either<String, JsonObject>>() {
+                                                                @Override
+                                                                public void handle(Either<String, JsonObject> event) {
+                                                                    if (event.isRight()){
 
-                                                    //moodleWebService.getPreferences(user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-
+                                                                    } else {
+                                                                        handle(new Either.Left<>("Get list favorites and masked failed !"));
+                                                                    }
+                                                                }
+                                                            });*/
 
                                                     Renders.renderJson(request, coursArray);
                                                     handle(end);
@@ -423,13 +430,6 @@ public class MoodleController extends ControllerHelper {
 	    String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
 	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" + request.getParam("id"));
     }
-
-    @Get("/course/preferences/:id")
-    @ApiDoc("get a course preferences (masked & favorites)")
-    public void getPreferences (final HttpServerRequest request) {
-                    long id_course =Long.parseLong(request.params().get("id"));
-                    moodleWebService.getPreferences(id_course, DefaultResponseHandler.defaultResponseHandler(request));
-                }
 
     @Get("/choices")
     @ApiDoc("get a choice")

@@ -46,10 +46,10 @@ public interface MoodleWebService{
 
     /**
      * get choice of user in a specific view
-     * @param id_course
+     * @param id_user
      * @param handler function handler returning data
      */
-    void getPreferences(long id_course, Handler<Either<String, JsonObject>> handler);
+    void getPreferences(String id_user, Handler<Either<String, JsonObject>> handler);
 
     /**
      * get list courses ant shared by folder
