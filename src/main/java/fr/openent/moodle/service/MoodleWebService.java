@@ -123,6 +123,7 @@ public interface MoodleWebService{
      * @param handler
      */
     void getGroups(JsonArray groupsIds, Handler<Either<String, JsonArray>> handler);
+
     /**
      * get sharedbookmark
      * @param usersParamsId

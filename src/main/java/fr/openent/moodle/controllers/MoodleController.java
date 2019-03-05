@@ -31,6 +31,8 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
+import org.entcore.common.storage.Storage;
+import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -182,6 +184,13 @@ public class MoodleController extends ControllerHelper {
                                         log.debug("Invalid moodle web service uri", e);
                                     }
                                     if (moodleUri != null) {
+                                        String idImage = course.getString("imageurl");
+                                        String urlImage = request.host() + "/moodle/files/";
+                                        if(idImage != null){
+                                            urlImage +=  idImage + "/contents";
+                                        } else {
+                                            urlImage = "https://medias.liberation.fr/photo/552903--.jpg";
+                                        }
                                         final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                         final String moodleUrl = moodleUri.toString() +
                                                 "?wstoken=" + WSTOKEN +
@@ -195,7 +204,7 @@ public class MoodleController extends ControllerHelper {
                                                 "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname")) +
                                                 "&parameters[categoryid]=" + URLEncoder.encode(""+course.getInteger("categoryid")) +
                                                 "&parameters[summary]=" + URLEncoder.encode(course.getString("summary")) +
-                                                "&parameters[imageurl]=" + URLEncoder.encode(course.getString("imageurl")) +
+                                                "&parameters[imageurl]=" + urlImage +
                                                 "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type")) +
                                                 "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA")) +
                                                 "&moodlewsrestformat=" + JSON;
@@ -223,6 +232,24 @@ public class MoodleController extends ControllerHelper {
             }
         });
 	}
+
+    @Get("/files/:id/contents")
+    public void getFile(HttpServerRequest request) {
+        moodleEventBus.getImage(request.getParam("id"), event -> {
+            if (event.isRight()) {
+                JsonObject document = event.right().getValue();
+                storage.readFile( document.getString("file"), buffer ->
+                        request.response()
+                                .setStatusCode(200)
+                                .putHeader("Content-Type", "application/octet-stream")
+                                .putHeader("Content-Transfer-Encoding", "Binary")
+                                .putHeader("Content-disposition", "attachment; filename=" + document.getString("name"))
+                                .end(buffer));
+            } else {
+                badRequest(request);
+            }
+        });
+    }
 
     @Get("/folder/countsFolders/:id")
     @ApiDoc("Get count fodlers in course by id")

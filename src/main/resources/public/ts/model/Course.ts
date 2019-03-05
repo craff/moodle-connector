@@ -36,6 +36,7 @@ export class Course implements Shareable{
 
 
     toJSON() {
+        let tmpImgUrl = this.imageurl? this.imageurl.split("/") : [null];
         return {
             courseid: this.courseid,
             fullname: this.fullname,
@@ -43,7 +44,7 @@ export class Course implements Shareable{
             summary: this.summary,
             date: this.date,
             auteur: this.auteur,
-            imageurl: "https://medias.liberation.fr/photo/552903--.jpg",
+            imageurl: tmpImgUrl[tmpImgUrl.length-1],
             type: this.type,
             typeA: this.typeA,
             folderid: this.folderid,
