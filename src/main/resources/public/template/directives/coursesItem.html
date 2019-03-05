@@ -1,35 +1,42 @@
-<div class="cell" ng-class="{ activitySmallPicture : place == 'coursesRecent' && course.course_type == 'singleactivity',
-                                activityBigPicture : place == 'coursesToDo' && course.course_type == 'singleactivity',
-                                activityToComePicture : place == 'coursesToCome' && course.course_type == 'singleactivity',
-                                activityPictureBackground : place != 'coursesRecent' && place != 'coursesToDo' && place != 'coursesToCome' && course.course_type == 'singleactivity',
-                                courseSmallPicture : place == 'coursesRecent' && course.course_type == 'topics',
-                                courseBigPicture : place == 'coursesToDo' && course.course_type == 'topics',
-                                courseToComePicture : place == 'coursesToCome' && course.course_type == 'topics',
-                                courseSmallWidthPicture : place == 'coursesToDo' && course.image === undefined,
-                                courseBigWidthPicture : place == 'coursesToDo' && course.image !== undefined,
-                                coursePictureBackground : place != 'coursesRecent' && place != 'coursesToDo' && place != 'coursesToCome' && course.course_type == 'topics'}"
+<div class="cell" ng-class="{ activityRecentPicture : place == 'coursesRecent' && course.course_type == 'singleactivity',
+                                activityToDoPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && (course.image !== null && course.image !== undefined),
+                                activityToComePicture : place == 'coursesToCome' && course.course_type == 'singleactivity' && (course.image !== null && course.image !== undefined),
+                                activityToComeNoPadding : place == 'coursesToCome' && course.course_type == 'singleactivity' && (course.image === null || course.image === undefined),
+                                activityPictureBackground : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'singleactivity' && (course.image !== null && course.image !== undefined),
+                                activityPictureNoPadding : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'singleactivity' && (course.image === null || course.image === undefined),
+                                activityToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && (course.image === null || course.image === undefined),
+                                courseRecentPicture : place == 'coursesRecent' && course.course_type == 'topics',
+                                courseToDoPicture : place == 'coursesToDo' && course.course_type == 'topics' && (course.image !== null && course.image !== undefined),
+                                courseToComePicture : place == 'coursesToCome' && course.course_type == 'topics' && (course.image !== null && course.image !== undefined),
+                                courseToComeNoPadding : place == 'coursesToCome' && course.course_type == 'topics' && (course.image === null || course.image === undefined),
+                                courseToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'topics' && (course.image === null || course.image === undefined),
+                                coursePictureBackground : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'topics' && course.image !== null && course.image !== undefined,
+                                coursePictureNoPadding : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'topics' && (course.image === null || course.image === undefined)}"
                                 ng-click="course.goTo()">
     <img ng-src="[[course.image]]" class="image-dashboard"
+         ng-class="{ recentPicture : place == 'coursesRecent',
+            toDoPicture : place == 'coursesToDo',
+            toComePicture : place == 'coursesToCome',
+            defaultPicture : place == 'coursesShared' || place == 'coursesMine'}"
          ng-show="course.image !== null && course.image !== undefined"/>
-    <img skin-src="/img/illustrations/pages-default.png"  class="image-dashboard"
-         ng-show="course.image === null || course.image === undefined" ng-if="place != 'coursesToDo'"/>
+    <img ng-src="moodle/public/img/logo_image_ent.png"  class="image-dashboard"
+         ng-show="course.image === null || course.image === undefined"/>
 </div>
-<div  ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' && course.image == undefined && view == 'icons',
+<div  ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' && course.image === undefined && view == 'icons',
                   'small-eleven cell' : place == 'coursesToDo' && course.image !== undefined && view == 'icons',
 
-                  'big-big cell' : place == 'coursesToDo' && course.image == undefined && view == 'list',
-                  'middle-eleven cell' : place == 'coursesToDo' && course.image !== undefined && view == 'list',
+                  'big-big cell' : place == 'coursesToDo' && course.image === undefined && view == 'list',
+                  'seven-mobile nine middle-eleven cell' : place == 'coursesToDo' && course.image !== undefined && view == 'list',
 
-                  'specific-all-toCome-width cell' : place == 'coursesToCome' && view == 'list',
+                  'eight-mobile specific-all-toCome-width cell' : place == 'coursesToCome' && view == 'list',
                   'specific-small-toCome-width cell' : place == 'coursesToCome' && view == 'icons'}">
-    <div ng-class="{ 'left-margin' : (place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'),
-                      'right-margin' : (place == 'coursesToDo' || place == 'coursesToCome'),
+    <div ng-class="{ 'right-margin' : (place == 'coursesToDo' || place == 'coursesToCome'),
                       'big-right-margin' : (place == 'coursesShared' || place == 'coursesMine'),
-                      'inside-margin-left' : place == 'coursesRecent'}">
-        <div ng-click="course.goTo()">
-            <label class="text-font" ng-if="place == 'coursesToCome'">
+                      'inside-margin' : place == 'coursesRecent'}">
+        <div ng-click="course.goTo()" ng-class="{'specific-mine-shared-width' : place == 'coursesMine' || place == 'coursesShared'}">
+            <label class="text-font" ng-if="place == 'coursesToCome' && course.startdate != null">
                 <i18n>toBegin.at</i18n>
-                <span class="date"><!--[[ printDate(course,"begindate") ]]//--></span></br>
+                <span class="date">[[ printDate(course,"begindate") ]]</span></br>
             </label>
             <div class="ellipsis">
                 <span class="text-font">[[course.fullname]]</span>
@@ -45,16 +52,17 @@
             <i18n>modified.on</i18n>:
             <span class="date">[[ printDate(course, "modified" ) ]]</span>
         </label>
-        <label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'" ng-click="">
+        <label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'">
             <input type="checkbox" ng-change="checkCourse()" ng-model="course.select">
             <span></span>
         </label>
     </div>
     <div class="left-margin">
-        <label class="size-font" ng-if="place == 'coursesToDo'">
+        <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != null">
             <i18n>toDo.before</i18n>
             <span class="date">[[ printDate(course,"enddate") ]]</span>
         </label>
+        <br ng-if="place == 'coursesToDo' && course.enddate == null" />
         <div class="row move-up">
             <progress-bar class="progress" ng-class="{activityProgress : course.course_type == 'singleactivity',
 courseProgress : course.course_type == 'topics'}" filled="course.progress" ng-if="place == 'coursesToDo'">

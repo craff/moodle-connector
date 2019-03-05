@@ -80,6 +80,7 @@ body.moodle {
   .coursesBackground-dashboard{
     background: #eee;
     padding: 15px 60px;
+    min-width: 425px;
   }
 
   .right-margin{
@@ -94,21 +95,29 @@ body.moodle {
 
   .defined-image-small-toDo-width{
     width: 48.705%;
+    min-width: 380px;
   }
 
   .small-eleven{
-    width:69.6%;
+    right:10px;
+    width: 63%;
+    position:absolute;
   }
 
   .pseudo-eleven{
     right:10px;
     min-width:200px;
-    max-width: 95%;
+    width: 95%;
     position: absolute;
   }
 
   .middle-eleven{
-    width:85.333%;
+    right: 10px;
+    position: absolute;
+  }
+
+  .overEleven{
+    width:67%;
   }
 
   .big-big{
@@ -120,18 +129,13 @@ body.moodle {
 
   .specific-all-toCome-width{
     right:10px;
-    max-width: 75%;
-    @media screen and (max-width: 700px) {
-      body {
-        max-width: 59%;
-      }
-    }
+    max-width: 79%;
     position:absolute;
   }
 
   .specific-small-toCome-width{
     right:10px;
-    max-width:76%;
+    max-width:70%;
     position:absolute;
   }
 
@@ -142,15 +146,35 @@ body.moodle {
   .small-width{
     width : 48%;
     min-width:425px;
-    margin-left:15px;
+    margin-right: 15px;
+  }
+
+  .specific-mine-shared-width{
+    width: 90%;
+  }
+
+  .minimal-mine-recent-width{
+    min-width: 340px;
   }
 
   .big-right-margin{
-    margin-left: 100px;
+    margin-left: 85px;
   }
 
-  .inside-margin-left{
-    margin-left: 70px;
+  .inside-margin{
+    margin-left: 60px;
+    margin-top: 3px;
+  }
+
+  .center-courses{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .responsive-button{
+    width: 100%;
+    white-space: normal;
   }
 
   .ellipsis{

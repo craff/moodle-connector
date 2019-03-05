@@ -33,9 +33,9 @@
                 <i class="show-icons" ng-class="{ selected: viewModeToDo == 'icons' }" ng-click="changeViewModeToDo('icons')"></i>
             </div>
         </div>
-        <div class="row">
+        <div class="row center-courses">
             <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin right-course-margin"
-            ng-class="{'undefined-image-small-toDo-width cell' : course.image == undefined && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : course.image !== undefined && viewModeToDo == 'icons',
+            ng-class="{'undefined-image-small-toDo-width cell' : course.image === undefined && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : course.image !== undefined && viewModeToDo == 'icons',
             'all-width cell' : viewModeToDo == 'list'}">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo"></courses-item>
             </div>
@@ -71,9 +71,9 @@
                 <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewModeToCome('icons')"></i>
             </div>
         </div>
-        <div class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" class="twelve-mobile style-bord infoBackground bottom-margin"
-                 ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}">
+        <div class="row center-courses">
+            <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToCome,lastCoursesToCome)" ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}"
+                 class="twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
         </div>

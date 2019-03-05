@@ -32,53 +32,76 @@
 }
 .image-dashboard{
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-  height: 100%;
-}
-@mixin pictureSize() {
-  height: 75px;
-  width: 85px;
-  padding-left: 10px;
+  object-fit: cover;
 }
 
-.activitySmallPicture{
-  width: 4.5vw;
-  min-width: 60px;
-  padding-left: 5px;
+@mixin pictureSize() {
+  width: 14%;
+  min-width: 80px;
+}
+
+.activityRecentPicture{
+  width: 3.75vw;
+  min-width: 51px;
   background-color: #ff8500;
 }
 
 .activityToComePicture{
-  width: 10vw;
-  min-width: 130px;
+  width: 7.5vw;
+  min-width: 115px;
   padding-left: 10px;
   background-color: #ff8500;
 }
 
-.courseSmallPicture{
-  width: 4.5vw;
-  min-width: 60px;
-  padding-left: 5px;
+.activityToComeNoPadding{
+  width: 7.5vw;
+  min-width: 115px;
+  background-color: #ff8500;
+}
+
+.activityToDoSmallWidthPicture{
+  width:10px;
+  height: 120px;
+  padding-left:10px;
+  background-color: #ff8500;
+}
+
+.courseToDoSmallWidthPicture{
+  width:10px;
+  height: 120px;
+  padding-left:10px;
+  background-color: #e20037;
+}
+
+.courseRecentPicture{
+  width: 3.75vw;
+  min-width: 51px;
   background-color: #e20037;
 }
 
 .courseToComePicture{
-  width: 10vw;
-  min-width: 130px;
+  width: 7.5vw;
+  min-width: 115px;
   padding-left: 10px;
   background-color: #e20037;
 }
 
-.activityBigPicture{
-  height: 125px;
+.courseToComeNoPadding{
+  width: 7.5vw;
+  min-width: 115px;
+  background-color: #e20037;
+}
+
+.activityToDoPicture{
+  width: 9.5vw;
+  min-width: 130px;
   padding-left: 10px;
   background-color: #ff8500;
 }
 
-.courseBigPicture{
-  height: 125px;
+.courseToDoPicture{
+  width: 9.5vw;
+  min-width: 130px;
   padding-left: 10px;
   background-color: #e20037;
 }
@@ -86,11 +109,53 @@
 .activityPictureBackground{
   @include pictureSize();
   background-color: #ff8500;
+  padding-left: 6px;
 }
+
+.activityPictureNoPadding{
+  @include pictureSize();
+  background-color: #ff8500;
+}
+
 .coursePictureBackground{
   @include pictureSize();
   background-color: #e20037;
+  padding-left: 6px;
 }
+
+.coursePictureNoPadding{
+  @include pictureSize();
+  background-color: #e20037;
+}
+
+.recentPicture{
+  width: 3.75vw;
+  min-width: 51px;
+  height: 3.75vw;
+  min-height: 51px;
+}
+
+.toDoPicture{
+  width: 9.5vw;
+  min-width: 130px;
+  height: 9.5vw;
+  min-height: 130px;
+}
+
+.toComePicture{
+  width: 7.5vw;
+  min-width: 115px;
+  height: 7.5vw;
+  min-height: 115px;
+}
+
+.defaultPicture{
+  width: 14%;
+  min-width: 80px;
+  height: 14%;
+  min-height: 80px;
+}
+
 i.sort-desc::before {
   content: "\e925";
   font-family:"generic-icons";
@@ -164,7 +229,6 @@ i.defavoris::before {
  width: 78%;
 }
 .text-font{
-  font-size: 20px;
   font-weight: bolder;
 }
 .size-font{
