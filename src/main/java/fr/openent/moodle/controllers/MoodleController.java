@@ -31,9 +31,8 @@ import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
-import org.entcore.common.storage.Storage;
-import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -184,41 +183,46 @@ public class MoodleController extends ControllerHelper {
                                         log.debug("Invalid moodle web service uri", e);
                                     }
                                     if (moodleUri != null) {
-                                        String idImage = course.getString("imageurl");
-                                        String urlImage = "";
-                                        if(idImage != null){
-                                            urlImage = "&parameters[imageurl]=" + request.host() + "/moodle/files/" + idImage + "/contents";
-                                        }
-                                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                        final String moodleUrl = moodleUri.toString() +
-                                                "?wstoken=" + WSTOKEN +
-                                                "&wsfunction=" + WS_CREATE_FUNCTION +
-                                                "&parameters[username]=" + URLEncoder.encode(user.getLogin()) +
-                                                "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId()) +
-                                                "&parameters[email]=" +URLEncoder.encode( event.right().getValue().getString("email")) +
-                                                "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName()) +
-                                                "&parameters[lastname]=" + URLEncoder.encode(user.getLastName()) +
-                                                "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname")) +
-                                                "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname")) +
-                                                "&parameters[categoryid]=" + URLEncoder.encode(""+course.getInteger("categoryid")) +
-                                                "&parameters[summary]=" + URLEncoder.encode(course.getString("summary")) +
-                                                 urlImage +
-                                                "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type")) +
-                                                "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA")) +
-                                                "&moodlewsrestformat=" + JSON;
-                                        httpClientHelper.webServiceMoodlePost(moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                            @Override
-                                            public void handle(Either<String, Buffer> event) {
-                                                if (event.isRight()) {
-                                                    JsonObject object = event.right().getValue().toJsonArray().getJsonObject(0);
-                                                    course.put("moodleid", object.getValue("courseid"));
-                                                    course.put("userid", user.getUserId());
-                                                    moodleWebService.createCourse(course, defaultResponseHandler(request));
-                                                } else {
-                                                    log.debug("Post service failed");
-                                                }
+                                        try {
+
+                                            String idImage = course.getString("imageurl");
+                                            String urlImage = "";
+                                            if (idImage != null) {
+                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request) + "://" + getHost(request) + "/moodle/files/" + idImage + "/contents", "UTF-8");
                                             }
-                                        });
+                                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                            final String moodleUrl = moodleUri.toString() +
+                                                    "?wstoken=" + WSTOKEN +
+                                                    "&wsfunction=" + WS_CREATE_FUNCTION +
+                                                    "&parameters[username]=" + URLEncoder.encode(user.getLogin(), "UTF-8") +
+                                                    "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
+                                                    "&parameters[email]=" + URLEncoder.encode(event.right().getValue().getString("email"), "UTF-8") +
+                                                    "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
+                                                    "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
+                                                    "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +
+                                                    "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname")) +
+                                                    "&parameters[categoryid]=" + URLEncoder.encode("" + course.getInteger("categoryid"), "UTF-8") +
+                                                    "&parameters[summary]=" + URLEncoder.encode(course.getString("summary"), "UTF-8") +
+                                                    urlImage +
+                                                    "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type"), "UTF-8") +
+                                                    "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA"), "UTF-8") +
+                                                    "&moodlewsrestformat=" + JSON;
+                                            httpClientHelper.webServiceMoodlePost(moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                                                @Override
+                                                public void handle(Either<String, Buffer> event) {
+                                                    if (event.isRight()) {
+                                                        JsonObject object = event.right().getValue().toJsonArray().getJsonObject(0);
+                                                        course.put("moodleid", object.getValue("courseid"));
+                                                        course.put("userid", user.getUserId());
+                                                        moodleWebService.createCourse(course, defaultResponseHandler(request));
+                                                    } else {
+                                                        log.debug("Post service failed");
+                                                    }
+                                                }
+                                            });
+                                        } catch (UnsupportedEncodingException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 } else {
                                     handle(new Either.Left<>("Failed to gets the http params"));
