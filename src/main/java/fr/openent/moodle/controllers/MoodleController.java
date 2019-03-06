@@ -243,7 +243,7 @@ public class MoodleController extends ControllerHelper {
                 storage.readFile( document.getString("file"), buffer ->
                         request.response()
                                 .setStatusCode(200)
-                                .putHeader("Content-Type", "image/jpeg")
+                                .putHeader("Content-Type", "image/jpg")
                                 .end(buffer));
             } else {
                 badRequest(request);
