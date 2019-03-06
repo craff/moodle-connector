@@ -188,7 +188,7 @@ public class MoodleController extends ControllerHelper {
                                             String idImage = course.getString("imageurl");
                                             String urlImage = "";
                                             if (idImage != null) {
-                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request) + "://" + getHost(request) + "/moodle/files/" + idImage + "/contents", "UTF-8");
+                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request) + "://" + getHost(request) + "/moodle/files/" + idImage + "/" + course.getString("fullname") + "_picture.jpg", "UTF-8");
                                             }
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                             final String moodleUrl = moodleUri.toString() +
@@ -235,7 +235,7 @@ public class MoodleController extends ControllerHelper {
         });
 	}
 
-    @Get("/files/:id/contents")
+    @Get("/files/:id/:name")
     public void getFile(HttpServerRequest request) {
         moodleEventBus.getImage(request.getParam("id"), event -> {
             if (event.isRight()) {
