@@ -48,7 +48,9 @@ export class Course implements Shareable{
             type: this.type,
             typeA: this.typeA,
             folderid: this.folderid,
-            id: this.courseid
+            id: this.courseid,
+            masked: this.masked,
+            favorites: this.favorites
         }
     }
 
@@ -82,25 +84,18 @@ export class Course implements Shareable{
         window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
     }
 
-    async getCoursePreferences() {
-        if(this.courseid != null) {
-            try {
-                const {data} = await http.get(`/moodle/course/preferences/${this.courseid}`);
-                if (data.length != 0) {
-                    this.masked = data[0].masked;
-                    this.favorites = data[0].favorites;
-                } else {
-                    this.masked = false;
-                    this.favorites = false;
-                }
-            } catch (e) {
-                notify.error("Get course preferences function didn't work");
-                throw e;
-            }
-        }else{
-            this.masked = false;
-            this.favorites = false;
-        }
+    async setPreferences(preference : string) {
+
+        if(preference == "masked")
+            this.masked = !this.masked;
+        else if(preference == "favorites")
+            this.favorites = !this.favorites;
+        try {
+        await http.put(`/moodle/course/preferences/${this.courseid}`, this.toJSON());
+    } catch (e) {
+        notify.error("Set course preference function didn't work");
+        throw e;
+    }
     }
 }
 

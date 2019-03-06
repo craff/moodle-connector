@@ -315,18 +315,15 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("Get cours by user in database")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void listCouresByuser(final HttpServerRequest request){
-	    log.error(1);
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
                 if(user!=null){
                     Handler<Either<String, JsonArray>> handler = arrayResponseHandler(request);
-                    log.error(2);
                     moodleWebService.getCoursesByUserInEnt(user.getUserId(), new Handler<Either<String, JsonArray>>() {
                         @Override
                         public void handle(Either<String, JsonArray> sqlCours) {
                             if(sqlCours.isRight()){
-                                log.error(3);
                                 final JsonArray sqlCoursArray = sqlCours.right().getValue();
                                 final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                 final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
@@ -340,12 +337,10 @@ public class MoodleController extends ControllerHelper {
                                     @Override
                                     public void handle(HttpClientResponse response) {
                                         if (response.statusCode() == 200) {
-                                            log.error(5);
                                             response.handler(wsResponse::appendBuffer);
                                             response.endHandler(new Handler<Void>() {
                                                 @Override
                                                 public void handle(Void end) {
-                                                    log.error(12);
                                                     JsonArray object = new JsonArray(wsResponse);
                                                     JsonArray coursArray = object.getJsonObject(0).getJsonArray("enrolments");
 
@@ -360,14 +355,11 @@ public class MoodleController extends ControllerHelper {
                                                                 @Override
                                                                 public void handle(Either<String, JsonArray> event) {
                                                                     if (event.isRight()){
-                                                                        log.error(7);
                                                                         JsonArray list = event.right().getValue();
                                                                         if(list.getJsonObject(0) != null) {
                                                                             for (int i = 0; i < coursArray.size(); i++) {
-                                                                                log.error(9);
                                                                                 JsonObject cours = coursArray.getJsonObject(i);
                                                                                 for (int j = 0; j < list.size(); j++) {
-                                                                                    log.error(10);
                                                                                     JsonObject PreferencesCours = list.getJsonObject(j);
                                                                                     if(PreferencesCours.getValue("moodle_id").toString().compareTo(cours.getValue("courseid").toString()) == 0){
                                                                                         coursArray.getJsonObject(i).put("masked", PreferencesCours.getValue("masked"));
@@ -385,22 +377,19 @@ public class MoodleController extends ControllerHelper {
                                                                                 coursArray.getJsonObject(i).put("favorites", false);
                                                                             }
                                                                         }
-                                                                        log.error(11);
                                                                         Renders.renderJson(request, coursArray);
                                                                     } else {
-                                                                        log.error(8);
-                                                                        handle(new Either.Left<>("Get list favorites and masked failed !"));
+                                                                        log.error("Get list favorites and masked failed !");
+                                                                        renderError(request);
                                                                     }
                                                                 }
                                                             });
-                                                    handle(end);
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
                                                     }
                                                 }
                                             });
                                         } else {
-                                            log.error(6);
                                             log.debug(response.statusMessage());
                                             response.bodyHandler(new Handler<Buffer>() {
                                                 @Override
@@ -411,7 +400,7 @@ public class MoodleController extends ControllerHelper {
                                                     }
                                                 }
                                             });
-                                            handle(response);
+                                            renderError(request);
                                         }
                                     }
                                 });
@@ -422,14 +411,14 @@ public class MoodleController extends ControllerHelper {
                                     public void handle(Throwable event) {
                                         log.error(event.getMessage(), event);
                                         if (!responseIsSent.getAndSet(true)) {
-                                            handle(event);
+                                            renderError(request);
                                             httpClient.close();
                                         }
                                     }
                                 }).end();
                             } else {
-                                log.error(4);
-                                handle(new Either.Left<>("Get list in Ent Base failed"));
+                                log.error("Get list in Ent Base failed");
+                                renderError(request);
                             }
                         }
                     });
@@ -525,6 +514,30 @@ public class MoodleController extends ControllerHelper {
                             courses.put("userId", user.getUserId());
                             String view = request.getParam("view");
                             moodleWebService.setChoice(courses, view, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    @Put("/moodle/course/preferences/:id")
+    @ApiDoc("set preferences")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void setPreferences(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject course) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            course.put("userId", user.getUserId());
+                            long course_id =Long.parseLong(request.params().get("id"));
+                            moodleWebService.setPreferences(course_id, course, defaultResponseHandler(request));
                         } else {
                             log.debug("User not found in session.");
                             unauthorized(request);

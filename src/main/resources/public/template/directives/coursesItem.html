@@ -63,28 +63,28 @@
             <span class="date">[[ printDate(course,"enddate") ]]</span>
         </label>
         <br ng-if="place == 'coursesToDo' && course.enddate == null" />
-        <div class="row move-up">
+        <div ng-class="{'row move-up' : place == 'coursesToDo'}">
             <progress-bar class="progress" ng-class="{activityProgress : course.course_type == 'singleactivity',
 courseProgress : course.course_type == 'topics'}" filled="course.progress" ng-if="place == 'coursesToDo'">
             </progress-bar>
-            <dots-menu class="cell right-magnet" ng-class="{'next-previous-courses' : place == 'coursesToCome'}" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
+            <dots-menu class="cell right-magnet" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
 
-                <opt  ng-if="!course.masked" ng-click="course.setMasked()">
+                <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
                     <i class="eye-slash">
                     </i>
                     &nbsp;&nbsp;<i18n>course.mask</i18n>
                 </opt>
-                <opt ng-if="course.masked">
+                <opt ng-if="course.masked" ng-click="course.setPreferences('masked')">
                     <i class="eye-open">
                     </i>
                     &nbsp;<i18n>course.demask</i18n>
                 </opt>
-                <opt  ng-if="!course.favorites">
+                <opt  ng-if="!course.favorites" ng-click="course.setPreferences('favorites')">
                     <i class="favoris">
                     </i>
                     &nbsp;&nbsp;<i18n>course.favoris</i18n>
                 </opt>
-                <opt ng-if="course.favorites">
+                <opt ng-if="course.favorites" ng-click="course.setPreferences('favorites')">
                     <i class="defavoris">
                     </i>
                     &nbsp;<i18n>course.defavoris</i18n>

@@ -91,6 +91,23 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
+    public void setPreferences(final long course_id, final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
+        String query = "INSERT INTO " + Moodle.moodleSchema + ".preferences (moodle_id, user_id, masked, favorites)" +
+                " VALUES (?, ?, ?, ?) ON CONFLICT (moodle_id, user_id) DO UPDATE SET masked =" + course.getBoolean("masked")+
+                "AND favorites ="+course.getBoolean("favorites")+" ; "+
+                "DELETE FROM " + Moodle.moodleSchema + ".preferences WHERE masked=false AND favorites=false";
+
+        JsonArray values = new JsonArray();
+        values.add(course_id);
+        values.add(course.getString("userId"));
+        values.add(course.getBoolean("masked"));
+        values.add(course.getBoolean("masked"));
+
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
     public void deleteCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         JsonArray courses = course.getJsonArray("coursesId");

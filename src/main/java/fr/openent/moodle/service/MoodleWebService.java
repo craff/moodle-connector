@@ -45,11 +45,19 @@ public interface MoodleWebService{
     void deleteCourse(JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * get choice of user in a specific view
+     * get course preferences of user
      * @param id_user
      * @param handler function handler returning data
      */
     void getPreferences(String id_user, Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * set course preferences of user
+     * @param course_id
+     * @param course course where preferences was changed
+     * @param handler function handler returning data
+     */
+    void setPreferences(long course_id, JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
      * get list courses ant shared by folder
