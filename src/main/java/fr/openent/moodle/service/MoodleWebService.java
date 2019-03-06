@@ -49,7 +49,7 @@ public interface MoodleWebService{
      * @param id_user
      * @param handler function handler returning data
      */
-    void getPreferences(String id_user, Handler<Either<String, JsonObject>> handler);
+    void getPreferences(String id_user, Handler<Either<String, JsonArray>> handler);
 
     /**
      * get list courses ant shared by folder

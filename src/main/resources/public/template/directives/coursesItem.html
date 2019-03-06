@@ -69,7 +69,7 @@ courseProgress : course.course_type == 'topics'}" filled="course.progress" ng-if
             </progress-bar>
             <dots-menu class="cell right-magnet" ng-class="{'next-previous-courses' : place == 'coursesToCome'}" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
 
-                <opt  ng-if="!course.maskes">
+                <opt  ng-if="!course.masked" ng-click="course.setMasked()">
                     <i class="eye-slash">
                     </i>
                     &nbsp;&nbsp;<i18n>course.mask</i18n>

@@ -159,9 +159,6 @@ export class Courses {
             let allCourses = Mix.castArrayAs(Course, courses.data);
 
             this.allCourses = allCourses;
-            /*this.allCourses.forEach(function(course) {
-                course.date = new Date((new Date((course.date).toString())).toLocaleDateString());
-            });*/
             _.each(this.allCourses,function(course) {
                course.id = course.courseid;
                 course._id = course.courseid;

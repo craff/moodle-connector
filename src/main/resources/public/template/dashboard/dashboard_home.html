@@ -36,7 +36,7 @@
         <div class="row center-courses">
             <div ng-repeat="course in courses.coursesByUser.slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin right-course-margin"
             ng-class="{'undefined-image-small-toDo-width cell' : course.image === undefined && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : course.image !== undefined && viewModeToDo == 'icons',
-            'all-width cell' : viewModeToDo == 'list'}">
+            'all-width cell' : viewModeToDo == 'list'}"> <!--ng-show="!(course.masked)"-->
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo"></courses-item>
             </div>
         </div>
