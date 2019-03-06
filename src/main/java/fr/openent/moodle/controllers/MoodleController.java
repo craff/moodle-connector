@@ -185,11 +185,9 @@ public class MoodleController extends ControllerHelper {
                                     }
                                     if (moodleUri != null) {
                                         String idImage = course.getString("imageurl");
-                                        String urlImage = request.host() + "/moodle/files/";
+                                        String urlImage = "";
                                         if(idImage != null){
-                                            urlImage +=  idImage + "/contents";
-                                        } else {
-                                            urlImage = "https://medias.liberation.fr/photo/552903--.jpg";
+                                            urlImage = "&parameters[imageurl]=" + request.host() + "/moodle/files/" + idImage + "/contents";
                                         }
                                         final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                         final String moodleUrl = moodleUri.toString() +
@@ -204,7 +202,7 @@ public class MoodleController extends ControllerHelper {
                                                 "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname")) +
                                                 "&parameters[categoryid]=" + URLEncoder.encode(""+course.getInteger("categoryid")) +
                                                 "&parameters[summary]=" + URLEncoder.encode(course.getString("summary")) +
-                                                "&parameters[imageurl]=" + urlImage +
+                                                 urlImage +
                                                 "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type")) +
                                                 "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA")) +
                                                 "&moodlewsrestformat=" + JSON;
