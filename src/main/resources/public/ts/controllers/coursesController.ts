@@ -253,6 +253,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
+    $scope.shareCourse = async function() {
+        $scope.course = new Course();
+        $scope.course.share();
+        Utils.safeApply($scope);
+    };
+
     $scope.deleteCourse = function () {
         $scope.course.delete();
         Utils.safeApply($scope);

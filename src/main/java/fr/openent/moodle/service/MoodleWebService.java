@@ -131,5 +131,4 @@ public interface MoodleWebService{
      * @param handler
      */
     void getSharedBookMark(JsonArray usersParamsId, String sharedBookMarkId, Handler<Either<String, JsonArray>> handler);
-
 }

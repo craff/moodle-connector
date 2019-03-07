@@ -176,15 +176,16 @@ public class MoodleController extends ControllerHelper {
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                     URI moodleUri = null;
                                     try {
-                                        final String service = (config.getString("address_moodle")+ config.getString("ws-path"));
+                                        final String service = (config.getString("address_moodle") + config.getString("ws-path"));
                                         final String urlSeparator = service.endsWith("") ? "" : "/";
                                         moodleUri = new URI(service + urlSeparator);
                                     } catch (URISyntaxException e) {
                                         log.debug("Invalid moodle web service uri", e);
                                     }
                                     if (moodleUri != null) {
+                                        JsonObject shareSend = new JsonObject();
+                                        shareSend = null;
                                         try {
-
                                             String idImage = course.getString("imageurl");
                                             String urlImage = "";
                                             if (idImage != null) {
@@ -207,13 +208,13 @@ public class MoodleController extends ControllerHelper {
                                                     "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type"), "UTF-8") +
                                                     "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA"), "UTF-8") +
                                                     "&moodlewsrestformat=" + JSON;
-                                            httpClientHelper.webServiceMoodlePost(moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                                            httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
                                                 @Override
                                                 public void handle(Either<String, Buffer> event) {
                                                     if (event.isRight()) {
                                                         JsonObject object = event.right().getValue().toJsonArray().getJsonObject(0);
-                                                        course.put("moodleid", object.getValue("courseid"));
-                                                        course.put("userid", user.getUserId());
+                                                        course.put("moodleid", object.getValue("courseid"))
+                                                                .put("userid", user.getUserId());
                                                         moodleWebService.createCourse(course, defaultResponseHandler(request));
                                                     } else {
                                                         log.debug("Post service failed");
@@ -373,7 +374,7 @@ public class MoodleController extends ControllerHelper {
                                             response.bodyHandler(new Handler<Buffer>() {
                                                 @Override
                                                 public void handle(Buffer event) {
-                                                    log.error("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                                                    log.error("Returning body after GET CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
                                                     }
@@ -430,13 +431,15 @@ public class MoodleController extends ControllerHelper {
                     log.debug("Invalid moodle web service uri", e);
                 }
                 if (moodleDeleteUri != null) {
+                    JsonObject shareSend = new JsonObject();
+                    shareSend = null;
                     final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                     final String moodleDeleteUrl = moodleDeleteUri.toString() +
                             "?wstoken=" + WSTOKEN +
                             "&wsfunction=" + WS_DELETE_FUNCTION +
                             idsDeletes +
                             "&moodlewsrestformat=" + JSON;
-                    httpClientHelper.webServiceMoodlePost(moodleDeleteUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                    httpClientHelper.webServiceMoodlePost(shareSend, moodleDeleteUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
                         @Override
                         public void handle(Either<String, Buffer> event) {
                             if (event.isRight()) {
@@ -527,7 +530,7 @@ public class MoodleController extends ControllerHelper {
 
     }
 
-    @Put("/share/resource/:id")
+    @Post("/share/resource")
     @ApiDoc("Adds rights for a given course.")
     @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
@@ -552,7 +555,7 @@ public class MoodleController extends ControllerHelper {
                                 if (finalUsers.isRight()) {
                                     getUsersFuture.complete(finalUsers.right().getValue());
                                 } else {
-                                    getUsersFuture.fail( "Drinking problem");
+                                    getUsersFuture.fail( "Users not found");
                                 }
                             };
                             moodleWebService.getUsers(usersIds, getUsersHandler);
@@ -562,7 +565,7 @@ public class MoodleController extends ControllerHelper {
                                 if (finalGroups.isRight()) {
                                     getGroupsFuture.complete(finalGroups.right().getValue());
                                 } else {
-                                    getGroupsFuture.fail( "Drinking problem");
+                                    getGroupsFuture.fail( "Groups not found");
                                 }
                             };
                             moodleWebService.getGroups(groupsIds, getGroupsHandler);
@@ -575,27 +578,57 @@ public class MoodleController extends ControllerHelper {
                                     if (finalShareGroups.isRight()) {
                                         getShareGroupsFuture.complete(finalShareGroups.right().getValue());
                                     } else {
-                                        getShareGroupsFuture.fail("Drinking problem");
+                                        getShareGroupsFuture.fail("Share groups problem");
                                     }
                                 };
                                 moodleWebService.getSharedBookMark(usersParamsId, sharedBookMarkId, getShareGroupsHandler);
                             }
 
-                            // Final Response
                             CompositeFuture.all(getUsersFuture, getGroupsFuture, getShareGroupsFuture).setHandler(event -> {
                                 if (event.succeeded()) {
                                     JsonArray usersFuture = getUsersFuture.result(); //return object from service
                                     JsonArray groupsFuture = getGroupsFuture.result(); //return object from service
                                     JsonArray shareGroups = getShareGroupsFuture.result(); //return object from service
                                     share.put("users", usersFuture)
-                                            .put("groups", groupsFuture);
+                                            .put("groups", groupsFuture)
+                                            .getJsonArray("users").getJsonObject(0);
                                     share.getJsonArray("groups").add(getShareGroupsFuture.result().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
+
+                                    JsonObject shareSend = new JsonObject();
+                                    shareSend.put("parameters", share)
+                                            .put("wstoken", WSTOKEN)
+                                            .put("wsfunction", WS_CREATE_SHARECOURSE)
+                                            .put("moodlewsrestformat", JSON);
+                                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                                    URI moodleUri = null;
+                                    try {
+                                        final String service = (config.getString("address_moodle") + config.getString("ws-path"));
+                                        final String urlSeparator = service.endsWith("") ? "" : "/";
+                                        moodleUri = new URI(service + urlSeparator);
+                                    } catch (URISyntaxException e) {
+                                        log.debug("Invalid moodle web service uri", e);
+                                    }
+                                    if (moodleUri != null) {
+                                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                        final String moodleUrl = moodleUri.toString();
+                                        HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                                            @Override
+                                            public void handle(Either<String, Buffer> event) {
+                                                if (event.isRight()) {
+                                                    log.info("Cours partager");
+                                                } else {
+                                                    log.error("Share service didn't work");
+                                                    unauthorized(request);
+                                                }
+                                            }
+                                        });
+                                    }
                                 } else {
                                     badRequest(request, event.cause().getMessage());
                                 }
                             });
                         } else {
-                            log.debug("User or group not found.");
+                            log.error("User or group not found.");
                             unauthorized(request);
                         }
                     }

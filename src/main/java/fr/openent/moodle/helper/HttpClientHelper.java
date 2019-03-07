@@ -3,13 +3,12 @@ package fr.openent.moodle.helper;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.service.impl.DefaultMoodleWebService;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.http.Renders;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import fr.openent.moodle.service.MoodleWebService;
-import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.ProxyOptions;
 import org.entcore.common.controller.ControllerHelper;
 
@@ -46,8 +45,7 @@ public class HttpClientHelper extends ControllerHelper {
         return vertx.createHttpClient(options);
     }
 
-    public void webServiceMoodlePost(String moodleUrl, HttpClient httpClient, AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler) {
-
+    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, HttpClient httpClient, AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler) {
         URI url = null;
         try {
             url = new URI(moodleUrl);
@@ -55,6 +53,7 @@ public class HttpClientHelper extends ControllerHelper {
             handler.handle(new Either.Left<>("Bad request"));
             return;
         }
+
         final HttpClientRequest httpClientRequest = httpClient.postAbs(url.toString(), new Handler<HttpClientResponse>() {
             @Override
             public void handle(HttpClientResponse response) {
@@ -80,7 +79,7 @@ public class HttpClientHelper extends ControllerHelper {
                     response.bodyHandler(new Handler<Buffer>() {
                         @Override
                         public void handle(Buffer event) {
-                            log.error("Returning body after PT CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                            log.error("Returning body after POST CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
                             if (!responseIsSent.getAndSet(true)) {
                                 httpClient.close();
                             }
@@ -89,7 +88,17 @@ public class HttpClientHelper extends ControllerHelper {
                 }
             }
         });
+
+        if (shareSend != null) {
+            httpClientRequest.setChunked(true)
+                    .write("parameters=").write(shareSend.getJsonObject("parameters").encode())
+                    .write("&wstoken=").write(shareSend.getString("wstoken"))
+                    .write("&wsfunction=").write(shareSend.getString("wsfunction"))
+                    .write("&moodlewsrestformat=").write(shareSend.getString("moodlewsrestformat"));
+        }
+
         httpClientRequest.putHeader("Host", "moodle-dev.preprod-ent.fr");
+        httpClientRequest.putHeader("Content-type", "application/x-www-form-urlencoded");
         //Typically an unresolved Address, a timeout about connection or response
         httpClientRequest.exceptionHandler(new Handler<Throwable>() {
             @Override
@@ -103,6 +112,7 @@ public class HttpClientHelper extends ControllerHelper {
         }).setFollowRedirects(true).end();
     }
 
+    //TODO Finir le helper de WS Get
     public void webServiceMoodleGet (String moodleUrl, Buffer wsResponse, HttpClient httpClient, AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler) {
 
         final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {

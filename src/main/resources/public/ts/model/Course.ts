@@ -3,12 +3,12 @@ import http from "axios";
 import {Mix} from "entcore-toolkit";
 
 export class Course implements Shareable{
-    shared: any;
-    owner: {userId: string; displayName: string};
-    myRights: Rights<Course>;
+    shared : any;
+    owner : {userId: string; displayName: string};
+    myRights : Rights<Course>;
 
     courseid : number;
-    id:number;
+    id : number;
 
     fullname : string;
     summary : string;
@@ -22,10 +22,10 @@ export class Course implements Shareable{
     imageurl : string;
     type : string;
     typeA : string;
-    select: boolean;
-    selectConfirm: boolean;
-    masked: boolean;
-    favorites: boolean;
+    select : boolean;
+    selectConfirm : boolean;
+    masked : boolean;
+    favorites : boolean;
 
     constructor(){
         this.type = "1";
@@ -54,13 +54,13 @@ export class Course implements Shareable{
 
     toJson() {
         return {
-            role: "editingteacher"
+            role: "edit"
         }
     }
 
     async share() {
         try {
-            await http.put('/moodle/course', this.toJson());
+            await http.post('/moodle/share/resource', this.toJson());
         } catch (e) {
             notify.error("Share function didn't work");
             throw e;
