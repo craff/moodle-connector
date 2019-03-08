@@ -1,7 +1,8 @@
 /**
  * Created by jolloiss on 21/02/2019.
  */
-import {ng, appPrefix, template} from 'entcore';
+import {ng, appPrefix, template,_} from 'entcore';
+import {Utils} from "../utils/Utils";
 //import shave from 'yaclamp';
 
 export let coursesItem = ng.directive("coursesItem", function(){
@@ -25,7 +26,7 @@ export let coursesItem = ng.directive("coursesItem", function(){
             };
             $scope.printAuthor = (item,number) => {
                 return $scope.authorFunction(item,number);
-            }
+            };
 
             /*const maxLineNumber = $scope.place === 'coursesToCome' ?  2 : 6;
             const selector = $scope.place === 'coursesToCome' ? '.clamp-me' : '.big-clamp-me';

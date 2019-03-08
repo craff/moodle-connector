@@ -53,11 +53,10 @@ public interface MoodleWebService{
 
     /**
      * set course preferences of user
-     * @param course_id
      * @param course course where preferences was changed
      * @param handler function handler returning data
      */
-    void setPreferences(long course_id, JsonObject course, Handler<Either<String, JsonObject>> handler);
+    void setPreferences(JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
      * get list courses ant shared by folder

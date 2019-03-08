@@ -208,38 +208,39 @@ body.moodle {
 
       right: 0px;
       left: 20px;
-      background: #fff;
+      background:  #fff;
 
       opt:hover {
         background: #FF8500;
         color: #fff;
       }
 
-      opt {
-        color: #555;
+      opt{
+        color:#555;
         border-bottom: none;
       }
     }
   }
 
   dots-menu {
-
-    .opened .options {
-      width: 110px;
-    }
-
     &.bigWidth {
-      .opened .options {
+      dots-menu.opened .options {
         width: 205px;
       }
     }
-
     &.middleWidth {
-      .opened .options {
+      dots-menu.opened .options {
         width: 150px;
       }
     }
+
+    .dots-menu{
+      .opened .options {
+        width: 110px;
+      }
+    }
   }
+
 
   progress-bar {
 

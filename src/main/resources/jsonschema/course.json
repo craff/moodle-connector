@@ -29,12 +29,6 @@
 		},
 		"folderid": {
 			"type" : ["number", "null"]
-		},
-		"masked": {
-			"type" : "boolean"
-		},
-		"favorites": {
-			"type" : "boolean"
 		}
 	},
 	"required": [

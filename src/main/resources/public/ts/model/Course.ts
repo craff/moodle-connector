@@ -48,15 +48,21 @@ export class Course implements Shareable{
             type: this.type,
             typeA: this.typeA,
             folderid: this.folderid,
-            id: this.courseid,
-            masked: this.masked,
-            favorites: this.favorites
+            id: this.courseid
         }
     }
 
     toJson() {
         return {
             role: "edit"
+        }
+    }
+
+    toJsonPreferences() {
+        return {
+            courseid: this.courseid,
+            masked: this.masked,
+            favorites: this.favorites
         }
     }
 
@@ -86,16 +92,17 @@ export class Course implements Shareable{
 
     async setPreferences(preference : string) {
 
-        if(preference == "masked")
+        if(preference == "masked") {
             this.masked = !this.masked;
-        else if(preference == "favorites")
+        }else if(preference == "favorites") {
             this.favorites = !this.favorites;
+        }
         try {
-        await http.put(`/moodle/course/preferences/${this.courseid}`, this.toJSON());
-    } catch (e) {
-        notify.error("Set course preference function didn't work");
-        throw e;
-    }
+            await http.put('/moodle/course/preferences', this.toJsonPreferences());
+        } catch (e) {
+            notify.error("Set course preference function didn't work");
+            throw e;
+        }
     }
 }
 
@@ -108,6 +115,8 @@ export class Courses {
     printcourseslastcreation : boolean;
     printcoursestodo : boolean;
     printcoursestocome : boolean;
+    coursesToDo : Course[];
+    coursesToCome : Course[];
 
     constructor() {
         this.allbyfolder = [];
@@ -155,12 +164,12 @@ export class Courses {
 
             this.allCourses = allCourses;
             _.each(this.allCourses,function(course) {
-               course.id = course.courseid;
+                course.id = course.courseid;
                 course._id = course.courseid;
                 course.owner = {userId: course.auteur[0].entidnumber, displayName:course.auteur[0].firstname+" "+ course.auteur[0].lastname};
             });
-            this.coursesByUser = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
-            this.coursesShared = _.filter(allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
+            this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
+            this.coursesShared = _.filter(this.allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
             this.coursesByUser = this.coursesByUser.sort(
                 function compare(a, b) {
                     if (a.date < b.date)
@@ -185,23 +194,37 @@ export class Courses {
         }
     }*/
 
+    coursesToShow(id : string){
+        if(id == "all"){
+            return _.filter(this.coursesByUser, function(cours) { return !(cours.masked); });
+        }else if (id =="doing"){
+            return _.filter(this.coursesByUser, function(cours) { return !(cours.masked); });
+        }else if (id == "favorites"){
+            return _.filter(this.coursesByUser, function(cours) { return cours.favorites; });
+        }else if (id == "finished"){
+            return _.filter(this.coursesByUser, function(cours) { return !(cours.masked); });
+        }else if (id == "masked"){
+            return _.filter(this.coursesByUser, function(cours) { return cours.masked; });
+        }
+    }
+
     async getChoice() {
-            try {
-                const {data} = await http.get('/moodle/choices');
-                if(data.length != 0) {
-                    this.printcourseslastcreation = data[0].lastcreation;
-                    this.printcoursestodo = data[0].todo;
-                    this.printcoursestocome = data[0].tocome;
-                }
-                else
-                {
-                    this.printcourseslastcreation = true;
-                    this.printcoursestodo = true;
-                    this.printcoursestocome = true;
-                }
-            } catch (e) {
-                notify.error("Get Choice function didn't work");
-                }
+        try {
+            const {data} = await http.get('/moodle/choices');
+            if(data.length != 0) {
+                this.printcourseslastcreation = data[0].lastcreation;
+                this.printcoursestodo = data[0].todo;
+                this.printcoursestocome = data[0].tocome;
+            }
+            else
+            {
+                this.printcourseslastcreation = true;
+                this.printcoursestodo = true;
+                this.printcoursestocome = true;
+            }
+        } catch (e) {
+            notify.error("Get Choice function didn't work");
+        }
     }
 
     async setChoice(view:number){

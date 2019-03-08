@@ -356,7 +356,7 @@ public class MoodleController extends ControllerHelper {
                                                                 public void handle(Either<String, JsonArray> event) {
                                                                     if (event.isRight()){
                                                                         JsonArray list = event.right().getValue();
-                                                                        if(list.getJsonObject(0) != null) {
+                                                                        if(list.size() != 0) {
                                                                             for (int i = 0; i < coursArray.size(); i++) {
                                                                                 JsonObject cours = coursArray.getJsonObject(i);
                                                                                 for (int j = 0; j < list.size(); j++) {
@@ -524,20 +524,19 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-    @Put("/moodle/course/preferences/:id")
+    @Put("/course/preferences")
     @ApiDoc("set preferences")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void setPreferences(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
+        RequestUtils.bodyToJson(request, pathPrefix + "coursePreferences", new Handler<JsonObject>() {
             @Override
-            public void handle(JsonObject course) {
+            public void handle(JsonObject coursePreferences) {
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
                     @Override
                     public void handle(UserInfos user) {
                         if (user != null) {
-                            course.put("userId", user.getUserId());
-                            long course_id =Long.parseLong(request.params().get("id"));
-                            moodleWebService.setPreferences(course_id, course, defaultResponseHandler(request));
+                            coursePreferences.put("userId", user.getUserId());
+                            moodleWebService.setPreferences(coursePreferences, defaultResponseHandler(request));
                         } else {
                             log.debug("User not found in session.");
                             unauthorized(request);
