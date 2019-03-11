@@ -487,9 +487,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
     };
 
-   $scope.showInfoShare =() => {
+    $scope.showInfoShare = () => {
        $scope.getTheSelectedCourse();
        $scope.showInfoSharePanel = true;
        Utils.safeApply($scope);
    }
+    /**
+     * Close lightbox Share
+     */
+    $scope.closePopUpShare = () => {
+        $scope.showInfoSharePanel = false;
+    };
+
 }]);
