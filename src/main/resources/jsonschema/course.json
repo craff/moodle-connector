@@ -36,6 +36,16 @@
 				"null"
 			]
 		}
+		},
+        "bookmarks": {
+          "type" : ["number", "null"]
+        },
+        "groups": {
+          "type" : ["number", "null"]
+        },
+        "users": {
+          "type" : ["number", "null"]
+        }
 	},
 	"required": [
 		"fullname"

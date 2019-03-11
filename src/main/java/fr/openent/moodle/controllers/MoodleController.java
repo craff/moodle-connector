@@ -332,8 +332,7 @@ public class MoodleController extends ControllerHelper {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
-                if(user!=null){
-                    Handler<Either<String, JsonArray>> handler = arrayResponseHandler(request);
+                if(user != null){
                     moodleWebService.getCoursesByUserInEnt(user.getUserId(), new Handler<Either<String, JsonArray>>() {
                         @Override
                         public void handle(Either<String, JsonArray> sqlCours) {
@@ -588,7 +587,7 @@ public class MoodleController extends ControllerHelper {
 
     }
 
-    @Post("/share/resource")
+    @Put("/share/resource/:id")
     @ApiDoc("Adds rights for a given course.")
     @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)

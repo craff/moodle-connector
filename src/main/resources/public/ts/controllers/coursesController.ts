@@ -3,46 +3,46 @@ import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
 
-export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route','$rootScope', ($scope, $timeout, route,$rootScope) => {
+export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', '$rootScope', ($scope, $timeout, route, $rootScope) => {
 
 
-     route({
-        dashboard: function(params){
+    route({
+        dashboard: function (params) {
             $scope.initController();
             $scope.initDashBoardTab();
         },
-        courses: function(params){
+        courses: function (params) {
             $scope.initController();
             $scope.initCoursesTab();
         },
-         library: function(params){
-             $scope.initController();
-             $scope.initLibraryTab();
-         }
+        library: function (params) {
+            $scope.initController();
+            $scope.initLibraryTab();
+        }
 
     });
 
-    $scope.switchTab = function(current: string){
+    $scope.switchTab = function (current: string) {
         $scope.currentTab = current;
         $scope.resetSelect();
         $scope.toasterShow = false;
-        if($scope.currentTab == 'courses'){
+        if ($scope.currentTab == 'courses') {
             $scope.initCoursesTab();
-        }else if($scope.currentTab == 'dashboard'){
+        } else if ($scope.currentTab == 'dashboard') {
             $scope.initDashBoardTab();
-        }else if($scope.currentTab == 'library'){
+        } else if ($scope.currentTab == 'library') {
             $scope.initLibraryTab();
         } else {
             $scope.initDashBoardTab();
         }
     };
 
-    $scope.initDashBoardTab = async function(){
+    $scope.initDashBoardTab = async function () {
         $scope.currentTab = 'dashboard';
         // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
 
 
-        if($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
+        if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
 
@@ -52,10 +52,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
-    $scope.initCoursesTab = async function(){
-        $scope.currentTab ='courses';
+    $scope.initCoursesTab = async function () {
+        $scope.currentTab = 'courses';
         // TODO ne charger que si besoin
-        if($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
+        if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
 
@@ -71,7 +71,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
-    $scope.initLibraryTab = async function() {
+    $scope.initLibraryTab = async function () {
         $scope.currentTab = 'library';
         template.open('main', 'page-library');
         Utils.safeApply($scope);
@@ -80,11 +80,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.initController = async function () {
         $scope.courses = new Courses();
-        $scope.currentTab ='dashboard';
+        $scope.currentTab = 'dashboard';
         $scope.lightboxes = {};
         $scope.params = {};
         $scope.printmenufolder = false;
-        $scope.printmenucourseShared =false;
+        $scope.printmenucourseShared = false;
         $scope.currentfolderid = 0;
         $scope.printcours = false;
         $scope.printfolders = false;
@@ -99,7 +99,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.nbFoldersSelect = 0;
         $scope.nbCoursesSelect = 0;
         $scope.disableDeleteSend = true;
-        $scope.typeShowCourses = ["Tout","En cours","Favoris","Passés","Masqués"];
+        $scope.typeShowCourses = ["Tout", "En cours", "Favoris", "Passés", "Masqués"];
         $scope.typeShow = {
             availableOptions: [
                 {id: 'all', name: 'Tout'},
@@ -122,7 +122,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.imgCompatibleMoodle = false;
     };
 
-    $scope.isPrintMenuFolder = function() {
+    $scope.isPrintMenuFolder = function () {
         $scope.printmenufolder = !$scope.printmenufolder;
         $scope.printmenucourseShared = false;
         if ($scope.printmenufolder) {
@@ -137,7 +137,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.setprintsubfolderValue();
         }
     };
-    $scope.isPrintMenuCoursesShared = function() {
+    $scope.isPrintMenuCoursesShared = function () {
         $scope.printmenucourseShared = !$scope.printmenucourseShared;
         $scope.printmenufolder = false;
         $scope.printfolders = false;
@@ -150,70 +150,70 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
         $scope.setprintsubfolderValue();
     };
-    $scope.setprintsubfolderValue = function() {
-        $scope.folders.all.forEach(function(e) {
-                e.printsubfolder = false;
+    $scope.setprintsubfolderValue = function () {
+        $scope.folders.all.forEach(function (e) {
+            e.printsubfolder = false;
         });
         Utils.safeApply($scope);
     };
-    $scope.setprintsubfolderValuebyFolder = function(folder:Folder, printsubfolder: boolean) {
-        $scope.folders.all.forEach(function(e) {
-            if(e.id != folder.parent_id && e.id != folder.id && e.id != 0)
-            e.printsubfolder=false;
+    $scope.setprintsubfolderValuebyFolder = function (folder: Folder, printsubfolder: boolean) {
+        $scope.folders.all.forEach(function (e) {
+            if (e.id != folder.parent_id && e.id != folder.id && e.id != 0)
+                e.printsubfolder = false;
         });
         folder.printsubfolder = printsubfolder;
-        $scope.parent= folder.parent_id;
-        while ($scope.parent != 0) {
-            $scope.folders.all.forEach(function(e) {
-                if (e.id == $scope.parent) {
-                    e.printsubfolder = true;
-                    $scope.parent = e.parent_id;
+        $scope.parent = folder.parent_id;
+        while ($scope.parent != 0) {
+            $scope.folders.all.forEach(function (e) {
+                if (e.id == $scope.parent) {
+                    e.printsubfolder = true;
+                    $scope.parent = e.parent_id;
                 }
             });
         }
         Utils.safeApply($scope);
     };
-    $scope.isPrintSubFolder = function(folder:Folder){
-       $scope.folders.all.forEach(function (e) {
-           if(e.id == folder.id){
-               e.printsubfolder = !e.printsubfolder;
-               folder.printsubfolder = e.printsubfolder;
-           }
-       });
+    $scope.isPrintSubFolder = function (folder: Folder) {
+        $scope.folders.all.forEach(function (e) {
+            if (e.id == folder.id) {
+                e.printsubfolder = !e.printsubfolder;
+                folder.printsubfolder = e.printsubfolder;
+            }
+        });
 
-       if(folder.printsubfolder){
+        if (folder.printsubfolder) {
             $scope.currentfolderid = folder.id;
             $scope.printcours = true;
-           $scope.printCouresbySubFolder(folder.id);
-       }else{
-           (folder.parent_id != folder.id) ? $scope.currentfolderid = folder.parent_id : $scope.currentfolderid=0;
-           $scope.printCouresbySubFolder($scope.currentfolderid);
-       }
+            $scope.printCouresbySubFolder(folder.id);
+        } else {
+            (folder.parent_id != folder.id) ? $scope.currentfolderid = folder.parent_id : $scope.currentfolderid = 0;
+            $scope.printCouresbySubFolder($scope.currentfolderid);
+        }
         $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
     };
 
-    $scope.printCouresbySubFolder = function(idfolder:number){
+    $scope.printCouresbySubFolder = function (idfolder: number) {
         $scope.initCouresbyFolder(idfolder);
         $scope.printcours = true;
         $scope.printfolders = true;
 
     };
 
-    $scope.initCoursesbyuser = async function(){
+    $scope.initCoursesbyuser = async function () {
         await $scope.courses.getCoursesbyUser();
         Utils.safeApply($scope);
     };
-	$scope.initCouresbyFolder = async function(idfolder:number){
-	    //await $scope.courses.getCoursesbyFolder(idfolder);
+    $scope.initCouresbyFolder = async function (idfolder: number) {
+        //await $scope.courses.getCoursesbyFolder(idfolder);
         Utils.safeApply($scope);
     };
 
-	/*$scope.initAllCouresbyuser = async function(){
+    /*$scope.initAllCouresbyuser = async function(){
         await $scope.courses.getCoursesAndSheredbyFolder();
         Utils.safeApply($scope);
     };*/
 
-    $scope.initFolders = async function(){
+    $scope.initFolders = async function () {
         $scope.folders = new Folders();
         await $scope.folders.sync();
         $scope.resetSelect();
@@ -222,15 +222,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
-    $scope.getFolderParent = function (): Folder[]{
+    $scope.getFolderParent = function (): Folder[] {
         return $scope.folders.getparentFolder();
     };
-    $scope.getSubFolder = function (folder:Folder): Folder[]{
+    $scope.getSubFolder = function (folder: Folder): Folder[] {
         return $scope.folders.getSubFolder(folder.id);
     };
 
-    $scope.countItems =async function (folder:Folder){
-        if(folder){
+    $scope.countItems = async function (folder: Folder) {
+        if (folder) {
             await folder.countItemsModel();
         }
     };
@@ -248,14 +248,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.closePopUp = function () {
         $scope.openLightbox = false;
-        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm= false );
-        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm= false );
+        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = false);
+        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = false);
     };
 
     /**
      * Create a course
      */
-    $scope.createCourse = async function() {
+    $scope.createCourse = async function () {
         // TODO get current folder id
         $scope.course.folderid = $scope.currentfolderid;
         $scope.course.create();
@@ -263,11 +263,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
-    $scope.shareCourse = async function() {
-        $scope.course = new Course();
-        $scope.course.share();
-        Utils.safeApply($scope);
-    };
+    // $scope.shareCourse = async function () {
+    //     $scope.course = new Course();
+    //     $scope.course.share();
+    //     Utils.safeApply($scope);
+    // };
 
     $scope.deleteCourse = function () {
         $scope.course.delete();
@@ -277,39 +277,39 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * Filter Type
      */
-    $scope.checkTypeFilterSelected = function(id:number) {
+    $scope.checkTypeFilterSelected = function (id: number) {
         $scope.typeFilter[id] = !$scope.typeFilter[id];
     };
 
-    $scope.showCourse = function(courseType:string) {
-        if(courseType == "topics")
+    $scope.showCourse = function (courseType: string) {
+        if (courseType == "topics")
             return $scope.typeFilter[0];
         else
             return $scope.typeFilter[1];
     };
 
-    $scope.getAllFolders = function (){
+    $scope.getAllFolders = function () {
         return $scope.folders.getAllFoldersModel();
     };
-    $scope.resetSelect = function (){
-        $scope.folders.all.map(folder => folder.select= false );
-        $scope.courses.allCourses.map(course => course.select= false );
+    $scope.resetSelect = function () {
+        $scope.folders.all.map(folder => folder.select = false);
+        $scope.courses.allCourses.map(course => course.select = false);
     };
     /**
      * toaster show
      * */
-    $scope.showToaster = function (){
+    $scope.showToaster = function () {
         template.open('toaster', 'toaster');
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         $scope.countFoldersCourses();
-        if($scope.toasterShow === true) {
-            $scope.selectedCourse = _.findWhere($scope.courses.coursesByUser, {select:true});
+        if ($scope.toasterShow === true) {
+            $scope.selectedCourse = _.findWhere($scope.courses.coursesByUser, {select: true});
         }
     };
     /**
      * count folders and courses select
      * */
-    $scope.countFoldersCourses = function (){
+    $scope.countFoldersCourses = function () {
         $scope.nbFoldersSelect = $scope.folders.all.filter(folder => folder.select).length;
         $scope.nbCoursesSelect = $scope.courses.allCourses.filter(course => course.select).length;
 
@@ -323,40 +323,40 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.openLightbox = true;
     };
 
-    $scope.createFolder = async function() {
+    $scope.createFolder = async function () {
         $scope.folder.parent_id = $scope.currentfolderid;
         await $scope.folder.create();
         $scope.initFolders();
         $scope.openLightbox = false;
     };
     /**
-    * delete elements
-    * */
+     * delete elements
+     * */
 
     $scope.openPopUpDelete = function () {
         template.open('ligthBoxContainer', 'courses/deleteLightbox');
-        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm= true );
-        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm= true );
+        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = true);
+        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = true);
         $scope.confirmDeleteSend();
         $scope.openLightbox = true;
     };
-    $scope.hideSuccessDelete = function(){
+    $scope.hideSuccessDelete = function () {
         $scope.successDelete = false;
     };
-    $scope.deleteElements = async function (){
-            if($scope.folders.all.some(folder => folder.selectConfirm)){
-                await $scope.folders.foldersDelete();
-            }
-            if($scope.courses.allCourses.some(course => course.selectConfirm)){
-                await $scope.courses.coursesDelete();
-                await $scope.courses.getCoursesbyUser(model.me.userId);
-            }
-            $scope.openLightbox = false;
-            $scope.successDelete = true;
-            $timeout(()=>
-                    $scope.successDelete = false
-                , 3000);
-            $scope.initFolders();
+    $scope.deleteElements = async function () {
+        if ($scope.folders.all.some(folder => folder.selectConfirm)) {
+            await $scope.folders.foldersDelete();
+        }
+        if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
+            await $scope.courses.coursesDelete();
+            await $scope.courses.getCoursesbyUser(model.me.userId);
+        }
+        $scope.openLightbox = false;
+        $scope.successDelete = true;
+        $timeout(() =>
+                $scope.successDelete = false
+            , 3000);
+        $scope.initFolders();
     };
     /**
      * move folders
@@ -365,7 +365,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         template.open('ligthBoxContainer', 'courses/moveElementLightbox');
         $scope.openLightbox = true;
     };
-    $scope.foldersMove = async function (){
+    $scope.foldersMove = async function () {
         await $scope.folders.moveFolders();
         $scope.initFolders();
         $scope.openLightbox = false;
@@ -373,8 +373,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * confirm delete
      * */
-    $scope.confirmDeleteSend = function (){
-         $scope.disableDeleteSend = !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
+    $scope.confirmDeleteSend = function () {
+        $scope.disableDeleteSend = !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
     };
 
     /**
@@ -384,9 +384,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.previousCoursesToDoButton = function () {
         $scope.firstCoursesToDo -= $scope.countToDo();
         $scope.lastCoursesToDo -= $scope.countToDo();
-        if($scope.firstCoursesToDo < 0){
+        if ($scope.firstCoursesToDo < 0) {
             $scope.firstCoursesToDo = 0;
-            $scope.lastCoursesToDo=$scope.countToDo();
+            $scope.lastCoursesToDo = $scope.countToDo();
         }
     };
     $scope.nextCoursesToDoButton = function () {
@@ -395,17 +395,17 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.countToCome = function () {
-        if($scope.viewModeToCome == 'list'){
+        if ($scope.viewModeToCome == 'list') {
             return 5;
-        }else{
+        } else {
             return 4;
         }
     };
 
     $scope.countToDo = function () {
-        if($scope.viewModeToDo == 'list'){
+        if ($scope.viewModeToDo == 'list') {
             return 5;
-        }else{
+        } else {
             //count number of defined image and deal with !
             return 8;
         }
@@ -416,7 +416,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.lastCoursesToCome -= $scope.countToCome();
         if($scope.firstCoursesToCome < 0){
             $scope.firstCoursesToCome = 0;
-            $scope.lastCoursesToCome=$scope.countToCome();
+            $scope.lastCoursesToCome = $scope.countToCome();
         }
     };
 
@@ -425,27 +425,26 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.lastCoursesToCome += $scope.countToCome();
     };
 
-
     /**
      * print the right format of course data
      * */
 
-    $scope.printRightFormatDate = function (course:Course, spec:string) {
-            if(spec == "modified") {
-                let date = (new Date((course.date).toString())).toLocaleString('fr-FR', {hour12: false});
-                return date;
-            }else if(spec=="enddate"){
-                let date = (new Date((course.enddate).toString())).toLocaleString('fr-FR', {hour12: false}).substring(0,10);
-                return date;
-            }else if(spec=="begindate"){
-                var options = {month: "long", day: "2-digit"};
-                let date = (new Date((course.startdate).toString())).toLocaleString('fr-FR', options);
-                return date;
-            }
+    $scope.printRightFormatDate = function (course: Course, spec: string) {
+        if (spec == "modified") {
+            let date = (new Date((course.date).toString())).toLocaleString('fr-FR', {hour12: false});
+            return date;
+        } else if (spec == "enddate") {
+            let date = (new Date((course.enddate).toString())).toLocaleString('fr-FR', {hour12: false}).substring(0, 10);
+            return date;
+        } else if (spec == "begindate") {
+            var options = {month: "long", day: "2-digit"};
+            let date = (new Date((course.startdate).toString())).toLocaleString('fr-FR', options);
+            return date;
+        }
     };
 
-    $scope.printRightFormatAuthor = function (course:Course) {
-        let author = course.auteur[0].firstname[0]+". "+course.auteur[0].lastname[0].toUpperCase()+course.auteur[0].lastname.slice(1).toLowerCase();
+    $scope.printRightFormatAuthor = function (course: Course) {
+        let author = course.auteur[0].firstname[0] + ". " + course.auteur[0].lastname[0].toUpperCase() + course.auteur[0].lastname.slice(1).toLowerCase();
         return author;
     };
 
@@ -453,26 +452,27 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * change and get the view mode of courses to do and to come
      * */
 
-    $scope.changeViewModeToCome = function (view:string){
-        $scope.viewModeToCome=view;
-        $scope.lastCoursesToCome=$scope.firstCoursesToCome+$scope.countToCome();
+    $scope.changeViewModeToCome = function (view : string) {
+        $scope.viewModeToCome = view;
+        $scope.lastCoursesToCome = $scope.firstCoursesToCome + $scope.countToCome();
     };
 
-    $scope.changeViewModeToDo = function (view:string){
-        $scope.viewModeToDo=view;
-        $scope.lastCoursesToDo=$scope.firstCoursesToDo+$scope.countToDo();
+    $scope.changeViewModeToDo = function (view : string) {
+        $scope.viewModeToDo = view;
+        $scope.lastCoursesToDo = $scope.firstCoursesToDo + $scope.countToDo();
     };
 
     $scope.getSelectedCourses = function () {
-        var selectedCourses = _.where($scope.courses.coursesByUser, {select:true});
-        return selectedCourses;
+        return _.where($scope.courses.coursesByUser, {select: true});
+    };
+    $scope.getTheSelectedCourse = function () {
+        $scope.myCourse = _.findWhere($scope.courses.coursesByUser, {select: true});
     };
 
     // TODO remplacer par balise authorize dans toaster.html
     // <authorize name="manage" resource="uploads.selection()"> ...
     $scope.showShareButton = function () {
-        var selectedCourses = $scope.getSelectedCourses();
-        return selectedCourses.length === 1;
+        return $scope.getSelectedCourses().length === 1;
     };
 
     /**
@@ -487,4 +487,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
     };
 
+   $scope.showInfoShare =() => {
+       $scope.getTheSelectedCourse();
+       $scope.showInfoSharePanel = true;
+       Utils.safeApply($scope);
+   }
 }]);

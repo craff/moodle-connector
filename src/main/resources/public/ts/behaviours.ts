@@ -29,8 +29,9 @@ Behaviours.register('moodle', {
 	 * Allows to set rights for behaviours.
 	 */
 	resource : function(resource) {
-		var rightsContainer = resource;
-		if (!resource.myRights) {
+		let rightsContainer = resource;
+
+		if (resource && !resource.myRights) {
 			resource.myRights = {};
 		}
 

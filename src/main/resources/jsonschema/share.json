@@ -5,6 +5,15 @@
 	"properties": {
 		"role": {
 			"type" : "string"
+		},
+		"bookmarks": {
+			"type" : "object"
+		},
+		"groups": {
+			"type" : "object"
+		},
+		"users": {
+			"type" : "object"
 		}
 	}
 }
