@@ -29,6 +29,12 @@
 		},
 		"folderid": {
 			"type" : ["number", "null"]
+		},
+		"nameImgUrl": {
+			"type": [
+				"string",
+				"null"
+			]
 		}
 	},
 	"required": [

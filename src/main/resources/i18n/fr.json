@@ -82,6 +82,7 @@
 	"moodle.course.description" : "Descriptif",
 	"moodle.course.author" : "Auteur",
 	"moodle.course.image": "Image",
+	"moodle.course.error.type": "Ce type d'image n'est pas pris en change par moodle ",
 	"moodle.activity.type": "Type d'activité",
 	"modify" : "Modifier",
 	"COURSE" : "PARCOURS",

@@ -119,6 +119,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.viewModeToDo = "icons";
         $scope.viewModeToCome = "icons";
         $scope.initFolders();
+        $scope.imgCompatibleMoodle = false;
     };
 
     $scope.isPrintMenuFolder = function() {
@@ -474,5 +475,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         return selectedCourses.length === 1;
     };
 
+    /**
+     * get info image
+     * */
+    $scope.getTypeImage = function () {
+        if ($scope.course.imageurl) {
+            $scope.course.setInfoImg();
+            $timeout(() =>
+                    $scope.imgCompatibleMoodle = $scope.course.infoImg.compatibleMoodle
+                , 1000)
+        }
+    };
 
 }]);

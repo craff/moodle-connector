@@ -190,7 +190,7 @@ public class MoodleController extends ControllerHelper {
                                             String idImage = course.getString("imageurl");
                                             String urlImage = "";
                                             if (idImage != null) {
-                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request) + "://" + getHost(request) + "/moodle/files/" + idImage + "/" + course.getString("fullname") + "_picture.jpg", "UTF-8");
+                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request) + "://" + getHost(request) + "/moodle/files/" + idImage + "/" + course.getString("nameImgUrl"), "UTF-8");
                                             }
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                             final String moodleUrl = moodleUri.toString() +
@@ -202,7 +202,7 @@ public class MoodleController extends ControllerHelper {
                                                     "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
                                                     "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
                                                     "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +
-                                                    "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname")) +
+                                                    "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname"), "UTF-8") +
                                                     "&parameters[categoryid]=" + URLEncoder.encode("" + course.getInteger("categoryid"), "UTF-8") +
                                                     "&parameters[summary]=" + URLEncoder.encode(course.getString("summary"), "UTF-8") +
                                                     urlImage +
@@ -222,6 +222,7 @@ public class MoodleController extends ControllerHelper {
                                                     }
                                                 }
                                             });
+
                                         } catch (UnsupportedEncodingException e) {
                                             e.printStackTrace();
                                         }
@@ -237,20 +238,33 @@ public class MoodleController extends ControllerHelper {
         });
 	}
 
+    @ApiDoc("public Get pictutre for moodle webside")
     @Get("/files/:id/:name")
     public void getFile(HttpServerRequest request) {
         moodleEventBus.getImage(request.getParam("id"), event -> {
             if (event.isRight()) {
                 JsonObject document = event.right().getValue();
-                storage.readFile( document.getString("file"), buffer ->
+                JsonObject metadata = document.getJsonObject("metadata");
+                String contentType = metadata.getString("content-type");
+                storage.readFile(document.getString("file"), buffer ->
                         request.response()
                                 .setStatusCode(200)
-                                .putHeader("Content-Type", "image/jpg")
+                                .putHeader("Content-Type", contentType)
                                 .end(buffer));
             } else {
                 badRequest(request);
             }
         });
+    }
+
+    @ApiDoc("get info image workspace")
+    @Get("/info/image/:id")
+    public void getInfoImg(final HttpServerRequest request) {
+        if (true) {
+            moodleEventBus.getImage(request.getParam("id"), DefaultResponseHandler.defaultResponseHandler(request));
+        } else {
+            badRequest(request);
+        }
     }
 
     @Get("/folder/countsFolders/:id")

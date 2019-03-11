@@ -42,7 +42,6 @@ public class DefaultMoodleEventBus extends SqlCrudService implements MoodleEvent
                 .put("action", "getDocument")
                 .put("id", idImage);
         eb.send(WORKSPACE_BUS_ADDRESS, action, handlerToAsyncHandler(message -> {
-            JsonObject body = message.body().getJsonObject("result");
             if (idImage.equals("")) {
                 handler.handle(new Either.Left<>("[DefaultDocumentService@get] An error id image"));
             } else {

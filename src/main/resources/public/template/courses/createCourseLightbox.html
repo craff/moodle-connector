@@ -27,9 +27,13 @@
     </div>
     <div class="row horizontal-spacing">
         <span class="row label-input-row"><i18n>moodle.course.image</i18n></span>
-        <image-select class="three cell" default="/img/illustrations/image-default.svg" ng-model="course.imageurl"/>
+        <image-select class="three cell" default="/img/illustrations/image-default.svg" ng-change="getTypeImage()"
+                      ng-model="course.imageurl"/>
     </div>
-    <div class="row horizontal-spacing" ng-if="course.type == 2">
+<p ng-if="imgCompatibleMoodle">
+    <i18n>moodle.course.error.type</i18n>
+</p>
+<div class="row horizontal-spacing" ng-if="course.type == 2">
         <label>
             <span class="row label-input-row"><i18n>moodle.activity.type</i18n>*</span>
             <select ng-model="course.typeA" ng-required="course.type == 2">

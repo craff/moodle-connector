@@ -1,4 +1,4 @@
-import {_, notify, Shareable, Rights} from "entcore";
+import {_, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
 
@@ -26,6 +26,11 @@ export class Course implements Shareable{
     selectConfirm : boolean;
     masked : boolean;
     favorites : boolean;
+    infoImg: {
+        name: string;
+        type: string;
+        compatibleMoodle: boolean;
+    };
 
     constructor(){
         this.type = "1";
@@ -34,23 +39,6 @@ export class Course implements Shareable{
         this.myRights = new Rights<Course>(this);
     }
 
-
-    toJSON() {
-        let tmpImgUrl = this.imageurl? this.imageurl.split("/") : [null];
-        return {
-            courseid: this.courseid,
-            fullname: this.fullname,
-            categoryid: 1,
-            summary: this.summary,
-            date: this.date,
-            auteur: this.auteur,
-            imageurl: tmpImgUrl[tmpImgUrl.length-1],
-            type: this.type,
-            typeA: this.typeA,
-            folderid: this.folderid,
-            id: this.courseid
-        }
-    }
 
     toJson() {
         return {
@@ -75,10 +63,43 @@ export class Course implements Shareable{
         }
     }
 
+    async setInfoImg() {
+        const typesImgNoSend = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
+        try {
+            const {data: {metadata}} = await http.get(`/moodle/info/image/${this.imageurl ? this.imageurl.split("/").slice(-1)[0] : null}`);
+            this.infoImg = {
+                name: metadata.filename,
+                type: metadata["content-type"],
+                compatibleMoodle: !typesImgNoSend.some(type => type === metadata["content-type"]),
+            };
+        } catch (e) {
+            notify.error("info img function didn't work");
+            throw e;
+        }
+    }
+
+    toJSON() {
+        return {
+            courseid: this.courseid,
+            fullname: this.fullname,
+            categoryid: 1,
+            summary: this.summary,
+            date: this.date,
+            auteur: this.auteur,
+            imageurl: this.imageurl ? this.imageurl.split("/").slice(-1)[0] : null,
+            type: this.type,
+            typeA: this.typeA,
+            folderid: this.folderid,
+            id: this.courseid,
+            nameImgUrl: this.infoImg ? this.infoImg.name.toLocaleLowerCase() : null,
+        }
+    }
+
     async create() {
         try {
             const {data} = await http.post('/moodle/course', this.toJSON());
             this.courseid = data.id;
+            this.infoImg.compatibleMoodle = false;
             this.goTo('edit');
         } catch (e) {
             notify.error("Save function didn't work");
