@@ -182,6 +182,7 @@ export class Courses {
         try {
             let courses = await http.get(`/moodle/users/courses`);
             let allCourses = Mix.castArrayAs(Course, courses.data);
+            console.log(allCourses);
 
             this.allCourses = allCourses;
             _.each(this.allCourses,function(course) {

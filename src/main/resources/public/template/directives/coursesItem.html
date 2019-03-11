@@ -13,14 +13,14 @@
                                 coursePictureBackground : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'topics' && course.image !== null && course.image !== undefined,
                                 coursePictureNoPadding : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'topics' && (course.image === null || course.image === undefined)}"
                                 ng-click="course.goTo()">
-    <img ng-src="[[course.image]]" class="image-dashboard"
+    <img ng-src="[[course.imageurl]]" class="image-dashboard"
          ng-class="{ recentPicture : place == 'coursesRecent',
             toDoPicture : place == 'coursesToDo',
             toComePicture : place == 'coursesToCome',
             defaultPicture : place == 'coursesShared' || place == 'coursesMine'}"
-         ng-show="course.image !== null && course.image !== undefined"/>
-    <img ng-src="moodle/public/img/logo_image_ent.png"  class="image-dashboard"
-         ng-show="course.image === null || course.image === undefined"/>
+         ng-show="course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-' "/>
+    <img ng-src="moodle/public/img/logo_image_ent.png" class="image-dashboard"
+         ng-show="course.imageurl === null || course.imageurl === undefined || course.imageurl === '-' "/>
 </div>
 <div  ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' && course.image === undefined && view == 'icons',
                   'small-eleven cell' : place == 'coursesToDo' && course.image !== undefined && view == 'icons',
