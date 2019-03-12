@@ -607,10 +607,13 @@ public class MoodleController extends ControllerHelper {
                             JsonArray groupsIds = new JsonArray(new ArrayList(idGroups.keySet()));
                             JsonArray bookmarksIds = new JsonArray(new ArrayList(idBookmarks.keySet()));
                             JsonObject share = new JsonObject();
-                            if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 3) {
+                            if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getString(0)).size() == 3) {
                                 shareCourse.put("role", "edit");
                             }
-                            if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 2) {
+                            if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 3) {
+                                shareCourse.put("role", "edit");
+                            }
+                            if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 2) {
                                 shareCourse.put("role", "attend");
                             }
                             share.put("courseid", request.params().entries().get(0).getValue());
@@ -664,6 +667,7 @@ public class MoodleController extends ControllerHelper {
                                     JsonArray shareGroups = getShareGroupsFuture.result();
                                     if (usersFuture != null && !usersFuture.isEmpty()) {
                                         share.put("users", usersFuture);
+                                        share.getJsonArray("users").getJsonObject(0).put("role", shareCourse.getString("role"));
                                     }
                                     if (groupsFuture != null && !groupsFuture.isEmpty()) {
                                         share.put("groups", groupsFuture);
