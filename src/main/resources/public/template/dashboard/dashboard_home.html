@@ -21,10 +21,15 @@
     </div>
     <div ng-if="courses.printcoursestodo">
         <div class="row list-dashboard">
-            <select class="cell left-magnet" ng-model="typeShow.selectedToDoOption"
+            <select class="cell left-magnet special-selected" ng-model="typeShow.selectedToDoOption"
                     ng-options="option.name for option in typeShow.availableOptions track by option.id"
                     ng-change="changeShowCoursesToDo()">
             </select>
+            <ul class="cell left-magnet special-selected" ng-model="typeShow.selectedToDoOption"
+                    ng-options="option.name for option in typeShow.availableOptions track by option.id"
+                    ng-change="changeShowCoursesToDo()">
+            </ul>
+
             <div class="cell right-magnet icons-dashboard">
                 <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewModeToDo('list')"></i>
             </div>
@@ -34,8 +39,8 @@
             </div>
         </div>
         <div class="row center-courses">
-            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id).slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin right-course-margin"
-            ng-class="{'undefined-image-small-toDo-width cell' : course.image === undefined && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : course.image !== undefined && viewModeToDo == 'icons',
+            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo',firstCoursesToDo,viewModeToDo).slice(firstCoursesToDo,courses.coursesToDoWithImage)" class="twelve-mobile style-bord infoBackground bottom-margin right-course-margin"
+            ng-class="{'undefined-image-small-toDo-width cell' : (course.imageurl === null || course.imageurl === undefined || course.imageurl === '-') && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-' && viewModeToDo == 'icons',
             'all-width cell' : viewModeToDo == 'list'}">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo"></courses-item>
             </div>
@@ -46,7 +51,7 @@
                     <button ng-class="{specialDisable : firstCoursesToDo == 0}" class="" ng-click="previousCoursesToDoButton()" ng-disabled="firstCoursesToDo == 0">
                         <i class="left-open"></i>
                     </button>
-                    <button ng-class="{specialDisable : lastCoursesToDo >= courses.coursesToShow(typeShow.selectedToDoOption.id).length}" ng-click="nextCoursesToDoButton()" ng-disabled="lastCoursesToDo >= courses.coursesToShow(typeShow.selectedToDoOption.id).length">
+                    <button ng-class="{specialDisable : courses.coursesToDoWithImage >= courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo',firstCoursesToDo,viewModeToDo).length}" ng-click="nextCoursesToDoButton()" ng-disabled="courses.coursesToDoWithImage >= courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo',firstCoursesToDo,viewModeToDo).length">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -63,8 +68,8 @@
     </div>
     <div ng-if="courses.printcoursestocome">
         <div class="row  list-dashboard">
-            <select class="cell left-magnet" ng-model="typeShow.selectedToComeOption"
-                    ng-options="option.name for option in typeShow.availableOptions track by option.id"
+            <select class="cell left-magnet special-selected" ng-model="typeShow.selectedToComeOption"
+                    ng-options="option.name for option in typeShow.availableOptions.slice(0, 1).concat(typeShow.availableOptions.slice(2, 4)) track by option.id"
                     ng-change="changeShowCoursesToDo()">
             </select>
                 <!--[[translate('moodle.views.libelle')]]-->
@@ -73,11 +78,11 @@
             </div>
             <span> </span>
             <div class="cell right-magnet">
-                <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewModeToCome('icons')"></i>
+                 <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewModeToCome('icons')"></i>
             </div>
         </div>
         <div class="row center-courses">
-            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToComeOption.id).slice(firstCoursesToCome,lastCoursesToCome)" ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}"
+            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome',0,viewModeToCome).slice(firstCoursesToCome,lastCoursesToCome)" ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}"
                  class="twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
@@ -88,7 +93,7 @@
                     <button  ng-class="{specialDisable : firstCoursesToCome == 0}" ng-click="previousCoursesToComeButton()" ng-disabled="firstCoursesToCome == 0">
                         <i class="left-open"></i>
                     </button>
-                    <button ng-class="{specialDisable : lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id).length}" ng-click="nextCoursesToComeButton()" ng-disabled="lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id).length">
+                    <button ng-class="{specialDisable : lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome',0,viewModeToCome).length}" ng-click="nextCoursesToComeButton()" ng-disabled="lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome',0,viewModeToCome).length">
                         <i class="open-right"></i>
                     </button>
                 </li>

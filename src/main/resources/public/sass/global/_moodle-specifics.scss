@@ -40,6 +40,7 @@ body.moodle {
   .show-icons {
     height: 24px;
     width: 24px;
+    font-size: 25px;
     background-repeat: no-repeat;
     background-position: center;
     display: inline-block;
@@ -51,6 +52,7 @@ body.moodle {
   .show-list {
     height: 24px;
     width: 24px;
+    font-size: 25px;
     margin-left: 15px;
     background-repeat: no-repeat;
     background-position: center;
@@ -170,7 +172,7 @@ body.moodle {
   }
 
   .inside-margin {
-    margin-left: 60px;
+    margin-left: 4.5vw;
     margin-top: 3px;
   }
 
@@ -207,7 +209,7 @@ body.moodle {
     .options {
 
       right: 0px;
-      left: 20px;
+      left: 15px;
       background:  #fff;
 
       opt:hover {
@@ -218,27 +220,24 @@ body.moodle {
       opt{
         color:#555;
         border-bottom: none;
+        padding-left: 10px;
       }
     }
   }
 
-  dots-menu {
-    &.bigWidth {
-      dots-menu.opened .options {
-        width: 205px;
-      }
-    }
-    &.middleWidth {
-      dots-menu.opened .options {
-        width: 150px;
-      }
-    }
+  dots-menu.opened .options {
+    width: 125px;
+  }
 
-    .dots-menu{
-      .opened .options {
-        width: 110px;
-      }
-    }
+  .display{
+    display:flex;
+  }
+
+  .special-selected{
+    font-size: 15px;
+    min-width: 85px;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.26);
   }
 
 

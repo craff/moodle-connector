@@ -106,8 +106,8 @@
 	"toBegin.at": "À PARTIR DU ",
 
 	"course.mask": "Masquer",
-	"course.demask": "Ne plus cacher",
+	"course.demask": "Ne plus<br/>masquer",
 	"course.favoris": "Favoris",
-	"course.defavoris": "Enlever de mes favoris"
+	"course.defavoris": "Enlever de<br/>mes favoris"
 
 }

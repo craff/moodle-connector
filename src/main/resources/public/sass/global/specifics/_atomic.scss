@@ -46,6 +46,13 @@
   background-color: #ff8500;
 }
 
+.activityRecentPicturePadding{
+  width: 3.75vw;
+  min-width: 51px;
+  padding-left:5px;
+  background-color: #ff8500;
+}
+
 .activityToComePicture{
   width: 7.5vw;
   min-width: 115px;
@@ -61,21 +68,40 @@
 
 .activityToDoSmallWidthPicture{
   width:10px;
-  height: 120px;
+  height: 130px;
   padding-left:10px;
   background-color: #ff8500;
 }
 
 .courseToDoSmallWidthPicture{
   width:10px;
-  height: 120px;
+  height: 130px;
   padding-left:10px;
+  background-color: #e20037;
+}
+
+.activityToDoNoPadding{
+  width: 9.5vw;
+  min-width: 130px;
+  background-color: #ff8500;
+}
+
+.courseToDoNoPadding{
+  width: 9.5vw;
+  min-width: 130px;
   background-color: #e20037;
 }
 
 .courseRecentPicture{
   width: 3.75vw;
   min-width: 51px;
+  background-color: #e20037;
+}
+
+.courseRecentPicturePadding{
+  width: 3.75vw;
+  min-width: 51px;
+  padding-left:5px;
   background-color: #e20037;
 }
 
@@ -138,7 +164,8 @@
 .toDoPicture{
   width: 9.5vw;
   min-width: 130px;
-  height: 100%;
+  height: 9.5vw;
+  min-height: 130px;
 }
 
 .toComePicture{
@@ -191,6 +218,10 @@ i.favoris::before {
 
 i.defavoris::before {
   content: '\e9d7';
+}
+
+.top-margin{
+  margin-top: 10px;
 }
 
 .left-padding{

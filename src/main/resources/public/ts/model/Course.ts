@@ -137,6 +137,8 @@ export class Courses {
     printcoursestocome : boolean;
     coursesToDo : Course[];
     coursesToCome : Course[];
+    showCourses : Course[];
+    coursesToDoWithImage : number;
 
     constructor() {
         this.allbyfolder = [];
@@ -144,6 +146,7 @@ export class Courses {
         this.allCourses = [];
         this.coursesShared = [];
         this.coursesByUser = [];
+        this.showCourses = [];
         this.isSynchronized = false;
         this.getChoice();
     }
@@ -198,6 +201,56 @@ export class Courses {
                 }
             );
 
+             let now = new Date(Date.now());
+            this.coursesToCome = _.filter(this.coursesByUser, function(cours) {
+                let coursDate = new Date(cours.startdate);
+                    if(coursDate.getFullYear() > now.getFullYear()){
+                        return true;
+                    }else if(coursDate.getFullYear() === now.getFullYear()) {
+                        if (coursDate.getMonth() > now.getMonth()) {
+                            return true;
+                        } else if (coursDate.getMonth() === now.getMonth()) {
+                            if (coursDate.getDate() > now.getDate()) {
+                                return true;
+                            } else if (coursDate.getDate() === now.getDate()) {
+                                if (coursDate.getHours() > now.getHours()) {
+                                    return true;
+                                } else if (coursDate.getHours() === now.getHours()) {
+                                    if (coursDate.getMinutes() > now.getMinutes()) {
+                                        return true;
+                                    } else if (coursDate.getMinutes() === now.getMinutes()) {
+                                        if (coursDate.getSeconds() > now.getSeconds()) {
+                                            return true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return false;
+            });
+            this.coursesToDo = _.filter(this.coursesByUser, function(cours) {
+                let coursDate = new Date(cours.startdate);
+                if(coursDate.getFullYear() < now.getFullYear())
+                    return true;
+                else if(coursDate.getFullYear() === now.getFullYear())
+                    if(coursDate.getMonth() < now.getMonth())
+                        return true;
+                    else if(coursDate.getMonth() === now.getMonth())
+                        if(coursDate.getDate() < now.getDate())
+                            return true;
+                        else if(coursDate.getDate() === now.getDate())
+                            if(coursDate.getHours() < now.getHours())
+                                return true;
+                            else if(coursDate.getHours() === now.getHours())
+                                if(coursDate.getMinutes() < now.getMinutes())
+                                    return true;
+                                else if(coursDate.getMinutes() === now.getMinutes())
+                                    if(coursDate.getSeconds() < now.getSeconds())
+                                        return true;
+                return false;
+            });
+
             this.isSynchronized = true;
         } catch (e) {
             this.isSynchronized = false;
@@ -213,18 +266,79 @@ export class Courses {
         }
     }*/
 
-    coursesToShow(id : string){
-        if(id == "all"){
-            return _.filter(this.coursesByUser, function(cours) { return !(cours.masked); });
-        }else if (id =="doing"){
-            return _.filter(this.coursesByUser, function(cours) { return !(cours.masked); });
-        }else if (id == "favorites"){
-            return _.filter(this.coursesByUser, function(cours) { return cours.favorites; });
-        }else if (id == "finished"){
-            return _.filter(this.coursesByUser, function(cours) { return !(cours.masked); });
-        }else if (id == "masked"){
-            return _.filter(this.coursesByUser, function(cours) { return cours.masked; });
+    coursesToShow(id : string, place:string, firstCourseToDo:number, view : string){
+        if(place == "coursesToDo"){
+            this.showCourses = this.coursesToDo;
+        }else if (place == "coursesToCome"){
+            this.showCourses = this.coursesToCome;
         }
+
+        if(id == "all"){
+            this.showCourses = _.filter(this.showCourses, function(cours) { return !(cours.masked); });
+            if(place == "coursesToDo"){
+                if (view == 'list') {
+                    this.coursesToDoWithImage = firstCourseToDo + 5;
+                }else {
+                    this.countToDoImage(firstCourseToDo, this.showCourses);
+                }
+            }
+            return this.showCourses
+        }else if (id =="doing"){
+            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.progress == "100%" });
+            if(place == "coursesToDo"){
+                if (view == 'list') {
+                    this.coursesToDoWithImage = firstCourseToDo + 5;
+                }else {
+                    this.countToDoImage(firstCourseToDo, this.showCourses);
+                }            }
+            return this.showCourses
+        }else if (id == "favorites"){
+            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.favorites; });
+            if(place == "coursesToDo"){
+                if (view == 'list') {
+                    this.coursesToDoWithImage = firstCourseToDo + 5;
+                }else {
+                    this.countToDoImage(firstCourseToDo, this.showCourses);
+                }            }
+            return this.showCourses
+        }else if (id == "masked"){
+            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.masked; });
+            if(place == "coursesToDo"){
+                if (view == 'list') {
+                    this.coursesToDoWithImage = firstCourseToDo + 5;
+                }else {
+                    this.countToDoImage(firstCourseToDo, this.showCourses);
+                }            }
+            return this.showCourses
+        }
+    }
+
+    countToDoImage(firstNbr : number, courses : Course[]) {
+        let nbrCoursesToShow = 8;
+        for (let i = 0; i < nbrCoursesToShow; i++) {
+            if(courses.slice(firstNbr, firstNbr + 8)[i] != undefined) {
+                if (courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== null && courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== undefined && courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== '-') {
+                    if(i==3)
+                        nbrCoursesToShow--;
+                    nbrCoursesToShow--;
+                }
+            }
+        }
+        if(nbrCoursesToShow==4 || nbrCoursesToShow==3) {
+            let nbrtest = 4;
+            let noPicture = 0;
+            for (let i = firstNbr; i < firstNbr + nbrtest; i++) {
+                if (courses[i] != undefined) {
+                    if (courses[i].imageurl === null || courses[i].imageurl === undefined || courses[i].imageurl === '-') {
+                        noPicture++;
+                    }
+                }
+            }
+            if (noPicture == 2 || noPicture == 0)
+                nbrCoursesToShow++;
+        }
+        this.coursesToDoWithImage = firstNbr + nbrCoursesToShow;
+        console.log(this.coursesToDoWithImage );
     }
 
     async getChoice() {
