@@ -220,6 +220,14 @@ i.defavoris::before {
   content: '\e9d7';
 }
 
+i.share {
+  margin-right:10px;
+}
+
+i.share::before {
+  content: '\e937';
+}
+
 .top-margin{
   margin-top: 10px;
 }

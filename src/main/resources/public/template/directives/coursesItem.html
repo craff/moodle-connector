@@ -55,6 +55,8 @@
             <span class="date">[[ printDate(course, "modified" ) ]]</span>
         </label>
         <label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'">
+            <i class="share"></i>
+            <span></span>
             <input type="checkbox" ng-change="checkCourse()" ng-model="course.select">
             <span></span>
         </label>

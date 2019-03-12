@@ -284,7 +284,7 @@ export class Courses {
             }
             return this.showCourses
         }else if (id =="doing"){
-            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.progress == "100%" });
+            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && cours.progress != "0%") });
             if(place == "coursesToDo"){
                 if (view == 'list') {
                     this.coursesToDoWithImage = firstCourseToDo + 5;
@@ -338,7 +338,8 @@ export class Courses {
                 nbrCoursesToShow++;
         }
         this.coursesToDoWithImage = firstNbr + nbrCoursesToShow;
-        console.log(this.coursesToDoWithImage );
+        console.log("index premiere images : "+firstNbr );
+        console.log("index last images : "+this.coursesToDoWithImage );
     }
 
     async getChoice() {
