@@ -56,7 +56,7 @@ export class Course implements Shareable{
 
     async share() {
         try {
-            await http.put(`/moodle/share/resource/${this.courseid}`);
+            await http.put(`/moodle/share/resource/${this.courseid}`, this.toJson());
         } catch (e) {
             notify.error("Share function didn't work");
             throw e;

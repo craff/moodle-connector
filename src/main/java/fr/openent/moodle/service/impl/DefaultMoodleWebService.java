@@ -238,21 +238,15 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void getSharedBookMark(final JsonArray usersParamsId, String sharedBookMarkId, Handler<Either<String, JsonArray>> handler) {
+    public void getSharedBookMark(String sharedBookMarkId, Handler<Either<String, JsonArray>> handler) {
         JsonObject params = new JsonObject()
-                .put("userId", usersParamsId);
+                .put("sharedBookMarkId", sharedBookMarkId);
 
         String queryNeo4j = "MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) " +
-                "UNWIND TAIL(sb." +
-                sharedBookMarkId +
-                ") as vid " +
+                "UNWIND TAIL(sb.{sharedBookMarkId}) as vid " +
                 "MATCH (v:Visible {id : vid}) " +
                 "WHERE not(has(v.deleteDate)) " +
-                "RETURN{group: {id: \"SB\" + \"" +
-                sharedBookMarkId +
-                "\", name: HEAD(sb." +
-                sharedBookMarkId +
-                "), " +
+                "RETURN{group: {id: \"SB\" + \" {sharedBookMarkId} \", name: HEAD(sb.{sharedBookMarkId}), " +
                 "users: COLLECT(DISTINCT " +
                 "{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}} " +
                 "as sharedBookMark;";

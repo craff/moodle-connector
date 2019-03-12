@@ -599,6 +599,7 @@ public class MoodleController extends ControllerHelper {
                     @Override
                     public void handle(UserInfos user) {
                         if (user != null) {
+                            List<Future> listeFutures = new ArrayList<Future>();
                             Map idUsers = shareCourse.getJsonObject("users").getMap();
                             Map idGroups = shareCourse.getJsonObject("groups").getMap();
                             Map idBookmarks = shareCourse.getJsonObject("bookmarks").getMap();
@@ -606,6 +607,13 @@ public class MoodleController extends ControllerHelper {
                             JsonArray groupsIds = new JsonArray(new ArrayList(idGroups.keySet()));
                             JsonArray bookmarksIds = new JsonArray(new ArrayList(idBookmarks.keySet()));
                             JsonObject share = new JsonObject();
+                            if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 3) {
+                                shareCourse.put("role", "edit");
+                            }
+                            if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 2) {
+                                shareCourse.put("role", "attend");
+                            }
+                            share.put("courseid", request.params().entries().get(0).getValue());
 
                             Future<JsonArray> getUsersFuture = Future.future();
                             Handler<Either<String, JsonArray>> getUsersHandler = finalUsers -> {
@@ -615,7 +623,10 @@ public class MoodleController extends ControllerHelper {
                                     getUsersFuture.fail( "Users not found");
                                 }
                             };
-                            moodleWebService.getUsers(usersIds, getUsersHandler);
+                            if (!usersIds.isEmpty()) {
+                                moodleWebService.getUsers(usersIds, getUsersHandler);
+                                listeFutures.add(getUsersFuture);
+                            }
 
                             Future<JsonArray> getGroupsFuture = Future.future();
                             Handler<Either<String, JsonArray>> getGroupsHandler = finalGroups -> {
@@ -625,32 +636,42 @@ public class MoodleController extends ControllerHelper {
                                     getGroupsFuture.fail( "Groups not found");
                                 }
                             };
-                            moodleWebService.getGroups(groupsIds, getGroupsHandler);
-
-                            Future<JsonArray> getShareGroupsFuture = Future.future();
-                            for (int i = 0; i < bookmarksIds.size(); i++) {
-                                String sharedBookMarkId = bookmarksIds.getString(i);
-                                JsonArray usersParamsId = new JsonArray().add(user.getUserId());
-                                Handler<Either<String, JsonArray>> getShareGroupsHandler = finalShareGroups -> {
-                                    if (finalShareGroups.isRight()) {
-                                        getShareGroupsFuture.complete(finalShareGroups.right().getValue());
-                                    } else {
-                                        getShareGroupsFuture.fail("Share groups problem");
-                                    }
-                                };
-                                moodleWebService.getSharedBookMark(usersParamsId, sharedBookMarkId, getShareGroupsHandler);
+                            if (!groupsIds.isEmpty()) {
+                                moodleWebService.getGroups(groupsIds, getGroupsHandler);
+                                listeFutures.add(getGroupsFuture);
                             }
 
-                            CompositeFuture.all(getUsersFuture, getGroupsFuture, getShareGroupsFuture).setHandler(event -> {
-                                if (event.succeeded()) {
-                                    JsonArray usersFuture = getUsersFuture.result(); //return object from service
-                                    JsonArray groupsFuture = getGroupsFuture.result(); //return object from service
-                                    JsonArray shareGroups = getShareGroupsFuture.result(); //return object from service
-                                    share.put("users", usersFuture)
-                                            .put("groups", groupsFuture)
-                                            .getJsonArray("users").getJsonObject(0);
-                                    share.getJsonArray("groups").add(getShareGroupsFuture.result().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
+                            Future<JsonArray> getShareGroupsFuture = Future.future();
+                            if (!bookmarksIds.isEmpty()) {
+                                listeFutures.add(getShareGroupsFuture);
+                                for (int i = 0; i < bookmarksIds.size(); i++) {
+                                    String sharedBookMarkId = bookmarksIds.getString(i);
+                                    Handler<Either<String, JsonArray>> getShareGroupsHandler = finalShareGroups -> {
+                                        if (finalShareGroups.isRight()) {
+                                            getShareGroupsFuture.complete(finalShareGroups.right().getValue());
+                                        } else {
+                                            getShareGroupsFuture.fail("Share groups problem");
+                                        }
+                                    };
+                                    moodleWebService.getSharedBookMark(sharedBookMarkId, getShareGroupsHandler);
+                                }
+                            }
 
+                            CompositeFuture.all(listeFutures).setHandler(event -> {
+                                if (event.succeeded()) {
+                                    JsonArray usersFuture = getUsersFuture.result();
+                                    JsonArray groupsFuture = getGroupsFuture.result();
+                                    JsonArray shareGroups = getShareGroupsFuture.result();
+                                    if (usersFuture != null && !usersFuture.isEmpty()) {
+                                        share.put("users", usersFuture);
+                                    }
+                                    if (groupsFuture != null && !groupsFuture.isEmpty()) {
+                                        share.put("groups", groupsFuture);
+                                        share.getJsonArray("groups").getJsonObject(0).put("role", shareCourse.getString("role"));
+                                    }
+                                    if (shareGroups != null && !shareGroups.isEmpty()) {
+                                        share.getJsonArray("groups").add(getShareGroupsFuture.result().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
+                                    }
                                     JsonObject shareSend = new JsonObject();
                                     shareSend.put("parameters", share)
                                             .put("wstoken", WSTOKEN)

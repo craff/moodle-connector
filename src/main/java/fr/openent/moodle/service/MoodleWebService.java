@@ -133,9 +133,8 @@ public interface MoodleWebService{
 
     /**
      * get sharedbookmark
-     * @param usersParamsId
      * @param sharedBookMarkId
      * @param handler
      */
-    void getSharedBookMark(JsonArray usersParamsId, String sharedBookMarkId, Handler<Either<String, JsonArray>> handler);
+    void getSharedBookMark(String sharedBookMarkId, Handler<Either<String, JsonArray>> handler);
 }
