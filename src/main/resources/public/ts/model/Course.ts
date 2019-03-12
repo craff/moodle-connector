@@ -99,7 +99,6 @@ export class Course implements Shareable{
         try {
             const {data} = await http.post('/moodle/course', this.toJSON());
             this.courseid = data.id;
-            this.infoImg.compatibleMoodle = false;
             this.goTo('edit');
         } catch (e) {
             notify.error("Save function didn't work");
