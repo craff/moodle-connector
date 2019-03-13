@@ -294,7 +294,7 @@ export class Courses {
             }
             return this.showCourses
         }else if (id =="doing"){
-            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && cours.progress != "0%") });
+            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%") });
             if(place == "coursesToDo"){
                 if (view == 'list') {
                     this.coursesToDoWithImage = firstCourseToDo + 5;
@@ -304,6 +304,15 @@ export class Courses {
             return this.showCourses
         }else if (id == "favorites"){
             this.showCourses = _.filter(this.showCourses, function(cours) { return cours.favorites; });
+            if(place == "coursesToDo"){
+                if (view == 'list') {
+                    this.coursesToDoWithImage = firstCourseToDo + 5;
+                }else {
+                    this.countToDoImage(firstCourseToDo, this.showCourses);
+                }            }
+            return this.showCourses
+        }else if (id == "finished"){
+            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.progress == "100%"; });
             if(place == "coursesToDo"){
                 if (view == 'list') {
                     this.coursesToDoWithImage = firstCourseToDo + 5;

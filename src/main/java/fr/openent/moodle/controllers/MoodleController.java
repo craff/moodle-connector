@@ -40,6 +40,7 @@ import java.net.URLEncoder;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.*;
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
@@ -565,26 +566,158 @@ public class MoodleController extends ControllerHelper {
     @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
     public void share(final HttpServerRequest request) {
+        final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
             public void handle(UserInfos user) {
                 if (user != null) {
+
+                    List<Future> listeFutures = new ArrayList<Future>();
+
+                    Future<JsonObject> getShareInfosFuture = Future.future();
+                    Handler<Either<String, JsonObject>> getShareInfosHandler = finalUsers -> {
+                        if (finalUsers.isRight()) {
+                            getShareInfosFuture.complete(finalUsers.right().getValue());
+                        } else {
+                            getShareInfosFuture.fail( "Share infos not found");
+                        }
+                    };
                     shareService.shareInfos(user.getUserId(), request.getParam("id"),
-                            I18n.acceptLanguage(request), request.params().get("search"), new Handler<Either<String, JsonObject>>() {
+                            I18n.acceptLanguage(request), request.params().get("search"), getShareInfosHandler);
+                    listeFutures.add(getShareInfosFuture);
+
+                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                    Buffer wsResponse = new BufferImpl();
+                    final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
+                            "?wstoken=" + WSTOKEN +
+                            "&wsfunction=" + WS_GET_SHARECOURSE +
+                            "&parameters[courseid]=" + request.getParam("id") +
+                            "&moodlewsrestformat=" + JSON;
+
+
+                    Future<JsonArray> getUsersEnrolementsFuture = Future.future();
+                    Handler<HttpClientResponse> getUsersEnrolementsHandler = response -> {
+                        if (response.statusCode() == 200) {
+                            response.handler(wsResponse::appendBuffer);
+                            response.endHandler(new Handler<Void>() {
                                 @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if (event.isRight()) {
-                                        JsonObject responce = event.right().getValue();
-                                        final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
-                                        handler.handle(new Either.Right<String, JsonObject>(responce));
-                                    } else {
-                                        log.error("Share service didn't work");
-                                        unauthorized(request);
+                                public void handle(Void end) {
+                                    JsonArray finalGroups = new JsonArray(wsResponse);
+                                    getUsersEnrolementsFuture.complete(finalGroups);
+                                    if (!responseIsSent.getAndSet(true)) {
+                                        httpClient.close();
                                     }
                                 }
                             });
+                        } else {
+                            log.debug(response.statusMessage());
+                            response.bodyHandler(new Handler<Buffer>() {
+                                @Override
+                                public void handle(Buffer event) {
+                                    log.error("Returning body after GET CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                                    getUsersEnrolementsFuture.fail( response.statusMessage());
+                                    if (!responseIsSent.getAndSet(true)) {
+                                        httpClient.close();
+                                    }
+                                }
+                            });
+                                //getUsersEnrolementsFuture.fail( response.statusMessage());
+                    }};
+
+                    final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, getUsersEnrolementsHandler);
+                    listeFutures.add(getUsersEnrolementsFuture);
+                    httpClientRequest.headers().set("Content-Length", "0");
+                    //Typically an unresolved Address, a timeout about connection or response
+                    httpClientRequest.exceptionHandler(new Handler<Throwable>() {
+                        @Override
+                        public void handle(Throwable event) {
+                            log.error(event.getMessage(), event);
+                            getUsersEnrolementsFuture.fail( event.getMessage());
+                            if (!responseIsSent.getAndSet(true)) {
+                                renderError(request);
+                                httpClient.close();
+                            }
+                        }
+                    }).end();
+
+
+                    CompositeFuture.all(listeFutures).setHandler(event -> {
+                        if (event.succeeded()) {
+                            JsonObject shareInfosFuture = getShareInfosFuture.result();
+                            JsonArray usersEnrolmentsFuture = getUsersEnrolementsFuture.result();
+                            if (usersEnrolmentsFuture != null && !usersEnrolmentsFuture.isEmpty() && shareInfosFuture != null && !shareInfosFuture.isEmpty()) {
+                                JsonArray usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+                                JsonArray groupEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups");
+                                JsonArray shareInfosUsers = shareInfosFuture.getJsonObject("users").getJsonArray("visibles");
+                                JsonArray shareInfosGroups = shareInfosFuture.getJsonObject("groups").getJsonArray("visibles");
+                                List<String> usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
+                                List<String> usersshareInfosId = shareInfosUsers.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
+
+                                if(groupEnroled.size()>0){
+                                    List<String> groupsEnroledId = groupEnroled.stream().map(obj -> ((JsonObject)obj).getString("idnumber") ).collect(Collectors.toList());
+                                    List<String> groupsshareInfosId = shareInfosGroups.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
+                                    for (String groupId: groupsEnroledId) {
+                                        if(!(groupsshareInfosId.contains(groupId))){
+                                            JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(usersEnroledId.indexOf(groupId));
+                                            String id = jsonobjctToAdd.getString("idnumber");
+                                            jsonobjctToAdd.remove("idnumber");
+                                            jsonobjctToAdd.put("id",id);
+                                            //jsonobjctToAdd.put("groupDisplayName", null);
+                                            //jsonobjctToAdd.put("structureName",null);
+                                            shareInfosFuture.getJsonObject("groups").getJsonArray("visibles").add(jsonobjctToAdd);
+                                        }
+                                    }
+                                    JsonObject objctToAdd = new JsonObject();
+                                    String[] tabToAdd = new String[] {"fr-openent-moodle-controllers-MoodleController|read","fr-openent-moodle-controllers-MoodleController|contrib",
+                                            "fr-openent-moodle-controllers-MoodleController|shareSubmit"};
+
+                                    for (Object group : groupEnroled) {
+                                        if(((JsonObject)group).getInteger("role") == student){
+                                            tabToAdd = Arrays.copyOf(tabToAdd, 2);
+                                        }
+                                        objctToAdd.put(((JsonObject) group).getString("id"),tabToAdd);
+                                        shareInfosFuture.getJsonObject("groups").getJsonArray("checked").add(objctToAdd);
+                                    }
+                                }
+
+                                for (String userId: usersEnroledId) {
+                                    if(!(usersshareInfosId.contains(userId))){
+                                        JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").getJsonObject(usersEnroledId.indexOf(userId)).copy();
+                                        String prenom = jsonobjctToAdd.getString("firstname");
+                                        String nom = jsonobjctToAdd.getString("lastname");
+                                        jsonobjctToAdd.remove("firstname");
+                                        jsonobjctToAdd.remove("lastname");
+                                        jsonobjctToAdd.put("firstName",prenom.charAt(0)+prenom.substring(1).toLowerCase());
+                                        jsonobjctToAdd.put("lastName",nom);
+                                        jsonobjctToAdd.put("login",prenom.toLowerCase()+"."+nom.toLowerCase());
+                                        jsonobjctToAdd.put("username",nom+" "+prenom.charAt(0)+prenom.substring(1).toLowerCase());
+                                        String profile = "Relative";
+                                        if(jsonobjctToAdd.getInteger("role") == student){
+                                            profile = "Student";
+                                        }
+                                        jsonobjctToAdd.put("profile",profile);
+                                        jsonobjctToAdd.remove("role");
+                                        shareInfosFuture.getJsonObject("users").getJsonArray("visibles").add(jsonobjctToAdd);
+                                    }
+                                }
+
+                                JsonArray tabToAdd = new JsonArray().add("fr-openent-moodle-controllers-MoodleController|read").add("fr-openent-moodle-controllers-MoodleController|contrib").add("fr-openent-moodle-controllers-MoodleController|shareSubmit");
+                                for (Object userEnroled : usersEnroled) {
+                                    if(((JsonObject)userEnroled).getInteger("role") == student){
+                                        tabToAdd.remove(2);
+                                    }
+                                    shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"),tabToAdd);
+                                }
+                                handler.handle(new Either.Right<String, JsonObject>(shareInfosFuture));
+                            }
+                        } else {
+                            badRequest(request, event.cause().getMessage());
+                            //renderError(request);
+                        }
+                    });
                 } else {
-                    log.debug("User not found in session.");
+                    log.error("User or group not found.");
                     unauthorized(request);
                 }
             }

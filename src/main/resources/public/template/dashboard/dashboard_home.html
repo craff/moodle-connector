@@ -69,7 +69,7 @@
     <div ng-if="courses.printcoursestocome">
         <div class="row  list-dashboard">
             <select class="cell left-magnet special-selected" ng-model="typeShow.selectedToComeOption"
-                    ng-options="option.name for option in typeShow.availableOptions.slice(0, 1).concat(typeShow.availableOptions.slice(2, 4)) track by option.id"
+                    ng-options="option.name for option in typeShow.availableOptions.slice(0, 1).concat(typeShow.availableOptions.slice(2, 3)).concat(typeShow.availableOptions.slice(4, 5)) track by option.id"
                     ng-change="changeShowCoursesToDo()">
             </select>
                 <!--[[translate('moodle.views.libelle')]]-->

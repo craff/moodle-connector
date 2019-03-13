@@ -19,17 +19,18 @@ public class Moodle extends BaseServer {
 	public static String WS_DELETE_FUNCTION = "core_course_delete_courses";
 	public static String WS_GET_USERCOURSES = "local_entcgi_services_usercourses";
 	public static String WS_CREATE_SHARECOURSE = "local_entcgi_services_shareenrolment";
+	public static String WS_GET_SHARECOURSE = "local_entcgi_services_getcourseenrolment";
 	public static String JSON = "json";
 
-	public static String manager = "1";
-	public static String coursecreator = "2";
-	public static String editingteacher = "3";
-	public static String teacher = "4";
-	public static String student = "5";
-	public static String guest = "6";
-	public static String user = "7";
-	public static String frontpage = "8";
-	public static String entcgi = "9";
+	public static Integer manager = 1;
+	public static Integer coursecreator = 2;
+	public static Integer editingteacher = 3;
+	public static Integer teacher = 4;
+	public static Integer student = 5;
+	public static Integer guest = 6;
+	public static Integer user = 7;
+	public static Integer frontpage = 8;
+	public static Integer entcgi = 9;
 
 	public static String moodleSchema;
 	@Override

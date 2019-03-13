@@ -104,9 +104,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                 {id: 'all', name: 'Tout'},
                 {id: 'doing', name: 'En cours'},
                 {id: 'favorites', name: 'Favoris'},
+                {id: 'finished', name: 'Terminés'},
                 {id: 'masked', name: 'Masqués'}
             ],
-            selectedToDoOption: {id: 'all', name: 'Tout'},
+            selectedToDoOption: {id: 'doing', name: 'En cours'},
             selectedToComeOption: {id: 'all', name: 'Tout'}
         };
         $scope.firstCoursesToDo = 0;
