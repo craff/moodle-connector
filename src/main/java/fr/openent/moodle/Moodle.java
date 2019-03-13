@@ -21,6 +21,16 @@ public class Moodle extends BaseServer {
 	public static String WS_CREATE_SHARECOURSE = "local_entcgi_services_shareenrolment";
 	public static String JSON = "json";
 
+	public static String manager = "1";
+	public static String coursecreator = "2";
+	public static String editingteacher = "3";
+	public static String teacher = "4";
+	public static String student = "5";
+	public static String guest = "6";
+	public static String user = "7";
+	public static String frontpage = "8";
+	public static String entcgi = "9";
+
 	public static String moodleSchema;
 	@Override
 	public void start() throws Exception {

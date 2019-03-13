@@ -633,42 +633,41 @@ public class MoodleController extends ControllerHelper {
                                 for (Map.Entry<String, Object> mapShareUsers : idUsers.entrySet()) {
                                     IdFront.put(mapShareUsers.getKey(), mapShareUsers.getValue());
                                     if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 3) {
-                                        keyShare.put(mapShareUsers.getKey(), "3");
+                                        keyShare.put(mapShareUsers.getKey(), editingteacher);
                                     }
                                     if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 2) {
-                                        keyShare.put(mapShareUsers.getKey(), "attend");
+                                        keyShare.put(mapShareUsers.getKey(), student);
                                         Map<String, Object> mapInfo = keyShare.getMap();
                                     }
                                 }
                             } else if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() == 1) {
                                 if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 3) {
-                                    keyShare.put(usersIds.getString(0), "3");
+                                    keyShare.put(usersIds.getString(0), editingteacher);
                                 }
                                 if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(usersIds.getString(0), "attend");
+                                    keyShare.put(usersIds.getString(0), student);
                                 }
                             }
                             if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() > 1) {
                                 for (Map.Entry<String, Object> mapShareGroups : idGroups.entrySet()) {
                                     IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
                                     if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 3) {
-                                        keyShare.put(mapShareGroups.getKey(), "3");
+                                        keyShare.put(mapShareGroups.getKey(), editingteacher);
                                     }
                                     if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
-                                        keyShare.put(mapShareGroups.getKey(), "attend");
+                                        keyShare.put(mapShareGroups.getKey(), student);
                                     }
                                 }
                             } else if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() == 1) {
                                 if (shareCourse.getJsonObject("groups").getJsonArray(usersIds.getValue(0).toString()).size() == 3) {
-                                    keyShare.put(groupsIds.getString(0), "3");
+                                    keyShare.put(groupsIds.getString(0), editingteacher);
                                 }
                                 if (shareCourse.getJsonObject("groups").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(groupsIds.getString(0), "attend");
+                                    keyShare.put(groupsIds.getString(0), student);
                                 }
                             }
                             final Map<String, Object> mapInfo = keyShare.getMap();
-                            // TODo ajout du role editinteacher pour l'auteur du cours
-                            mapInfo.put(user.getUserId(),"3");
+                            mapInfo.put(user.getUserId(),editingteacher);
                             share.put("courseid", request.params().entries().get(0).getValue());
 
                             Future<JsonArray> getUsersFuture = Future.future();
