@@ -2,7 +2,6 @@ package fr.openent.moodle.service;
 
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
-import io.vertx.core.eventbus.impl.Handlers;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -137,4 +136,5 @@ public interface MoodleWebService{
      * @param handler
      */
     void getSharedBookMark(String sharedBookMarkId, Handler<Either<String, JsonArray>> handler);
+
 }

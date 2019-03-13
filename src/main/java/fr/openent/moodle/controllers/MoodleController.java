@@ -11,6 +11,7 @@ import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
+import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
@@ -564,17 +565,35 @@ public class MoodleController extends ControllerHelper {
     @ResourceFilter(CanShareResoourceFilter.class)
     @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
     public void share(final HttpServerRequest request) {
-        //super.shareJson(request, false);
-        final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(UserInfos user) {
+                if (user != null) {
+                    shareService.shareInfos(user.getUserId(), request.getParam("id"),
+                            I18n.acceptLanguage(request), request.params().get("search"), new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        JsonObject responce = event.right().getValue();
+                                        final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
+                                        handler.handle(new Either.Right<String, JsonObject>(responce));
+                                    } else {
+                                        log.error("Share service didn't work");
+                                        unauthorized(request);
+                                    }
+                                }
+                            });
+                } else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
 
-        String json = "{\"actions\":[{\"name\":[\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"displayName\":\"moodle.manager\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"displayName\":\"moodle.contrib\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|read\"],\"displayName\":\"moodle.read\",\"type\":\"RESOURCE\"}],\"groups\":{\"visibles\":[{\"id\":\"1761599-1535020399757\",\"name\":\"Élèves du groupe 3 A.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"1761587-1535020399755\",\"name\":\"Élèves du groupe 3 B.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\",\"name\":\"Enseignants de discipline ALLEMAND.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"782-1468756944518\",\"name\":\"Enseignants du groupe CLG-NICOLAS FOUQUET-MORMANT.\",\"groupDisplayName\":null,\"structureName\":null}],\"checked\":{\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"782-1468756944518\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"1761599-1535020399757\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}},\"users\":{\"visibles\":[{\"id\":\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\",\"login\":\"allan.ackra\",\"username\":\"ACKRA Allan\",\"lastName\":\"ACKRA\",\"firstName\":\"Allan\",\"profile\":\"Student\"},{\"id\":\"0c4bc331-fbde-47a2-87fd-ea801676612c\",\"login\":\"virginie.duponcest\",\"username\":\"DUPONCEST Virginie\",\"lastName\":\"DUPONCEST\",\"firstName\":\"Virginie\",\"profile\":\"Relative\"}],\"checked\":{\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"0c4bc331-fbde-47a2-87fd-ea801676612c\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}}}";
-
-        JsonObject shares = new JsonObject(json);
+        //String json = "{\"actions\":[{\"name\":[\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"displayName\":\"moodle.manager\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"displayName\":\"moodle.contrib\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|read\"],\"displayName\":\"moodle.read\",\"type\":\"RESOURCE\"}],\"groups\":{\"visibles\":[{\"id\":\"1761599-1535020399757\",\"name\":\"Élèves du groupe 3 A.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"1761587-1535020399755\",\"name\":\"Élèves du groupe 3 B.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\",\"name\":\"Enseignants de discipline ALLEMAND.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"782-1468756944518\",\"name\":\"Enseignants du groupe CLG-NICOLAS FOUQUET-MORMANT.\",\"groupDisplayName\":null,\"structureName\":null}],\"checked\":{\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"782-1468756944518\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"1761599-1535020399757\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}},\"users\":{\"visibles\":[{\"id\":\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\",\"login\":\"allan.ackra\",\"username\":\"ACKRA Allan\",\"lastName\":\"ACKRA\",\"firstName\":\"Allan\",\"profile\":\"Student\"},{\"id\":\"0c4bc331-fbde-47a2-87fd-ea801676612c\",\"login\":\"virginie.duponcest\",\"username\":\"DUPONCEST Virginie\",\"lastName\":\"DUPONCEST\",\"firstName\":\"Virginie\",\"profile\":\"Relative\"}],\"checked\":{\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"0c4bc331-fbde-47a2-87fd-ea801676612c\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}}}";
+        //JsonObject shares = new JsonObject(json);
 
         // TODO appeler WS Moodle pour recuperer les droits et construire le json au bon format
-
-
-        handler.handle(new Either.Right<String, JsonObject>(shares));
     }
 
     @Put("/contrib")
