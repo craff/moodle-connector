@@ -12,7 +12,7 @@
             </p>
             <p>
                 <i18n>moodle.toaster.folderDirection</i18n>
-                <select ng-model="folders.folderIdMoveIn" ng-change="selectFolder()" >
+                <select ng-model="folders.folderIdMoveIn" ng-change="folderIdMoveIn()">
                     <option value="" disabled selected hidden>Sélectionner un dossier</option>
                     <option value=0>Mes cours</option>
                     <option ng-repeat="folderList in getAllFolders()" ng-if="!folderList.select" value=[[folderList.id]]>
