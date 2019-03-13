@@ -616,23 +616,59 @@ public class MoodleController extends ControllerHelper {
                     @Override
                     public void handle(UserInfos user) {
                         if (user != null) {
-                            List<Future> listeFutures = new ArrayList<Future>();
-                            Map idUsers = shareCourse.getJsonObject("users").getMap();
-                            Map idGroups = shareCourse.getJsonObject("groups").getMap();
-                            Map idBookmarks = shareCourse.getJsonObject("bookmarks").getMap();
+                            List<Future> listeFutures = new ArrayList<>();
+                            JsonObject IdFront = new JsonObject();
+                            JsonObject keyShare = new JsonObject();
+                            JsonObject share = new JsonObject();
+
+                            Map<String, Object> idUsers = shareCourse.getJsonObject("users").getMap();
+                            Map<String, Object> idGroups = shareCourse.getJsonObject("groups").getMap();
+                            Map<String, Object> idBookmarks = shareCourse.getJsonObject("bookmarks").getMap();
+
                             JsonArray usersIds = new JsonArray(new ArrayList(idUsers.keySet()));
                             JsonArray groupsIds = new JsonArray(new ArrayList(idGroups.keySet()));
                             JsonArray bookmarksIds = new JsonArray(new ArrayList(idBookmarks.keySet()));
-                            JsonObject share = new JsonObject();
-                            if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getString(0)).size() == 3) {
-                                shareCourse.put("role", "edit");
+
+                            if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() > 1) {
+                                for (Map.Entry<String, Object> mapShareUsers : idUsers.entrySet()) {
+                                    IdFront.put(mapShareUsers.getKey(), mapShareUsers.getValue());
+                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 3) {
+                                        keyShare.put(mapShareUsers.getKey(), "3");
+                                    }
+                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 2) {
+                                        keyShare.put(mapShareUsers.getKey(), "attend");
+                                        Map<String, Object> mapInfo = keyShare.getMap();
+                                    }
+                                }
+                            } else if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() == 1) {
+                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 3) {
+                                    keyShare.put(usersIds.getString(0), "3");
+                                }
+                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
+                                    keyShare.put(usersIds.getString(0), "attend");
+                                }
                             }
-                            if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 3) {
-                                shareCourse.put("role", "edit");
+                            if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() > 1) {
+                                for (Map.Entry<String, Object> mapShareGroups : idGroups.entrySet()) {
+                                    IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
+                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 3) {
+                                        keyShare.put(mapShareGroups.getKey(), "3");
+                                    }
+                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
+                                        keyShare.put(mapShareGroups.getKey(), "attend");
+                                    }
+                                }
+                            } else if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() == 1) {
+                                if (shareCourse.getJsonObject("groups").getJsonArray(usersIds.getValue(0).toString()).size() == 3) {
+                                    keyShare.put(groupsIds.getString(0), "3");
+                                }
+                                if (shareCourse.getJsonObject("groups").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
+                                    keyShare.put(groupsIds.getString(0), "attend");
+                                }
                             }
-                            if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getString(0)).size() == 2) {
-                                shareCourse.put("role", "attend");
-                            }
+                            final Map<String, Object> mapInfo = keyShare.getMap();
+                            // TODo ajout du role editinteacher pour l'auteur du cours
+                            mapInfo.put(user.getUserId(),"3");
                             share.put("courseid", request.params().entries().get(0).getValue());
 
                             Future<JsonArray> getUsersFuture = Future.future();
@@ -643,6 +679,8 @@ public class MoodleController extends ControllerHelper {
                                     getUsersFuture.fail( "Users not found");
                                 }
                             };
+
+                            usersIds.add(user.getUserId());
                             if (!usersIds.isEmpty()) {
                                 moodleWebService.getUsers(usersIds, getUsersHandler);
                                 listeFutures.add(getUsersFuture);
@@ -684,7 +722,10 @@ public class MoodleController extends ControllerHelper {
                                     JsonArray shareGroups = getShareGroupsFuture.result();
                                     if (usersFuture != null && !usersFuture.isEmpty()) {
                                         share.put("users", usersFuture);
-                                        share.getJsonArray("users").getJsonObject(0).put("role", shareCourse.getString("role"));
+                                        for (Object userObj : usersFuture) {
+                                            JsonObject userJson = ((JsonObject) userObj);
+                                            userJson.put("role", mapInfo.get(userJson.getString("id")));
+                                        }
                                     }
                                     if (groupsFuture != null && !groupsFuture.isEmpty()) {
                                         share.put("groups", groupsFuture);
@@ -727,7 +768,7 @@ public class MoodleController extends ControllerHelper {
                                 }
                             });
                         } else {
-                            log.error("User or group not found.");
+                            log.error("User not found.");
                             unauthorized(request);
                         }
                     }
