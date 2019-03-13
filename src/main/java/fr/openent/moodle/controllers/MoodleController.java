@@ -659,10 +659,10 @@ public class MoodleController extends ControllerHelper {
                                     }
                                 }
                             } else if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() == 1) {
-                                if (shareCourse.getJsonObject("groups").getJsonArray(usersIds.getValue(0).toString()).size() == 3) {
+                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 3) {
                                     keyShare.put(groupsIds.getString(0), editingteacher);
                                 }
-                                if (shareCourse.getJsonObject("groups").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
+                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 2) {
                                     keyShare.put(groupsIds.getString(0), student);
                                 }
                             }
@@ -728,7 +728,10 @@ public class MoodleController extends ControllerHelper {
                                     }
                                     if (groupsFuture != null && !groupsFuture.isEmpty()) {
                                         share.put("groups", groupsFuture);
-                                        share.getJsonArray("groups").getJsonObject(0).put("role", shareCourse.getString("role"));
+                                        for (Object groupObj : groupsFuture) {
+                                            JsonObject groupJson = ((JsonObject) groupObj);
+                                            groupJson.put("role", mapInfo.get(groupJson.getString("id").substring(3)));
+                                        }
                                     }
                                     if (shareGroups != null && !shareGroups.isEmpty()) {
                                         share.getJsonArray("groups").add(getShareGroupsFuture.result().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
