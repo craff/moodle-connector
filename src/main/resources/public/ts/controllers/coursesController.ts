@@ -1,4 +1,4 @@
-import {_, model, ng, template} from "entcore";
+import {_, model, moment, ng, template} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
@@ -453,17 +453,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * */
 
     $scope.printRightFormatDate = function (course: Course, spec: string) {
+        let format = "DD/MM/YYYY";
         if (spec == "modified") {
-            let date = (new Date((course.date).toString())).toLocaleString().substring(0, 10);
-            return date;
+            return moment(course.date + "000", "x").format(format);
         } else if (spec == "enddate") {
-            let date = (new Date((course.enddate).toString())).toLocaleString().substring(0, 10);
-            return date;
+            return moment(course.enddate + "000", "x").format(format);
         } else if (spec == "begindate") {
-            var options = {month: "long", day: "2-digit"};
-            let date = (new Date((course.startdate).toString())).toLocaleString('fr-FR', options);
-            return date;
+            return moment(course.startdate + "000", "x").format(format);
         }
+        return moment();
     };
 
     $scope.printRightFormatAuthor = function (course: Course) {
@@ -518,10 +516,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.showInfoShare = () => {
-       $scope.getTheSelectedCourse();
-       $scope.showInfoSharePanel = true;
-       Utils.safeApply($scope);
-   }
+        $scope.getTheSelectedCourse();
+        $scope.showInfoSharePanel = true;
+        Utils.safeApply($scope);
+    }
     /**
      * Close lightbox Share
      */

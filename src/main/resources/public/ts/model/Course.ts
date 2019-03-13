@@ -1,4 +1,4 @@
-import {_, notify, Rights, Shareable} from "entcore";
+import {_, moment, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
 
@@ -129,6 +129,7 @@ export class Course implements Shareable{
 export class Courses {
     allbyfolder: Course[];
     coursesShared: Course[];
+    coursesSharedToFollow: Course[];
     coursesByUser: Course[];
     isSynchronized: Boolean;
     allCourses: Course[];
@@ -145,6 +146,7 @@ export class Courses {
 
         this.allCourses = [];
         this.coursesShared = [];
+        this.coursesSharedToFollow = [];
         this.coursesByUser = [];
         this.showCourses = [];
         this.isSynchronized = false;
@@ -191,7 +193,12 @@ export class Courses {
                 course.owner = {userId: course.auteur[0].entidnumber, displayName:course.auteur[0].firstname+" "+ course.auteur[0].lastname};
             });
             this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
-            this.coursesShared = _.filter(this.allCourses, function(cours) { return cours.auteur[0].entidnumber !== userId; });
+            this.coursesShared = _.filter(this.allCourses, function (cours) {
+                return cours.role === "3" && cours.auteur[0].entidnumber !== userId;
+            });
+            this.coursesSharedToFollow = _.filter(this.allCourses, function (cours) {
+                return cours.role === "5" && cours.auteur[0].entidnumber !== userId;
+            });
             this.coursesByUser = this.coursesByUser.sort(
                 function compare(a, b) {
                     if (a.date < b.date)
@@ -201,36 +208,39 @@ export class Courses {
                 }
             );
 
-             let now = new Date(Date.now());
-            this.coursesToCome = _.filter(this.coursesByUser, function(cours) {
-                let coursDate = new Date(cours.startdate);
-                    if(coursDate.getFullYear() > now.getFullYear()){
+            let now = moment();
+            this.coursesToCome = _.filter(this.coursesSharedToFollow, function (course) {
+                let coursDate = moment(course.startdate + "000", "x");
+                return now.isBefore(coursDate);
+                /*if(coursDate.getFullYear() > now.getFullYear()){
+                    return true;
+                }else if(coursDate.getFullYear() === now.getFullYear()) {
+                    if (coursDate.getMonth() > now.getMonth()) {
                         return true;
-                    }else if(coursDate.getFullYear() === now.getFullYear()) {
-                        if (coursDate.getMonth() > now.getMonth()) {
+                    } else if (coursDate.getMonth() === now.getMonth()) {
+                        if (coursDate.getDate() > now.getDate()) {
                             return true;
-                        } else if (coursDate.getMonth() === now.getMonth()) {
-                            if (coursDate.getDate() > now.getDate()) {
+                        } else if (coursDate.getDate() === now.getDate()) {
+                            if (coursDate.getHours() > now.getHours()) {
                                 return true;
-                            } else if (coursDate.getDate() === now.getDate()) {
-                                if (coursDate.getHours() > now.getHours()) {
+                            } else if (coursDate.getHours() === now.getHours()) {
+                                if (coursDate.getMinutes() > now.getMinutes()) {
                                     return true;
-                                } else if (coursDate.getHours() === now.getHours()) {
-                                    if (coursDate.getMinutes() > now.getMinutes()) {
+                                } else if (coursDate.getMinutes() === now.getMinutes()) {
+                                    if (coursDate.getSeconds() > now.getSeconds()) {
                                         return true;
-                                    } else if (coursDate.getMinutes() === now.getMinutes()) {
-                                        if (coursDate.getSeconds() > now.getSeconds()) {
-                                            return true;
-                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    return false;
+                }
+                return false;*/
             });
-            this.coursesToDo = _.filter(this.coursesByUser, function(cours) {
-                let coursDate = new Date(cours.startdate);
+            this.coursesToDo = _.filter(this.coursesSharedToFollow, function (course) {
+                let coursDate = moment(course.startdate + "000", "x");
+                return coursDate.isBefore(now);
+                /*
                 if(coursDate.getFullYear() < now.getFullYear())
                     return true;
                 else if(coursDate.getFullYear() === now.getFullYear())
@@ -248,7 +258,7 @@ export class Courses {
                                 else if(coursDate.getMinutes() === now.getMinutes())
                                     if(coursDate.getSeconds() < now.getSeconds())
                                         return true;
-                return false;
+                return false;*/
             });
 
             this.isSynchronized = true;
@@ -338,8 +348,6 @@ export class Courses {
                 nbrCoursesToShow++;
         }
         this.coursesToDoWithImage = firstNbr + nbrCoursesToShow;
-        console.log("index premiere images : "+firstNbr );
-        console.log("index last images : "+this.coursesToDoWithImage );
     }
 
     async getChoice() {
