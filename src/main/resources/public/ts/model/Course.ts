@@ -211,55 +211,11 @@ export class Courses {
             let now = moment();
             this.coursesToCome = _.filter(this.coursesSharedToFollow, function (course) {
                 let coursDate = moment(course.startdate + "000", "x");
-                return now.isBefore(coursDate);
-                /*if(coursDate.getFullYear() > now.getFullYear()){
-                    return true;
-                }else if(coursDate.getFullYear() === now.getFullYear()) {
-                    if (coursDate.getMonth() > now.getMonth()) {
-                        return true;
-                    } else if (coursDate.getMonth() === now.getMonth()) {
-                        if (coursDate.getDate() > now.getDate()) {
-                            return true;
-                        } else if (coursDate.getDate() === now.getDate()) {
-                            if (coursDate.getHours() > now.getHours()) {
-                                return true;
-                            } else if (coursDate.getHours() === now.getHours()) {
-                                if (coursDate.getMinutes() > now.getMinutes()) {
-                                    return true;
-                                } else if (coursDate.getMinutes() === now.getMinutes()) {
-                                    if (coursDate.getSeconds() > now.getSeconds()) {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                return false;*/
-            });
+                return now.isBefore(coursDate);});
+
             this.coursesToDo = _.filter(this.coursesSharedToFollow, function (course) {
                 let coursDate = moment(course.startdate + "000", "x");
-                return coursDate.isBefore(now);
-                /*
-                if(coursDate.getFullYear() < now.getFullYear())
-                    return true;
-                else if(coursDate.getFullYear() === now.getFullYear())
-                    if(coursDate.getMonth() < now.getMonth())
-                        return true;
-                    else if(coursDate.getMonth() === now.getMonth())
-                        if(coursDate.getDate() < now.getDate())
-                            return true;
-                        else if(coursDate.getDate() === now.getDate())
-                            if(coursDate.getHours() < now.getHours())
-                                return true;
-                            else if(coursDate.getHours() === now.getHours())
-                                if(coursDate.getMinutes() < now.getMinutes())
-                                    return true;
-                                else if(coursDate.getMinutes() === now.getMinutes())
-                                    if(coursDate.getSeconds() < now.getSeconds())
-                                        return true;
-                return false;*/
-            });
+                return coursDate.isBefore(now);});
 
             this.isSynchronized = true;
         } catch (e) {
@@ -294,7 +250,7 @@ export class Courses {
             }
             return this.showCourses
         }else if (id =="doing"){
-            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%") });
+            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && !(cours.masked)) });
             if(place == "coursesToDo"){
                 if (view == 'list') {
                     this.coursesToDoWithImage = firstCourseToDo + 5;
@@ -303,7 +259,7 @@ export class Courses {
                 }            }
             return this.showCourses
         }else if (id == "favorites"){
-            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.favorites; });
+            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.favorites); });
             if(place == "coursesToDo"){
                 if (view == 'list') {
                     this.coursesToDoWithImage = firstCourseToDo + 5;
@@ -312,7 +268,7 @@ export class Courses {
                 }            }
             return this.showCourses
         }else if (id == "finished"){
-            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.progress == "100%"; });
+            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress == "100%" && !(cours.masked)); });
             if(place == "coursesToDo"){
                 if (view == 'list') {
                     this.coursesToDoWithImage = firstCourseToDo + 5;

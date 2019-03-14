@@ -119,6 +119,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.viewModeToCome = "icons";
         $scope.initFolders();
         $scope.imgCompatibleMoodle = false;
+        $scope.typeActivity = {
+            availableOptions: [
+                {id: 'quiz', name: 'Quizz'},
+                {id: 'file', name: 'Fichier'},
+                {id: 'page', name: 'Page'},
+                {id: 'assignment', name: 'Devoir'}
+            ],
+            selectedOption: {id: undefined, name: 'Choisissez votre type'}
+        };
     };
 
     $scope.isPrintMenuFolder = function () {
@@ -240,6 +249,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.openPopUp = function () {
         $scope.course = new Course();
         template.open('ligthBoxContainer', 'courses/createCourseLightbox');
+        $scope.typeActivity.selectedOption.id = undefined;
         $scope.openLightbox = true;
     };
     /**
@@ -261,6 +271,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.openLightbox = false;
         Utils.safeApply($scope);
     };
+
+    $scope.changeTypeA = function(course : Course) {
+        course.typeA = $scope.typeActivity.selectedOption.id;
+    }
 
     // $scope.shareCourse = async function () {
     //     $scope.course = new Course();
