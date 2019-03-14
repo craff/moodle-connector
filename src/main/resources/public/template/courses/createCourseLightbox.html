@@ -47,6 +47,8 @@
     <div class="row">
         <div class="right-magnet">
             <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
-            <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()" ng-disabled="course.fullname === undefined"/>
+            <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()" ng-disabled="course.fullname === undefined" ng-if="course.type == 1"/>
+            <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()" ng-disabled="course.fullname === undefined || course.typeA === undefined" ng-if="course.type == 2"/>
+
         </div>
     </div>

@@ -62,11 +62,11 @@
         </label>
     </div>
     <div class="left-margin">
-        <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != null">
+        <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != '0'">
             <i18n>toDo.before</i18n>
             <span class="date">[[ printDate(course,"enddate") ]]</span>
         </label>
-        <br ng-if="place == 'coursesToDo' && course.enddate == null" />
+        <br ng-if="place == 'coursesToDo' && course.enddate == '0'" />
         <div ng-class="{'row move-up' : place == 'coursesToDo'}">
             <progress-bar class="progress" ng-class="{activityProgress : course.course_type == 'singleactivity', courseProgress : course.course_type == 'topics'}"
                           max="100" filled="course.progress.slice(0,course.progress.length-1)" unit="%" ng-if="place == 'coursesToDo'">
