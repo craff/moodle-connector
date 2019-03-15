@@ -128,6 +128,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             ],
             selectedOption: {id: undefined, name: 'Choisissez votre type'}
         };
+        $scope.course.submitWait = false;
     };
 
     $scope.isPrintMenuFolder = function () {
@@ -267,8 +268,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.createCourse = async function () {
         // TODO get current folder id
         $scope.course.folderid = $scope.currentfolderid;
-        $scope.course.create();
+        $scope.course.submitWait = true;
+        await $scope.course.create();
+        await $scope.courses.getCoursesbyUser(model.me.userId);
         $scope.openLightbox = false;
+        $scope.course.submitWait = false;
         Utils.safeApply($scope);
     };
 
@@ -281,12 +285,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     //     $scope.course.share();
     //     Utils.safeApply($scope);
     // };
-
-    $scope.deleteCourse = function () {
-        $scope.course.delete();
-        Utils.safeApply($scope);
-    };
-
+    /*
+        $scope.deleteCourse = function () {
+            $scope.course.delete();
+            Utils.safeApply($scope);
+        };
+    */
     /**
      * Filter Type
      */
@@ -357,6 +361,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.successDelete = false;
     };
     $scope.deleteElements = async function () {
+        $scope.disableDeleteSend = false;
         if ($scope.folders.all.some(folder => folder.selectConfirm)) {
             await $scope.folders.foldersDelete();
         }
