@@ -54,15 +54,16 @@ export class Course implements Shareable{
         }
     }
 
-    async share() {
-        try {
-            await http.put(`/moodle/share/resource/${this.courseid}`, this.toJson());
-        } catch (e) {
-            notify.error("Share function didn't work");
-            throw e;
+    /*
+        async share() {
+            try {
+                await http.put(`/moodle/share/resource/${this.courseid}`, this.toJson());
+            } catch (e) {
+                notify.error("Share function didn't work");
+                throw e;
+            }
         }
-    }
-
+    */
     async setInfoImg() {
         const typesImgNoSend = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
         try {

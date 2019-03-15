@@ -891,6 +891,9 @@ public class MoodleController extends ControllerHelper {
                                             public void handle(Either<String, Buffer> event) {
                                                 if (event.isRight()) {
                                                     log.info("Cours partager");
+                                                    request.response()
+                                                            .setStatusCode(200)
+                                                            .end();
                                                 } else {
                                                     log.error("Share service didn't work");
                                                     unauthorized(request);
