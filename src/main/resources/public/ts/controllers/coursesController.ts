@@ -272,6 +272,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         await $scope.course.create();
         await $scope.courses.getCoursesbyUser(model.me.userId);
         $scope.openLightbox = false;
+        $scope.showToaster();
         $scope.course.submitWait = false;
         Utils.safeApply($scope);
     };
