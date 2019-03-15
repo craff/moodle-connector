@@ -533,12 +533,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.showInfoShare = () => {
         $scope.getTheSelectedCourse();
         $scope.showInfoSharePanel = true;
-    }
+    };
+    ;
     /**
      * Close lightbox Share
      */
     $scope.closePopUpShare = () => {
         $scope.showInfoSharePanel = false;
     };
-
+    $scope.submitShareCourse = () => {
+        $scope.initFolders();
+    }
 }]);
