@@ -30,7 +30,7 @@
                     ng-change="changeShowCoursesToDo()">
             </ul>
 
-            <div class="cell right-magnet icons-dashboard">
+            <div class="cell right-magnet title-dashboard">
                 <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewModeToDo('list')"></i>
             </div>
             <span> </span>
@@ -39,9 +39,9 @@
             </div>
         </div>
         <div class="row center-courses">
-            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo',firstCoursesToDo,viewModeToDo).slice(firstCoursesToDo,courses.coursesToDoWithImage)" class="twelve-mobile style-bord infoBackground bottom-margin right-course-margin"
+            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo',firstCoursesToDo,viewModeToDo).slice(firstCoursesToDo,courses.coursesToDoWithImage)" class="twelve-mobile style-bord infoBackground bottom-margin"
             ng-class="{'undefined-image-small-toDo-width cell' : (course.imageurl === null || course.imageurl === undefined || course.imageurl === '-') && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-' && viewModeToDo == 'icons',
-            'all-width cell' : viewModeToDo == 'list'}">
+            'all-width cell' : viewModeToDo == 'list', 'right-course-margin' : viewModeToDo == 'icons'}">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo"></courses-item>
             </div>
         </div>
@@ -73,7 +73,7 @@
                     ng-change="changeShowCoursesToDo()">
             </select>
                 <!--[[translate('moodle.views.libelle')]]-->
-            <div class="cell right-magnet icons-dashboard">
+            <div class="cell right-magnet title-dashboard">
                 <i class="show-list" ng-class="{ selected: viewModeToCome == 'list' }" ng-click="changeViewModeToCome('list')"></i>
             </div>
             <span> </span>

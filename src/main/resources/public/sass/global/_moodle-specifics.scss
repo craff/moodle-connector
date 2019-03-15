@@ -83,19 +83,18 @@ body.moodle {
     margin: 15px 0px 15px 0px;
   }
 
-  .icons-dashboard {
-    margin-right: 10px;
-  }
-
   .coursesBackground-dashboard {
     background: #eee;
     padding: 15px 60px;
     min-width: 425px;
   }
 
-  .right-margin {
+  .right-align {
     text-align: right;
-    margin: 10px 0px 0px 10px;
+  }
+
+  .rightTop-margin {
+    margin: 5px 0px 0px 10px;
   }
 
   .undefined-image-small-toDo-width {
@@ -171,9 +170,17 @@ body.moodle {
     margin-left: 90px;
   }
 
+  .right-magnet {
+    float: right;
+  }
+
+  .shared-margin-left {
+    margin-left: 110px;
+  }
+
   .inside-margin {
-    margin-left: 4.5vw;
-    margin-top: 3px;
+    margin-left: 80px;
+    margin-top: 2px;
   }
 
   .center-courses {
@@ -204,8 +211,6 @@ body.moodle {
 
   dots-menu {
     vertical-align: top;
-    margin-bottom: 15px;
-
     .options {
 
       right: 0px;

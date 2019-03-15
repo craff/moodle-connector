@@ -41,28 +41,15 @@
 }
 
 .activityRecentPicture{
-  width: 3.75vw;
-  min-width: 51px;
-  background-color: #ff8500;
-}
-
-.activityRecentPicturePadding{
-  width: 3.75vw;
-  min-width: 51px;
-  padding-left:5px;
-  background-color: #ff8500;
-}
-
-.activityToComePicture{
-  width: 7.5vw;
-  min-width: 115px;
+  width:75px;
   padding-left: 10px;
   background-color: #ff8500;
 }
 
-.activityToComeNoPadding{
-  width: 7.5vw;
-  min-width: 115px;
+.activityToComePicture{
+  width: 9vw;
+  min-width: 125px;
+  padding-left: 10px;
   background-color: #ff8500;
 }
 
@@ -80,41 +67,16 @@
   background-color: #e20037;
 }
 
-.activityToDoNoPadding{
-  width: 9.5vw;
-  min-width: 130px;
-  background-color: #ff8500;
-}
-
-.courseToDoNoPadding{
-  width: 9.5vw;
-  min-width: 130px;
-  background-color: #e20037;
-}
-
 .courseRecentPicture{
-  width: 3.75vw;
-  min-width: 51px;
-  background-color: #e20037;
-}
-
-.courseRecentPicturePadding{
-  width: 3.75vw;
-  min-width: 51px;
-  padding-left:5px;
-  background-color: #e20037;
-}
-
-.courseToComePicture{
-  width: 7.5vw;
-  min-width: 115px;
+  width:75px;
   padding-left: 10px;
   background-color: #e20037;
 }
 
-.courseToComeNoPadding{
-  width: 7.5vw;
-  min-width: 115px;
+.courseToComePicture{
+  width: 9vw;
+  min-width: 125px;
+  padding-left: 10px;
   background-color: #e20037;
 }
 
@@ -142,8 +104,10 @@
   padding-left: 6px;
 }
 
-.activityPictureNoPadding{
-  @include pictureSize();
+.activitySharedPicture{
+  width: 14%;
+  min-width: 100px;
+  padding-left: 8px;
   background-color: #ff8500;
 }
 
@@ -153,16 +117,16 @@
   padding-left: 6px;
 }
 
-.coursePictureNoPadding{
-  @include pictureSize();
+.courseSharedPicture{
+  width: 14%;
+  min-width: 100px;
+  padding-left: 8px;
   background-color: #e20037;
 }
 
 .recentPicture{
-  width: 3.75vw;
-  min-width: 51px;
-  height: 3.75vw;
-  min-height: 51px;
+  width:75px;
+  height: 55px;
 }
 
 .toDoPicture{
@@ -184,6 +148,18 @@
   min-width: 80px;
   height: 14%;
   min-height: 80px;
+}
+
+.sharedPicture{
+  width: 14%;
+  min-width: 100px;
+  height: 14%;
+  min-height: 100px;
+}
+
+.NoImagePicture{
+  width: 55px;
+  height: 55px;
 }
 
 i.sort-desc::before {
