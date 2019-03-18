@@ -36,8 +36,7 @@
 }
 
 @mixin pictureSize() {
-  width: 14%;
-  min-width: 80px;
+  width: 90px;
 }
 
 .activityRecentPicture{
@@ -101,32 +100,40 @@
 .activityPictureBackground{
   @include pictureSize();
   background-color: #ff8500;
-  padding-left: 6px;
+  padding-left: 10px;
 }
 
 .activitySharedPicture{
-  width: 14%;
-  min-width: 100px;
-  padding-left: 8px;
+  width: 110px;
+  padding-left: 10px;
   background-color: #ff8500;
 }
 
 .coursePictureBackground{
   @include pictureSize();
   background-color: #e20037;
-  padding-left: 6px;
+  padding-left: 10px;
 }
 
 .courseSharedPicture{
-  width: 14%;
-  min-width: 100px;
-  padding-left: 8px;
+  width: 110px;
+  padding-left: 10px;
   background-color: #e20037;
 }
 
 .recentPicture{
   width:75px;
   height: 55px;
+}
+
+.NoImageMine{
+  width:70px;
+  height:80px;
+}
+
+.NoImageShared{
+  width:90px;
+  height: 100px;
 }
 
 .toDoPicture{
