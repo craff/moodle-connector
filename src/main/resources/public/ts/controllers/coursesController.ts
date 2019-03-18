@@ -95,10 +95,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.openLightboxFolder = false;
         $scope.lightboxFolderMove = false;
         $scope.successDelete = false;
+        $scope.successDuplicate = false;
         $scope.typeFilter = [true, true];
         $scope.nbFoldersSelect = 0;
         $scope.nbCoursesSelect = 0;
         $scope.disableDeleteSend = true;
+        $scope.disableDuplicateSend = true;
         $scope.typeShow = {
             availableOptions: [
                 {id: 'all', name: 'Tout'},
@@ -377,6 +379,38 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             , 3000);
         $scope.initFolders();
     };
+
+    /**
+     * duplicate elements
+     * */
+
+    $scope.openPopUpDuplicate = function () {
+        template.open('ligthBoxContainer', 'courses/duplicateLightbox');
+        //$scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = true);
+        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = true);
+        $scope.confirmDuplicateSend();
+        $scope.openLightbox = true;
+    };
+    $scope.hideSuccessDuplicate = function () {
+        $scope.successDuplicate = false;
+    };
+    $scope.duplicateElements = async function () {
+        $scope.disableDuplicateSend = false;
+        /*if ($scope.folders.all.some(folder => folder.selectConfirm)) {
+            await $scope.folders.foldersDelete();
+        }
+        if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
+            await $scope.courses.coursesDelete();
+            await $scope.courses.getCoursesbyUser(model.me.userId);
+        }*/
+        $scope.openLightbox = false;
+        $scope.successDuplicate = true;
+        $timeout(() =>
+                $scope.successDuplicate = false
+            , 3000);
+        $scope.initFolders();
+    };
+
     /**
      * move folders
      * */
@@ -394,6 +428,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * */
     $scope.confirmDeleteSend = function () {
         $scope.disableDeleteSend = !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
+    };
+
+    /**
+     * confirm duplicate
+     * */
+    $scope.confirmDuplicateSend = function () {
+        $scope.disableDuplicateSend = !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
     };
 
     /**

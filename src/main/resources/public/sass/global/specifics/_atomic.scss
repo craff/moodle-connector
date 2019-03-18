@@ -46,8 +46,7 @@
 }
 
 .activityToComePicture{
-  width: 9vw;
-  min-width: 125px;
+  width: 125px;
   padding-left: 10px;
   background-color: #ff8500;
 }
@@ -73,8 +72,7 @@
 }
 
 .courseToComePicture{
-  width: 9vw;
-  min-width: 125px;
+  width:125px;
   padding-left: 10px;
   background-color: #e20037;
 }
@@ -138,31 +136,23 @@
 }
 
 .toDoPicture{
-  width: 9.5vw;
-  min-width: 130px;
-  height: 9.5vw;
-  min-height: 130px;
+  width: 130px;
+  height: 130px;
 }
 
 .toComePicture{
-  width: 7.5vw;
-  min-width: 115px;
-  height: 7.5vw;
-  min-height: 115px;
+  width: 115px;
+  height: 115px;
 }
 
 .defaultPicture{
-  width: 14%;
-  min-width: 80px;
-  height: 14%;
-  min-height: 80px;
+  width: 80px;
+  height: 80px;
 }
 
 .sharedPicture{
-  width: 14%;
-  min-width: 100px;
-  height: 14%;
-  min-height: 100px;
+  width: 100px;
+  height: 100px;
 }
 
 .NoImagePicture{
@@ -228,6 +218,19 @@ i.share::before {
   border-left-style: outset;
   padding-left: 5px;
 }
+
+.specific-border-lightbox{
+  border-color: #ff8500;
+  border-radius: 6px;
+  border-style: solid;
+  border-width: 1px;
+}
+
+.number-width{
+  width:60px;
+  padding: 5px;
+}
+
 .colorActivity{
    color: #ff8500;
  }

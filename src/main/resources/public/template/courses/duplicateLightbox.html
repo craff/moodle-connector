@@ -1,0 +1,39 @@
+<!-- alert for duplicate folders and courses -->
+<form ng-submit="duplicateElements()">
+    <div class="eight cell horizontal-spacing">
+        <h2 class="row twelve"><i18n>moodle.lightBox.duplicate.title</i18n></h2>
+        <p><i18n>moodle.lightBox.duplicate.content</i18n></p>
+        <ul class="list-element-delete">
+            <!--<li class="ellipsis" ng-repeat="folderList in getAllFolders()" ng-if="folderList.select">
+                <label class="checkbox" >
+                    <input id="folders" type="checkbox" ng-change="confirmDeleteSend()" checked class="checkbox"  ng-model="folderList.selectConfirm"/>
+                    <span>[[folderList.name]]</span>
+                </label>
+            </li>-->
+            <li class="ellipsis bottom-margin" ng-repeat="courseList in courses.allCourses" ng-if="courseList.select">
+                <label class="checkbox" >
+                    <input id="courses" type="checkbox" ng-change="confirmDuplicateSend()" checked  ng-model="courseList.selectConfirm" class="checkbox "/>
+                    &nbsp;&nbsp;
+                    <span>[[courseList.fullname]]</span>
+                </label>
+            </li>
+        </ul>
+    </div>
+    <br>
+    <div class="horizontal-spacing row seven vertical-spacing">
+        <label class="row twelve">
+            <span class="row"><i18n>moodle.lightBox.duplicate.question</i18n></span>
+            <input type="number" min="1" class="number-width specific-border-lightbox" required i18n-placeholder="moodle.lightBox.duplicate.example" ng-model="course.fullname">
+        </label>
+    </div>
+    <div class="horizontal-spacing row seven vertical-spacing specific-border-lightbox">
+            <p><i18n>moodle.lightBox.duplicate.informations</i18n></p>
+    </div>
+    <br>
+    <div class="row">
+        <div class="right-magnet">
+            <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
+            <input type="submit" class="button" i18n-value="moodle.lightBox.duplicate.submit" ng-disabled="!disableDuplicateSend"/>
+        </div>
+    </div>
+</form>

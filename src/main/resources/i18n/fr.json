@@ -63,7 +63,7 @@
     "moodle.toaster.rename": "renommer",
     "moodle.folder.name.long": "Titre du dossier",
 	"moodle.toaster.property": "Proprietes",
-	"moodle.toaster.copy": "Copier",
+	"moodle.toaster.duplicate": "Dupliquer",
 	"moodle.toaster.move": "Déplacer",
 	"moodle.toaster.delete": "Supprimer",
 	"moodle.toaster.registration" : "Inscrire",
@@ -102,6 +102,14 @@
 	"moodle.lightBox.delete.title": "Supprimer la sélection",
 	"moodle.lightBox.delete.submit": "supprimer la selection",
 	"moodle.lightBox.delete.content": "Confirmez-vous la suppression de la sélection?",
+
+	"moodle.info.duplicateTextConfirmSuccess": "La sélection a bien été dupliqué",
+	"moodle.lightBox.duplicate.title": "Demande de duplication",
+	"moodle.lightBox.duplicate.submit": "Envoyer la demande",
+	"moodle.lightBox.duplicate.content": "Demande de duplication pour la sélection :",
+	"moodle.lightBox.duplicate.question": "Combien de duplication souhaitez-vous ?",
+	"moodle.lightBox.duplicate.informations": "Votre demande de duplication sera disponible dans l'onglet \"Mes demandes\".<br/>Une fois la duplication réalisée, le cours sera disponible dans le dossier du cours d'origine.",
+	"moodle.lightBox.duplicate.example": "Ex. : 2",
 
 	"moodle.all.courses": "Tout",
 	"moodle.others.courses": "Autres",
