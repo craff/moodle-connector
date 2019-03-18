@@ -111,7 +111,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             selectedToComeOption: {id: 'all', name: 'Tout'}
         };
         $scope.firstCoursesToDo = 0;
-        $scope.lastCoursesToDo = 8;
+        $scope.lastCoursesToDo = $scope.countToDo();
         $scope.firstCoursesToCome = 0;
         $scope.lastCoursesToCome = $scope.countToCome();
         $scope.showInfoSharePanel = false;
@@ -401,16 +401,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * */
 
     $scope.previousCoursesToDoButton = function () {
-        $scope.firstCoursesToDo -= $scope.countPreviousToDo();
-
+        $scope.firstCoursesToDo -= $scope.countToDo();
+        $scope.lastCoursesToDo -= $scope.countToDo();
         if ($scope.firstCoursesToDo < 0) {
             $scope.firstCoursesToDo = 0;
-            //$scope.countForwardToDo();
+            $scope.lastCoursesToDo = $scope.countToDo();
         }
     };
     $scope.nextCoursesToDoButton = function () {
-        $scope.firstCoursesToDo = $scope.courses.coursesToDoWithImage;
-        //$scope.countForwardToDo();
+        $scope.firstCoursesToDo = $scope.lastCoursesToDo;
+        $scope.lastCoursesToDo += $scope.countToDo();
     };
 
     $scope.countToCome = function () {
@@ -421,39 +421,17 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
     };
 
-    /*$scope.countForwardToDo = function () {
-        if ($scope.viewModeToDo == 'list') {
-            $scope.courses.coursesToDoWithImage = 5;
-        }else{
-            $scope.lastCoursesToDo = 9;
-            for (let i = 0; i < $scope.lastCoursesToDo; i++) {
-                if ($scope.courses.coursesToShow($scope.typeShow.selectedToDoOption.id,'coursesToDo',$scope.firstCoursesToDo,$scope.viewModeToDo).slice(firstNbr, firstNbr + 8)[i].imageurl !== null && courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== undefined && courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== '-') {
-                    $scope.lastCoursesToDo--;
-                }
-            }
-            this.coursesToDoWithImage = $scope.lastCoursesToDo;
-        }
-    };*/
-
-    $scope.countPreviousToDo = function () {
+    $scope.countToDo = function () {
         if ($scope.viewModeToDo == 'list') {
             return 5;
-        }else{
-            $scope.lastCoursesToDo = 8;
-            let i = 1
-            while (i <= $scope.lastCoursesToDo && $scope.firstCoursesToDo-i >= 0) {
-                if ($scope.courses.coursesToShow($scope.typeShow.selectedToDoOption.id,'coursesToDo',$scope.firstCoursesToDo,$scope.viewModeToDo)[$scope.firstCoursesToDo-i].imageurl !== null &&
-                    $scope.courses.coursesToShow($scope.typeShow.selectedToDoOption.id,'coursesToDo',$scope.firstCoursesToDo,$scope.viewModeToDo)[$scope.firstCoursesToDo-i].imageurl !== undefined &&
-                    $scope.courses.coursesToShow($scope.typeShow.selectedToDoOption.id,'coursesToDo',$scope.firstCoursesToDo,$scope.viewModeToDo)[$scope.firstCoursesToDo-i].imageurl !== '-') {
-                    if(i == 5)
-                        $scope.lastCoursesToDo--;
-                    $scope.lastCoursesToDo--;
-                }
-                i++;
-            }
-            return $scope.lastCoursesToDo;
+        } else {
+            if($scope.firstCoursesToDo==0)
+                return 7;
+            else
+                return 8;
         }
     };
+
 
     $scope.previousCoursesToComeButton = function () {
         $scope.firstCoursesToCome -= $scope.countToCome();

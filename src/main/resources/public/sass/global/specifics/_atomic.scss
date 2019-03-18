@@ -80,19 +80,15 @@
 }
 
 .activityToDoPicture{
-  width: 9.5vw;
-  min-width: 130px;
-  height: 9.5vw;
-  min-height: 130px;
+  width: 140px;
+  height: 130px;
   padding-left: 10px;
   background-color: #ff8500;
 }
 
 .courseToDoPicture{
-  width: 9.5vw;
-  min-width: 130px;
-  height: 9.5vw;
-  min-height: 130px;
+  width: 140px;
+  height: 130px;
   padding-left: 10px;
   background-color: #e20037;
 }
@@ -134,6 +130,11 @@
 .NoImageShared{
   width:90px;
   height: 100px;
+}
+
+.NoImageToDo{
+  width:120px;
+  height: 130px;
 }
 
 .toDoPicture{

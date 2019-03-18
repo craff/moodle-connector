@@ -14,7 +14,8 @@ export let coursesItem = ng.directive("coursesItem", function(){
             check: '=',
             dateFunction : '=',
             authorFunction : '=',
-            view : '='
+            view : '=',
+            first : '='
         },
         templateUrl : `/${appPrefix}/public/template/directives/coursesItem.html`,
         controller : ['$scope', '$element', function($scope, $element) {
@@ -27,12 +28,6 @@ export let coursesItem = ng.directive("coursesItem", function(){
             $scope.printAuthor = (item,number) => {
                 return $scope.authorFunction(item,number);
             };
-
-            /*const maxLineNumber = $scope.place === 'coursesToCome' ?  2 : 6;
-            const selector = $scope.place === 'coursesToCome' ? '.clamp-me' : '.big-clamp-me';
-
-            const element = $element[0].querySelector(selector);
-            shave(element, maxLineNumber,'...');*/
         }]
     };
 });

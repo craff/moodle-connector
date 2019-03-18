@@ -1,28 +1,29 @@
 <div class="cell" ng-class="{ activityRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list')) && course.course_type == 'singleactivity',
-                                activityToDoPicture : place == 'coursesToDo' && course.course_type == 'singleactivity',
+                                activityToDoPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && view == 'icons' && first,
                                 activityToComePicture : place == 'coursesToCome' && course.course_type == 'singleactivity' && view == 'icons',
                                 activityPictureBackground : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'singleactivity',
                                 activitySharedPicture : place == 'coursesShared' && course.course_type == 'singleactivity',
-                                activityToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && view == 'icons',
+                                activityToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && view == 'icons' && !first,
                                 courseRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list')) && course.course_type == 'topics',
                                 courseToComePicture : place == 'coursesToCome' && course.course_type == 'topics' && view == 'icons',
-                                courseToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'topics' && view == 'icons',
+                                courseToDoPicture : place == 'coursesToDo' && course.course_type == 'topics' && view == 'icons' && first,
+                                courseToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'topics' && view == 'icons' && !first,
                                 coursePictureBackground : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'topics' ,
                                 courseSharedPicture : place == 'coursesShared' && course.course_type == 'topics'}"
      ng-click="course.goTo()">
     <img ng-src="[[course.imageurl]]" class="image-dashboard"
          ng-class="{ recentPicture : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list') ,
-            toDoPicture : place == 'coursesToDo' && view == 'icons',
+            toDoPicture : place == 'coursesToDo' && first && view == 'icons',
             toComePicture : place == 'coursesToCome' && view == 'icons',
             defaultPicture : place == 'coursesMine',
             sharedPicture : place == 'coursesShared'}"
          ng-show="course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-' "/>
     <img ng-src="moodle/public/img/logo_image_ent.png" class="image-dashboard" ng-class="{ 'NoImagePicture' : place=='coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list'),
-    'NoImageMine' : place=='coursesMine', 'NoImageShared' : place=='coursesShared'}"
+    'NoImageMine' : place=='coursesMine', 'NoImageShared' : place=='coursesShared', 'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons'}"
          ng-show="course.imageurl === null || course.imageurl === undefined || course.imageurl === '-' "/>
 </div>
-<div  ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' && (course.imageurl === null || course.imageurl === undefined || course.imageurl === '-') && view == 'icons',
-                  'small-eleven cell' : place == 'coursesToDo' && course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-'  && view == 'icons',
+<div  ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' &&  !first && view == 'icons',
+                  'small-eleven cell' : place == 'coursesToDo' && first  && view == 'icons',
                   'specific-small-toCome-width cell' : place == 'coursesToCome' && view == 'icons'}">
     <div ng-class="{ 'right-align' : (place == 'coursesToDo' || place == 'coursesToCome') && view == 'icons',
                      'rightTop-margin' : (place == 'coursesToDo' || place == 'coursesToCome'),

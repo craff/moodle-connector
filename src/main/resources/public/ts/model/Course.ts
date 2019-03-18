@@ -140,7 +140,6 @@ export class Courses {
     coursesToDo : Course[];
     coursesToCome : Course[];
     showCourses : Course[];
-    coursesToDoWithImage : number;
 
     constructor() {
         this.allbyfolder = [];
@@ -214,9 +213,27 @@ export class Courses {
                 let coursDate = moment(course.startdate + "000", "x");
                 return now.isBefore(coursDate);});
 
+            this.coursesToCome = this.coursesToCome.sort(
+                function compare(a, b) {
+                    if (a.startdate < b.startdate)
+                        return 1;
+                    if (a.startdate > b.startdate)
+                        return -1;
+                }
+            );
+
             this.coursesToDo = _.filter(this.coursesSharedToFollow, function (course) {
                 let coursDate = moment(course.startdate + "000", "x");
                 return coursDate.isBefore(now);});
+
+            this.coursesToDo = this.coursesToDo.sort(
+                function compare(a, b) {
+                    if (a.startdate < b.startdate)
+                        return 1;
+                    if (a.startdate > b.startdate)
+                        return -1;
+                }
+            );
 
             this.isSynchronized = true;
         } catch (e) {
@@ -233,7 +250,14 @@ export class Courses {
         }
     }*/
 
-    coursesToShow(id : string, place:string, firstCourseToDo:number, view : string){
+    isTheFirst(course : Course){
+        if(this.coursesToDo.indexOf(course) == 0)
+            return true;
+        else
+            return false;
+    }
+
+    coursesToShow(id : string, place:string){
         if(place == "coursesToDo"){
             this.showCourses = this.coursesToDo;
         }else if (place == "coursesToCome"){
@@ -242,78 +266,20 @@ export class Courses {
 
         if(id == "all"){
             this.showCourses = _.filter(this.showCourses, function(cours) { return !(cours.masked); });
-            if(place == "coursesToDo"){
-                if (view == 'list') {
-                    this.coursesToDoWithImage = firstCourseToDo + 5;
-                }else {
-                    this.countToDoImage(firstCourseToDo, this.showCourses);
-                }
-            }
             return this.showCourses
         }else if (id =="doing"){
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && !(cours.masked)) });
-            if(place == "coursesToDo"){
-                if (view == 'list') {
-                    this.coursesToDoWithImage = firstCourseToDo + 5;
-                }else {
-                    this.countToDoImage(firstCourseToDo, this.showCourses);
-                }            }
             return this.showCourses
         }else if (id == "favorites"){
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.favorites); });
-            if(place == "coursesToDo"){
-                if (view == 'list') {
-                    this.coursesToDoWithImage = firstCourseToDo + 5;
-                }else {
-                    this.countToDoImage(firstCourseToDo, this.showCourses);
-                }            }
             return this.showCourses
         }else if (id == "finished"){
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress == "100%" && !(cours.masked)); });
-            if(place == "coursesToDo"){
-                if (view == 'list') {
-                    this.coursesToDoWithImage = firstCourseToDo + 5;
-                }else {
-                    this.countToDoImage(firstCourseToDo, this.showCourses);
-                }            }
             return this.showCourses
         }else if (id == "masked"){
             this.showCourses = _.filter(this.showCourses, function(cours) { return cours.masked; });
-            if(place == "coursesToDo"){
-                if (view == 'list') {
-                    this.coursesToDoWithImage = firstCourseToDo + 5;
-                }else {
-                    this.countToDoImage(firstCourseToDo, this.showCourses);
-                }            }
             return this.showCourses
         }
-    }
-
-    countToDoImage(firstNbr : number, courses : Course[]) {
-        let nbrCoursesToShow = 8;
-        for (let i = 0; i < nbrCoursesToShow; i++) {
-            if(courses.slice(firstNbr, firstNbr + 8)[i] != undefined) {
-                if (courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== null && courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== undefined && courses.slice(firstNbr, firstNbr + 8)[i].imageurl !== '-') {
-                    if(i==3)
-                        nbrCoursesToShow--;
-                    nbrCoursesToShow--;
-                }
-            }
-        }
-        if(nbrCoursesToShow==4 || nbrCoursesToShow==3) {
-            let nbrtest = 4;
-            let noPicture = 0;
-            for (let i = firstNbr; i < firstNbr + nbrtest; i++) {
-                if (courses[i] != undefined) {
-                    if (courses[i].imageurl === null || courses[i].imageurl === undefined || courses[i].imageurl === '-') {
-                        noPicture++;
-                    }
-                }
-            }
-            if (noPicture == 2 || noPicture == 0)
-                nbrCoursesToShow++;
-        }
-        this.coursesToDoWithImage = firstNbr + nbrCoursesToShow;
     }
 
     async getChoice() {
