@@ -124,9 +124,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.typeActivity = {
             availableOptions: [
                 {id: 'quiz', name: 'Quizz'},
-                {id: 'file', name: 'Fichier'},
+                {id: 'resource', name: 'Fichier'},
                 {id: 'page', name: 'Page'},
-                {id: 'assignment', name: 'Devoir'}
+                {id: 'assign', name: 'Devoir'}
             ],
             selectedOption: {id: undefined, name: 'Choisissez votre type'}
         };
@@ -161,12 +161,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
         $scope.setprintsubfolderValue();
     };
+
     $scope.setprintsubfolderValue = function () {
         $scope.folders.all.forEach(function (e) {
             e.printsubfolder = false;
         });
         Utils.safeApply($scope);
     };
+
     $scope.setprintsubfolderValuebyFolder = function (folder: Folder, printsubfolder: boolean) {
         $scope.folders.all.forEach(function (e) {
             if (e.id != folder.parent_id && e.id != folder.id && e.id != 0)
@@ -184,6 +186,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
         Utils.safeApply($scope);
     };
+
     $scope.isPrintSubFolder = function (folder: Folder) {
         $scope.folders.all.forEach(function (e) {
             if (e.id == folder.id) {
@@ -255,6 +258,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.typeActivity.selectedOption.id = undefined;
         $scope.openLightbox = true;
     };
+
     /**
      * Close lightbox
      */
@@ -281,7 +285,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.changeTypeA = function(course : Course) {
         course.typeA = $scope.typeActivity.selectedOption.id;
-    }
+    };
 
     // $scope.shareCourse = async function () {
     //     $scope.course = new Course();
@@ -326,6 +330,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.selectedCourse = _.findWhere($scope.courses.coursesByUser, {select: true});
         }
     };
+
     /**
      * count folders and courses select
      * */
@@ -334,6 +339,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.nbCoursesSelect = $scope.courses.allCourses.filter(course => course.select).length;
 
     };
+
     /**
      * create folder
      * */
@@ -349,10 +355,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.initFolders();
         $scope.openLightbox = false;
     };
+
     /**
      * delete elements
      * */
-
     $scope.openPopUpDelete = function () {
         template.open('ligthBoxContainer', 'courses/deleteLightbox');
         $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = true);
@@ -360,9 +366,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.confirmDeleteSend();
         $scope.openLightbox = true;
     };
+
     $scope.hideSuccessDelete = function () {
         $scope.successDelete = false;
     };
+
     $scope.deleteElements = async function () {
         $scope.disableDeleteSend = false;
         if ($scope.folders.all.some(folder => folder.selectConfirm)) {
@@ -418,11 +426,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         template.open('ligthBoxContainer', 'courses/moveElementLightbox');
         $scope.openLightbox = true;
     };
+
     $scope.foldersMove = async function () {
         await $scope.folders.moveFolders();
         $scope.initFolders();
         $scope.openLightbox = false;
     };
+
     /**
      * confirm delete
      * */
@@ -440,7 +450,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * next and previous button to show courses
      * */
-
     $scope.previousCoursesToDoButton = function () {
         $scope.firstCoursesToDo -= $scope.countToDo();
         $scope.lastCoursesToDo -= $scope.countToDo();
@@ -449,6 +458,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.lastCoursesToDo = $scope.countToDo();
         }
     };
+
     $scope.nextCoursesToDoButton = function () {
         $scope.firstCoursesToDo = $scope.lastCoursesToDo;
         $scope.lastCoursesToDo += $scope.countToDo();
@@ -559,13 +569,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.getTheSelectedCourse();
         $scope.showInfoSharePanel = true;
     };
-    ;
+
     /**
      * Close lightbox Share
      */
     $scope.closePopUpShare = () => {
         $scope.showInfoSharePanel = false;
     };
+
     $scope.submitShareCourse = () => {
         $scope.initFolders();
     }

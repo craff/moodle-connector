@@ -366,38 +366,38 @@ public class MoodleController extends ControllerHelper {
                                                     }*/
 
                                                     moodleWebService.getPreferences(user.getUserId(), new Handler<Either<String, JsonArray>>() {
-                                                                @Override
-                                                                public void handle(Either<String, JsonArray> event) {
-                                                                    if (event.isRight()){
-                                                                        JsonArray list = event.right().getValue();
-                                                                        if(list.size() != 0) {
-                                                                            for (int i = 0; i < coursArray.size(); i++) {
-                                                                                JsonObject cours = coursArray.getJsonObject(i);
-                                                                                for (int j = 0; j < list.size(); j++) {
-                                                                                    JsonObject PreferencesCours = list.getJsonObject(j);
-                                                                                    if(PreferencesCours.getValue("moodle_id").toString().compareTo(cours.getValue("courseid").toString()) == 0){
-                                                                                        coursArray.getJsonObject(i).put("masked", PreferencesCours.getValue("masked"));
-                                                                                        coursArray.getJsonObject(i).put("favorites", PreferencesCours.getValue("favorites"));
-                                                                                    }
-                                                                                }
-                                                                                if(coursArray.getJsonObject(i).containsKey("masked") == false){
-                                                                                    coursArray.getJsonObject(i).put("masked", false);
-                                                                                    coursArray.getJsonObject(i).put("favorites", false);
-                                                                                }
-                                                                            }
-                                                                        }else{
-                                                                            for (int i = 0; i < coursArray.size(); i++) {
-                                                                                coursArray.getJsonObject(i).put("masked", false);
-                                                                                coursArray.getJsonObject(i).put("favorites", false);
+                                                        @Override
+                                                        public void handle(Either<String, JsonArray> event) {
+                                                            if (event.isRight()){
+                                                                JsonArray list = event.right().getValue();
+                                                                if(list.size() != 0) {
+                                                                    for (int i = 0; i < coursArray.size(); i++) {
+                                                                        JsonObject cours = coursArray.getJsonObject(i);
+                                                                        for (int j = 0; j < list.size(); j++) {
+                                                                            JsonObject PreferencesCours = list.getJsonObject(j);
+                                                                            if(PreferencesCours.getValue("moodle_id").toString().compareTo(cours.getValue("courseid").toString()) == 0){
+                                                                                coursArray.getJsonObject(i).put("masked", PreferencesCours.getValue("masked"));
+                                                                                coursArray.getJsonObject(i).put("favorites", PreferencesCours.getValue("favorites"));
                                                                             }
                                                                         }
-                                                                        Renders.renderJson(request, coursArray);
-                                                                    } else {
-                                                                        log.error("Get list favorites and masked failed !");
-                                                                        renderError(request);
+                                                                        if(coursArray.getJsonObject(i).containsKey("masked") == false){
+                                                                            coursArray.getJsonObject(i).put("masked", false);
+                                                                            coursArray.getJsonObject(i).put("favorites", false);
+                                                                        }
+                                                                    }
+                                                                }else{
+                                                                    for (int i = 0; i < coursArray.size(); i++) {
+                                                                        coursArray.getJsonObject(i).put("masked", false);
+                                                                        coursArray.getJsonObject(i).put("favorites", false);
                                                                     }
                                                                 }
-                                                            });
+                                                                Renders.renderJson(request, coursArray);
+                                                            } else {
+                                                                log.error("Get list favorites and masked failed !");
+                                                                renderError(request);
+                                                            }
+                                                        }
+                                                    });
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
                                                     }
@@ -571,7 +571,6 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 if (user != null) {
-
                     List<Future> listeFutures = new ArrayList<Future>();
 
                     Future<JsonObject> getShareInfosFuture = Future.future();
@@ -595,7 +594,6 @@ public class MoodleController extends ControllerHelper {
                             "&parameters[courseid]=" + request.getParam("id") +
                             "&moodlewsrestformat=" + JSON;
 
-
                     Future<JsonArray> getUsersEnrolementsFuture = Future.future();
                     Handler<HttpClientResponse> getUsersEnrolementsHandler = response -> {
                         if (response.statusCode() == 200) {
@@ -615,15 +613,15 @@ public class MoodleController extends ControllerHelper {
                             response.bodyHandler(new Handler<Buffer>() {
                                 @Override
                                 public void handle(Buffer event) {
-                                    log.error("Returning body after GET CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                                    getUsersEnrolementsFuture.fail( response.statusMessage());
+                                    log.error("Returning body after GET CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                                    getUsersEnrolementsFuture.fail(response.statusMessage());
                                     if (!responseIsSent.getAndSet(true)) {
                                         httpClient.close();
                                     }
                                 }
                             });
-                                //getUsersEnrolementsFuture.fail( response.statusMessage());
-                    }};
+                        }        //getUsersEnrolementsFuture.fail( response.statusMessage());
+                    };
 
                     final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, getUsersEnrolementsHandler);
                     listeFutures.add(getUsersEnrolementsFuture);
@@ -641,7 +639,6 @@ public class MoodleController extends ControllerHelper {
                         }
                     }).end();
 
-
                     CompositeFuture.all(listeFutures).setHandler(event -> {
                         if (event.succeeded()) {
                             JsonObject shareInfosFuture = getShareInfosFuture.result();
@@ -654,7 +651,7 @@ public class MoodleController extends ControllerHelper {
                                 List<String> usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
                                 List<String> usersshareInfosId = shareInfosUsers.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
 
-                                if(groupEnroled.size()>0){
+                                if(groupEnroled.size() > 0){
                                     List<String> groupsEnroledId = groupEnroled.stream().map(obj -> ((JsonObject)obj).getString("idnumber") ).collect(Collectors.toList());
                                     List<String> groupsshareInfosId = shareInfosGroups.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
                                     for (String groupId: groupsEnroledId) {
@@ -662,7 +659,7 @@ public class MoodleController extends ControllerHelper {
                                             JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(usersEnroledId.indexOf(groupId));
                                             String id = jsonobjctToAdd.getString("idnumber");
                                             jsonobjctToAdd.remove("idnumber");
-                                            jsonobjctToAdd.put("id",id);
+                                            jsonobjctToAdd.put("id", id);
                                             //jsonobjctToAdd.put("groupDisplayName", null);
                                             //jsonobjctToAdd.put("structureName",null);
                                             shareInfosFuture.getJsonObject("groups").getJsonArray("visibles").add(jsonobjctToAdd);
@@ -688,10 +685,10 @@ public class MoodleController extends ControllerHelper {
                                         String nom = jsonobjctToAdd.getString("lastname");
                                         jsonobjctToAdd.remove("firstname");
                                         jsonobjctToAdd.remove("lastname");
-                                        jsonobjctToAdd.put("firstName",prenom.charAt(0)+prenom.substring(1).toLowerCase());
-                                        jsonobjctToAdd.put("lastName",nom);
-                                        jsonobjctToAdd.put("login",prenom.toLowerCase()+"."+nom.toLowerCase());
-                                        jsonobjctToAdd.put("username",nom+" "+prenom.charAt(0)+prenom.substring(1).toLowerCase());
+                                        jsonobjctToAdd.put("firstName", prenom.charAt(0) + prenom.substring(1).toLowerCase());
+                                        jsonobjctToAdd.put("lastName", nom);
+                                        jsonobjctToAdd.put("login", prenom.toLowerCase() + "." + nom.toLowerCase());
+                                        jsonobjctToAdd.put("username", nom + " " + prenom.charAt(0) + prenom.substring(1).toLowerCase());
                                         String profile = "Relative";
                                         if(jsonobjctToAdd.getInteger("role") == student){
                                             profile = "Student";
@@ -722,11 +719,6 @@ public class MoodleController extends ControllerHelper {
                 }
             }
         });
-
-        //String json = "{\"actions\":[{\"name\":[\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"displayName\":\"moodle.manager\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"displayName\":\"moodle.contrib\",\"type\":\"RESOURCE\"},{\"name\":[\"fr-openent-moodle-controllers-MoodleController|read\"],\"displayName\":\"moodle.read\",\"type\":\"RESOURCE\"}],\"groups\":{\"visibles\":[{\"id\":\"1761599-1535020399757\",\"name\":\"Élèves du groupe 3 A.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"1761587-1535020399755\",\"name\":\"Élèves du groupe 3 B.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\",\"name\":\"Enseignants de discipline ALLEMAND.\",\"groupDisplayName\":null,\"structureName\":\"CLG-NICOLAS FOUQUET-MORMANT\"},{\"id\":\"782-1468756944518\",\"name\":\"Enseignants du groupe CLG-NICOLAS FOUQUET-MORMANT.\",\"groupDisplayName\":null,\"structureName\":null}],\"checked\":{\"a60163b1-85e8-4d1e-ade7-36ce7bb8d7d2\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"782-1468756944518\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\"],\"1761599-1535020399757\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}},\"users\":{\"visibles\":[{\"id\":\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\",\"login\":\"allan.ackra\",\"username\":\"ACKRA Allan\",\"lastName\":\"ACKRA\",\"firstName\":\"Allan\",\"profile\":\"Student\"},{\"id\":\"0c4bc331-fbde-47a2-87fd-ea801676612c\",\"login\":\"virginie.duponcest\",\"username\":\"DUPONCEST Virginie\",\"lastName\":\"DUPONCEST\",\"firstName\":\"Virginie\",\"profile\":\"Relative\"}],\"checked\":{\"29cf6d55-8f2a-410c-8db8-8c58c7f2887f\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"],\"0c4bc331-fbde-47a2-87fd-ea801676612c\":[\"fr-openent-moodle-controllers-MoodleController|read\",\"fr-openent-moodle-controllers-MoodleController|contrib\",\"fr-openent-moodle-controllers-MoodleController|shareSubmit\"]}}}";
-        //JsonObject shares = new JsonObject(json);
-
-        // TODO appeler WS Moodle pour recuperer les droits et construire le json au bon format
     }
 
     @Put("/contrib")
@@ -800,7 +792,7 @@ public class MoodleController extends ControllerHelper {
                                 }
                             }
                             final Map<String, Object> mapInfo = keyShare.getMap();
-                            mapInfo.put(user.getUserId(),editingteacher);
+                            mapInfo.put(user.getUserId(), editingteacher);
                             share.put("courseid", request.params().entries().get(0).getValue());
 
                             Future<JsonArray> getUsersFuture = Future.future();
