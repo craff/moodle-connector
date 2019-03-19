@@ -493,7 +493,8 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("Redirect to Moodle")
     public void redirectToMoodle (HttpServerRequest request){
 	    String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
-	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" + request.getParam("id"));
+	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" +
+                request.getParam("id") + "&notifyeditingon=1");
     }
 
     @Get("/choices")
