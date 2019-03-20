@@ -17,6 +17,7 @@ export class Course implements Shareable{
     role : string;
     startdate : Date;
     enddate : Date;
+    timemodified : number;
     categoryid : number;
     folderid : number;
     imageurl : string;

@@ -323,9 +323,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * toaster show
      * */
     $scope.showToaster = function () {
+        $scope.myCourse = undefined;
         template.open('toaster', 'toaster');
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         $scope.countFoldersCourses();
+        if($scope.nbCoursesSelect == 1)
+            $scope.myCourse = _.findWhere($scope.courses.coursesByUser, {select: true});
         if ($scope.toasterShow === true) {
             $scope.selectedCourse = _.findWhere($scope.courses.coursesByUser, {select: true});
         }
@@ -505,7 +508,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.printRightFormatDate = function (course: Course, spec: string) {
         let format = "DD/MM/YYYY";
         if (spec == "modified") {
-            return moment(course.date + "000", "x").format(format);
+            return moment(course.timemodified.toString() + "000", "x").format(format);
         } else if (spec == "enddate") {
             return moment(course.enddate + "000", "x").format(format);
         } else if (spec == "begindate") {
@@ -543,9 +546,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.getSelectedCourses = function () {
         return _.where($scope.courses.coursesByUser, {select: true});
     };
-    $scope.getTheSelectedCourse = function () {
-        $scope.myCourse = _.findWhere($scope.courses.coursesByUser, {select: true});
-    };
 
     // TODO remplacer par balise authorize dans toaster.html
     // <authorize name="manage" resource="uploads.selection()"> ...
@@ -565,19 +565,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
     };
 
-    $scope.showInfoShare = () => {
-        $scope.getTheSelectedCourse();
-        $scope.showInfoSharePanel = true;
-    };
-
     /**
-     * Close lightbox Share
+     * refresh after a Share
      */
-    $scope.closePopUpShare = () => {
-        $scope.showInfoSharePanel = false;
-    };
 
     $scope.submitShareCourse = () => {
+        $scope.showInfoSharePanel = false;
         $scope.initFolders();
     }
 }]);

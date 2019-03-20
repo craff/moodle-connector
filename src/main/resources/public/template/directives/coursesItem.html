@@ -35,8 +35,8 @@
                 <i18n>toBegin.at</i18n>
                 <span class="date">[[ printDate(course,"begindate") ]]</span></br>
             </label>
-            <div class="ellipsis">
-                <span class="text-font">[[course.fullname]]</span>
+            <div>
+                <span class="text-font ten ellipsis" ng-click="course.goTo()">[[course.fullname]]</span>
                 <dots-menu class="cell right-magnet" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="(place == 'coursesToCome' || place == 'coursesToDo') && view == 'list'">
 
                     <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
@@ -73,7 +73,7 @@
                 </label>
                 <label class="size-font right-magnet" ng-if="place == 'coursesToCome' && course.startdate != null && view == 'list'">
                     <i18n>toBegin.at</i18n>
-                    <span class="date">[[ printDate(course,"begindate") ]]</span></br>
+                    <span class="date">[[ printDate(course,"begindate") ]]</span>
                 </label>
             </div>
             <div ng-if="place == 'coursesMine' || place == 'coursesShared' || (place=='coursesToDo' && view == 'icons')" class="ellipsis" ng-click="course.goTo()">
