@@ -187,7 +187,7 @@ export class Courses {
         try {
             let courses = await http.get(`/moodle/users/courses`);
             let allCourses = Mix.castArrayAs(Course, courses.data);
-            this.allCourses = allCourses;
+            this.allCourses = _.uniq(allCourses, 'courseid');
             _.each(this.allCourses,function(course) {
                 course.id = course.courseid;
                 course._id = course.courseid;
