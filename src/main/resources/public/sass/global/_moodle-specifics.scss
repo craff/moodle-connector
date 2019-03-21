@@ -150,6 +150,7 @@ body.moodle {
 
   .all-width {
     width: 100%;
+    margin-right: 12px;
   }
 
   .small-width {
@@ -232,6 +233,12 @@ body.moodle {
 
   dots-menu.opened .options {
     width: 125px;
+  }
+
+  .rightDotsMenu{
+    top: 5px;
+    position: absolute;
+    right: 13px;
   }
 
   .display{

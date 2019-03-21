@@ -356,7 +356,24 @@ public class MoodleController extends ControllerHelper {
                                                 @Override
                                                 public void handle(Void end) {
                                                     JsonArray object = new JsonArray(wsResponse);
-                                                    JsonArray coursArray = object.getJsonObject(0).getJsonArray("enrolments");
+                                                    JsonArray DuplicatesCours = object.getJsonObject(0).getJsonArray("enrolments");
+
+                                                    JsonArray coursArray = new JsonArray();
+                                                    for (Object course : DuplicatesCours) {
+                                                        boolean findDuplicates = false;
+                                                        for(int i = 0; i < coursArray.size(); i++){
+                                                            if (((JsonObject)course).getValue("courseid").toString().compareTo(coursArray.getJsonObject(i).getValue("courseid").toString()) == 0){
+                                                                findDuplicates = true;
+                                                                if(Integer.parseInt(((JsonObject)course).getValue("role").toString()) > Integer.parseInt(coursArray.getJsonObject(i).getValue("role").toString())){
+                                                                    coursArray.remove(i);
+                                                                    coursArray.add(course);
+                                                                }
+                                                            }
+                                                        }
+                                                        if(!findDuplicates){
+                                                            coursArray.add(course);
+                                                        }
+                                                    }
 
                                                     /*for(int i = 0; i < coursArray.size(); i++){
                                                         JsonObject cours = coursArray.getJsonObject(i);

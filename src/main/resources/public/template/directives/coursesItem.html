@@ -35,43 +35,43 @@
                 <i18n>toBegin.at</i18n>
                 <span class="date">[[ printDate(course,"begindate") ]]</span></br>
             </label>
-            <div>
-                <span class="text-font ten ellipsis" ng-click="course.goTo()">[[course.fullname]]</span>
-                <dots-menu class="cell right-magnet" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="(place == 'coursesToCome' || place == 'coursesToDo') && view == 'list'">
-
-                    <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
-                        <i class="eye-slash">
-                        </i>
-                        &nbsp;&nbsp;<i18n>course.mask</i18n>
-                    </opt>
-                    <opt ng-if="course.masked" ng-click="course.setPreferences('masked')">
-                        <div class="display">
-                            <i class="eye-open top-margin">
-                            </i>
-                            &nbsp;&nbsp;<i18n>course.demask</i18n>
-                        </div>
-                    </opt>
-                    <opt  ng-if="!course.favorites" ng-click="course.setPreferences('favorites')">
-                        <i class="favoris">
-                        </i>
-                        &nbsp;&nbsp;<i18n>course.favoris</i18n>
-                    </opt>
-                    <opt ng-if="course.favorites" ng-click="course.setPreferences('favorites')">
-                        <div class="display">
-                            <i class="defavoris top-margin">
-                            </i>
-                            &nbsp;&nbsp;<i18n>course.defavoris</i18n>
-                        </div>
-                    </opt>
-                </dots-menu>
+            <div class="ellipsis">
+                <span class="text-font" ng-click="course.goTo()">[[course.fullname]]</span>
             </div>
+            <dots-menu class="rightDotsMenu" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="(place == 'coursesToCome' || place == 'coursesToDo') && view == 'list'">
+
+                <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
+                    <i class="eye-slash">
+                    </i>
+                    &nbsp;&nbsp;<i18n>course.mask</i18n>
+                </opt>
+                <opt ng-if="course.masked" ng-click="course.setPreferences('masked')">
+                    <div class="display">
+                        <i class="eye-open top-margin">
+                        </i>
+                        &nbsp;&nbsp;<i18n>course.demask</i18n>
+                    </div>
+                </opt>
+                <opt  ng-if="!course.favorites" ng-click="course.setPreferences('favorites')">
+                    <i class="favoris">
+                    </i>
+                    &nbsp;&nbsp;<i18n>course.favoris</i18n>
+                </opt>
+                <opt ng-if="course.favorites" ng-click="course.setPreferences('favorites')">
+                    <div class="display">
+                        <i class="defavoris top-margin">
+                        </i>
+                        &nbsp;&nbsp;<i18n>course.defavoris</i18n>
+                    </div>
+                </opt>
+            </dots-menu>
             <div class="title-dashboard" ng-click="course.goTo()">
                 <span class="summary-list size-font" ng-if="place != 'coursesMine' && place != 'coursesRecent'">[[ printAuthor(course) ]]</span>
-                <label class="size-font right-magnet" ng-if="place == 'coursesToDo' && course.enddate != '0' && view == 'list'">
+                <label class="size-font right-magnet title-dashboard" ng-if="place == 'coursesToDo' && course.enddate != '0' && view == 'list'">
                     <i18n>toDo.before</i18n>
                     <span class="date">[[ printDate(course,"enddate") ]]</span>
                 </label>
-                <label class="size-font right-magnet" ng-if="place == 'coursesToCome' && course.startdate != null && view == 'list'">
+                <label class="size-font right-magnet title-dashboard" ng-if="place == 'coursesToCome' && course.startdate != null && view == 'list'">
                     <i18n>toBegin.at</i18n>
                     <span class="date">[[ printDate(course,"begindate") ]]</span>
                 </label>

@@ -569,8 +569,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * refresh after a Share
      */
 
+    $scope.OpenShareLightBox = () => {
+        template.open('ligthBoxContainer', 'courses/shareLightbox');
+        $scope.openLightbox = true;
+    }
+
     $scope.submitShareCourse = () => {
-        $scope.showInfoSharePanel = false;
-        $scope.initFolders();
+        $scope.myCourse = undefined;
+        $scope.resetSelect();
+        $scope.closePopUp();
+        $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
+        Utils.safeApply($scope);
     }
 }]);
