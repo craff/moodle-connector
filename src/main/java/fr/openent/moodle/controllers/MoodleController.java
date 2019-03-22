@@ -662,6 +662,8 @@ public class MoodleController extends ControllerHelper {
                             JsonObject shareInfosFuture = getShareInfosFuture.result();
                             JsonArray usersEnrolmentsFuture = getUsersEnrolementsFuture.result();
                             if (usersEnrolmentsFuture != null && !usersEnrolmentsFuture.isEmpty() && shareInfosFuture != null && !shareInfosFuture.isEmpty()) {
+                                if(shareInfosFuture.getJsonArray("actions").size() == 3)
+                                    shareInfosFuture.getJsonArray("actions").remove(1);
                                 JsonArray usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
                                 JsonArray groupEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups");
                                 JsonArray shareInfosUsers = shareInfosFuture.getJsonObject("users").getJsonArray("visibles");
