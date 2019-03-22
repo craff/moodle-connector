@@ -251,14 +251,14 @@ export class Courses {
         }
     }*/
 
-    isTheFirst(course : Course){
-        if(this.coursesToDo.indexOf(course) == 0)
+    isTheFirst(courseFirst : Course, id : string){
+        if(this.coursesToShow(id,"coursesToDo").indexOf(courseFirst) == 0)
             return true;
         else
             return false;
     }
 
-    coursesToShow(id : string, place:string){
+    coursesToShow(id : string, place : string){
         if(place == "coursesToDo"){
             this.showCourses = this.coursesToDo;
         }else if (place == "coursesToCome"){

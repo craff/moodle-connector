@@ -40,18 +40,19 @@
         </div>
         <div class="row center-courses">
             <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin"
-            ng-class="{'undefined-image-small-toDo-width cell' : !(courses.isTheFirst(course)) && viewModeToDo == 'icons', 'defined-image-small-toDo-width cell' : courses.isTheFirst(course) && viewModeToDo == 'icons',
-            'all-width cell' : viewModeToDo == 'list', 'right-course-margin' : viewModeToDo == 'icons'}">
-                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course)"></courses-item>
+            ng-class="{'defined-image-small-toDo-width cell' : courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
+             'right-course-margin' : viewModeToDo == 'icons'}">
+                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course,typeShow.selectedToDoOption.id)"></courses-item>
             </div>
         </div>
         <div class="row next-previous-courses">
+
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button ng-class="{specialDisable : firstCoursesToDo == 0}" class="" ng-click="previousCoursesToDoButton()" ng-disabled="firstCoursesToDo == 0">
+                    <button ng-if="!(firstCoursesToDo == 0)" class="pagination-button" ng-click="previousCoursesToDoButton()" >
                         <i class="left-open"></i>
                     </button>
-                    <button ng-class="{specialDisable : lastCoursesToDo >= courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').length}" ng-click="nextCoursesToDoButton()" ng-disabled="lastCoursesToDo >= courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').length">
+                    <button ng-if="!(lastCoursesToDo >= courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').length)" class="pagination-button" ng-click="nextCoursesToDoButton()">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -90,10 +91,10 @@
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button  ng-class="{specialDisable : firstCoursesToCome == 0}" ng-click="previousCoursesToComeButton()" ng-disabled="firstCoursesToCome == 0">
+                    <button  ng-if=" !(firstCoursesToCome == 0)" class="pagination-button" ng-click="previousCoursesToComeButton()">
                         <i class="left-open"></i>
                     </button>
-                    <button ng-class="{specialDisable : lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome').length}" ng-click="nextCoursesToComeButton()" ng-disabled="lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome').length">
+                    <button ng-if=" !(lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome').length)" class="pagination-button" ng-click="nextCoursesToComeButton()">
                         <i class="open-right"></i>
                     </button>
                 </li>
