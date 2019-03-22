@@ -668,13 +668,18 @@ public class MoodleController extends ControllerHelper {
                                 JsonArray shareInfosGroups = shareInfosFuture.getJsonObject("groups").getJsonArray("visibles");
                                 List<String> usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
                                 List<String> usersshareInfosId = shareInfosUsers.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
+                                while(usersEnroledId.contains(user.getUserId())){
+                                    usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(usersEnroledId.indexOf(user.getUserId()));
+                                    usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+                                    usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
+                                }
 
                                 if(groupEnroled.size() > 0){
                                     List<String> groupsEnroledId = groupEnroled.stream().map(obj -> ((JsonObject)obj).getString("idnumber") ).collect(Collectors.toList());
                                     List<String> groupsshareInfosId = shareInfosGroups.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
                                     for (String groupId: groupsEnroledId) {
                                         if(!(groupsshareInfosId.contains(groupId))){
-                                            JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(usersEnroledId.indexOf(groupId));
+                                            JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(groupsEnroledId.indexOf(groupId));
                                             String id = jsonobjctToAdd.getString("idnumber");
                                             jsonobjctToAdd.remove("idnumber");
                                             jsonobjctToAdd.put("id", id);
@@ -683,16 +688,13 @@ public class MoodleController extends ControllerHelper {
                                             shareInfosFuture.getJsonObject("groups").getJsonArray("visibles").add(jsonobjctToAdd);
                                         }
                                     }
-                                    JsonObject objctToAdd = new JsonObject();
-                                    String[] tabToAdd = new String[] {"fr-openent-moodle-controllers-MoodleController|read","fr-openent-moodle-controllers-MoodleController|contrib",
-                                            "fr-openent-moodle-controllers-MoodleController|shareSubmit"};
 
                                     for (Object group : groupEnroled) {
+                                        JsonArray tabToAdd = new JsonArray().add("fr-openent-moodle-controllers-MoodleController|read").add("fr-openent-moodle-controllers-MoodleController|contrib").add("fr-openent-moodle-controllers-MoodleController|shareSubmit");
                                         if(((JsonObject)group).getInteger("role") == student){
-                                            tabToAdd = Arrays.copyOf(tabToAdd, 2);
+                                            tabToAdd.remove(2);
                                         }
-                                        objctToAdd.put(((JsonObject) group).getString("id"),tabToAdd);
-                                        shareInfosFuture.getJsonObject("groups").getJsonArray("checked").add(objctToAdd);
+                                        shareInfosFuture.getJsonObject("groups").getJsonObject("checked").put(((JsonObject) group).getString("id"),tabToAdd);
                                     }
                                 }
 
@@ -717,8 +719,8 @@ public class MoodleController extends ControllerHelper {
                                     }
                                 }
 
-                                JsonArray tabToAdd = new JsonArray().add("fr-openent-moodle-controllers-MoodleController|read").add("fr-openent-moodle-controllers-MoodleController|contrib").add("fr-openent-moodle-controllers-MoodleController|shareSubmit");
                                 for (Object userEnroled : usersEnroled) {
+                                    JsonArray tabToAdd = new JsonArray().add("fr-openent-moodle-controllers-MoodleController|read").add("fr-openent-moodle-controllers-MoodleController|contrib").add("fr-openent-moodle-controllers-MoodleController|shareSubmit");
                                     if(((JsonObject)userEnroled).getInteger("role") == student){
                                         tabToAdd.remove(2);
                                     }
