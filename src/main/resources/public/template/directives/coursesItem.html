@@ -81,7 +81,6 @@
             </div>
         </div>
         <label class="size-font" ng-if="place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'" ng-click="course.goTo()">
-            <i18n>modified.on</i18n>:
             <span class="date">[[ printDate(course, "modified" ) ]]</span>
         </label>
         <label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'">

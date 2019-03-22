@@ -23,9 +23,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     });
 
     $scope.switchTab = function (current: string) {
+        $scope.toasterShow = false;
         $scope.currentTab = current;
         $scope.resetSelect();
-        $scope.toasterShow = false;
         if ($scope.currentTab == 'courses') {
             $scope.initCoursesTab();
         } else if ($scope.currentTab == 'dashboard') {
@@ -79,6 +79,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.initController = async function () {
+        $scope.toasterShow = false;
         $scope.courses = new Courses();
         $scope.currentTab = 'dashboard';
         $scope.lightboxes = {};
@@ -89,7 +90,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.printcours = true;
         $scope.printfolders = true;
         $scope.folders = new Folders();
-        $scope.toasterShow = false;
         $scope.openLightbox = false;
         $scope.searchbar = {};
         $scope.openLightboxFolder = false;
@@ -508,7 +508,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.printRightFormatDate = function (course: Course, spec: string) {
         let format = "DD/MM/YYYY";
         if (spec == "modified") {
-            return moment(course.timemodified.toString() + "000", "x").format(format);
+            if(course.timemodified.toString() == course.date.toString())
+                return "Créé le : " + moment(course.timemodified.toString() + "000", "x").format(format);
+            else
+                return "Modifié le : " + moment(course.timemodified.toString() + "000", "x").format(format);
         } else if (spec == "enddate") {
             return moment(course.enddate + "000", "x").format(format);
         } else if (spec == "begindate") {
@@ -563,6 +566,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                     $scope.imgCompatibleMoodle = $scope.course.infoImg.compatibleMoodle
                 , 1000)
         }
+        Utils.safeApply($scope);
     };
 
     /**

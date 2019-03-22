@@ -28,7 +28,7 @@
     <div class="row horizontal-spacing">
         <span class="row label-input-row"><i18n>moodle.course.image</i18n></span>
         <image-select class="three cell" default="/img/illustrations/image-default.svg" ng-change="getTypeImage()"
-                      ng-model="course.imageurl"/>
+                      ng-model="course.imageurl" on-close=""/>
     </div>
 <p ng-if="imgCompatibleMoodle">
     <i18n class="textError">moodle.course.error.type</i18n>

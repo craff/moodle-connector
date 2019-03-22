@@ -1,6 +1,10 @@
 body.moodle {
   @import 'specifics/atomic';
 
+  header.main{
+    z-index: 999;
+  }
+
   .filter-course {
     width: 97%;
 
