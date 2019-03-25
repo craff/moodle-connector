@@ -699,7 +699,6 @@ public class MoodleController extends ControllerHelper {
                                         shareInfosFuture.getJsonObject("groups").getJsonObject("checked").put(((JsonObject) group).getString("id"),tabToAdd);
                                     }
                                 }
-
                                 for (String userId: usersEnroledId) {
                                     if(!(usersshareInfosId.contains(userId))){
                                         JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").getJsonObject(usersEnroledId.indexOf(userId)).copy();
@@ -788,29 +787,47 @@ public class MoodleController extends ControllerHelper {
                                     }
                                 }
                             } else if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() == 1) {
-                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 3) {
+                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
                                     keyShare.put(usersIds.getString(0), editingteacher);
                                 }
-                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
+                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 1) {
                                     keyShare.put(usersIds.getString(0), student);
                                 }
                             }
                             if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() > 1) {
                                 for (Map.Entry<String, Object> mapShareGroups : idGroups.entrySet()) {
                                     IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
-                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 3) {
+                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
                                         keyShare.put(mapShareGroups.getKey(), editingteacher);
                                     }
-                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
+                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 1) {
                                         keyShare.put(mapShareGroups.getKey(), student);
                                     }
                                 }
                             } else if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() == 1) {
-                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 3) {
+                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 2) {
                                     keyShare.put(groupsIds.getString(0), editingteacher);
                                 }
-                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 2) {
+                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 1) {
                                     keyShare.put(groupsIds.getString(0), student);
+                                }
+                            }
+                            if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() > 1) {
+                                for (Map.Entry<String, Object> mapShareBookmarks : idBookmarks.entrySet()) {
+                                    IdFront.put(mapShareBookmarks.getKey(), mapShareBookmarks.getValue());
+                                    if (IdFront.getJsonArray(mapShareBookmarks.getKey()).size() == 2) {
+                                        keyShare.put(mapShareBookmarks.getKey(), editingteacher);
+                                    }
+                                    if (IdFront.getJsonArray(mapShareBookmarks.getKey()).size() == 1) {
+                                        keyShare.put(mapShareBookmarks.getKey(), student);
+                                    }
+                                }
+                            } else if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() == 1) {
+                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 2) {
+                                    keyShare.put(bookmarksIds.getString(0), editingteacher);
+                                }
+                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 1) {
+                                    keyShare.put(bookmarksIds.getString(0), student);
                                 }
                             }
                             final Map<String, Object> mapInfo = keyShare.getMap();

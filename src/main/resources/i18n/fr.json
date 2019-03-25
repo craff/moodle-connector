@@ -62,6 +62,7 @@
 	"moodle.folder.placeholder": "Nom du dossier",
     "moodle.toaster.rename": "renommer",
     "moodle.folder.name.long": "Titre du dossier",
+	"moodle.folder.destination": "Dossier de destination de l'activité",
 	"moodle.toaster.property": "Proprietes",
 	"moodle.toaster.duplicate": "Dupliquer",
 	"moodle.toaster.move": "Déplacer",
@@ -118,8 +119,8 @@
 	"toBegin.at": "À PARTIR DU ",
 
 	"course.mask": "Masquer",
-	"course.demask": "Ne plus<br/>masquer",
-	"course.favoris": "Favoris",
-	"course.defavoris": "Enlever de<br/>mes favoris"
+	"course.unMask": "Ne plus<br/>masquer",
+	"course.favorite": "Favoris",
+	"course.unFavorite": "Enlever de<br/>mes favoris"
 
 }

@@ -22,7 +22,8 @@
     'NoImageMine' : place=='coursesMine', 'NoImageShared' : place=='coursesShared', 'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons'}"
          ng-show="course.imageurl === null || course.imageurl === undefined || course.imageurl === '-' "/>
 </div>
-<div  ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' &&  !first && view == 'icons',
+
+<div ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' &&  !first && view == 'icons',
                   'small-eleven cell' : place == 'coursesToDo' && first  && view == 'icons',
                   'specific-small-toCome-width cell' : place == 'coursesToCome' && view == 'icons'}">
     <div ng-class="{ 'right-align' : (place == 'coursesToDo' || place == 'coursesToCome') && view == 'icons',
@@ -49,19 +50,19 @@
                     <div class="display">
                         <i class="eye-open top-margin">
                         </i>
-                        &nbsp;&nbsp;<i18n>course.demask</i18n>
+                        &nbsp;&nbsp;<i18n>course.unMask</i18n>
                     </div>
                 </opt>
                 <opt  ng-if="!course.favorites" ng-click="course.setPreferences('favorites')">
-                    <i class="favoris">
+                    <i class="favorite">
                     </i>
-                    &nbsp;&nbsp;<i18n>course.favoris</i18n>
+                    &nbsp;&nbsp;<i18n>course.favorite</i18n>
                 </opt>
                 <opt ng-if="course.favorites" ng-click="course.setPreferences('favorites')">
                     <div class="display">
-                        <i class="defavoris top-margin">
+                        <i class="unFavorite top-margin">
                         </i>
-                        &nbsp;&nbsp;<i18n>course.defavoris</i18n>
+                        &nbsp;&nbsp;<i18n>course.unFavorite</i18n>
                     </div>
                 </opt>
             </dots-menu>
@@ -101,7 +102,6 @@
                           max="100" filled="course.progress.slice(0,course.progress.length-1)" unit="%" ng-if="place == 'coursesToDo'" ng-click="course.goTo()">
             </progress-bar>
             <dots-menu class="cell right-magnet" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
-
                 <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
                     <i class="eye-slash">
                     </i>
@@ -111,23 +111,22 @@
                     <div class="display">
                         <i class="eye-open top-margin">
                         </i>
-                        &nbsp;&nbsp;<i18n>course.demask</i18n>
+                        &nbsp;&nbsp;<i18n>course.unMask</i18n>
                     </div>
                 </opt>
                 <opt  ng-if="!course.favorites" ng-click="course.setPreferences('favorites')">
-                    <i class="favoris">
+                    <i class="favorite">
                     </i>
-                    &nbsp;&nbsp;<i18n>course.favoris</i18n>
+                    &nbsp;&nbsp;<i18n>course.favorite</i18n>
                 </opt>
                 <opt ng-if="course.favorites" ng-click="course.setPreferences('favorites')">
                     <div class="display">
-                        <i class="defavoris top-margin">
+                        <i class="unFavorite top-margin">
                         </i>
-                        &nbsp;&nbsp;<i18n>course.defavoris</i18n>
+                        &nbsp;&nbsp;<i18n>course.unFavorite</i18n>
                     </div>
                 </opt>
             </dots-menu>
-
         </div>
     </div>
 </div>
