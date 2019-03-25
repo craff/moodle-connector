@@ -812,24 +812,6 @@ public class MoodleController extends ControllerHelper {
                                     keyShare.put(groupsIds.getString(0), student);
                                 }
                             }
-                            if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() > 1) {
-                                for (Map.Entry<String, Object> mapShareBookmarks : idBookmarks.entrySet()) {
-                                    IdFront.put(mapShareBookmarks.getKey(), mapShareBookmarks.getValue());
-                                    if (IdFront.getJsonArray(mapShareBookmarks.getKey()).size() == 2) {
-                                        keyShare.put(mapShareBookmarks.getKey(), editingteacher);
-                                    }
-                                    if (IdFront.getJsonArray(mapShareBookmarks.getKey()).size() == 1) {
-                                        keyShare.put(mapShareBookmarks.getKey(), student);
-                                    }
-                                }
-                            } else if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() == 1) {
-                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(bookmarksIds.getString(0), editingteacher);
-                                }
-                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 1) {
-                                    keyShare.put(bookmarksIds.getString(0), student);
-                                }
-                            }
                             final Map<String, Object> mapInfo = keyShare.getMap();
                             mapInfo.put(user.getUserId(), editingteacher);
                             share.put("courseid", request.params().entries().get(0).getValue());
