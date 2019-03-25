@@ -778,10 +778,10 @@ public class MoodleController extends ControllerHelper {
                             if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() > 1) {
                                 for (Map.Entry<String, Object> mapShareUsers : idUsers.entrySet()) {
                                     IdFront.put(mapShareUsers.getKey(), mapShareUsers.getValue());
-                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 3) {
+                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 2) {
                                         keyShare.put(mapShareUsers.getKey(), editingteacher);
                                     }
-                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 2) {
+                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 1) {
                                         keyShare.put(mapShareUsers.getKey(), student);
                                         Map<String, Object> mapInfo = keyShare.getMap();
                                     }
