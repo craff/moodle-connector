@@ -12,6 +12,7 @@ export interface Folder {
     nbItems: number;
     subFolders : Folder[];
     printsubfolder : boolean;
+    printTargetsubfolder: boolean;
     select: boolean;
     selectConfirm: boolean;
 }
@@ -23,6 +24,7 @@ export class Folder {
         this.select = false;
         this.parent_id = 0;
         this.selectConfirm=false;
+        printTargetsubfolder=false;
     }
     toJson() {
         return {
@@ -57,8 +59,18 @@ export class Folders {
     folderIdMoveIn: string;
     all: Folder[];
     isSynchronized: Boolean;
+    selectedFolders: number[];
+    listSelectedFolders: Folder[];
+    toJSON() {
+        return {
+            selectedFolders : this.selectedFolders,
+        }
+    }
+
     constructor() {
         this.all = [];
+        this.selectedFolders = [];
+        this.listSelectedFolders = [];
         this.isSynchronized = false;
     }
     toJsonForMove(){
@@ -116,4 +128,13 @@ export class Folders {
         }
         return [];
     }
+
+    async moveFolders (targetFolderId:number) {
+        try {
+            await http.put(`/moodle/folders/move/${targetFolderId}`, this.toJSON());
+        } catch (e) {
+            throw e;
+        }
+    }
+
 }

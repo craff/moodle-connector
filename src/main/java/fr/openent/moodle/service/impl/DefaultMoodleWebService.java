@@ -8,6 +8,8 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
@@ -15,8 +17,23 @@ import org.entcore.common.sql.SqlResult;
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMoodleWebService.class);
+
     public DefaultMoodleWebService(String schema, String table) {
         super(schema, table);
+    }
+
+    @Override
+    public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
+        JsonArray values = new JsonArray();
+        values.add(folder.getValue("userId"));
+        values.add(folder.getValue("structureId"));
+        values.add(folder.getValue("name"));
+        values.add(folder.getValue("parentId"));
+
+        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
+                    " VALUES (?, ?, ?, ?)";
+            sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
@@ -34,35 +51,22 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void moveFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler) {
+    public void moveFolder(final JsonObject folder, final long id_targetFolder, final Handler<Either<String, JsonObject>> handler){
         JsonArray values = new JsonArray();
-        JsonArray folders = folder.getJsonArray("foldersId");
-        values.add(folder.getValue("parentId"));
+        JsonArray folders = folder.getJsonArray("selectedFolders");
+        values.add(id_targetFolder);
 
-        for (int i = 0; i < folders.size(); i++) {
+        for (int i = 0;i<folders.size();i++){
             values.add(folders.getValue(i));
         }
 
-        String moveFolder = "UPDATE " + Moodle.moodleSchema + ".folder" + " SET parent_id = ? WHERE id IN " + Sql.listPrepared(folders.getList());
+        String moveFolder = "UPDATE " + Moodle.moodleSchema + ".folder SET parent_id = ? WHERE id IN " + Sql.listPrepared(folders.getList());
 
-        sql.prepared(moveFolder, values, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(moveFolder,values , SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
-    public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler) {
-        JsonArray values = new JsonArray();
-        values.add(folder.getValue("parentId"));
-        values.add(folder.getValue("userId"));
-        values.add(folder.getValue("structureId"));
-        values.add(folder.getValue("name"));
-
-        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(parent_id, user_id, structure_id, name)" +
-                " VALUES (?, ?, ?, ?)";
-        sql.prepared(createFolder, values, SqlResult.validUniqueResultHandler(handler));
-    }
-
-    @Override
-    public void createCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
+    public void createCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
         String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id, folder_id, user_id)" +
                 " VALUES (?, ?, ?) RETURNING moodle_id as id";
 

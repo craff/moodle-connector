@@ -42,7 +42,7 @@
 	"from": "De",
 	"date": "Date",
 	"cancel": "Annuler",
-	"validate": "valider",
+	"validate": "Valider",
 	"create": "Créer",
 	"move": "Déplacer",
 	"share.search.title": "Rechercher des utilisateurs et des groupes",
@@ -61,7 +61,6 @@
 	"moodle.folder.title": "Moodle - Créer un dossier",
 	"moodle.folder.placeholder": "Nom du dossier",
     "moodle.toaster.rename": "renommer",
-    "moodle.folder.name.long": "Titre du dossier",
 	"moodle.folder.destination": "Dossier de destination de l'activité",
 	"moodle.toaster.property": "Proprietes",
 	"moodle.toaster.duplicate": "Dupliquer",
@@ -75,11 +74,14 @@
 	"moodle.toaster.folderSelected": "Déplacer le dossier",
 	"moodle.toaster.folderDirection": "dans le dossier cible",
 	"moodle.course.new": "Créer un cours",
+	"moodle.folder.information": "Créer un dossier",
 	"moodle.course.delete": "Supprimer un cours",
 	"moodle.folder.delete": "Supprimer un dossier",
-	"moodle.folder.information": "Créer un dossier",
+	"delete": "Supprimer",
 	"moodle.course.information": "Que voulez-vous créer ?",
 	"moodle.course.name.long" : "Titre",
+	"moodle.folder.name.long" : "Nom du dossier",
+	"moodle.course.name.short" : "Titre court",
 	"moodle.course.description" : "Descriptif",
 	"moodle.course.author" : "Auteur",
 	"moodle.course.image": "Image",
@@ -123,4 +125,10 @@
 	"course.favorite": "Favoris",
 	"course.unFavorite": "Enlever de<br/>mes favoris"
 
+	"moodle.toaster.properties": "Propriétés",
+	"moodle.toaster.copy": "Copier",
+	"moodle.toaster.text.title.move": "Déplacer la sélection ",
+    "moodle.toaster.text.name.move": "Déplacer le dossier ",
+	"moodle.toaster.text.name.moves": "Déplacer les dossiers ",
+    "moodle.toaster.text.target.move": " dans le dossier cible : "
 }

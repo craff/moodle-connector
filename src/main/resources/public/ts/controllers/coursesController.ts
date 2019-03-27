@@ -2,6 +2,7 @@ import {_, model, moment, ng, template} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
+import http from "axios";
 
 export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', '$rootScope', ($scope, $timeout, route, $rootScope) => {
 
@@ -187,23 +188,86 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
-    $scope.isPrintSubFolder = function (folder: Folder) {
+    $scope.isPrintSubFolder= function(folder:Folder){
+       $scope.folders.all.forEach(function (e) {
+           if(e.id==folder.id){
+               e.printsubfolder=!e.printsubfolder;
+               folder.printsubfolder=e.printsubfolder;
+           }
+       });
+
+       if(folder.printsubfolder){
+            $scope.currentfolderid=folder.id;
+            $scope.printcours=true;
+           $scope.printCouresbySubFolder(folder.id);
+       }else{
+           $scope.currentfolderid=folder.parent_id;
+           $scope.printCouresbySubFolder($scope.currentfolderid);
+       }
+       $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
+
+    };
+
+    $scope.targetFolder = undefined;
+
+    $scope.isPrintTargetSubFolder= function(folder:Folder){
+        $scope.targetFolder=folder.id;
         $scope.folders.all.forEach(function (e) {
-            if (e.id == folder.id) {
-                e.printsubfolder = !e.printsubfolder;
-                folder.printsubfolder = e.printsubfolder;
+            if(e.id==folder.id){
+                e.printTargetsubfolder=!e.printTargetsubfolder;
+                folder.printTargetsubfolder=e.printTargetsubfolder;
             }
         });
+        $scope.setprintTargetsubfolderValuebyFolder(folder, folder.printTargetsubfolder);
+    };
 
-        if (folder.printsubfolder) {
-            $scope.currentfolderid = folder.id;
-            $scope.printcours = true;
-            $scope.printCouresbySubFolder(folder.id);
-        } else {
-            (folder.parent_id != folder.id) ? $scope.currentfolderid = folder.parent_id : $scope.currentfolderid = 0;
-            $scope.printCouresbySubFolder($scope.currentfolderid);
+    $scope.targetMenu = function(){
+        $scope.targetFolder= 0;
+        $scope.folders.all.forEach(function (e) {
+             e.printTargetsubfolder=false;
+        });
+    };
+
+    $scope.isSelectRoot = function(){
+        $scope.targetFolder = 0;
+    };
+
+    $scope.setprintTargetsubfolderValuebyFolder = function (folder:Folder, printTargetsubfolder:boolean){
+        $scope.folders.all.forEach(function (e) {
+            e.printTargetsubfolder=false;
+        });
+        folder.printTargetsubfolder=printTargetsubfolder;
+        $scope.parent= folder.parent_id;
+        while ($scope.parent != 0){
+            $scope.folders.all.forEach(function (e) {
+                if(e.id == $scope.parent) {
+                    e.printTargetsubfolder = true;
+                    $scope.parent = e.parent_id;
+                }
+            });
         }
-        $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
+        Utils.safeApply($scope);
+    };
+
+    $scope.setInitialprintsubfolderValuebyFolder = function (targetFolder:number){
+        $scope.folders.all.forEach(function (e) {
+            e.printsubfolder=false;
+        });
+
+        $scope.folders.all.forEach(function (e) {
+            if(e.id === targetFolder)
+            e.printsubfolder=true;
+            $scope.parent= e.parent_id;
+        });
+        while ($scope.parent != 0){
+            $scope.folders.all.forEach(function (e) {
+                if(e.id === $scope.parent) {
+                    e.printsubfolder = true;
+                    $scope.parent = e.parent_id;
+                }
+            });
+        }
+        Utils.safeApply($scope);
     };
 
     $scope.printCouresbySubFolder = function (idfolder: number) {
@@ -221,11 +285,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         //await $scope.courses.getCoursesbyFolder(idfolder);
         Utils.safeApply($scope);
     };
-
-    /*$scope.initAllCouresbyuser = async function(){
-        await $scope.courses.getCoursesAndSheredbyFolder();
-        Utils.safeApply($scope);
-    };*/
+    $scope.initAllCouresbyuser = async function(){
+        Promise.all([
+            await $scope.courses.getCoursesAndSheredbyFolder()
+        ]).then(()=>{Utils.safeApply($scope)});
+    };
 
     $scope.initFolders = async function () {
         $scope.folders = new Folders();
@@ -236,6 +300,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
+
     $scope.getFolderParent = function (): Folder[] {
         return $scope.folders.getparentFolder();
     };
@@ -243,11 +308,28 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         return $scope.folders.getSubFolder(folder.id);
     };
 
-    $scope.countItems = async function (folder: Folder) {
-        if (folder) {
-            await folder.countItemsModel();
-        }
+    $scope.countItems =async function (folder:Folder){
+        await folder.countitems();
+        Utils.safeApply($scope);
     };
+    $scope.switchTab= function(current: string){
+        $scope.currentTab=current;
+        if($scope.currentTab=='courses'){
+            template.open('main', 'page-courses');
+        }else if($scope.currentTab=='dashboard'){
+            template.open('main', 'main');
+        }else{
+            template.open('main', 'page-library');
+        }
+        Utils.safeApply($scope);
+    };
+	route({
+        view: function(params){
+		    template.open('main', 'main');
+            Utils.safeApply($scope);
+
+		}
+    });
 
     /**
      * Open creation course lightbox
@@ -430,9 +512,17 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.openLightbox = true;
     };
 
-    $scope.foldersMove = async function () {
-        await $scope.folders.moveFolders();
+    $scope.closePopUpMoveFolder = function () {
+        $scope.targetFolder = undefined;
+        $scope.openLightbox = false;
+    };
+
+    $scope.moveFolder = async function() {
+        await $scope.folders.moveFolders($scope.targetFolder);
         $scope.initFolders();
+        $scope.setInitialprintsubfolderValuebyFolder($scope.targetFolder);
+        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = false);
+        $scope.targetFolder = undefined;
         $scope.openLightbox = false;
     };
 
