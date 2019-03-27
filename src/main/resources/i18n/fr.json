@@ -111,7 +111,7 @@
 	"moodle.lightBox.duplicate.submit": "Envoyer la demande",
 	"moodle.lightBox.duplicate.content": "Demande de duplication pour la sélection :",
 	"moodle.lightBox.duplicate.question": "Combien de duplications souhaitez-vous ?",
-	"moodle.lightBox.duplicate.informations": "Votre demande de duplication sera disponible dans l'onglet \"Mes demandes\".<br/>Une fois la duplication réalisée, le cours sera disponible dans le dossier du cours d'origine.",
+	"moodle.lightBox.duplicate.informations": "Il se peut que la duplication de votre cours prenne du temps.</br>La copie en attente sera visible, grisée, dans le dossier actuel. Elle apparaîtra en couleur une fois la duplication terminée.",
 	"moodle.lightBox.duplicate.example": "Ex. : 2",
 
 	"moodle.all.courses": "Tout",

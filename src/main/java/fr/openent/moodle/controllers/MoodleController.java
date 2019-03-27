@@ -961,13 +961,13 @@ public class MoodleController extends ControllerHelper {
                                                 if (event.isRight()) {
                                                     log.error("Test");
                                                 } else {
-
+                                                    handle(new Either.Left<>("Failed to duplicate the course with the duplicate WS"));
                                                 }
                                             }
                                         });
                                     }
                                 } else {
-
+                                    handle(new Either.Left<>("Failed to insert in database"));
                                 }
                             }
                         });
