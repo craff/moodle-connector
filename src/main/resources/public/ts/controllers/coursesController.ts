@@ -407,13 +407,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
     $scope.duplicateElements = async function () {
         $scope.disableDuplicateSend = false;
-        /*if ($scope.folders.all.some(folder => folder.selectConfirm)) {
+        if ($scope.folders.all.some(folder => folder.selectConfirm)) {
             await $scope.folders.foldersDelete();
         }
         if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
-            await $scope.courses.coursesDelete();
+            await $scope.courses.coursesDuplicate();
             await $scope.courses.getCoursesbyUser(model.me.userId);
-        }*/
+        }
         $scope.openLightbox = false;
         $scope.successDuplicate = true;
         $timeout(() =>
@@ -576,7 +576,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.OpenShareLightBox = () => {
         template.open('ligthBoxContainer', 'courses/shareLightbox');
         $scope.openLightbox = true;
-    }
+    };
 
     $scope.submitShareCourse = () => {
         $scope.myCourse = undefined;

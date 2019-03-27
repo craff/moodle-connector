@@ -20,6 +20,7 @@ public class Moodle extends BaseServer {
 	public static String WS_GET_USERCOURSES = "local_entcgi_services_usercourses";
 	public static String WS_CREATE_SHARECOURSE = "local_entcgi_services_shareenrolment";
 	public static String WS_GET_SHARECOURSE = "local_entcgi_services_getcourseenrolment";
+	public static String WS_POST_DUPLICATECOURSE = "local_entcgi_services_duplicatecourse";
 	public static String JSON = "json";
 
 	public static Integer manager = 1;

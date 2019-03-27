@@ -55,16 +55,6 @@ export class Course implements Shareable{
         }
     }
 
-    /*
-        async share() {
-            try {
-                await http.put(`/moodle/share/resource/${this.courseid}`, this.toJson());
-            } catch (e) {
-                notify.error("Share function didn't work");
-                throw e;
-            }
-        }
-    */
     async setInfoImg() {
         const typesImgNoSend = ["image/png", "image/jpg", "image/jpeg", "image/gif"];
         try {
@@ -153,6 +143,21 @@ export class Courses {
         this.isSynchronized = false;
         this.getChoice();
     }
+    toJsonForDuplicate(){
+        return {
+            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
+            foldersId: this.allbyfolder.filter(course => course.selectConfirm).map(folder => folder.folderid ),
+        }
+    }
+    async coursesDuplicate() {
+        try {
+            await http.delete('/moodle/course/duplicate', { data: this.toJsonForDuplicate() } );
+        } catch (e) {
+            notify.error("Duplicate function didn't work");
+            throw e;
+        }
+    }
+
     toJsonForDelete(){
         return {
             coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),

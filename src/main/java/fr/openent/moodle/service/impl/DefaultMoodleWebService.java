@@ -253,5 +253,17 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
     }
 
+    @Override
+    public void insertDuplicateTable (JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler) {
+        String query = "INSERT INTO " + Moodle.moodleSchema + ".duplication (id_course, id_folder, id_users, status)" +
+                " VALUES (?, ?, ?, ?)";
 
+        JsonArray values = new JsonArray();
+        values.add(courseToDuplicate.getInteger("courseid"));
+        values.add(courseToDuplicate.getInteger("folderid"));
+        values.add(courseToDuplicate.getString("userId"));
+        values.add(courseToDuplicate.getString("status"));
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
 }

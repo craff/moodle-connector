@@ -2,17 +2,17 @@ package fr.openent.moodle.service;
 
 import io.vertx.core.Handler;
 import fr.wseduc.webutils.Either;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 public interface MoodleEventBus {
 
     /**
-     * Create a course
-     * @param action User Id
+     * Get email to create a course
+     * @param action Method call
      * @param handler function handler returning data
      */
-
-    void getParams (JsonObject action, Handler<Either<String,JsonObject>> handler);
+    void getParams (JsonObject action, Handler<Either<String, JsonObject>> handler);
 
     /**
      * get image to bus

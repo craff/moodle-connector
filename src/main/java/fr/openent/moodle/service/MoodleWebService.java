@@ -137,4 +137,17 @@ public interface MoodleWebService{
      */
     void getSharedBookMark(String sharedBookMarkId, Handler<Either<String, JsonArray>> handler);
 
+    /**
+     * insert duplication table
+     * @param courseToDuplicate course to duplicate
+     * @param handler function handler returning data
+     */
+    void insertDuplicateTable (JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler);
+
+//    /**
+//     * update duplication table
+//     * @param updateCourseToDuplicate course to duplicate
+//     * @param handler function handler returning data
+//     */
+//    void updateDuplicateTable (JsonObject updateCourseToDuplicate, Handler<Either<String, JsonObject>> handler);
 }
