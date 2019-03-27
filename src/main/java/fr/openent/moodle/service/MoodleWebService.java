@@ -23,11 +23,13 @@ public interface MoodleWebService{
     void createFolder (JsonObject folder, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * Move a folder
-     * @param folder folder to move
+     * move a folder
+     * @param id_targetFolder
+     * @param folders folders to move
      * @param handler function handler returning data
      */
-    void moveFolder (JsonObject folder, Handler<Either<String, JsonObject>> handler);
+    void moveFolder(JsonObject folders, long id_targetFolder, Handler<Either<String, JsonObject>> handler);
+
 
     /**
      * Create a course

@@ -9,7 +9,6 @@ export interface Folder {
     user_id : string;
     name : string;
     structure_id : string;
-    nbItems: number;
     subFolders : Folder[];
     printsubfolder : boolean;
     printTargetsubfolder: boolean;
@@ -20,11 +19,10 @@ export interface Folder {
 export class Folder {
     constructor() {
         this.printsubfolder = false;
-        this.nbItems = 0;
         this.select = false;
         this.parent_id = 0;
         this.selectConfirm=false;
-        printTargetsubfolder=false;
+        this.printTargetsubfolder=false;
     }
     toJson() {
         return {
@@ -42,17 +40,6 @@ export class Folder {
             throw e;
         }
     }
-    async countItemsModel () {
-        try {
-            let countsfolders = await http.get(`/moodle/folder/countsFolders/${this.id}`);
-            let countscourses = await http.get(`/moodle/folder/countsCourses/${this.id}`);
-            if(countsfolders && countscourses){
-                this.nbItems=countsfolders.data.count+countscourses.data.count;
-            }
-        } catch (e) {
-            throw e;
-        }
-    }
 }
 
 export class Folders {
@@ -61,11 +48,6 @@ export class Folders {
     isSynchronized: Boolean;
     selectedFolders: number[];
     listSelectedFolders: Folder[];
-    toJSON() {
-        return {
-            selectedFolders : this.selectedFolders,
-        }
-    }
 
     constructor() {
         this.all = [];
@@ -73,20 +55,14 @@ export class Folders {
         this.listSelectedFolders = [];
         this.isSynchronized = false;
     }
+
     toJsonForMove(){
         return {
             parentId: parseInt(this.folderIdMoveIn, 10),
             foldersId: this.all.filter(folder => folder.select).map(folder => folder.id ),
         }
     }
-    async moveFolders() {
-        try {
-            await http.put('/moodle/folder/move', this.toJsonForMove());
-        } catch (e) {
-            notify.error("Move function didn't work");
-            throw e;
-        }
-    }
+
     toJsonForDelete(){
         return {
             foldersId: this.all.filter(folder => folder.selectConfirm).map(folder => folder.id ),
@@ -131,10 +107,9 @@ export class Folders {
 
     async moveFolders (targetFolderId:number) {
         try {
-            await http.put(`/moodle/folders/move/${targetFolderId}`, this.toJSON());
+            await http.put(`/moodle/folders/move/${targetFolderId}`, this.toJsonForMove());
         } catch (e) {
             throw e;
         }
     }
-
 }

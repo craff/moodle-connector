@@ -20,7 +20,7 @@ export class Course implements Shareable{
     timemodified : number;
     categoryid : number;
     folderid : number;
-    imageurl : string;
+    imageurl : string;cou
     type : string;
     typeA : string;
     select : boolean;
@@ -254,7 +254,7 @@ export class Courses {
         } catch (e) {
             throw e;
         }
-    }*/
+    }
 
     isTheFirst(courseFirst : Course, id : string){
         if(this.coursesToShow(id,"coursesToDo").indexOf(courseFirst) == 0)

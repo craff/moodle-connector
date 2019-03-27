@@ -286,16 +286,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
     $scope.initAllCouresbyuser = async function(){
-        Promise.all([
-            await $scope.courses.getCoursesAndSheredbyFolder()
-        ]).then(()=>{Utils.safeApply($scope)});
+            await $scope.courses.getCoursesAndSharedByFolder();
+            Utils.safeApply($scope);
     };
 
     $scope.initFolders = async function () {
         $scope.folders = new Folders();
         await $scope.folders.sync();
         $scope.resetSelect();
-        $scope.countItems();
         $scope.showToaster();
         Utils.safeApply($scope);
     };
@@ -308,21 +306,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         return $scope.folders.getSubFolder(folder.id);
     };
 
-    $scope.countItems =async function (folder:Folder){
-        await folder.countitems();
-        Utils.safeApply($scope);
-    };
-    $scope.switchTab= function(current: string){
-        $scope.currentTab=current;
-        if($scope.currentTab=='courses'){
-            template.open('main', 'page-courses');
-        }else if($scope.currentTab=='dashboard'){
-            template.open('main', 'main');
-        }else{
-            template.open('main', 'page-library');
-        }
-        Utils.safeApply($scope);
-    };
 	route({
         view: function(params){
 		    template.open('main', 'main');
@@ -505,20 +488,21 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     /**
-     * move folders
+     * move folders & courses
      * */
-    $scope.openPopUpFolderMove = function () {
+    $scope.openPopUpMove = function () {
         template.open('ligthBoxContainer', 'courses/moveElementLightbox');
         $scope.openLightbox = true;
     };
 
-    $scope.closePopUpMoveFolder = function () {
+    $scope.closePopUpMove = function () {
         $scope.targetFolder = undefined;
         $scope.openLightbox = false;
     };
 
-    $scope.moveFolder = async function() {
+    $scope.move = async function() {
         await $scope.folders.moveFolders($scope.targetFolder);
+        // await $scope.courses.moveCourses($scope.targetFolder);
         $scope.initFolders();
         $scope.setInitialprintsubfolderValuebyFolder($scope.targetFolder);
         $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = false);

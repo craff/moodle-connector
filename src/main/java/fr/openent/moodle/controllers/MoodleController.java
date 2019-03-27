@@ -34,7 +34,6 @@ import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
 import java.io.UnsupportedEncodingException;
-import java.lang.ref.ReferenceQueue;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -272,44 +271,6 @@ public class MoodleController extends ControllerHelper {
         } else {
             badRequest(request);
         }
-    }
-
-    @Get("/folder/countsFolders/:id")
-    @ApiDoc("Get count fodlers in course by id")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getCountsItemInFolder(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    long id_folder =Long.parseLong(request.params().get("id"));
-                    moodleWebService.countItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-                }
-                else {
-                    log.debug("User not found in session.");
-                    unauthorized(request);
-                }
-            }
-        });
-    }
-
-    @Get("/folder/countsCourses/:id")
-    @ApiDoc("Get count courses in folder by id")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getCountsItemCoursesInFolder(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    long id_folder =Long.parseLong(request.params().get("id"));
-                    moodleWebService.countCoursesItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-                }
-                else {
-                    log.debug("User not found in session.");
-                    unauthorized(request);
-                }
-            }
-        });
     }
 
     @Get("/folders")
