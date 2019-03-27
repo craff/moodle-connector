@@ -51,10 +51,10 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void moveFolder(final JsonObject folder, final long id_targetFolder, final Handler<Either<String, JsonObject>> handler){
+    public void moveFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
         JsonArray values = new JsonArray();
-        JsonArray folders = folder.getJsonArray("selectedFolders");
-        values.add(id_targetFolder);
+        JsonArray folders = folder.getJsonArray("foldersId");
+        values.add(folder.getValue("parentId"));
 
         for (int i = 0;i<folders.size();i++){
             values.add(folders.getValue(i));

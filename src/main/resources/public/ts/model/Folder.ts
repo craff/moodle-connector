@@ -107,7 +107,7 @@ export class Folders {
 
     async moveFolders (targetFolderId:number) {
         try {
-            await http.put(`/moodle/folders/move/${targetFolderId}`, this.toJsonForMove());
+            await http.put(`/moodle/folders/move`, this.toJsonForMove());
         } catch (e) {
             throw e;
         }

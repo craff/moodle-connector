@@ -84,7 +84,7 @@ public class MoodleController extends ControllerHelper {
 		renderView(request);
 	}
 
-    @Put("/folders/move/:targetId")
+    @Put("/folders/move")
     @ApiDoc("move a folder")
     //@SecuredAction("moodle.modify")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
@@ -96,8 +96,7 @@ public class MoodleController extends ControllerHelper {
                     @Override
                     public void handle(UserInfos user) {
                         if (user != null) {
-                            long id_targetFolder = Long.parseLong(request.params().get("targetId"));
-                            moodleWebService.moveFolder(folders, id_targetFolder, defaultResponseHandler(request));
+                            moodleWebService.moveFolder(folders, defaultResponseHandler(request));
                         } else {
                             log.debug("User not found in session.");
                             unauthorized(request);
@@ -348,6 +347,15 @@ public class MoodleController extends ControllerHelper {
                                                             mydata.add(cours);
                                                         }
                                                     }*/
+
+                                                    List<String> sqlCoursId = sqlCoursArray.stream().map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
+
+                                                    for(int i = 0; i < coursArray.size(); i++){
+                                                        if(sqlCoursId.contains(coursArray.getJsonObject(i).getValue("courseid").toString()))
+                                                            coursArray.getJsonObject(i).put("folderid",Integer.parseInt(sqlCoursArray.getJsonObject(sqlCoursId.indexOf(coursArray.getJsonObject(i).getValue("courseid").toString())).getValue("folder_id").toString()));
+                                                        else
+                                                            coursArray.getJsonObject(i).put("folderid",0);
+                                                    }
 
                                                     moodleWebService.getPreferences(user.getUserId(), new Handler<Either<String, JsonArray>>() {
                                                         @Override

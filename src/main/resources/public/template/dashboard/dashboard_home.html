@@ -1,19 +1,5 @@
 <div class="coursesBackground-dashboard">
     <div class="row">
-        <div>
-            <span class="left-magnet title-dashboard">
-                <i18n>moodle.create.courses.recent</i18n>
-            </span>
-            <switch ng-model="courses.printcourseslastcreation" ng-click="courses.setChoice(1)"></switch>
-        </div>
-        <div ng-if="courses.printcourseslastcreation" class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
-                <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
-            </div>
-        </div>
-    </div>
-    <br/>
-    <div class="row">
         <span class="left-magnet title-dashboard">
             <i18n>moodle.todo.courses</i18n>
         </span>
@@ -98,6 +84,20 @@
                         <i class="open-right"></i>
                     </button>
                 </li>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div>
+            <span class="left-magnet title-dashboard">
+                <i18n>moodle.create.courses.recent</i18n>
+            </span>
+            <switch ng-model="courses.printcourseslastcreation" ng-click="courses.setChoice(1)"></switch>
+        </div>
+        <div ng-if="courses.printcourseslastcreation" class="row">
+            <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
+                <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>
     </div>

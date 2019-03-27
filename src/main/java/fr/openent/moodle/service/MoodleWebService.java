@@ -24,11 +24,10 @@ public interface MoodleWebService{
 
     /**
      * move a folder
-     * @param id_targetFolder
      * @param folders folders to move
      * @param handler function handler returning data
      */
-    void moveFolder(JsonObject folders, long id_targetFolder, Handler<Either<String, JsonObject>> handler);
+    void moveFolder(JsonObject folders, Handler<Either<String, JsonObject>> handler);
 
 
     /**

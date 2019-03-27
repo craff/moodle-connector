@@ -288,6 +288,10 @@ export class Courses {
         }
     }
 
+    getCourseInFolder(courses : Course[], folder : number){
+        return _.filter(courses, function(cours){return cours.folderid == folder});
+    }
+
     async getChoice() {
         try {
             const {data} = await http.get('/moodle/choices');
