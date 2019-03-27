@@ -20,7 +20,7 @@ export class Course implements Shareable{
     timemodified : number;
     categoryid : number;
     folderid : number;
-    imageurl : string;cou
+    imageurl : string;
     type : string;
     typeA : string;
     select : boolean;
@@ -131,6 +131,7 @@ export class Courses {
     coursesToDo : Course[];
     coursesToCome : Course[];
     showCourses : Course[];
+    folderid : number;
 
     constructor() {
         this.allbyfolder = [];
@@ -142,25 +143,13 @@ export class Courses {
         this.showCourses = [];
         this.isSynchronized = false;
         this.getChoice();
-    }
-    toJsonForDuplicate(){
-        return {
-            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
-            foldersId: this.allbyfolder.filter(course => course.selectConfirm).map(folder => folder.folderid ),
-        }
-    }
-    async coursesDuplicate() {
-        try {
-            await http.delete('/moodle/course/duplicate', { data: this.toJsonForDuplicate() } );
-        } catch (e) {
-            notify.error("Duplicate function didn't work");
-            throw e;
-        }
+
     }
 
     toJsonForDelete(){
         return {
             coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
+            folderid: this.folderid,
         }
     }
     async coursesDelete() {
@@ -168,6 +157,21 @@ export class Courses {
             await http.delete('/moodle/course', { data: this.toJsonForDelete() } );
         } catch (e) {
             notify.error("Delete function didn't work");
+            throw e;
+        }
+    }
+
+    toJsonForDuplicate(){
+        return {
+            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
+            folderid: this.folderid,
+        }
+    }
+    async coursesDuplicate() {
+        try {
+            await http.post('/moodle/course/duplicate', this.toJsonForDuplicate());
+        } catch (e) {
+            notify.error("Duplicate function didn't work");
             throw e;
         }
     }

@@ -459,7 +459,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * duplicate elements
      * */
-
     $scope.openPopUpDuplicate = function () {
         template.open('ligthBoxContainer', 'courses/duplicateLightbox');
         //$scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = true);

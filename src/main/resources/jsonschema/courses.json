@@ -15,8 +15,8 @@
 		"coursesId": {
 			"type" : "array"
 		},
-		"foldersId": {
-			"type" : "array"
+		"folderid": {
+			"type" : "number"
 		}
 	}
 }

@@ -914,7 +914,7 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-    @Delete("/course/duplicate")
+    @Post("/course/duplicate")
     @ApiDoc("Duplicate courses")
     @SecuredAction(workflow_duplicate)
     public void duplicate (final HttpServerRequest request) {
