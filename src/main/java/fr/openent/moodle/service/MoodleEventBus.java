@@ -21,4 +21,12 @@ public interface MoodleEventBus {
      */
 
     void getImage (String idImage, Handler<Either<String,JsonObject>> handler);
+
+    /**
+     * get users & groups to bus
+     * @param groupIds Group Ids
+     * @param handler function handler returning data
+     */
+
+    void getUsers (JsonArray groupIds, Handler<Either<String,JsonArray>> handler);
 }

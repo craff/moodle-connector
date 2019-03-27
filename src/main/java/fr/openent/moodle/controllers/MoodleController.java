@@ -85,17 +85,20 @@ public class MoodleController extends ControllerHelper {
 		renderView(request);
 	}
 
-    @Put("/folder/move")
+    @Put("/folders/move/:targetId")
     @ApiDoc("move a folder")
-    public void moveFolder(final HttpServerRequest request) {
+    //@SecuredAction("moodle.modify")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void moveFolder(final HttpServerRequest request){
         RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
             @Override
-            public void handle(JsonObject folder) {
+            public void handle(JsonObject folders) {
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
                     @Override
                     public void handle(UserInfos user) {
                         if (user != null) {
-                            moodleWebService.moveFolder(folder, defaultResponseHandler(request));
+                            long id_targetFolder = Long.parseLong(request.params().get("targetId"));
+                            moodleWebService.moveFolder(folders, id_targetFolder, defaultResponseHandler(request));
                         } else {
                             log.debug("User not found in session.");
                             unauthorized(request);
@@ -105,6 +108,7 @@ public class MoodleController extends ControllerHelper {
             }
         });
     }
+
 
     @Delete("/folder")
     @ApiDoc("delete a folder")
@@ -664,24 +668,17 @@ public class MoodleController extends ControllerHelper {
                             JsonObject shareInfosFuture = getShareInfosFuture.result();
                             JsonArray usersEnrolmentsFuture = getUsersEnrolementsFuture.result();
                             if (usersEnrolmentsFuture != null && !usersEnrolmentsFuture.isEmpty() && shareInfosFuture != null && !shareInfosFuture.isEmpty()) {
-                                if(shareInfosFuture.getJsonArray("actions").size() == 3)
-                                    shareInfosFuture.getJsonArray("actions").remove(1);
-                                JsonArray usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
                                 JsonArray groupEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups");
-                                JsonArray shareInfosUsers = shareInfosFuture.getJsonObject("users").getJsonArray("visibles");
                                 JsonArray shareInfosGroups = shareInfosFuture.getJsonObject("groups").getJsonArray("visibles");
-                                List<String> usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
-                                List<String> usersshareInfosId = shareInfosUsers.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
-                                while(usersEnroledId.contains(user.getUserId())){
-                                    usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(usersEnroledId.indexOf(user.getUserId()));
-                                    usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
-                                    usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
-                                }
-
+                                JsonArray usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+                                JsonArray shareInfosUsers = shareInfosFuture.getJsonObject("users").getJsonArray("visibles");
+                                List<String> usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
+                                List<String> usersshareInfosId = shareInfosUsers.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
                                 if(groupEnroled.size() > 0){
                                     List<String> groupsEnroledId = groupEnroled.stream().map(obj -> ((JsonObject)obj).getString("idnumber") ).collect(Collectors.toList());
                                     List<String> groupsshareInfosId = shareInfosGroups.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
                                     for (String groupId: groupsEnroledId) {
+                                        //groupIds.add(groupId.substring(3));
                                         if(!(groupsshareInfosId.contains(groupId))){
                                             JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(groupsEnroledId.indexOf(groupId));
                                             String id = jsonobjctToAdd.getString("idnumber");
@@ -700,9 +697,26 @@ public class MoodleController extends ControllerHelper {
                                         }
                                         shareInfosFuture.getJsonObject("groups").getJsonObject("checked").put(((JsonObject) group).getString("id"),tabToAdd);
                                     }
+
+                                    /*for(Object userEnroled : usersEnroled){
+                                        for(Object group : groupEnroled)
+                                        if(((JsonObject)userEnroled).getJsonArray("groupsId").contains(((JsonObject)group).getValue("idnumber" ).toString()) && Integer.parseInt(((JsonObject)userEnroled).getValue("role" ).toString()) == Integer.parseInt(((JsonObject)group).getValue("role" ).toString())){
+                                            usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(userEnroled);
+                                            usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+                                            usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
+                                        }
+                                    }*/
                                 }
-                                for (String userId: usersEnroledId) {
-                                    if(!(usersshareInfosId.contains(userId))){
+                                if (shareInfosFuture.getJsonArray("actions").size() == 3)
+                                    shareInfosFuture.getJsonArray("actions").remove(1);
+                                while (usersEnroledId.contains(user.getUserId())) {
+                                    usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(usersEnroledId.indexOf(user.getUserId()));
+                                    usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+                                    usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
+                                }
+
+                                for (String userId : usersEnroledId) {
+                                    if (!(usersshareInfosId.contains(userId))) {
                                         JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").getJsonObject(usersEnroledId.indexOf(userId)).copy();
                                         String prenom = jsonobjctToAdd.getString("firstname");
                                         String nom = jsonobjctToAdd.getString("lastname");
@@ -713,10 +727,10 @@ public class MoodleController extends ControllerHelper {
                                         jsonobjctToAdd.put("login", prenom.toLowerCase() + "." + nom.toLowerCase());
                                         jsonobjctToAdd.put("username", nom + " " + prenom.charAt(0) + prenom.substring(1).toLowerCase());
                                         String profile = "Relative";
-                                        if(jsonobjctToAdd.getInteger("role") == student){
+                                        if (jsonobjctToAdd.getInteger("role") == student) {
                                             profile = "Student";
                                         }
-                                        jsonobjctToAdd.put("profile",profile);
+                                        jsonobjctToAdd.put("profile", profile);
                                         jsonobjctToAdd.remove("role");
                                         shareInfosFuture.getJsonObject("users").getJsonArray("visibles").add(jsonobjctToAdd);
                                     }
@@ -724,12 +738,13 @@ public class MoodleController extends ControllerHelper {
 
                                 for (Object userEnroled : usersEnroled) {
                                     JsonArray tabToAdd = new JsonArray().add("fr-openent-moodle-controllers-MoodleController|read").add("fr-openent-moodle-controllers-MoodleController|contrib").add("fr-openent-moodle-controllers-MoodleController|shareSubmit");
-                                    if(((JsonObject)userEnroled).getInteger("role") == student){
+                                    if (((JsonObject) userEnroled).getInteger("role") == student) {
                                         tabToAdd.remove(2);
                                     }
-                                    shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"),tabToAdd);
+                                    shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"), tabToAdd);
                                 }
-                                handler.handle(new Either.Right<String, JsonObject>(shareInfosFuture));
+
+                            handler.handle(new Either.Right<String, JsonObject>(shareInfosFuture));
                             }
                         } else {
                             badRequest(request, event.cause().getMessage());

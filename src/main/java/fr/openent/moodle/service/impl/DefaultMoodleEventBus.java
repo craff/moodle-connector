@@ -11,6 +11,8 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.service.impl.SqlCrudService;
 
 import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
+import static org.entcore.common.neo4j.Neo4jResult.validResultHandler;
+
 
 public class DefaultMoodleEventBus extends SqlCrudService implements MoodleEventBus {
 
@@ -48,5 +50,14 @@ public class DefaultMoodleEventBus extends SqlCrudService implements MoodleEvent
                 handler.handle(new Either.Right<>(message.body().getJsonObject("result")));
             }
         }));
+    }
+
+    @Override
+    public void getUsers(final JsonArray groupIds, final Handler<Either<String,JsonArray>> handler){
+        JsonObject action = new JsonObject()
+                .put("action", "list-users")
+                .put("groupIds", groupIds);
+
+        eb.send(Moodle.DIRECTORY_BUS_ADDRESS, action, handlerToAsyncHandler(validResultHandler(handler)));
     }
 }

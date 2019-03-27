@@ -1,6 +1,7 @@
 package fr.openent.moodle;
 
 import fr.openent.moodle.controllers.MoodleController;
+import fr.openent.moodle.cron.synchDuplicationMoodle;
 import fr.openent.moodle.service.MoodleWebService;
 import io.vertx.core.eventbus.EventBus;
 import org.entcore.common.http.BaseServer;
@@ -10,6 +11,9 @@ import org.entcore.common.sql.SqlConf;
 import org.entcore.common.sql.SqlConfs;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.storage.StorageFactory;
+import fr.wseduc.cron.CronTrigger;
+
+import java.text.ParseException;
 
 public class Moodle extends BaseServer {
 
@@ -48,6 +52,16 @@ public class Moodle extends BaseServer {
 		courseConf.setSchema("moodle");
 		courseConf.setTable("course");
 		courseConf.setShareTable("course_shares");
+
+		//final String cronExpression = config().getString("$yourProperty$Cron", "0 */"+config.getString("timeMinuteSynchCron")+" * * * ? *");
+		final String cronExpression = config().getString("$yourProperty$Cron", "*/10 * * * * ? *");
+		try {
+			new CronTrigger(vertx, cronExpression).schedule(
+					new synchDuplicationMoodle()
+			);
+		} catch (ParseException e) {
+			log.fatal("Invalid cron expression.", e);
+		}
 
 
 		MoodleController moodleController = new MoodleController(storage, eb);
