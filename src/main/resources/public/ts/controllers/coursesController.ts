@@ -524,9 +524,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.move = async function() {
         if($scope.nbFoldersSelect > 0)
-            await $scope.folders.moveFolders();
+            await $scope.folders.moveToFolder();
         if($scope.nbCoursesSelect > 0)
-            await $scope.courses.moveCourses($scope.folders.folderIdMoveIn);
+            await $scope.courses.moveToFolder($scope.folders.folderIdMoveIn);
         $scope.currentfolderid = $scope.folders.folderIdMoveIn;
         $scope.initFolders();
         $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = false);
@@ -541,6 +541,30 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
 
     }
+
+    /**
+     * Drag & drop file adn course
+     */
+    $scope.dropTo = async (targetItem: string | Folder, $originalEvent) => {
+        let dataField = $originalEvent.dataTransfer.types.indexOf && $originalEvent.dataTransfer.types.indexOf("application/json") > -1 ? "application/json" : //Chrome & Safari
+            $originalEvent.dataTransfer.types.contains && $originalEvent.dataTransfer.types.contains("Text") ? "Text" : //IE
+                undefined;
+        let originalItem: string = JSON.parse($originalEvent.dataTransfer.getData(dataField));
+
+        console.log(originalItem);
+        if (targetItem instanceof Folder && originalItem == targetItem.id) {
+            return;
+        }
+        let actualItem: Course | Folder = $scope.folders.all.find(w => w.id === originalItem);
+        if(!actualItem) {
+            actualItem = $scope.courses.coursesByUser.find(w => w.courseid === originalItem);
+        }
+        if(actualItem instanceof Folder)
+            await actualItem.moveToFolder(targetItem.id);
+        else if(actualItem instanceof Course)
+            await actualItem.moveToFolder(targetItem.id);
+        await $scope.initFolders();
+    };
 
     /**
      * confirm delete

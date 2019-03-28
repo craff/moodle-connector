@@ -343,10 +343,10 @@ export class Courses {
         }
     }
 
-    async moveCourses (targetId : string) {
+    async moveToFolder(targetId : number) {
         try {
-            this.allCourses.filter(course => course.select).map(course => course.folderid = parseInt(targetId, 10));
-            await http.put(`/moodle/courses/move`, this.toJsonForMove(parseInt(targetId, 10)));
+            this.allCourses.filter(course => course.select).map(course => course.folderid = targetId);
+            await http.put(`/moodle/courses/move`, this.toJsonForMove(targetId));
         } catch (e) {
             throw e;
         }

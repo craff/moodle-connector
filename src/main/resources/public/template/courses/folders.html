@@ -1,9 +1,9 @@
 <div class="minimal-mine-recent-width five cell twelve-mobile folder-article style-bord infoBackground"
          ng-repeat="folder in folders.getparentFolder() track by $index" ng-if="(currentfolderid==0 || currentfolderid==null)">
-    <div static-include="/moodle/public/template/courses/folderDetails.html" ></div>
+    <div static-include="/moodle/public/template/courses/folderDetails.html" dragstart dragdrop="dropTo(folder, $originalEvent)"></div>
 </div>
 
 <div class="minimal-mine-recent-width five cell twelve-mobile folder-article style-bord infoBackground"
          ng-repeat="folder in folders.getSubFolder(currentfolderid) track by $index" ng-if="currentfolderid>0">
-    <div static-include="/moodle/public/template/courses/folderDetails.html" ></div>
+    <div static-include="/moodle/public/template/courses/folderDetails.html" dragstart dragdrop="dropTo(folder, $originalEvent)"></div>
 </div>

@@ -57,11 +57,17 @@ export class Folders {
         this.isSynchronized = false;
     }
 
-    toJsonForMove(){
-        return {
-            parentId: this.folderIdMoveIn,
-            foldersId: this.all.filter(folder => folder.select).map(folder => folder.id ),
-        }
+    toJsonForMove(targetId : number){
+        if(targetId == undefined)
+            return {
+                parentId: this.folderIdMoveIn,
+                foldersId: this.all.filter(folder => folder.select).map(folder => folder.id ),
+            }
+        else
+            return {
+                parentId: targetId,
+                foldersId: this.all.filter(folder => folder.select).map(folder => folder.id ),
+            }
     }
 
     toJsonForDelete(){
@@ -106,9 +112,9 @@ export class Folders {
         return [];
     }
 
-    async moveFolders () {
+    async moveToFolder(targetId : number) {
         try {
-            await http.put(`/moodle/folders/move`, this.toJsonForMove());
+            await http.put(`/moodle/folders/move`, this.toJsonForMove(targetId));
         } catch (e) {
             throw e;
         }
