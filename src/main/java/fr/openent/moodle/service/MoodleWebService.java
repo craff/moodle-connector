@@ -152,10 +152,20 @@ public interface MoodleWebService{
      */
     void insertDuplicateTable (JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler);
 
-//    /**
-//     * update duplication table
-//     * @param updateCourseToDuplicate course to duplicate
-//     * @param handler function handler returning data
-//     */
-//    void updateDuplicateTable (JsonObject updateCourseToDuplicate, Handler<Either<String, JsonObject>> handler);
+    /**
+     * get courseid to duplicate
+     * @param status state of the course to duplicate
+     * @param handler function handler returning data
+     */
+    void getCourseIdToDuplicate (String status, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * get courseid to duplicate
+     * @param status state of the course to duplicate
+     * @param id sql id of the course to duplicate
+     * @param handler function handler returning data
+     */
+
+    void updateStatusCourseToDuplicate (String status, Integer id, Handler<Either<String, JsonObject>> handler);
+
 }

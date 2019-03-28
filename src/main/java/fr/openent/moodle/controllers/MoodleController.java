@@ -181,7 +181,7 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(final UserInfos user) {
                 if (user != null) {
-                    long id_folder =Long.parseLong(request.params().get("id"));
+                    long id_folder = Long.parseLong(request.params().get("id"));
                     moodleWebService.countCoursesItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
                 }
                 else {

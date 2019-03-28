@@ -275,13 +275,34 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     @Override
     public void insertDuplicateTable (JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler) {
         String query = "INSERT INTO " + Moodle.moodleSchema + ".duplication (id_course, id_folder, id_users, status)" +
-                " VALUES (?, ?, ?, ?)";
+                " VALUES (?, ?, ?, ?);";
 
         JsonArray values = new JsonArray();
         values.add(courseToDuplicate.getInteger("courseid"));
         values.add(courseToDuplicate.getInteger("folderid"));
         values.add(courseToDuplicate.getString("userId"));
         values.add(courseToDuplicate.getString("status"));
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonObject>> handler){
+        String query = "SELECT id, id_course, id_users FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? LIMIT 1;";
+
+        JsonArray values = new JsonArray();
+        values.add(status);
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void updateStatusCourseToDuplicate (String status, Integer id, Handler<Either<String, JsonObject>> handler){
+        String query = "UPDATE " + Moodle.moodleSchema + ".duplication SET status = ? WHERE id = ?";
+
+        JsonArray values = new JsonArray();
+        values.add(status);
+        values.add(id);
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }

@@ -2,8 +2,8 @@ package fr.openent.moodle;
 
 import fr.openent.moodle.controllers.MoodleController;
 import fr.openent.moodle.cron.synchDuplicationMoodle;
-import fr.openent.moodle.service.MoodleWebService;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonObject;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.share.impl.SqlShareService;
@@ -38,11 +38,13 @@ public class Moodle extends BaseServer {
 	public static Integer entcgi = 9;
 
 	public static String moodleSchema;
-	@Override
+    public static JsonObject moodleConfig;
+    @Override
 	public void start() throws Exception {
 		super.start();
 
 		moodleSchema = config.getString("db-schema");
+        moodleConfig = config;
 		EventBus eb = getEventBus(vertx);
 
 		final Storage storage = new StorageFactory(vertx, config, /*new ExercizerStorage()*/ null).getStorage();
@@ -53,16 +55,15 @@ public class Moodle extends BaseServer {
 		courseConf.setTable("course");
 		courseConf.setShareTable("course_shares");
 
-		//final String cronExpression = config().getString("$yourProperty$Cron", "0 */"+config.getString("timeMinuteSynchCron")+" * * * ? *");
-		final String cronExpression = config().getString("$yourProperty$Cron", "*/10 * * * * ? *");
+		final String cronExpression = config().getString("$yourProperty$Cron", "0 */"+config.getString("timeMinuteSynchCron")+" * * * ? *");
+//		final String cronExpression = config().getString("$yourProperty$Cron", "*/10 * * * * ? *");
 		try {
 			new CronTrigger(vertx, cronExpression).schedule(
-					new synchDuplicationMoodle()
+					new synchDuplicationMoodle(vertx)
 			);
 		} catch (ParseException e) {
 			log.fatal("Invalid cron expression.", e);
 		}
-
 
 		MoodleController moodleController = new MoodleController(storage, eb);
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
