@@ -188,7 +188,6 @@ i.sort-desc::before {
   -moz-osx-font-smoothing:grayscale;
   background-image:none;
   color: #aaa;
-  font-size: 40px;
 }
 
 i.eye-slash::before {
@@ -308,6 +307,10 @@ i.share::before {
 
 .folder-size{
   font-size: 25px;
+}
+
+.big-folder-size{
+  font-size: 40px;
 }
 
 .specialDisable{
