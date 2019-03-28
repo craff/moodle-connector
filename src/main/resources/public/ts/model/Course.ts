@@ -1,6 +1,7 @@
 import {_, moment, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
+import {Folder} from "./Folder";
 
 export class Course implements Shareable{
     shared : any;
@@ -135,7 +136,6 @@ export class Courses {
 
     constructor() {
         this.allbyfolder = [];
-
         this.allCourses = [];
         this.coursesShared = [];
         this.coursesSharedToFollow = [];
@@ -209,6 +209,15 @@ export class Courses {
             this.coursesSharedToFollow = _.filter(this.allCourses, function (cours) {
                 return cours.role === "5" && cours.auteur[0].entidnumber !== userId;
             });
+            this.coursesSharedToFollow = this.coursesSharedToFollow.sort(
+                function compare(a, b) {
+                    if (a.date < b.date)
+                        return 1;
+                    if (a.date > b.date)
+                        return -1;
+                }
+            );
+
             this.coursesByUser = this.coursesByUser.sort(
                 function compare(a, b) {
                     if (a.date < b.date)
@@ -223,27 +232,10 @@ export class Courses {
                 let coursDate = moment(course.startdate + "000", "x");
                 return now.isBefore(coursDate);});
 
-            this.coursesToCome = this.coursesToCome.sort(
-                function compare(a, b) {
-                    if (a.startdate < b.startdate)
-                        return 1;
-                    if (a.startdate > b.startdate)
-                        return -1;
-                }
-            );
-
             this.coursesToDo = _.filter(this.coursesSharedToFollow, function (course) {
                 let coursDate = moment(course.startdate + "000", "x");
                 return coursDate.isBefore(now);});
 
-            this.coursesToDo = this.coursesToDo.sort(
-                function compare(a, b) {
-                    if (a.startdate < b.startdate)
-                        return 1;
-                    if (a.startdate > b.startdate)
-                        return -1;
-                }
-            );
 
             this.isSynchronized = true;
         } catch (e) {
@@ -296,6 +288,13 @@ export class Courses {
         return _.filter(courses, function(cours){return cours.folderid == folder});
     }
 
+    getAllCoursesModel(): Course[]  {
+        if(this.allCourses){
+            return this.allCourses;
+        }
+        return [];
+    }
+
     async getChoice() {
         try {
             const {data} = await http.get('/moodle/choices');
@@ -334,6 +333,22 @@ export class Courses {
             } catch (e) {
                 notify.error("Set Choice toCome function didn't work");
             }
+        }
+    }
+
+    toJsonForMove(targetId : number){
+        return {
+            coursesId: this.allCourses.filter(course => course.select).map(course => course.courseid ),
+            folderId: targetId
+        }
+    }
+
+    async moveCourses (targetId : string) {
+        try {
+            this.allCourses.filter(course => course.select).map(course => course.folderid = parseInt(targetId, 10));
+            await http.put(`/moodle/courses/move`, this.toJsonForMove(parseInt(targetId, 10)));
+        } catch (e) {
+            throw e;
         }
     }
 }

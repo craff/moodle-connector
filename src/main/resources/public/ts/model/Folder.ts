@@ -40,10 +40,11 @@ export class Folder {
             throw e;
         }
     }
+
 }
 
 export class Folders {
-    folderIdMoveIn: string;
+    folderIdMoveIn: number;
     all: Folder[];
     isSynchronized: Boolean;
     selectedFolders: number[];
@@ -58,7 +59,7 @@ export class Folders {
 
     toJsonForMove(){
         return {
-            parentId: parseInt(this.folderIdMoveIn, 10),
+            parentId: this.folderIdMoveIn,
             foldersId: this.all.filter(folder => folder.select).map(folder => folder.id ),
         }
     }
@@ -105,7 +106,7 @@ export class Folders {
         return [];
     }
 
-    async moveFolders (targetFolderId:number) {
+    async moveFolders () {
         try {
             await http.put(`/moodle/folders/move`, this.toJsonForMove());
         } catch (e) {

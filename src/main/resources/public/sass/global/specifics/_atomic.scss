@@ -9,6 +9,7 @@
   height: auto;
   margin-right: 15px;
   margin-top: 15px;
+  padding: 30px;
 }
 .summary-list{
   border-bottom-right-radius: 6%;
@@ -18,6 +19,12 @@
 .summary-color{
     color: #757575;
 }
+
+.colorfolder{
+  color: #ff8500;
+}
+
+
 
 .image{
    display: block;
@@ -180,6 +187,8 @@ i.sort-desc::before {
   -webkit-font-smoothing:antialiased;
   -moz-osx-font-smoothing:grayscale;
   background-image:none;
+  color: #aaa;
+  font-size: 40px;
 }
 
 i.eye-slash::before {
@@ -255,7 +264,7 @@ i.share::before {
   margin-top: 15px;
 }
 .coursesText{
- width: 78%;
+ width: 85%;
 }
 .text-font{
   font-weight: bolder;

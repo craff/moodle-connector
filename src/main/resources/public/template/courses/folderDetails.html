@@ -1,15 +1,18 @@
-<div class="cell">
+<div class="cell" ng-click="isPrintSubFolder(folder,false)">
     <i class="foldericon"></i></br>
 </div>
-<div class="eleven coursesText cell left-margin">
-    <span class="text-font">[[folder.name]]</span></br>
-    <label class="size-font">
-        <i18n>moodle.folder.item</i18n>:
-        [[folder.nbItems]]
-    </label>
+<div class="margin-left-file">
+    <span class="text-font ellipsis" ng-click="isPrintSubFolder(folder,false)">[[folder.name]]</span></br>
+    <div class="row">
+        <label class="size-font" ng-click="isPrintSubFolder(folder,false)">
+            [[countItems(folder)]]
+            <i18n ng-if="countItems(folder) > 1">moodle.folder.items</i18n>
+            <i18n ng-if="countItems(folder) < 2">moodle.folder.item</i18n>
+        </label>
+        <label class="checkbox right-magnet">
+            <input type="checkbox" ng-change="showToaster()" ng-model="folder.select">
+            <span></span>
+        </label>
+    </div>
 </div>
-<label class="checkbox right-magnet">
-    <input type="checkbox" ng-change="showToaster()" ng-model="folder.select">
-    <span></span>
-</label>
 

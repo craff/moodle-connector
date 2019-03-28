@@ -38,6 +38,13 @@ public interface MoodleWebService{
     void createCourse (JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
+     * move a folder
+     * @param courses courses to move
+     * @param handler function handler returning data
+     */
+    void moveCourse(JsonObject courses, Handler<Either<String, JsonObject>> handler);
+
+    /**
      * Delete courses
      * @param course course to delete
      * @param handler function handler returning data

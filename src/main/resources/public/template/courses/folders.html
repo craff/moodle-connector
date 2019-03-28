@@ -1,9 +1,9 @@
-<div class="five cell twelve-mobile folder-article style-bord infoBackground"
+<div class="minimal-mine-recent-width five cell twelve-mobile folder-article style-bord infoBackground"
          ng-repeat="folder in folders.getparentFolder() track by $index" ng-if="(currentfolderid==0 || currentfolderid==null)">
-    <div static-include="/moodle/public/template/courses/folderDetails.html" ng-click="isPrintSubFolder(folder)"></div>
+    <div static-include="/moodle/public/template/courses/folderDetails.html" ></div>
 </div>
 
-<div class="six cell twelve-mobile folder-article infoBackground"
+<div class="minimal-mine-recent-width five cell twelve-mobile folder-article style-bord infoBackground"
          ng-repeat="folder in folders.getSubFolder(currentfolderid) track by $index" ng-if="currentfolderid>0">
-    <div static-include="/moodle/public/template/courses/folderDetails.html" ng-click="isPrintSubFolder(folder)"></div>
+    <div static-include="/moodle/public/template/courses/folderDetails.html" ></div>
 </div>

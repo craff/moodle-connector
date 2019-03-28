@@ -152,7 +152,48 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-	@Post("/course")
+    @Get("/folder/countsFolders/:id")
+    @ApiDoc("Get cours in database by folder id")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getCountsItemInFolder(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    long id_folder =Long.parseLong(request.params().get("id"));
+                    moodleWebService.countItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
+                }
+                else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
+
+    @Get("/folder/countsCourses/:id")
+    @ApiDoc("Get cours in database by folder id")
+    //@SecuredAction("moodle.list")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getCountsItemCoursesInFolder(final HttpServerRequest request){
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(final UserInfos user) {
+                if (user != null) {
+                    long id_folder =Long.parseLong(request.params().get("id"));
+                    moodleWebService.countCoursesItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
+                }
+                else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
+
+
+    @Post("/course")
     @ApiDoc("create a course")
     @SecuredAction(workflow_create)
 	public void create(final HttpServerRequest request) {
@@ -435,8 +476,32 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
+    @Put("/courses/move")
+    @ApiDoc("move a course")
+    //@SecuredAction("moodle.modify")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void moveCourse(final HttpServerRequest request){
+        RequestUtils.bodyToJson(request, pathPrefix + "courses", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject courses) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            moodleWebService.moveCourse(courses, defaultResponseHandler(request));
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
+            }
+        });
+    }
 
-	@Delete("/course")
+
+
+    @Delete("/course")
     @ApiDoc("Delete a course")
     @SecuredAction(workflow_delete)
     public void delete (final HttpServerRequest request) {
