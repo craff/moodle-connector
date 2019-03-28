@@ -9,7 +9,7 @@
   height: auto;
   margin-right: 15px;
   margin-top: 15px;
-  padding: 30px;
+  padding: 15px;
 }
 .summary-list{
   border-bottom-right-radius: 6%;
@@ -242,10 +242,16 @@ i.share::before {
 
 .colorActivity{
    color: #ff8500;
+  font-weight: bold;
  }
 .colorCourse{
    color: #e20037;
 }
+.colorCourse:hover{
+  color: #ff8500;
+  font-weight: bold;
+}
+
 .colorButton{
   color: #e20037;
   background: $white ;
@@ -291,6 +297,17 @@ i.share::before {
   color: #555;
   font-weight: bold;
   font-size: 20px;
+}
+
+.big-folder{
+  color: #555;
+  font-weight: bold;
+  font-size: 20px;
+  margin-left: 10px;
+}
+
+.folder-size{
+  font-size: 25px;
 }
 
 .specialDisable{

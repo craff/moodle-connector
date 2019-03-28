@@ -12,8 +12,9 @@
         </div>
 
         <div class="ten cell horizontal-spacing padding-left-corp" >
-            <div  class ="row" static-include="/moodle/public/template/courses/filters.html"></div>
-            <div class="row center-courses" static-include="/moodle/public/template/courses/folders.html"></div>
+            <p><i class="foldericon folder-size"></i><span class="big-folder ellipsis">[[folderName()]]</span></br></p>
+            <p  class ="row" static-include="/moodle/public/template/courses/filters.html"></p>
+            <div class="row center-courses" static-include="/moodle/public/template/courses/folders.html" ng-if="printfolders"></div>
             <div class="row center-courses" static-include="/moodle/public/template/courses/courses.html"></div>
         </div>
     </div>

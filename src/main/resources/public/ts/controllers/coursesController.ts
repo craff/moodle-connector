@@ -131,6 +131,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             selectedOption: {id: undefined, name: 'Choisissez votre type'}
         };
         $scope.course.submitWait = false;
+        $scope.nameFolder="";
     };
 
     $scope.isPrintMenuFolder = function () {
@@ -289,6 +290,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         await $scope.folders.sync();
         $scope.resetSelect();
         $scope.showToaster();
+        $scope.isPrintSubFolderNumber($scope.currentfolderid)
         Utils.safeApply($scope);
     };
 
@@ -408,6 +410,26 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     /**
+     * display folder name
+     */
+
+    $scope.folderName = function() {
+        if($scope.printfolders){
+            if ($scope.currentfolderid != 0) {
+                $scope.folders.all.forEach(function (e) {
+                    if (e.id == $scope.currentfolderid) {
+                        $scope.nameFolder = e.name;
+                    }
+                });
+                ;
+            } else
+                $scope.nameFolder = "Mes cours";
+        }else
+            $scope.nameFolder = "Cours partagés avec moi";
+        return $scope.nameFolder;
+    }
+
+    /**
      * create folder
      * */
     $scope.openPopUpFolder = function () {
@@ -420,7 +442,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.folder.parent_id = $scope.currentfolderid;
         await $scope.folder.create();
         $scope.initFolders();
-        $scope.isPrintSubFolderNumber($scope.currentfolderid);
         $scope.openLightbox = false;
         Utils.safeApply($scope);
 
@@ -508,7 +529,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.moveCourses($scope.folders.folderIdMoveIn);
         $scope.currentfolderid = $scope.folders.folderIdMoveIn;
         $scope.initFolders();
-        $scope.isPrintSubFolderNumber($scope.currentfolderid);
         $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = false);
         $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = false);
         $scope.folders.folderIdMoveIn = undefined;
