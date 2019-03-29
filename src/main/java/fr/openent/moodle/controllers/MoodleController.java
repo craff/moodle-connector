@@ -1001,36 +1001,9 @@ public class MoodleController extends ControllerHelper {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
-                                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                                    URI moodleUri = null;
-                                    try {
-                                        final String service = (config.getString("address_moodle") + config.getString("ws-path"));
-                                        final String urlSeparator = service.endsWith("") ? "" : "/";
-                                        moodleUri = new URI(service + urlSeparator);
-                                    } catch (URISyntaxException e) {
-                                        log.debug("Invalid moodle web service uri", e);
-                                    }
-                                    if (moodleUri != null) {
-                                        JsonObject shareSend = new JsonObject();
-                                        shareSend = null;
-                                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                        final String moodleUrl = moodleUri.toString() +
-                                                "?wstoken=" + WSTOKEN +
-                                                "&wsfunction=" + WS_POST_DUPLICATECOURSE +
-                                                "&parameters[idnumber]=" + user.getUserId() +
-                                                "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getValue("courseid") +
-                                                "&moodlewsrestformat=" + JSON;
-                                        httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                            @Override
-                                            public void handle(Either<String, Buffer> event) {
-                                                if (event.isRight()) {
-                                                    log.error("Test");
-                                                } else {
-                                                    handle(new Either.Left<>("Failed to duplicate the course with the duplicate WS"));
-                                                }
-                                            }
-                                        });
-                                    }
+                                    request.response()
+                                            .setStatusCode(200)
+                                            .end();
                                 } else {
                                     handle(new Either.Left<>("Failed to insert in database"));
                                 }

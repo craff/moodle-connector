@@ -55,8 +55,8 @@ public class Moodle extends BaseServer {
 		courseConf.setTable("course");
 		courseConf.setShareTable("course_shares");
 
-		final String cronExpression = config().getString("$yourProperty$Cron", "0 */"+config.getString("timeMinuteSynchCron")+" * * * ? *");
-//		final String cronExpression = config().getString("$yourProperty$Cron", "*/10 * * * * ? *");
+//		final String cronExpression = config().getString("$yourProperty$Cron", "0 */"+config.getString("timeMinuteSynchCron")+" * * * ? *");
+		final String cronExpression = config().getString("$yourProperty$Cron", "*/30 * * * * ? *");
 		try {
 			new CronTrigger(vertx, cronExpression).schedule(
 					new synchDuplicationMoodle(vertx)

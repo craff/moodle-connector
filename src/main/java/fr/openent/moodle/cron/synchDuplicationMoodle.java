@@ -55,8 +55,8 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                         final String moodleUrl = moodleUri.toString() +
                                 "?wstoken=" + WSTOKEN +
                                 "&wsfunction=" + WS_POST_DUPLICATECOURSE +
-                                "&parameters[idnumber]=" + courseToDuplicate.getInteger("courseid") +
-                                "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getString("userid") +
+                                "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
+                                "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
                                 "&moodlewsrestformat=" + JSON;
                         httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
                             @Override
@@ -69,15 +69,19 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                                         public void handle(Either<String, JsonObject> event) {
                                             if (event.isRight()) {
                                                 log.error("test");
+                                            } else {
+                                                handle(new Either.Left<>("There are no course waiting to be duplicate"));
                                             }
                                         }
                                     });
+                                } else {
+                                    handle(new Either.Left<>("Duplication web-service failed"));
                                 }
                             }
                         });
                     }
                 } else {
-                    handle(new Either.Left<>("Failed to duplicate the course with the duplicate WS"));
+                    handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
                 }
             }
         });
