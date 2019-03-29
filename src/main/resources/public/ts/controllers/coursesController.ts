@@ -135,25 +135,18 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.isPrintMenuFolder = function () {
-        $scope.printmenufolder = !$scope.printmenufolder;
+        $scope.initFolders();
+        $scope.printmenufolder = true;
         $scope.printmenucourseShared = false;
-        if ($scope.printmenufolder) {
-            $scope.currentfolderid = 0;
-            $scope.printfolders = true;
-        } else {
-            $scope.printfolders = false;
-            $scope.currentfolderid = 0;
-            $scope.setprintsubfolderValue();
-        }
+        $scope.currentfolderid = 0;
+        $scope.printfolders = true;
     };
     $scope.isPrintMenuCoursesShared = function () {
-        $scope.printmenucourseShared = !$scope.printmenucourseShared;
+        $scope.printmenucourseShared = true;
         $scope.printmenufolder = false;
         $scope.printfolders = false;
         $scope.currentfolderid = 0;
-        if ($scope.printmenucourseShared) {
-            $scope.initAllCouresbyuser();
-        }
+        $scope.initAllCouresbyuser();
         $scope.setprintsubfolderValue();
     };
 
@@ -524,7 +517,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.move = async function() {
         if($scope.nbFoldersSelect > 0)
-            await $scope.folders.moveToFolder();
+            await $scope.folders.moveToFolder(undefined);
         if($scope.nbCoursesSelect > 0)
             await $scope.courses.moveToFolder($scope.folders.folderIdMoveIn);
         $scope.currentfolderid = $scope.folders.folderIdMoveIn;
@@ -545,24 +538,26 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * Drag & drop file adn course
      */
-    $scope.dropTo = async (targetItem: string | Folder, $originalEvent) => {
-        let dataField = $originalEvent.dataTransfer.types.indexOf && $originalEvent.dataTransfer.types.indexOf("application/json") > -1 ? "application/json" : //Chrome & Safari
-            $originalEvent.dataTransfer.types.contains && $originalEvent.dataTransfer.types.contains("Text") ? "Text" : //IE
-                undefined;
-        let originalItem: string = JSON.parse($originalEvent.dataTransfer.getData(dataField));
-
-        console.log(originalItem);
-        if (targetItem instanceof Folder && originalItem == targetItem.id) {
+    $scope.dropped  = async function(dragEl, dropEl) {
+        if (dragEl == dropEl)
             return;
+        // this is your application logic, do whatever makes sense
+        let originalItem = $('#'+dragEl);
+        let targetItem = $('#'+dropEl);
+        let idOriginalItem = originalItem[0].children[0].textContent;
+        let idTargetItem = targetItem[0].children[0].textContent;
+        let typeOriginalItem = originalItem[0].classList[0];
+
+        if(typeOriginalItem == "Folder"){
+            $scope.folders.all.filter(folder => folder.select).map(folder => folder.select = false);
+            $scope.folders.all.find(w => w.id == idOriginalItem).map(folder => folder.select = true);
+            await $scope.folders.moveToFolder(idTargetItem);
         }
-        let actualItem: Course | Folder = $scope.folders.all.find(w => w.id === originalItem);
-        if(!actualItem) {
-            actualItem = $scope.courses.coursesByUser.find(w => w.courseid === originalItem);
+        else if(typeOriginalItem == "Course") {
+            $scope.courses.allCourses.filter(course => course.select).map(course => course.select = false);
+            $scope.courses.allCourses.filter(course => course.id === idOriginalItem).map(course => course.select = true);
+            await $scope.courses.moveToFolder(idTargetItem);
         }
-        if(actualItem instanceof Folder)
-            await actualItem.moveToFolder(targetItem.id);
-        else if(actualItem instanceof Course)
-            await actualItem.moveToFolder(targetItem.id);
         await $scope.initFolders();
     };
 
