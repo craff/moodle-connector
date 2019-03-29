@@ -414,7 +414,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                         $scope.nameFolder = e.name;
                     }
                 });
-                ;
             } else
                 $scope.nameFolder = "Mes cours";
         }else
@@ -550,13 +549,21 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
         if(typeOriginalItem == "Folder"){
             $scope.folders.all.filter(folder => folder.select).map(folder => folder.select = false);
-            $scope.folders.all.find(w => w.id == idOriginalItem).map(folder => folder.select = true);
-            await $scope.folders.moveToFolder(idTargetItem);
+            $scope.folders.all.forEach(function (e) {
+                if (e.id.toString() === idOriginalItem) {
+                    e.select = true;
+                }
+            });
+            await $scope.folders.moveToFolder(parseInt(idTargetItem,10));
         }
         else if(typeOriginalItem == "Course") {
             $scope.courses.allCourses.filter(course => course.select).map(course => course.select = false);
-            $scope.courses.allCourses.filter(course => course.id === idOriginalItem).map(course => course.select = true);
-            await $scope.courses.moveToFolder(idTargetItem);
+            $scope.courses.allCourses.forEach(function (e) {
+                if (e.id.toString() === idOriginalItem) {
+                    e.select = true;
+                }
+            });
+            await $scope.courses.moveToFolder(parseInt(idTargetItem,10));
         }
         await $scope.initFolders();
     };

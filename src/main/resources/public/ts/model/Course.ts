@@ -338,8 +338,8 @@ export class Courses {
 
     toJsonForMove(targetId : number){
         return {
-            coursesId: this.allCourses.filter(course => course.select).map(course => course.courseid ),
-            folderId: targetId
+            folderId: targetId,
+            coursesId: this.allCourses.filter(course => course.select).map(course => course.courseid )
         }
     }
 
