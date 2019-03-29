@@ -996,7 +996,6 @@ public class MoodleController extends ControllerHelper {
                         }
                         courseToDuplicate.put("status", "en attente");
                         courseToDuplicate.put("userId", user.getUserId());
-                        courseToDuplicate.put("folderid", 0);
                         moodleWebService.insertDuplicateTable(courseToDuplicate, new Handler<Either<String, JsonObject>>() {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
