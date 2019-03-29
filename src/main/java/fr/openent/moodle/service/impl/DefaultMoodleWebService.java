@@ -111,17 +111,20 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void moveCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
+    public void moveCourse(final JsonObject courses, final Handler<Either<String, JsonObject>> handler){
         JsonArray values = new JsonArray();
-        JsonArray courses = course.getJsonArray("coursesId");
-        values.add(course.getValue("folderId"));
+        JsonArray value = new JsonArray();
+        JsonArray coursesToMove = courses.getJsonArray("coursesId");
 
-        for (int i = 0;i<courses.size();i++){
-            values.add(courses.getValue(i));
+        for (int i = 0;i<coursesToMove.size();i++){
+            value.add(coursesToMove.getValue(i));
+            value.add(courses.getValue("folderId"));
+            values.add(value);
         }
+        values.add(courses.getValue("folderId"));
 
-        String moveCourse = "UPDATE " + Moodle.moodleSchema + ".course SET folder_id = ? WHERE moodle_id IN " + Sql.listPrepared(courses.getList());
-
+        String moveCourse = "INSERT INTO " + Moodle.moodleSchema + ".course (moodle_id,folder_id) VALUES ? "+
+                "ON CONFLICT (moodle_id) DO UPDATE SET folder_id = ? ;";
         sql.prepared(moveCourse,values , SqlResult.validUniqueResultHandler(handler));
     }
 

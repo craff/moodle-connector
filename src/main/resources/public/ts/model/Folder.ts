@@ -49,11 +49,13 @@ export class Folders {
     isSynchronized: Boolean;
     selectedFolders: number[];
     listSelectedFolders: Folder[];
+    listOfSubfolders: Folder[];
 
     constructor() {
         this.all = [];
         this.selectedFolders = [];
         this.listSelectedFolders = [];
+        this.listOfSubfolders = [];
         this.isSynchronized = false;
     }
 
@@ -87,6 +89,7 @@ export class Folders {
         try {
             let folders = await http.get(`/moodle/folders`);
             this.all = Mix.castArrayAs(Folder, folders.data);
+            this.getAllsubfolders();
             this.isSynchronized = true;
         } catch (e) {
             this.isSynchronized = false;
@@ -110,6 +113,30 @@ export class Folders {
             return this.all;
         }
         return [];
+    }
+
+    getAllsubfolders() {
+        if (this.all) {
+            var that = this;
+            this.getparentFolder().forEach(function (folder) {
+                if (!folder.select) {
+                    that.listOfSubfolders.push(folder);
+                    that.insertSubFolders(folder);
+                }
+            });
+        }
+    }
+
+    insertSubFolders(folder:Folder){
+        var that = this;
+        if (folder.subFolders && folder.subFolders.length && folder.printTargetsubfolder) {
+            this.getSubFolder(folder.id).forEach(function (subFolder) {
+                if(!(subFolder.select)) {
+                    that.listOfSubfolders.push(subFolder);
+                    that.insertSubFolders(subFolder);
+                }
+            });
+        }
     }
 
     async moveToFolder(targetId : number) {

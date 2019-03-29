@@ -135,11 +135,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.isPrintMenuFolder = function () {
-        $scope.initFolders();
-        $scope.printmenufolder = true;
-        $scope.printmenucourseShared = false;
-        $scope.currentfolderid = 0;
-        $scope.printfolders = true;
+        if($scope.currentfolderid != 0) {
+            $scope.initFolders();
+            $scope.printmenufolder = true;
+            $scope.printmenucourseShared = false;
+            $scope.currentfolderid = 0;
+            $scope.printfolders = true;
+        }
     };
     $scope.isPrintMenuCoursesShared = function () {
         $scope.printmenucourseShared = true;
@@ -505,6 +507,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * move folders & courses
      * */
     $scope.openPopUpMove = function () {
+        $scope.folders.getAllsubfolders();
         template.open('ligthBoxContainer', 'courses/moveElementLightbox');
         $scope.openLightbox = true;
     };

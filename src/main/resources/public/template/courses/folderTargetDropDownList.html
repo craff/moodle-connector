@@ -2,13 +2,8 @@
     <select ng-model="folders.folderIdMoveIn" ng-change="selectFolder()" >
         <option value="" disabled selected hidden>Sélectionner un dossier</option>
         <option value=0>Mes cours</option>
-            <option ng-repeat="folder in getAllsubfolders()" class="left-padding"
+            <option ng-repeat="folder in folders.listOfSubfolders" class="left-padding"
                     value=[[folder.id]]>
-                [[folder.name]]
-            </option>
-            <option ng-repeat="subfolder in folder.subFolders" ng-init="subfolder.subFolders=getSubFolder(folder);"
-                    ng-if="!(subfolder.select) && subfolder.subFolders && subfolder.subFolders.length && subfolder.printTargetsubfolder"
-                    class="left-padding" value=[[subfolder.id]]>
                 [[folder.name]]
             </option>
     </select>
