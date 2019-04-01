@@ -1,9 +1,9 @@
 <!-- popup for move folders -->
 
     <form ng-submit="move()">
-        <div class="eight cell horizontal-spacing">
+        <div class="cell horizontal-spacing">
             <h2 class="row twelve"><i18n>moodle.toaster.title</i18n></h2>
-            <br>
+            <br ng-if="nbFoldersSelect > 0">
             <p ng-if="nbFoldersSelect > 0">
                 <i18n ng-if="nbFoldersSelect == 1">moodle.toaster.text.name.folder.move</i18n>
                 <i18n ng-if="nbFoldersSelect > 1">moodle.toaster.text.name.folder.moves</i18n>
@@ -19,9 +19,12 @@
             </p>
             <p>
                 <i18n>moodle.toaster.folderDirection</i18n>
+                <span><b>[[targetFolderName()]]</b></span>
                 </br>
+                </br>
+                <i18n class="text-italic">moodle.toaster.indication</i18n>
                 <div  class="six cell horizontal-spacing"
-                      static-include="/moodle/public/template/courses/folderTargetDropDownList.html">
+                      static-include="/moodle/public/template/courses/folderTargetTree.html">
                 </div>
                 <hr />
 

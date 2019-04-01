@@ -394,8 +394,13 @@ public class MoodleController extends ControllerHelper {
                                                     for(int i = 0; i < coursArray.size(); i++){
                                                         if(sqlCoursId.contains(coursArray.getJsonObject(i).getValue("courseid").toString()))
                                                             coursArray.getJsonObject(i).put("folderid",Integer.parseInt(sqlCoursArray.getJsonObject(sqlCoursId.indexOf(coursArray.getJsonObject(i).getValue("courseid").toString())).getValue("folder_id").toString()));
-                                                        else
-                                                            coursArray.getJsonObject(i).put("folderid",0);
+                                                        else{
+                                                            coursArray.getJsonObject(i).put("moodleid", coursArray.getJsonObject(i).getValue("courseid"))
+                                                                    .put("userid", user.getUserId()).put("folderid",0);
+                                                            if(coursArray.getJsonObject(i).getJsonArray("auteur").getJsonObject(0).getString("entidnumber") ==  user.getUserId()) {
+                                                                    moodleWebService.createCourse(coursArray.getJsonObject(i), defaultResponseHandler(request));
+                                                            }
+                                                        }
                                                     }
 
                                                     moodleWebService.getPreferences(user.getUserId(), new Handler<Either<String, JsonArray>>() {

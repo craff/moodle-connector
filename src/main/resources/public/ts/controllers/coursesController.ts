@@ -423,6 +423,19 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         return $scope.nameFolder;
     }
 
+    $scope.targetFolderName = function() {
+        var nameToReturn;
+            if ($scope.folders.folderIdMoveIn != 0) {
+                $scope.folders.all.forEach(function (e) {
+                    if (e.id == $scope.folders.folderIdMoveIn) {
+                        nameToReturn = e.name;
+                    }
+                });
+            } else
+                nameToReturn = "Mes cours";
+        return nameToReturn;
+    }
+
     /**
      * create folder
      * */
@@ -507,7 +520,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * move folders & courses
      * */
     $scope.openPopUpMove = function () {
-        $scope.folders.getAllsubfolders();
         template.open('ligthBoxContainer', 'courses/moveElementLightbox');
         $scope.openLightbox = true;
     };

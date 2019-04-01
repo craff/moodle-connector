@@ -89,7 +89,6 @@ export class Folders {
         try {
             let folders = await http.get(`/moodle/folders`);
             this.all = Mix.castArrayAs(Folder, folders.data);
-            this.getAllsubfolders();
             this.isSynchronized = true;
         } catch (e) {
             this.isSynchronized = false;
@@ -115,12 +114,14 @@ export class Folders {
         return [];
     }
 
-    getAllsubfolders() {
+    /*getAllsubfolders() {
         if (this.all) {
+            this.listOfSubfolders.length = 0;
             var that = this;
             this.getparentFolder().forEach(function (folder) {
                 if (!folder.select) {
                     that.listOfSubfolders.push(folder);
+                    folder.subFolders = that.getSubFolder(folder.id);
                     that.insertSubFolders(folder);
                 }
             });
@@ -129,15 +130,16 @@ export class Folders {
 
     insertSubFolders(folder:Folder){
         var that = this;
-        if (folder.subFolders && folder.subFolders.length && folder.printTargetsubfolder) {
+        if (folder.subFolders && folder.subFolders.length) {
             this.getSubFolder(folder.id).forEach(function (subFolder) {
                 if(!(subFolder.select)) {
                     that.listOfSubfolders.push(subFolder);
+                    subFolder.subFolders = that.getSubFolder(subFolder.id);
                     that.insertSubFolders(subFolder);
                 }
             });
         }
-    }
+    }*/
 
     async moveToFolder(targetId : number) {
         try {
