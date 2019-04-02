@@ -505,6 +505,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.folders.foldersDelete();
         }
         if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
+            $scope.courses.folderid = ($scope.courses.allCourses.filter(course => course.selectConfirm))[0].folderid;
             await $scope.courses.coursesDuplicate();
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }

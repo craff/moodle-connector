@@ -6,6 +6,12 @@
 
         "coursesId": {
             "type" : "array"
-        }
+        },
+		"folderId": {
+			"type": "number"
+		},
+		"numberDuplication": {
+			"type": "number"
+		}
 	}
 }
