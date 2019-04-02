@@ -167,7 +167,7 @@ export class Courses {
         return {
             coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
             folderId: this.folderid,
-            numberDuplication: this.numberDuplication
+            numberOfDuplication: this.numberDuplication
         }
     }
     async coursesDuplicate() {

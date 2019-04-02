@@ -988,7 +988,7 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("Duplicate courses")
     @SecuredAction(workflow_duplicate)
     public void duplicate (final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "courses", new Handler<JsonObject>() {
+        RequestUtils.bodyToJson(request, pathPrefix + "duplicate", new Handler<JsonObject>() {
             @Override
             public void handle(JsonObject duplicateCourse) {
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -996,23 +996,25 @@ public class MoodleController extends ControllerHelper {
                     public void handle(UserInfos user) {
                         JsonArray courseId = duplicateCourse.getJsonArray("coursesId");
                         JsonObject courseToDuplicate = new JsonObject();
-                        courseToDuplicate.put("folderid",duplicateCourse.getInteger("folderId"));
+                        courseToDuplicate.put("folderid", duplicateCourse.getInteger("folderId"));
                         courseToDuplicate.put("status", "en attente");
                         courseToDuplicate.put("userId", user.getUserId());
-                        for (int i = 0; courseToDuplicate.size() < courseId.size(); i++) {
-                            courseToDuplicate.put("courseid", courseId.getValue(i));
-                            moodleWebService.insertDuplicateTable(courseToDuplicate, new Handler<Either<String, JsonObject>>() {
-                                @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if (event.isRight()) {
-                                        request.response()
-                                                .setStatusCode(200)
-                                                .end();
-                                    } else {
-                                        handle(new Either.Left<>("Failed to insert in database"));
+                        for (int j = 0; j < duplicateCourse.getInteger("numberOfDuplication"); j++){
+                            for (int i = 0; i < courseId.size(); i++) {
+                                courseToDuplicate.put("courseid", courseId.getValue(i));
+                                moodleWebService.insertDuplicateTable(courseToDuplicate, new Handler<Either<String, JsonObject>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+                                        if (event.isRight()) {
+                                            request.response()
+                                                    .setStatusCode(200)
+                                                    .end();
+                                        } else {
+                                            handle(new Either.Left<>("Failed to insert in database"));
+                                        }
                                     }
-                                }
-                            });
+                                });
+                            }
                         }
                     }
                 });

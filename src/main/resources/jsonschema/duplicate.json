@@ -3,14 +3,13 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-
         "coursesId": {
             "type" : "array"
         },
 		"folderId": {
 			"type": "number"
 		},
-		"numberDuplication": {
+		"numberOfDuplication": {
 			"type": "number"
 		}
 	}

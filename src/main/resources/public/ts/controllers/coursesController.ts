@@ -135,7 +135,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.isPrintMenuFolder = function () {
-        if($scope.currentfolderid != 0) {
+        if($scope.currentfolderid != 0 || $scope.printmenucourseShared) {
             $scope.initFolders();
             $scope.printmenufolder = true;
             $scope.printmenucourseShared = false;
