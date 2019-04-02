@@ -33,6 +33,7 @@ export class Course implements Shareable{
         type: string;
         compatibleMoodle: boolean;
     };
+    duplication: string;
 
     constructor(){
         this.type = "1";
@@ -100,7 +101,8 @@ export class Course implements Shareable{
     }
 
     async goTo(scope: string = 'view') {
-        window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
+        if(this.duplication == "non")
+            window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
     }
 
     async setPreferences(preference : string) {

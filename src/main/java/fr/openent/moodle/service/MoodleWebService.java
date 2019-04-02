@@ -160,6 +160,13 @@ public interface MoodleWebService{
     void getCourseIdToDuplicate (String status, Handler<Either<String, JsonObject>> handler);
 
     /**
+     * get course of the user to duplicate
+     * @param userId
+     * @param eitherHandler function handler returning data
+     */
+    void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> eitherHandler);
+
+    /**
      * get courseid to duplicate
      * @param status state of the course to duplicate
      * @param id sql id of the course to duplicate

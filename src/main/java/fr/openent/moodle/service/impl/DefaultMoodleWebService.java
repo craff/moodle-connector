@@ -298,6 +298,16 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
+    public void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> eitherHandler){
+        String query = "SELECT * FROM " + Moodle.moodleSchema + ".duplication WHERE id_users = ? ;";
+
+        JsonArray values = new JsonArray();
+        values.add(userId);
+
+        sql.prepared(query, values, SqlResult.validResultHandler(eitherHandler));
+    }
+
+    @Override
     public void updateStatusCourseToDuplicate (String status, Integer id, Handler<Either<String, JsonObject>> handler){
         String query = "UPDATE " + Moodle.moodleSchema + ".duplication SET status = ? WHERE id = ?";
 

@@ -80,18 +80,19 @@
                     </label>
                 </div>
                 <div ng-if="place == 'coursesMine' || place == 'coursesShared' || (place=='coursesToDo' && view == 'icons')" class="ellipsis" ng-click="course.goTo()">
-                    <span class="summary-list summary-color size-font">[[course.summary]]</span></br>
+                    <span class="summary-list summary-color size-font" ng-class="{duplicateCourse : course.duplication != 'non'}">[[course.summary]]</span></br>
                 </div>
             </div>
             <label class="size-font" ng-if="place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'" ng-click="course.goTo()">
                 <span class="date">[[ printDate(course, "modified" ) ]]</span>
             </label>
-            <label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'">
+            <label class="checkbox right-magnet" ng-if="(place == 'coursesMine' && course.duplication == 'non') || place == 'coursesShared'">
                 <i class="share"></i>
                 <span></span>
                 <input type="checkbox" ng-change="checkCourse()" ng-model="course.select">
                 <span></span>
             </label>
+            <div class="lds-facebook right-magnet" ng-if="place == 'coursesMine' && course.duplication == 'en cours'"><div></div><div></div><div></div></div>
         </div>
         <div class="left-margin" ng-if="view =='icons'">
             <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != '0'" ng-click="course.goTo()">
