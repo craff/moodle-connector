@@ -69,7 +69,6 @@ public class MoodleController extends ControllerHelper {
             resource_read = "moodle.read",
             resource_contrib = "moodle.contrib",
             resource_manager = "moodle.manager",
-
             workflow_create = "moodle.create",
             workflow_delete = "moodle.delete",
             workflow_view = "moodle.view",
@@ -424,6 +423,7 @@ public class MoodleController extends ControllerHelper {
                                                                     courseToAdd.put("date", Long.toString((timestamp.getTime()/1000)));
                                                                     courseToAdd.put("timemodified", timestamp.getTime()/1000);
                                                                     courseToAdd.put("duplication",coursesInDuplication.getJsonObject(i).getString("status"));
+                                                                    courseToAdd.put("originalCourseId",coursesInDuplication.getJsonObject(i).getInteger("id_course"));
                                                                     courseToAdd.put("folderid",coursesInDuplication.getJsonObject(i).getInteger("id_folder"));
                                                                     coursArray.add(courseToAdd);
                                                                 }
@@ -1050,6 +1050,23 @@ public class MoodleController extends ControllerHelper {
                         }
                     }
                 });
+            }
+        });
+    }
+
+    @Get("/duplicateCourses")
+    @ApiDoc("Get duplicate courses")
+    @SecuredAction(workflow_duplicate)
+    public void getDuplicateCourses (final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
+            public void handle(UserInfos user) {
+                if (user != null) {
+                    moodleWebService.getCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
+                } else {
+                    log.debug("User not found in session.");
+                    unauthorized(request);
+                }
             }
         });
     }

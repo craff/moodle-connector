@@ -4,7 +4,7 @@ import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
 import http from "axios";
 
-export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', '$rootScope', ($scope, $timeout, route, $rootScope) => {
+export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', '$rootScope', '$interval', ($scope, $timeout, route, $rootScope, $interval) => {
 
 
     route({
@@ -734,4 +734,34 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         Utils.safeApply($scope);
     }
+
+    /**
+     * set timeout in order to update the status of duplicate course
+     */
+    $scope.updateCourse = async function () {
+            let duplicateCourses = await $scope.courses.getDuplicateCourse();
+            console.log(duplicateCourses);
+            let needRefresh = false;
+        $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
+            let findDuplicate = false;
+            duplicateCourses.forEach(async function (duplicateCourse){
+                    if(duplicateCourse.id_course == course.originalCourseId){
+                        findDuplicate = true;
+                        if(duplicateCourse.status != course.duplication){
+                            course.duplication = duplicateCourse.status;
+                            needRefresh=true;
+                        }
+                    }
+                });
+            if(!findDuplicate) {
+                await $scope.courses.getCoursesbyUser(model.me.userId);
+                needRefresh = true;
+            }
+        });
+        if(needRefresh)
+            Utils.safeApply($scope);
+    }
+
+    $interval( function(){ $scope.updateCourse(); }, 10000, $scope.courses != undefined);
+
 }]);

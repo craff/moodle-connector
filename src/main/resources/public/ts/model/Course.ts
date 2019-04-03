@@ -181,6 +181,16 @@ export class Courses {
         }
     }
 
+    async getDuplicateCourse () {
+        try {
+            let courses = await http.get(`/moodle/duplicateCourses`);
+            return courses.data;
+
+        } catch (e) {
+            throw e;
+        }
+    }
+
     toJSON() {
         return {
             printcourseslastcreation : this.printcourseslastcreation,
