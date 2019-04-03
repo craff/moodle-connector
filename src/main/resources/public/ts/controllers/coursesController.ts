@@ -762,6 +762,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             Utils.safeApply($scope);
     }
 
-    $interval( function(){ $scope.updateCourse(); }, 10000, $scope.courses != undefined);
+    $interval( function(){ $scope.updateCourse(); }, 60000, $scope.courses != undefined);
 
 }]);
