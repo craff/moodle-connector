@@ -64,7 +64,7 @@ export class Folders {
             return {
                 parentId: this.folderIdMoveIn,
                 foldersId: this.all.filter(folder => folder.select).map(folder => folder.id )
-            }
+            };
         else
             return {
                 parentId: targetId,

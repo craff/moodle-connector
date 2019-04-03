@@ -30,7 +30,7 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
 
     @Override
     public void handle(Long event) {
-        String status = "en attente";
+        String status = WAITING;
         moodleWebService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonObject>>() {
             @Override
             public void handle(Either<String, JsonObject> event) {
@@ -62,7 +62,7 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                             @Override
                             public void handle(Either<String, Buffer> event) {
                                 if (event.isRight()) {
-                                    final String status = "en cours";
+                                    final String status = PENDING;
                                     Integer id = courseToDuplicate.getInteger("id");
                                     moodleWebService.updateStatusCourseToDuplicate(status, id, new Handler<Either<String, JsonObject>>() {
                                         @Override
@@ -86,5 +86,4 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
             }
         });
     }
-        //Maj de la BDD
 }

@@ -59,15 +59,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
-
-        //Behaviours.findRights('moodle', $scope.courses.allCourses[0]);
-        //$scope.courses.allCourses[0].myRights.fromBehaviours("moodle");
-
-        // TODO gestion des dossiers
-        // if($scope.folders.isSynchronized === undefined || $scope.folders.isSynchronized === false) {
-        //     $scope.initFolders();
-        // }
-
         template.open('main', 'my-courses');
         Utils.safeApply($scope);
     };
@@ -343,17 +334,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         course.typeA = $scope.typeActivity.selectedOption.id;
     };
 
-    // $scope.shareCourse = async function () {
-    //     $scope.course = new Course();
-    //     $scope.course.share();
-    //     Utils.safeApply($scope);
-    // };
-    /*
-        $scope.deleteCourse = function () {
-            $scope.course.delete();
-            Utils.safeApply($scope);
-        };
-    */
     /**
      * Filter Type
      */
@@ -421,7 +401,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }else
             $scope.nameFolder = "Cours partagés avec moi";
         return $scope.nameFolder;
-    }
+    };
 
     $scope.targetFolderName = function() {
         var nameToReturn;
@@ -492,7 +472,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.openPopUpDuplicate = function () {
         $scope.courses.numberDuplication=undefined;
         template.open('ligthBoxContainer', 'courses/duplicateLightbox');
-        //$scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = true);
+        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = true);
         $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = true);
         $scope.confirmDuplicateSend();
         $scope.openLightbox = true;
@@ -547,9 +527,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.countItems = function (folder : Folder) {
         return _.where($scope.courses.coursesByUser,{folderid: folder.id}).length + _.where($scope.folders.all,{parent_id: folder.id}).length;
-
-
-    }
+    };
 
     /**
      * Drag & drop file adn course

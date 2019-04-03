@@ -27,6 +27,10 @@ public class Moodle extends BaseServer {
 	public static String WS_POST_DUPLICATECOURSE = "local_entcgi_services_duplicatecourse";
 	public static String JSON = "json";
 
+	public static String WAITING = "en attente";
+	public static String PENDING = "en cours";
+	public static String FINISHED = "terminé";
+
 	public static Integer manager = 1;
 	public static Integer coursecreator = 2;
 	public static Integer editingteacher = 3;

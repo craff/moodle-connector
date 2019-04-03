@@ -1054,19 +1054,13 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-    @Get("/duplicateCourses")
-    @ApiDoc("Get duplicate courses")
-    @SecuredAction(workflow_duplicate)
-    public void getDuplicateCourses (final HttpServerRequest request) {
+    @Post("/course/duplicate/response")
+    @ApiDoc("Duplicate courses")
+    public void getMoodleResponse (HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
             @Override
-            public void handle(UserInfos user) {
-                if (user != null) {
-                    moodleWebService.getCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
-                } else {
-                    log.debug("User not found in session.");
-                    unauthorized(request);
-                }
+            public void handle(UserInfos userInfos) {
+
             }
         });
     }
