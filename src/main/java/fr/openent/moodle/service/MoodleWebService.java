@@ -175,4 +175,11 @@ public interface MoodleWebService{
 
     void updateStatusCourseToDuplicate (String status, Integer id, Handler<Either<String, JsonObject>> handler);
 
+    /**
+     * updtae database in order to delete finished duplication
+     * @param handler function handler returning data
+     */
+
+    void deleteFinisedCoursesDuplicate (Handler<Either<String, JsonObject>> handler);
+
 }

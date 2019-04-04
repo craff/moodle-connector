@@ -731,15 +731,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                         }
                     }
                 });
-            if(!findDuplicate) {
+            if(!findDuplicate && !$scope.openLightbox) {
                 await $scope.courses.getCoursesbyUser(model.me.userId);
                 needRefresh = true;
             }
         });
-        if(needRefresh)
+        if(needRefresh && !$scope.openLightbox)
             Utils.safeApply($scope);
     }
 
-    $interval( function(){ $scope.updateCourse(); }, 60000, $scope.courses != undefined);
+    $interval( function(){ $scope.updateCourse(); }, 5000, $scope.courses != undefined);
 
 }]);

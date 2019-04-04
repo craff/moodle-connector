@@ -59,19 +59,19 @@ public class Moodle extends BaseServer {
 		courseConf.setTable("course");
 		courseConf.setShareTable("course_shares");
 
+		MoodleController moodleController = new MoodleController(storage, eb);
+		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
+		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
+
 //		final String cronExpression = config().getString("$yourProperty$Cron", "0 */"+config.getString("timeMinuteSynchCron")+" * * * ? *");
 		final String cronExpression = config().getString("$yourProperty$Cron", "*/30 * * * * ? *");
 		try {
 			new CronTrigger(vertx, cronExpression).schedule(
-					new synchDuplicationMoodle(vertx)
+					new synchDuplicationMoodle(vertx,moodleController)
 			);
 		} catch (ParseException e) {
 			log.fatal("Invalid cron expression.", e);
 		}
-
-		MoodleController moodleController = new MoodleController(storage, eb);
-		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
-		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
 
 		addController(moodleController);
 	}

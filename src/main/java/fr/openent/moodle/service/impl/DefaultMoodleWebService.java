@@ -14,6 +14,8 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
+import static fr.openent.moodle.Moodle.FINISHED;
+
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
 
@@ -289,7 +291,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonObject>> handler){
-        String query = "SELECT id, id_course, id_users FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? LIMIT 1;";
+        String query = "SELECT id, id_course, id_users, id_folder FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? LIMIT 1;";
 
         JsonArray values = new JsonArray();
         values.add(status);
@@ -314,6 +316,16 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         JsonArray values = new JsonArray();
         values.add(status);
         values.add(id);
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void deleteFinisedCoursesDuplicate ( Handler<Either<String, JsonObject>> handler){
+        String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? ;";
+
+        JsonArray values = new JsonArray();
+        values.add(FINISHED);
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
