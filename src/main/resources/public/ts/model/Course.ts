@@ -93,6 +93,7 @@ export class Course implements Shareable{
         try {
             const {data} = await http.post('/moodle/course', this.toJSON());
             this.courseid = data.id;
+            this.duplication="non";
             this.goTo('view');
         } catch (e) {
             notify.error("Save function didn't work");
@@ -152,8 +153,7 @@ export class Courses {
 
     toJsonForDelete(){
         return {
-            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
-            folderid: this.folderid
+            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid )
         }
     }
     async coursesDelete() {

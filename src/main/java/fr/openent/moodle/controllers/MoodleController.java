@@ -407,7 +407,7 @@ public class MoodleController extends ControllerHelper {
 
                                                     List<String> coursId = coursArray.stream().map(obj -> (((JsonObject) obj).getValue("courseid")).toString()).collect(Collectors.toList());
 
-                                                    moodleWebService.getCourseToDuplicate(user.getUserId(), new Handler<Either<String, JsonArray>>() {
+                                                    moodleWebService.getCourseToDuplicate(user.getUserId(),  new Handler<Either<String, JsonArray>> () {
                                                         @Override
                                                         public void handle(Either<String, JsonArray> event) {
                                                             if (event.right().getValue().size() != 0) {
@@ -429,7 +429,7 @@ public class MoodleController extends ControllerHelper {
                                                                     coursArray.add(courseToAdd);
                                                                 }
                                                             } else {
-                                                                handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
+                                                                log.error("There are no course to duplicate in the duplication table !");
                                                             }
                                                         }
                                                     });

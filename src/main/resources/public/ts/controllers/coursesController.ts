@@ -714,7 +714,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.updateCourse = async function () {
             let duplicateCourses = await $scope.courses.getDuplicateCourse();
-            console.log(duplicateCourses);
             let needRefresh = false;
         $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
             let findDuplicate = false;
