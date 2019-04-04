@@ -453,6 +453,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.disableDeleteSend = false;
         if ($scope.folders.all.some(folder => folder.selectConfirm)) {
             await $scope.folders.foldersDelete();
+            $scope.idAllFoldersToDelete = $scope.folders.all.filter(folder => folder.selectConfirm).map(folder => folder.id);
+                $scope.idAllFoldersToDelete.forEach(function (idFolder) {
+                    $scope.courses.allCourses.filter(course => course.folderid = idFolder).map(course => course.selectConfirm = true);
+                    $scope.newFoldersToDelete = $scope.folders.getSubFolder(idFolder);
+                    $scope.idAllFoldersToDelete.concat($scope.newFoldersToDelete.map(folder => folder.id))//pas de concatt!!
+                });
         }
         if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
             await $scope.courses.coursesDelete();

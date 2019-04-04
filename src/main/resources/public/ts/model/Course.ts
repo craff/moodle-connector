@@ -19,6 +19,7 @@ export class Course implements Shareable{
     startdate : Date;
     enddate : Date;
     timemodified : number;
+    enrolmentdate : number;
     categoryid : number;
     folderid : number;
     imageurl : string;
@@ -226,9 +227,9 @@ export class Courses {
             });
             this.coursesSharedToFollow = this.coursesSharedToFollow.sort(
                 function compare(a, b) {
-                    if (a.date < b.date)
+                    if (a.enrolmentdate < b.enrolmentdate)
                         return 1;
-                    if (a.date > b.date)
+                    if (a.enrolmentdate > b.enrolmentdate)
                         return -1;
                 }
             );
