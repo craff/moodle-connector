@@ -1096,94 +1096,99 @@ public class MoodleController extends ControllerHelper {
                         moodleWebService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonObject>>() {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
-                                JsonObject courseToDuplicate = new JsonObject();
-                                courseToDuplicate.put("courseid", event.right().getValue().getInteger("id_course"));
-                                courseToDuplicate.put("userid", event.right().getValue().getString("id_users"));
-                                courseToDuplicate.put("folderid", event.right().getValue().getInteger("id_folder"));
-                                courseToDuplicate.put("id", event.right().getValue().getInteger("id"));
                                 if (event.isRight()) {
-                                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                                    URI moodleUri = null;
-                                    try {
-                                        final String service = moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path");
-                                        final String urlSeparator = service.endsWith("") ? "" : "/";
-                                        moodleUri = new URI(service + urlSeparator);
-                                    } catch (URISyntaxException e) {
-                                        log.debug("Invalid moodle web service uri", e);
-                                    }
-                                    if (moodleUri != null) {
-                                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                        final String moodleUrl = moodleUri.toString() +
-                                                "?wstoken=" + WSTOKEN +
-                                                "&wsfunction=" + WS_POST_DUPLICATECOURSE +
-                                                "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
-                                                "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
-                                                "&moodlewsrestformat=" + JSON;
-                                        final String status = PENDING;
-                                        Integer id = courseToDuplicate.getInteger("id");
-                                        moodleWebService.updateStatusCourseToDuplicate(status, id, new Handler<Either<String, JsonObject>>() {
-                                            @Override
-                                            public void handle(Either<String, JsonObject> event) {
-                                                if (event.isRight()) {
-                                                    JsonObject shareSend = new JsonObject();
-                                                    shareSend = null;
-                                                    httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                                        @Override
-                                                        public void handle(Either<String, Buffer> event) {
-                                                            if (event.isRight()) {
-                                                                final String status = FINISHED;
-                                                                JsonObject duplicateCourse = event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0);
-                                                                Integer id = courseToDuplicate.getInteger("id");
-                                                                moodleWebService.updateStatusCourseToDuplicate(status, id, new Handler<Either<String, JsonObject>>() {
-                                                                    @Override
-                                                                    public void handle(Either<String, JsonObject> event) {
-                                                                        if (event.isRight()) {
-                                                                            duplicateCourse.put("userid", courseToDuplicate.getString("userid"));
-                                                                            duplicateCourse.put("folderid", courseToDuplicate.getValue("folderid"));
-                                                                            duplicateCourse.put("moodleid", duplicateCourse.getValue("courseid"));
-                                                                            moodleWebService.createCourse(duplicateCourse, new Handler<Either<String, JsonObject>>() {
-                                                                                @Override
-                                                                                public void handle(Either<String, JsonObject> event) {
-                                                                                    if (event.isRight()) {
-                                                                                        moodleWebService.deleteFinisedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
-                                                                                            @Override
-                                                                                            public void handle(Either<String, JsonObject> event) {
-                                                                                                if (event.isRight()) {
-                                                                                                    eitherHandler.handle(new Either.Right<>(event.right().getValue()));
-                                                                                                } else {
-                                                                                                    log.error("Problem to delete finished duplicate courses !");
-                                                                                                    eitherHandler.handle(new Either.Left<>("Problem to delete finished duplicate courses"));
+                                    if (event.right().getValue().size() != 0) {
+                                        JsonObject courseToDuplicate = new JsonObject();
+                                        courseToDuplicate.put("courseid", event.right().getValue().getInteger("id_course"));
+                                        courseToDuplicate.put("userid", event.right().getValue().getString("id_users"));
+                                        courseToDuplicate.put("folderid", event.right().getValue().getInteger("id_folder"));
+                                        courseToDuplicate.put("id", event.right().getValue().getInteger("id"));
+                                        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                                        URI moodleUri = null;
+                                        try {
+                                            final String service = moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path");
+                                            final String urlSeparator = service.endsWith("") ? "" : "/";
+                                            moodleUri = new URI(service + urlSeparator);
+                                        } catch (URISyntaxException e) {
+                                            log.debug("Invalid moodle web service uri", e);
+                                        }
+                                        if (moodleUri != null) {
+                                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                            final String moodleUrl = moodleUri.toString() +
+                                                    "?wstoken=" + WSTOKEN +
+                                                    "&wsfunction=" + WS_POST_DUPLICATECOURSE +
+                                                    "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
+                                                    "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
+                                                    "&moodlewsrestformat=" + JSON;
+                                            final String status = PENDING;
+                                            Integer id = courseToDuplicate.getInteger("id");
+                                            moodleWebService.updateStatusCourseToDuplicate(status, id, new Handler<Either<String, JsonObject>>() {
+                                                @Override
+                                                public void handle(Either<String, JsonObject> event) {
+                                                    if (event.isRight()) {
+                                                        JsonObject shareSend = new JsonObject();
+                                                        shareSend = null;
+                                                        httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                                                            @Override
+                                                            public void handle(Either<String, Buffer> event) {
+                                                                if (event.isRight()) {
+                                                                    final String status = FINISHED;
+                                                                    JsonObject duplicateCourse = event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0);
+                                                                    Integer id = courseToDuplicate.getInteger("id");
+                                                                    moodleWebService.updateStatusCourseToDuplicate(status, id, new Handler<Either<String, JsonObject>>() {
+                                                                        @Override
+                                                                        public void handle(Either<String, JsonObject> event) {
+                                                                            if (event.isRight()) {
+                                                                                duplicateCourse.put("userid", courseToDuplicate.getString("userid"));
+                                                                                duplicateCourse.put("folderid", courseToDuplicate.getValue("folderid"));
+                                                                                duplicateCourse.put("moodleid", duplicateCourse.getValue("courseid"));
+                                                                                moodleWebService.createCourse(duplicateCourse, new Handler<Either<String, JsonObject>>() {
+                                                                                    @Override
+                                                                                    public void handle(Either<String, JsonObject> event) {
+                                                                                        if (event.isRight()) {
+                                                                                            moodleWebService.deleteFinisedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                                                                                                @Override
+                                                                                                public void handle(Either<String, JsonObject> event) {
+                                                                                                    if (event.isRight()) {
+                                                                                                        eitherHandler.handle(new Either.Right<>(event.right().getValue()));
+                                                                                                    } else {
+                                                                                                        log.error("Problem to delete finished duplicate courses !");
+                                                                                                        eitherHandler.handle(new Either.Left<>("Problem to delete finished duplicate courses"));
+                                                                                                    }
                                                                                                 }
-                                                                                            }
-                                                                                        });
-                                                                                    } else {
-                                                                                        log.error("Problem to insert in course database !");
-                                                                                        eitherHandler.handle(new Either.Left<>("Problem to insert in course database"));
+                                                                                            });
+                                                                                        } else {
+                                                                                            log.error("Problem to insert in course database !");
+                                                                                            eitherHandler.handle(new Either.Left<>("Problem to insert in course database"));
+                                                                                        }
                                                                                     }
-                                                                                }
-                                                                            });
-                                                                        } else {
-                                                                            log.error("There are no course waiting to be duplicate!");
-                                                                            eitherHandler.handle(new Either.Left<>("There are no course waiting to be duplicate"));
+                                                                                });
+                                                                            } else {
+                                                                                log.error("There are no course waiting to be duplicate!");
+                                                                                eitherHandler.handle(new Either.Left<>("There are no course waiting to be duplicate"));
+                                                                            }
                                                                         }
-                                                                    }
-                                                                });
-                                                            } else {
-                                                                log.error("Duplication web-service failed !");
-                                                                eitherHandler.handle(new Either.Left<>("Duplication web-service failed"));
+                                                                    });
+                                                                } else {
+                                                                    log.error("Duplication web-service failed !");
+                                                                    eitherHandler.handle(new Either.Left<>("Duplication web-service failed"));
+                                                                }
                                                             }
-                                                        }
-                                                    });
-                                                } else{
-                                                    log.error("Update duplication databse failed !");
-                                                    eitherHandler.handle(new Either.Left<>("Update duplication databse failed "));
+                                                        });
+                                                    } else {
+                                                        log.error("Update duplication databse failed !");
+                                                        eitherHandler.handle(new Either.Left<>("Update duplication databse failed "));
+                                                    }
                                                 }
-                                            }
-                                        });
+                                            });
+                                        }
+                                    } else {
+                                        log.error("There are no course to duplicate in the duplication table !");
+                                        eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
                                     }
-                                } else {
-                                    log.error("There are no course to duplicate in the duplication table !");
-                                    eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
+                                }else{
+                                    log.error("the access to duplicate database failed !");
+                                    eitherHandler.handle(new Either.Left<>("the access to duplicate database failed"));
                                 }
                             }
                         });

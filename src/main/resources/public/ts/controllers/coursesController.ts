@@ -472,7 +472,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.openPopUpDuplicate = function () {
         $scope.courses.numberDuplication=undefined;
         template.open('ligthBoxContainer', 'courses/duplicateLightbox');
-        $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = true);
         $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = true);
         $scope.confirmDuplicateSend();
         $scope.openLightbox = true;
@@ -482,9 +481,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
     $scope.duplicateElements = async function () {
         $scope.disableDuplicateSend = false;
-        if ($scope.folders.all.some(folder => folder.selectConfirm)) {
-            await $scope.folders.foldersDelete();
-        }
         if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
             $scope.courses.folderid = ($scope.courses.allCourses.filter(course => course.selectConfirm))[0].folderid;
             await $scope.courses.coursesDuplicate();
