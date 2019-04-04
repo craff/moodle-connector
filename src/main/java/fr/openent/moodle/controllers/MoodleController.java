@@ -770,9 +770,7 @@ public class MoodleController extends ControllerHelper {
                                         shareInfosFuture.getJsonObject("groups").getJsonObject("checked").put(((JsonObject) group).getString("id"),tabToAdd);
                                     }
 
-                                    JsonArray usersInitialyEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
-
-                                    for(Object userEnroled : usersInitialyEnroled) {
+                                    for(Object userEnroled : usersEnroled.copy()) {
                                         if (!(Objects.isNull(((JsonObject) userEnroled).getValue("idnumber")))) {
                                             usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(usersEnroledId.indexOf(((JsonObject) userEnroled).getString("id")));
                                             usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
