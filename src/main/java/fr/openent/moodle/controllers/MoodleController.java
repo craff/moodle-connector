@@ -852,6 +852,12 @@ public class MoodleController extends ControllerHelper {
                     @Override
                     public void handle(UserInfos user) {
                         if (user != null) {
+                            for (Object idGroup : shareCourse.copy().getJsonObject("groups").getMap().keySet().toArray() ) {
+                                if(idGroup.toString().substring(0,3).compareTo("GR_") == 0){
+                                    shareCourse.getJsonObject("groups").put(idGroup.toString().substring(3),shareCourse.getJsonObject("groups").getValue(idGroup.toString()));
+                                    shareCourse.getJsonObject("groups").remove(idGroup.toString());
+                                }
+                            }
                             List<Future> listeFutures = new ArrayList<>();
                             JsonObject IdFront = new JsonObject();
                             JsonObject keyShare = new JsonObject();
