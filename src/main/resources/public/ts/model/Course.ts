@@ -268,6 +268,10 @@ export class Courses {
         }
     }
 
+    lastCreation(){
+        return this.coursesByUser.filter(course => course.duplication == 'non').slice(0,5);
+    }
+
     isTheFirst(courseFirst : Course, id : string){
         if(this.coursesToShow(id,"coursesToDo").indexOf(courseFirst) == 0)
             return true;

@@ -96,7 +96,7 @@
             <switch ng-model="courses.printcourseslastcreation" ng-click="courses.setChoice(1)"></switch>
         </div>
         <div ng-if="courses.printcourseslastcreation" class="row">
-            <div ng-repeat="course in courses.coursesByUser.slice(0,5)" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
+            <div ng-repeat="course in courses.lastCreation()" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>

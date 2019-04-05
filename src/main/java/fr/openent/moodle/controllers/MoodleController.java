@@ -1070,7 +1070,17 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 if (user != null) {
-                    moodleWebService.getCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
+                    moodleWebService.deleteFinisedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                        @Override
+                        public void handle(Either<String, JsonObject> event) {
+                            if (event.isRight()) {
+                                moodleWebService.getCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
+                            } else {
+                                log.error("Problem to delete finished duplicate courses !");
+                                renderError(request);
+                            }
+                        }
+                    });
                 } else {
                     log.debug("User not found in session.");
                     unauthorized(request);
@@ -1093,22 +1103,23 @@ public class MoodleController extends ControllerHelper {
 
     public void synchronisationDuplication (final Handler<Either<String, JsonObject>> eitherHandler){
         String status = PENDING;
-        moodleWebService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonObject>>() {
+        moodleWebService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonArray>>() {
             @Override
-            public void handle(Either<String, JsonObject> event) {
+            public void handle(Either<String, JsonArray> event) {
                 if (event.isRight()) {
-                    if(event.right().getValue().size() == 0) {
+                    if(event.right().getValue().size() < moodleConfig.getInteger("numberOfMaxPendingDuplication")) {
                         String status = WAITING;
-                        moodleWebService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonObject>>() {
+                        moodleWebService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonArray>>() {
                             @Override
-                            public void handle(Either<String, JsonObject> event) {
+                            public void handle(Either<String, JsonArray> event) {
                                 if (event.isRight()) {
                                     if (event.right().getValue().size() != 0) {
                                         JsonObject courseToDuplicate = new JsonObject();
-                                        courseToDuplicate.put("courseid", event.right().getValue().getInteger("id_course"));
-                                        courseToDuplicate.put("userid", event.right().getValue().getString("id_users"));
-                                        courseToDuplicate.put("folderid", event.right().getValue().getInteger("id_folder"));
-                                        courseToDuplicate.put("id", event.right().getValue().getInteger("id"));
+                                        courseToDuplicate.put("courseid", event.right().getValue().getJsonObject(0).getInteger("id_course"));
+                                        courseToDuplicate.put("userid", event.right().getValue().getJsonObject(0).getString("id_users"));
+                                        courseToDuplicate.put("folderid", event.right().getValue().getJsonObject(0).getInteger("id_folder"));
+                                        courseToDuplicate.put("id", event.right().getValue().getJsonObject(0).getInteger("id"));
+                                        courseToDuplicate.put("numberOfTentatives", event.right().getValue().getJsonObject(0).getInteger("nombre_tentatives"));
                                         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                         URI moodleUri = null;
                                         try {
@@ -1128,7 +1139,7 @@ public class MoodleController extends ControllerHelper {
                                                     "&moodlewsrestformat=" + JSON;
                                             final String status = PENDING;
                                             Integer id = courseToDuplicate.getInteger("id");
-                                            moodleWebService.updateStatusCourseToDuplicate(status, id, new Handler<Either<String, JsonObject>>() {
+                                            moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
                                                 @Override
                                                 public void handle(Either<String, JsonObject> event) {
                                                     if (event.isRight()) {
@@ -1141,7 +1152,7 @@ public class MoodleController extends ControllerHelper {
                                                                     final String status = FINISHED;
                                                                     JsonObject duplicateCourse = event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0);
                                                                     Integer id = courseToDuplicate.getInteger("id");
-                                                                    moodleWebService.updateStatusCourseToDuplicate(status, id, new Handler<Either<String, JsonObject>>() {
+                                                                    moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
                                                                         @Override
                                                                         public void handle(Either<String, JsonObject> event) {
                                                                             if (event.isRight()) {
@@ -1177,7 +1188,19 @@ public class MoodleController extends ControllerHelper {
                                                                     });
                                                                 } else {
                                                                     log.error("Duplication web-service failed !");
-                                                                    eitherHandler.handle(new Either.Left<>("Duplication web-service failed"));
+                                                                    final String status = WAITING;
+                                                                    Integer id = courseToDuplicate.getInteger("id");
+                                                                    Integer nbrTentatives =  courseToDuplicate.getInteger("numberOfTentatives");
+                                                                    moodleWebService.updateStatusCourseToDuplicate(status, id, nbrTentatives, new Handler<Either<String, JsonObject>>() {
+                                                                        @Override
+                                                                        public void handle(Either<String, JsonObject> event) {
+                                                                            if (event.isRight()) {
+                                                                                eitherHandler.handle(new Either.Left<>("Duplication web-service failed"));
+                                                                            } else {
+                                                                                eitherHandler.handle(new Either.Left<>("Update database doesn't work"));
+                                                                            }
+                                                                        }
+                                                                    });
                                                                 }
                                                             }
                                                         });

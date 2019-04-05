@@ -17,6 +17,9 @@
         "sql": true,
         "db-schema": "moodle",
         "timeMinuteSynchCron": "1",
+        "numberOfMaxDuplicationTentatives": 3,
+        "numberOfMaxPendingDuplication":1,
+        "timeDuplicationBeforeDelete": "10 minutes",
         "address_moodle": "${moodleServer}",
         "ws-path": "${moodleWsPath}"
       }

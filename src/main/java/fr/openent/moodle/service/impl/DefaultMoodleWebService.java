@@ -1,5 +1,6 @@
 package fr.openent.moodle.service.impl;
 
+
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.service.MoodleWebService;
 import fr.wseduc.webutils.Either;
@@ -14,12 +15,10 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
-import static fr.openent.moodle.Moodle.FINISHED;
+import static fr.openent.moodle.Moodle.*;
 
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMoodleWebService.class);
 
     public DefaultMoodleWebService(String schema, String table) {
         super(schema, table);
@@ -290,13 +289,18 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonObject>> handler){
-        String query = "SELECT id, id_course, id_users, id_folder FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? LIMIT 1;";
+    public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> eitherHandler){
+        String query = "SELECT id, id_course, id_users, id_folder FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? ";
+
+        if(status == WAITING)
+            query+= "LIMIT 1";
+
+        query += ";";
 
         JsonArray values = new JsonArray();
         values.add(status);
 
-        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(query, values, SqlResult.validResultHandler(eitherHandler));
     }
 
     @Override
@@ -310,23 +314,32 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void updateStatusCourseToDuplicate (String status, Integer id, Handler<Either<String, JsonObject>> handler){
-        String query = "UPDATE " + Moodle.moodleSchema + ".duplication SET status = ? WHERE id = ?";
-
+    public void updateStatusCourseToDuplicate (String status, Integer id, Integer numberOfTentatives, Handler<Either<String, JsonObject>> handler){
         JsonArray values = new JsonArray();
+        String query = "UPDATE " + Moodle.moodleSchema + ".duplication SET ";
+        if(status == WAITING){
+            if(numberOfTentatives == Moodle.moodleConfig.getInteger("numberOfMaxDuplicationTentatives"))
+                status=ERROR;
+            query += "nombre_tentatives = ?, ";
+
+            values.add(numberOfTentatives + 1);
+        }
+
+        query += "status = ? WHERE id = ?";
+
         values.add(status);
         values.add(id);
+
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void deleteFinisedCoursesDuplicate ( Handler<Either<String, JsonObject>> handler){
-        String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? ;";
+        String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status = '"+FINISHED+"' ;"+
+                "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status != '"+WAITING+"' AND status != '"+ERROR+"' AND now()-date > interval '"+
+                Moodle.moodleConfig.getString("timeDuplicationBeforeDelete")+"' ;";
 
-        JsonArray values = new JsonArray();
-        values.add(FINISHED);
-
-        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+        sql.raw(query, SqlResult.validUniqueResultHandler(handler));
     }
 }

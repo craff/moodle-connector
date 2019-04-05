@@ -360,6 +360,10 @@ body.moodle {
     margin-top: -13px;
   }
 
+  .notDraggable{
+    cursor:auto;
+  }
+
   .courseButton {
     display: block;
     height: 100px;

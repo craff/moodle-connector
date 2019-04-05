@@ -155,9 +155,9 @@ public interface MoodleWebService{
     /**
      * get courseid to duplicate
      * @param status state of the course to duplicate
-     * @param handler function handler returning data
+     * @param eitherHandler function handler returning data
      */
-    void getCourseIdToDuplicate (String status, Handler<Either<String, JsonObject>> handler);
+    void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> eitherHandler);
 
     /**
      * get course of the user to duplicate
@@ -170,10 +170,11 @@ public interface MoodleWebService{
      * get courseid to duplicate
      * @param status state of the course to duplicate
      * @param id sql id of the course to duplicate
+     * @param numberOfTentatives in order to increment the number of duplication when the processus failed
      * @param handler function handler returning data
      */
 
-    void updateStatusCourseToDuplicate (String status, Integer id, Handler<Either<String, JsonObject>> handler);
+    void updateStatusCourseToDuplicate (String status, Integer id, Integer numberOfTentatives, Handler<Either<String, JsonObject>> handler);
 
     /**
      * updtae database in order to delete finished duplication

@@ -29,7 +29,8 @@ public class Moodle extends BaseServer {
 
 	public static String WAITING = "en attente";
 	public static String PENDING = "en cours";
-	public static String FINISHED = "terminé";
+	public static String FINISHED = "finis";
+	public static String ERROR = "echec";
 
 	public static Integer manager = 1;
 	public static Integer coursecreator = 2;
