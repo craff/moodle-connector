@@ -723,7 +723,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
             let findDuplicate = false;
             duplicateCourses.forEach(async function (duplicateCourse){
-                    if(duplicateCourse.id_course == course.originalCourseId){
+                    if(duplicateCourse.id == course.courseid){
                         findDuplicate = true;
                         if(duplicateCourse.status != course.duplication){
                             course.duplication = duplicateCourse.status;

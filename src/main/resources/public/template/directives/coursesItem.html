@@ -86,7 +86,7 @@
                     <span class="summary-list summary-color size-font" ng-class="{duplicateCourse : course.duplication != 'non'}">[[course.summary]]</span></br>
                 </div>
             </div>
-            <label class="size-font" ng-if="place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'" ng-click="course.goTo()">
+            <label class="size-font" ng-if="(place == 'coursesMine' && course.duplication != 'echec') || place == 'coursesShared' || place == 'coursesRecent'" ng-click="course.goTo()">
                 <span class="date">[[ printDate(course, "modified" ) ]]</span>
             </label>
             <label class="checkbox right-magnet" ng-if="(place == 'coursesMine') || place == 'coursesShared'">
