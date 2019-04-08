@@ -146,7 +146,6 @@ export class Courses {
     coursesToCome : Course[];
     showCourses : Course[];
     folderid : number;
-    numberDuplication:number;
 
     constructor() {
         this.allbyfolder = [];
@@ -156,7 +155,6 @@ export class Courses {
         this.coursesByUser = [];
         this.showCourses = [];
         this.isSynchronized = false;
-        this.numberDuplication=0;
         this.getChoice();
 
     }
@@ -178,8 +176,7 @@ export class Courses {
     toJsonForDuplicate(){
         return {
             coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
-            folderId: this.folderid,
-            numberOfDuplication: this.numberDuplication
+            folderId: this.folderid
         }
     }
     async coursesDuplicate() {

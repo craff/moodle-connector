@@ -1040,22 +1040,20 @@ public class MoodleController extends ControllerHelper {
                         courseToDuplicate.put("folderid", duplicateCourse.getInteger("folderId"));
                         courseToDuplicate.put("status", WAITING);
                         courseToDuplicate.put("userId", user.getUserId());
-                        for (int j = 0; j < duplicateCourse.getInteger("numberOfDuplication"); j++){
-                            for (int i = 0; i < courseId.size(); i++) {
-                                courseToDuplicate.put("courseid", courseId.getValue(i));
-                                moodleWebService.insertDuplicateTable(courseToDuplicate, new Handler<Either<String, JsonObject>>() {
-                                    @Override
-                                    public void handle(Either<String, JsonObject> event) {
-                                        if (event.isRight()) {
-                                            request.response()
-                                                    .setStatusCode(200)
-                                                    .end();
-                                        } else {
-                                            handle(new Either.Left<>("Failed to insert in database"));
-                                        }
+                        for (int i = 0; i < courseId.size(); i++) {
+                            courseToDuplicate.put("courseid", courseId.getValue(i));
+                            moodleWebService.insertDuplicateTable(courseToDuplicate, new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        request.response()
+                                                .setStatusCode(200)
+                                                .end();
+                                    } else {
+                                        handle(new Either.Left<>("Failed to insert in database"));
                                     }
-                                });
-                            }
+                                }
+                            });
                         }
                     }
                 });

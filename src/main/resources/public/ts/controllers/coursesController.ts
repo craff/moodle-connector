@@ -451,6 +451,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.deleteElements = async function () {
         $scope.disableDeleteSend = false;
+        $scope.openLightbox = false;
         if ($scope.folders.all.some(folder => folder.selectConfirm)) {
             await $scope.folders.foldersDelete();
             let idAllFoldersToDelete = $scope.folders.all.filter(folder => folder.selectConfirm).map(folder => folder.id);
@@ -469,10 +470,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.coursesDelete();
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
-        $scope.openLightbox = false;
         $scope.successDelete = true;
         $timeout(() =>
-                $scope.successDelete = false
+                $scope.hideSuccessDelete()
             , 3000);
         $scope.initFolders();
     };
@@ -487,21 +487,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.confirmDuplicateSend();
         $scope.openLightbox = true;
     };
-    $scope.hideSuccessDuplicate = function () {
-        $scope.successDuplicate = false;
-    };
+
     $scope.duplicateElements = async function () {
         $scope.disableDuplicateSend = false;
+        $scope.openLightbox = false;
         if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
             $scope.courses.folderid = ($scope.courses.allCourses.filter(course => course.selectConfirm))[0].folderid;
             await $scope.courses.coursesDuplicate();
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
-        $scope.openLightbox = false;
-        $scope.successDuplicate = true;
-        $timeout(() =>
-                $scope.successDuplicate = false
-            , 3000);
         $scope.initFolders();
     };
 
