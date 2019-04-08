@@ -64,7 +64,6 @@ public class Moodle extends BaseServer {
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
 
-//		final String cronExpression = config().getString("$yourProperty$Cron", "0 */"+config.getString("timeMinuteSynchCron")+" * * * ? *");
 		final String cronExpression = config().getString("$yourProperty$Cron", "*/30 * * * * ? *");
 		try {
 			new CronTrigger(vertx, cronExpression).schedule(

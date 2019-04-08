@@ -41,7 +41,7 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                 if(event.isRight())
                     log.info("Cron launch successful");
                 else
-                    log.error("Cron synchonisation not full");
+                    log.info("Cron synchonisation not full");
             }
         });
     }

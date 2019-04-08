@@ -1093,10 +1093,20 @@ public class MoodleController extends ControllerHelper {
     @Post("/course/duplicate/response")
     @ApiDoc("Duplicate courses")
     public void getMoodleResponse (HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+        RequestUtils.bodyToJson(request, pathPrefix + "duplicate", new Handler<JsonObject>() {
             @Override
-            public void handle(UserInfos userInfos) {
-
+            public void handle(JsonObject entries) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos userInfos) {
+                        JsonObject testGetResponse = new JsonObject();
+                        testGetResponse.put("courseid", 900);
+                        testGetResponse.put("userid", "7a0eff20-1dc3-4cf4-9174-ece177e6b7f5");
+                        testGetResponse.put("originalcourseid", 745);
+                        testGetResponse.put("ident", 900);
+                        testGetResponse.put("status", "finish");
+                    }
+                });
             }
         });
     }
@@ -1181,7 +1191,7 @@ public class MoodleController extends ControllerHelper {
                                                                                     }
                                                                                 });
                                                                             } else {
-                                                                                log.error("There are no course waiting to be duplicate!");
+                                                                                log.info("There are no course waiting to be duplicate!");
                                                                                 eitherHandler.handle(new Either.Left<>("There are no course waiting to be duplicate"));
                                                                             }
                                                                         }
