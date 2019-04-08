@@ -457,7 +457,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             while(idAllFoldersToDelete.length != 0){
                 let newFoldersToDelete =[];
                 idAllFoldersToDelete.forEach(function (idFolder) {
-                    $scope.courses.allCourses.filter(course => course.folderid = idFolder).map(course => course.selectConfirm = true);
+                    $scope.courses.allCourses.filter(course => course.folderid == idFolder).map(course => course.selectConfirm = true);
                     $scope.folders.getSubFolder(idFolder).map(folder => folder.id).forEach(function (id) {
                         newFoldersToDelete.push(id)
                     });

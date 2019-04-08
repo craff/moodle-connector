@@ -1,4 +1,4 @@
-<div class="Course" lvl-draggable="[[place == 'coursesMine']]" ng-class="{notDraggable : !(place == 'coursesMine')}">
+<div class="Course" lvl-draggable="[[place == 'coursesMine']]" ng-class="{notDraggable : !(place == 'coursesMine' && course.duplication == 'non')}">
     <label ng-show="false">[[course.courseid]]</label>
     <div class="cell" ng-class="{ activityRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list')) && course.course_type == 'singleactivity',
                                     activityToDoPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && view == 'icons' && first,
@@ -41,6 +41,9 @@
                 <div class="ellipsis">
                     <span class="text-font" ng-click="course.goTo()">[[course.fullname]]</span>
                 </div>
+                <label class="rightDotsMenu" ng-if="place == 'coursesMine' && course.duplication == 'echec'">
+                    <i class="close-2x" ng-click="deleteDuplicateFailed(course)"></i>
+                </label>
                 <dots-menu class="rightDotsMenu" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="(place == 'coursesToCome' || place == 'coursesToDo') && view == 'list'">
 
                     <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
@@ -86,11 +89,11 @@
             <label class="size-font" ng-if="place == 'coursesMine' || place == 'coursesShared' || place == 'coursesRecent'" ng-click="course.goTo()">
                 <span class="date">[[ printDate(course, "modified" ) ]]</span>
             </label>
-            <label class="checkbox right-magnet" ng-if="(place == 'coursesMine' && course.duplication == 'non') || place == 'coursesShared'">
-                <i class="share"></i>
+            <label class="checkbox right-magnet" ng-if="(place == 'coursesMine') || place == 'coursesShared'">
+                <i class="share" ng-if="course.duplication == 'non'"></i>
                 <span></span>
-                <input type="checkbox" ng-change="checkCourse()" ng-model="course.select">
-                <label ng-if="place == 'coursesMine' && course.duplication == 'echec'" style="color:darkred;"><i18n>echec.duplication</i18n></label>
+                <input type="checkbox" ng-change="checkCourse()" ng-model="course.select" ng-if="course.duplication == 'non'">
+                <label ng-if="place == 'coursesMine' && course.duplication == 'echec'" class="title-dashboard big-folder duplicateCourse"><i18n>echec.duplication</i18n></label>
                 <span></span>
             </label>
             <div class="lds-facebook right-magnet" ng-if="place == 'coursesMine' && course.duplication == 'en cours'"><div></div><div></div><div></div></div>

@@ -1,8 +1,8 @@
 <div ng-if="printmenufolder && showCourse(course.course_type)"
      class="minimal-mine-recent-width cell twelve-mobile course-article style-bord infoBackground bottom-margin"
-     ng-class="{duplicateCourse: course.duplication != 'non', greyfilter: course.duplication !='non'}"
+     ng-class="{duplicateCourse: course.duplication != 'non', greyfilter: course.duplication !='non', duplicationFailed: course.duplication == 'echec'}"
      ng-repeat="course in courses.getCourseInFolder(courses.coursesByUser,currentfolderid)">
-    <courses-item course="course" place="'coursesMine'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
+    <courses-item course="course" place="'coursesMine'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" refresh-function="updateCourse"></courses-item>
 </div>
 
 <div ng-if="printmenucourseShared && showCourse(course.course_type)"

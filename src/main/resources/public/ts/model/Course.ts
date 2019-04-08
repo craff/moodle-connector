@@ -1,4 +1,4 @@
-import {_, moment, notify, Rights, Shareable} from "entcore";
+import {_, model, moment, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
 import {Folder} from "./Folder";
@@ -98,6 +98,15 @@ export class Course implements Shareable{
             this.goTo('view');
         } catch (e) {
             notify.error("Save function didn't work");
+            throw e;
+        }
+    }
+
+    async  deleteDuplication() {
+        try{
+            await http.delete(`/moodle/courseDuplicate/${this.courseid}`);
+        }catch(e){
+            notify.error("delete failed duplicate course didn't work");
             throw e;
         }
     }

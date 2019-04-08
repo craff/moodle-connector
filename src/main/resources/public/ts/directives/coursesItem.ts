@@ -14,6 +14,7 @@ export let coursesItem = ng.directive("coursesItem", function(){
             check: '=',
             dateFunction : '=',
             authorFunction : '=',
+            refreshFunction : '=',
             view : '=',
             first : '='
         },
@@ -27,6 +28,10 @@ export let coursesItem = ng.directive("coursesItem", function(){
             };
             $scope.printAuthor = (item,number) => {
                 return $scope.authorFunction(item,number);
+            };
+            $scope.deleteDuplicateFailed = (item) => {
+                item.deleteDuplication();
+                $scope.refreshFunction();
             };
         }]
     };

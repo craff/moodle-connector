@@ -426,6 +426,7 @@ public class MoodleController extends ControllerHelper {
                                                                     courseToAdd.put("duplication",coursesInDuplication.getJsonObject(i).getString("status"));
                                                                     courseToAdd.put("originalCourseId",coursesInDuplication.getJsonObject(i).getInteger("id_course"));
                                                                     courseToAdd.put("folderid",coursesInDuplication.getJsonObject(i).getInteger("id_folder"));
+                                                                    courseToAdd.put("courseid",coursesInDuplication.getJsonObject(i).getInteger("id"));
                                                                     coursArray.add(courseToAdd);
                                                                 }
                                                             } else {
@@ -1087,6 +1088,44 @@ public class MoodleController extends ControllerHelper {
                 }
             }
         });
+    }
+
+    @Delete("/courseDuplicate/:id")
+    @ApiDoc("delete a duplicateFailed folder")
+    public void deleteDuplicateCourse(final HttpServerRequest request) {
+                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+                    @Override
+                    public void handle(UserInfos user) {
+                        if (user != null) {
+                            final String status = FINISHED;
+                            Integer id = Integer.parseInt(request.params().get("id"));
+                            moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
+                                @Override
+                                public void handle(Either<String, JsonObject> event) {
+                                    if (event.isRight()) {
+                                        moodleWebService.deleteFinisedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonObject> event) {
+                                                if (event.isRight()) {
+                                                    request.response()
+                                                            .setStatusCode(200)
+                                                            .end();
+                                                } else {
+                                                    log.error("Problem to delete finished duplicate courses !");
+                                                    renderError(request);                                                }
+                                            }
+                                        });
+                                    } else {
+                                        log.error("Update Duplicate course database didn't work!");
+                                        renderError(request);                                    }
+                                }
+                            });
+                        } else {
+                            log.debug("User not found in session.");
+                            unauthorized(request);
+                        }
+                    }
+                });
     }
 
 
