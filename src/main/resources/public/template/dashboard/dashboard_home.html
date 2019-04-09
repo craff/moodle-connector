@@ -4,7 +4,7 @@
             <i18n>moodle.todo.courses</i18n>
         </span>
         <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
-        <div class="margin-two">
+        <div class="row">
             <input type="search" class="six cell ellipsis" i18n-placeholder="search" ng-model="courses.searchInput.toDo" />
         </div>
     </div>
@@ -28,6 +28,11 @@
             </div>
         </div>
         <div class="row center-courses">
+            <div ng-show="displayMessageLoader">
+                <div>
+                    <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
+                </div>
+            </div>
             <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin"
             ng-class="{'defined-image-small-toDo-width cell' : courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
              'right-course-margin' : viewModeToDo == 'icons'}">
@@ -54,7 +59,7 @@
             <i18n>moodle.tocome.courses</i18n>
         </span>
         <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
-        <div class="margin-two">
+        <div class="row">
             <input type="search" class="six cell ellipsis" i18n-placeholder="search" ng-model="courses.searchInput.toCome" />
         </div>
     </div>
@@ -74,6 +79,11 @@
             </div>
         </div>
         <div class="row center-courses">
+            <div ng-show="displayMessageLoader">
+                <div>
+                    <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
+                </div>
+            </div>
             <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)" ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}"
                  class="twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
@@ -100,7 +110,12 @@
             </span>
             <switch ng-model="courses.printcourseslastcreation" ng-click="courses.setChoice(1)"></switch>
         </div>
-        <div ng-if="courses.printcourseslastcreation" class="row">
+        <div ng-if="courses.printcourseslastcreation" class="row center-courses">
+            <div ng-show="displayMessageLoader">
+                <div>
+                    <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
+                </div>
+            </div>
             <div ng-repeat="course in courses.lastCreation()" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>

@@ -132,7 +132,12 @@
 	"course.favorite": "Favoris",
 	"course.unFavorite": "Enlever de<br/>mes favoris",
 
-	"search": "Recherchez vos cours à l'aide de leur nom, leur date ou du nom de l'enseignant",
+	"course.oneEnrolment": " inscrit ",
+	"course.numberEnrolments": " inscrits ",
+
+	"search": "Nom d'enseignant, date, titre..",
+
+    "moodle.importation": "en cours de récupération",
 
 	"moodle.toaster.properties": "Propriétés",
 	"moodle.toaster.copy": "Copier",

@@ -1,3 +1,8 @@
+<div ng-show="displayMessageLoader">
+    <div>
+        <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
+    </div>
+</div>
 <div ng-if="printmenufolder && showCourse(course.course_type)"
      class="minimal-mine-recent-width cell twelve-mobile course-article style-bord infoBackground bottom-margin"
      ng-class="{duplicateCourse: course.duplication != 'non', greyfilter: course.duplication !='non', duplicationFailed: course.duplication == 'echec'}"

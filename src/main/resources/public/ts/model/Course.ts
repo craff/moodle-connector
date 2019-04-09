@@ -42,6 +42,7 @@ export class Course implements Shareable{
         this.select = false;
         this.selectConfirm = false;
         this.myRights = new Rights<Course>(this);
+        this.submitWait = false;
     }
 
 

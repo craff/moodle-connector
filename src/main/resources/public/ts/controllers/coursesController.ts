@@ -24,6 +24,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     });
 
     $scope.switchTab = function (current: string) {
+
         $scope.toasterShow = false;
         $scope.currentTab = current;
         $scope.resetSelect();
@@ -39,9 +40,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.initDashBoardTab = async function () {
+        $scope.displayMessageLoader = true;
         $scope.currentTab = 'dashboard';
+        template.open('main', 'dashboard/dashboard_home');
+        Utils.safeApply($scope);
         // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
-
 
         if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             await $scope.courses.getCoursesbyUser(model.me.userId);
@@ -49,17 +52,20 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
         await $scope.courses.getChoice();
 
-        template.open('main', 'dashboard/dashboard_home');
+        $scope.displayMessageLoader = false;
         Utils.safeApply($scope);
     };
 
     $scope.initCoursesTab = async function () {
+        $scope.displayMessageLoader = true;
         $scope.currentTab = 'courses';
+        template.open('main', 'my-courses');
+        Utils.safeApply($scope);
         // TODO ne charger que si besoin
         if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
-        template.open('main', 'my-courses');
+
         Utils.safeApply($scope);
     };
 
@@ -121,7 +127,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             ],
             selectedOption: {id: undefined, name: 'Choisissez votre type'}
         };
-        $scope.course.submitWait = false;
         $scope.nameFolder="";
     };
 
@@ -706,12 +711,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.openLightbox = true;
     };
 
-    $scope.submitShareCourse = () => {
+    $scope.submitShareCourse = async function () {
         $scope.myCourse = undefined;
         $scope.resetSelect();
         $scope.closePopUp();
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
+        await $scope.courses.getCoursesbyUser(model.me.userId);
         Utils.safeApply($scope);
+
     };
 
     /**

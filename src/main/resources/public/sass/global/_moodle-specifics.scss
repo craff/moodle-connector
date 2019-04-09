@@ -5,6 +5,31 @@ body.moodle {
     z-index: 999;
   }
 
+  .lds-dual-ring {
+    display: inline-block;
+    height: 64px;
+    transform: scale(0.65);
+  }
+  .lds-dual-ring:after {
+    content: " ";
+    display: block;
+    width: 46px;
+    height: 46px;
+    margin: 1px;
+    border-radius: 50%;
+    border: 5px solid #555;
+    border-color: #555 transparent #555 transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
+  }
+  @keyframes lds-dual-ring {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
   .filter-course {
     width: 97%;
 
@@ -100,6 +125,10 @@ body.moodle {
 
   .whiteColor{
     color: #eee;
+  }
+
+  .greenColor{
+    color:#92d36e;
   }
 
   .duplicationFailed{
