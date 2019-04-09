@@ -1,4 +1,4 @@
-import {_, model, moment, notify, Rights, Shareable} from "entcore";
+import {_, idiom, model, moment, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
 import {Folder} from "./Folder";
@@ -35,6 +35,7 @@ export class Course implements Shareable{
         compatibleMoodle: boolean;
     };
     duplication: string;
+    submitWait: boolean;
 
     constructor(){
         this.type = "1";
@@ -146,6 +147,7 @@ export class Courses {
     coursesToCome : Course[];
     showCourses : Course[];
     folderid : number;
+    searchInput : any;
 
     constructor() {
         this.allbyfolder = [];
@@ -155,6 +157,10 @@ export class Courses {
         this.coursesByUser = [];
         this.showCourses = [];
         this.isSynchronized = false;
+        this.searchInput = {
+            toDo: "",
+            toCome: ""
+        }
         this.getChoice();
 
     }
@@ -287,9 +293,9 @@ export class Courses {
 
     coursesToShow(id : string, place : string){
         if(place == "coursesToDo"){
-            this.showCourses = this.coursesToDo;
+            this.showCourses = this.coursesToDo.filter(course => this.searchCoursesToDo(course));
         }else if (place == "coursesToCome"){
-            this.showCourses = this.coursesToCome;
+            this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));;
         }
 
         if(id == "all"){
@@ -309,6 +315,25 @@ export class Courses {
             return this.showCourses
         }
     }
+
+    /**
+     * search with teacher name
+     */
+    searchCoursesToDo = (item: Course) => {
+        let format = "DD/MM/YYYY";
+        return !this.searchInput.toDo || idiom.removeAccents(item.auteur[0].lastname.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1 || idiom.removeAccents(item.fullname.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1 || (item.enddate.toString() !== "0" && moment(item.enddate.toString() + "000", "x").format(format).indexOf(
+            idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1);
+    };
+
+    searchCoursesToCome = (item: Course) => {
+        let format = "DD/MM/YYYY";
+        return !this.searchInput.toCome || idiom.removeAccents(item.auteur[0].lastname.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1 || idiom.removeAccents(item.fullname.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1 || (item.enddate.toString() !== "0" && moment(item.startdate.toString() + "000", "x").format(format).indexOf(
+            idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1);
+    };
 
     getCourseInFolder(courses : Course[], folder : number){
         return _.filter(courses, function(cours){return cours.folderid == folder});

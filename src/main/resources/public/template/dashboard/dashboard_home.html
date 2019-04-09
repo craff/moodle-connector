@@ -4,6 +4,9 @@
             <i18n>moodle.todo.courses</i18n>
         </span>
         <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
+        <div class="margin-two">
+            <input type="search" class="six cell ellipsis" i18n-placeholder="search" ng-model="courses.searchInput.toDo" />
+        </div>
     </div>
     <div ng-if="courses.printcoursestodo">
         <div class="row list-dashboard">
@@ -50,8 +53,10 @@
         <span class="left-magnet title-dashboard">
             <i18n>moodle.tocome.courses</i18n>
         </span>
-
         <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
+        <div class="margin-two">
+            <input type="search" class="six cell ellipsis" i18n-placeholder="search" ng-model="courses.searchInput.toCome" />
+        </div>
     </div>
     <div ng-if="courses.printcoursestocome">
         <div class="row  list-dashboard">

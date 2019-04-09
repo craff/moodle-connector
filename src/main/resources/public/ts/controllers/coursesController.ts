@@ -1,4 +1,4 @@
-import {_, model, moment, ng, template} from "entcore";
+import {_, model, moment, ng, template, idiom} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
@@ -712,7 +712,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.closePopUp();
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         Utils.safeApply($scope);
-    }
+    };
 
     /**
      * set timeout in order to update the status of duplicate course
@@ -738,7 +738,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         });
         if(needRefresh && !$scope.openLightbox)
             Utils.safeApply($scope);
-    }
+    };
 
     $interval( function(){ $scope.updateCourse(); }, 5000, $scope.courses != undefined);
 

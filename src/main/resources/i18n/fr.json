@@ -132,6 +132,8 @@
 	"course.favorite": "Favoris",
 	"course.unFavorite": "Enlever de<br/>mes favoris",
 
+	"search": "Recherchez vos cours à l'aide de leur nom, leur date ou du nom de l'enseignant",
+
 	"moodle.toaster.properties": "Propriétés",
 	"moodle.toaster.copy": "Copier",
 	"moodle.toaster.text.title.move": "Déplacer la sélection ",
