@@ -25,6 +25,7 @@ export class Course implements Shareable{
     imageurl : string;
     type : string;
     typeA : string;
+    progress : string;
     select : boolean;
     selectConfirm : boolean;
     masked : boolean;
@@ -149,6 +150,7 @@ export class Courses {
     showCourses : Course[];
     folderid : number;
     searchInput : any;
+    order : any;
 
     constructor() {
         this.allbyfolder = [];
@@ -161,7 +163,11 @@ export class Courses {
         this.searchInput = {
             toDo: "",
             toCome: ""
-        }
+        };
+        this.order = {
+            field: "modificationDate",
+            desc: false
+        };
         this.getChoice();
 
     }
@@ -247,15 +253,6 @@ export class Courses {
                 }
             );
 
-            this.coursesByUser = this.coursesByUser.sort(
-                function compare(a, b) {
-                    if (a.date < b.date)
-                        return 1;
-                    if (a.date > b.date)
-                        return -1;
-                }
-            );
-
             let now = moment();
             this.coursesToCome = _.filter(this.coursesSharedToFollow, function (course) {
                 let coursDate = moment(course.startdate + "000", "x");
@@ -317,6 +314,70 @@ export class Courses {
             this.showCourses = _.filter(this.showCourses, function(cours) { return cours.masked; });
             return this.showCourses
         }
+    }
+
+    orderCourses(coursesToOrder : Course[]) {
+        var that = this;
+        return coursesToOrder.sort(
+            function compare(a, b) {
+                if(that.order.field == "creationDate") {
+                    if (a.date > b.date)
+                        if(that.order.desc)
+                            return 1;
+                        else
+                            return -1;
+                    if (a.date < b.date)
+                        if(that.order.desc)
+                            return -1;
+                        else
+                            return 1;
+                } else if(that.order.field == "modificationDate") {
+                    if (a.timemodified > b.timemodified)
+                        if(that.order.desc)
+                            return 1;
+                        else
+                            return -1;
+                    if (a.timemodified < b.timemodified)
+                        if(that.order.desc)
+                            return -1;
+                        else
+                            return 1;
+                } else if(that.order.field == "name") {
+                    if (a.fullname < b.fullname)
+                        if(that.order.desc)
+                            return 1;
+                        else
+                            return -1;
+                    if (a.fullname > b.fullname)
+                        if(that.order.desc)
+                            return -1;
+                        else
+                            return 1;
+                } else if(that.order.field == "numberEnrolment") {
+                    if (a.fullname < b.fullname)
+                        if(that.order.desc)
+                            return 1;
+                        else
+                            return -1;
+                    if (a.fullname > b.fullname)
+                        if(that.order.desc)
+                            return -1;
+                        else
+                            return 1;
+                } else if(that.order.field == "achievment") {
+                    if (a.progress.slice(0,a.progress.length-1) < b.progress.slice(0,b.progress.length-1))
+                        if(that.order.desc)
+                            return 1;
+                        else
+                            return -1;
+                    if (a.progress.slice(0,a.progress.length-1) > b.progress.slice(0,b.progress.length-1))
+                        if(that.order.desc)
+                            return -1;
+                        else
+                            return 1;
+                }
+            }
+        );
     }
 
     /**
@@ -402,6 +463,23 @@ export class Courses {
         } catch (e) {
             throw e;
         }
+    }
+
+    orderByField (fieldName) {
+        if (fieldName === this.order.field) {
+            this.order.desc = !this.order.desc;
+        }
+        else {
+            this.order.desc = false;
+            this.order.field = fieldName;
+        }
+    };
+
+    isOrderedAsc (field) {
+        return this.order.field === field && !this.order.desc;
+    }
+    isOrderedDesc (field) {
+        return this.order.field === field && this.order.desc;
     }
 }
 

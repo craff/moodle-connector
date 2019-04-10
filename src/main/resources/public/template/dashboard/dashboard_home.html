@@ -5,7 +5,7 @@
         </span>
         <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
         <div class="row">
-            <input type="search" class="six cell ellipsis" i18n-placeholder="search" ng-model="courses.searchInput.toDo" />
+            <input type="search" class="six cell ellipsis" i18n-placeholder="search.coursesToDoCome" ng-model="courses.searchInput.toDo" />
         </div>
     </div>
     <div ng-if="courses.printcoursestodo">
@@ -14,11 +14,6 @@
                     ng-options="option.name for option in typeShow.availableOptions track by option.id"
                     ng-change="changeShowCoursesToDo()">
             </select>
-            <ul class="cell left-magnet special-selected" ng-model="typeShow.selectedToDoOption"
-                    ng-options="option.name for option in typeShow.availableOptions track by option.id"
-                    ng-change="changeShowCoursesToDo()">
-            </ul>
-
             <div class="cell right-magnet title-dashboard">
                 <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewModeToDo('list')"></i>
             </div>
@@ -60,7 +55,7 @@
         </span>
         <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
         <div class="row">
-            <input type="search" class="six cell ellipsis" i18n-placeholder="search" ng-model="courses.searchInput.toCome" />
+            <input type="search" class="six cell ellipsis" i18n-placeholder="search.coursesToDoCome" ng-model="courses.searchInput.toCome" />
         </div>
     </div>
     <div ng-if="courses.printcoursestocome">

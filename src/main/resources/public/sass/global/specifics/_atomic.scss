@@ -40,6 +40,7 @@
 
 .style-bord:hover{
   box-shadow: 0 6px 18px rgba(0,0,0,0.26);
+  transition : all 0.3s cubic-bezier(.25, .8, .25, 1)
 }
 .image-dashboard{
   display: block;
@@ -211,11 +212,46 @@ i.unFavorite::before {
 }
 
 i.share {
-  margin-right:10px;
+  margin-right: 3px;
+  font-size: 17px;
 }
 
 i.share::before {
   content: '\e937';
+}
+
+.icon-off {
+  opacity: 0.15;
+}
+
+.order{
+  margin: 5px;
+  display: inline-block;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.middleVertical{
+  display: inline-flex;
+  align-items: center;
+}
+
+.icons{
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-direction: column;
+  flex-direction: column;
+  float: left;
+}
+
+i.orderArrow:before {
+   font-size: 10px;
+   color: black;
+ }
+
+i.orderArrow {
+  margin: -6px;
 }
 
 .top-margin{
@@ -229,6 +265,7 @@ i.share::before {
   border-left-color: #ff8500;
   border-left-style: outset;
   padding-left: 5px;
+  margin-top: 30px !important;
 }
 
 .specific-border-lightbox{

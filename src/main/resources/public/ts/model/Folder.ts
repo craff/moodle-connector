@@ -56,6 +56,7 @@ export class Folders {
         this.selectedFolders = [];
         this.listSelectedFolders = [];
         this.listOfSubfolders = [];
+        this.folderIdMoveIn = undefined;
         this.isSynchronized = false;
     }
 

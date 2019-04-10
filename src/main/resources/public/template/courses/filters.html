@@ -11,17 +11,52 @@
         </div>
     </div>
     <div ng-hide="!displayFilterCourse">
-        <label class="chip margin-left checkbox-course" ng-class="{ selected: typeFilter[0]}">
+        <label class="chip margin-left checkbox-course middleVertical" ng-class="{ selected: typeFilter[0]}">
             <span>
                 <i18n>course</i18n>
             </span>
             <input type="checkbox" ng-click="checkTypeFilterSelected(0)">
         </label>
-        <label class="chip margin-left checkbox-activity" ng-class="{ selected: typeFilter[1]}">
+        <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeFilter[1]}">
             <span>
                 <i18n>activity</i18n>
             </span>
             <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
+        </label>
+        <label class="order middleVertical" ng-click="courses.orderByField('creationDate')">
+            <span class="icons right-spacing">
+                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('creationDate')}"></i>
+                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('creationDate')}"></i>
+            </span>
+                <span translate content="creationDate"></span>
+        </label>
+        <label class="order middleVertical" ng-click="courses.orderByField('modificationDate')">
+            <span class="icons right-spacing">
+                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('modificationDate')}"></i>
+                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('modificationDate')}"></i>
+            </span>
+                <span translate content="modificationDate"></span>
+        </label>
+        <label class="order middleVertical" ng-click="courses.orderByField('name')">
+            <span class="icons right-spacing">
+                    <i class="arrow orderArrow " ng-class="{'icon-off':!courses.isOrderedAsc('name')}"></i>
+                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('name')}"></i>
+            </span>
+                <span translate content="name"></span>
+        </label>
+        <label class="order middleVertical" ng-click="courses.orderByField('numberEnrolment')">
+            <span class="icons right-spacing">
+                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('numberEnrolment')}"></i>
+                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('numberEnrolment')}"></i>
+            </span>
+                <span translate content="numberEnrolment"></span>
+        </label>
+        <label class="order middleVertical" ng-click="courses.orderByField('achievment')">
+            <span class="icons right-spacing">
+                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('achievment')}"></i>
+                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('achievment')}"></i>
+            </span>
+                <span translate content="achievment"></span>
         </label>
     </div>
 </div>

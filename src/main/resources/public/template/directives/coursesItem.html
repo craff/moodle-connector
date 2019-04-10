@@ -90,7 +90,7 @@
                 <span class="date">[[ printDate(course, "modified" ) ]]</span>
             </label>
             <label class="checkbox right-magnet" ng-if="(place == 'coursesMine') || place == 'coursesShared'">
-                <label ng-if="place == 'coursesMine' && course.duplication =='non' && course.usernumber > 1" class="size-font title-dashboard"><i class="share greenColor"></i><span>[[ course.usernumber - 1 ]]</span></label>
+                <label ng-if="place == 'coursesMine' && course.duplication =='non' && course.usernumber > 1" class="size-font title-dashboard"><i class="share"></i><span>[[ course.usernumber - 1 ]]</span></label>
                 <span></span>
                 <input type="checkbox" ng-change="checkCourse()" ng-model="course.select" ng-if="course.duplication == 'non'">
                 <label ng-if="place == 'coursesMine' && course.duplication == 'echec'" class="title-dashboard big-folder whiteColor"><i18n>echec.duplication</i18n></label>

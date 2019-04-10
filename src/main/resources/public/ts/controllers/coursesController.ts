@@ -144,6 +144,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.printmenucourseShared = true;
         $scope.printmenufolder = false;
         $scope.printfolders = false;
+        $scope.courses.order = {
+            field: "modificationDate",
+            desc: false
+        };
         $scope.currentfolderid = 0;
         $scope.initAllCouresbyuser();
         $scope.setprintsubfolderValue();
@@ -307,10 +311,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * Open creation course lightbox
      */
     $scope.openPopUp = function () {
+        $scope.folders.folderIdMoveIn = $scope.currentfolderid;
+        Utils.safeApply($scope);
         $scope.course = new Course();
         template.open('ligthBoxContainer', 'courses/createCourseLightbox');
-        $scope.typeActivity.selectedOption.id = undefined;
-        $scope.folders.folderIdMoveIn = $scope.currentfolderid;
         $scope.openLightbox = true;
     };
 

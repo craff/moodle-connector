@@ -107,6 +107,11 @@
 	"course" : "Parcours",
 	"activity" : "Activités",
 	"filter" : "Filtre",
+	"creationDate": "Date de création",
+	"modificationDate": "Date de modification",
+	"name": "Titre",
+	"numberEnrolment": "Nombre d'inscrits",
+	"achievment": "Taux d'achèvement",
 	"moodle.info.deleteTextConfirmSuccess": "La sélection a bien été supprimée",
 	"moodle.lightBox.delete.title": "Supprimer la sélection",
 	"moodle.lightBox.delete.submit": "supprimer la selection",
@@ -136,7 +141,8 @@
 	"course.oneEnrolment": " inscrit ",
 	"course.numberEnrolments": " inscrits ",
 
-	"search": "Nom d'enseignant, date, titre..",
+	"search.coursesToDoCome": "Nom d'enseignant, date, titre..",
+	"search.folder": "Rechercher",
 
     "moodle.importation": "en cours de récupération",
 
