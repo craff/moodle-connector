@@ -294,9 +294,11 @@ export class Courses {
 
     coursesToShow(id : string, place : string){
         if(place == "coursesToDo"){
-            this.showCourses = this.coursesToDo.filter(course => this.searchCoursesToDo(course));
+            if(this.coursesToDo)
+                this.showCourses = this.coursesToDo.filter(course => this.searchCoursesToDo(course));
         }else if (place == "coursesToCome"){
-            this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));;
+            if(this.coursesToCome)
+                this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));;
         }
 
         if(id == "all"){
@@ -321,19 +323,17 @@ export class Courses {
      * search with teacher name
      */
     searchCoursesToDo = (item: Course) => {
-        let format = "DD/MM/YYYY";
         return !this.searchInput.toDo || idiom.removeAccents(item.auteur[0].lastname.toLowerCase()).indexOf(
             idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1 || idiom.removeAccents(item.fullname.toLowerCase()).indexOf(
-            idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1 || (item.enddate.toString() !== "0" && moment(item.enddate.toString() + "000", "x").format(format).indexOf(
-            idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1);
+            idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1 || idiom.removeAccents(item.summary.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1;
     };
 
     searchCoursesToCome = (item: Course) => {
-        let format = "DD/MM/YYYY";
         return !this.searchInput.toCome || idiom.removeAccents(item.auteur[0].lastname.toLowerCase()).indexOf(
             idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1 || idiom.removeAccents(item.fullname.toLowerCase()).indexOf(
-            idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1 || (item.enddate.toString() !== "0" && moment(item.startdate.toString() + "000", "x").format(format).indexOf(
-            idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1);
+            idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1 || idiom.removeAccents(item.summary.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1;
     };
 
     getCourseInFolder(courses : Course[], folder : number){

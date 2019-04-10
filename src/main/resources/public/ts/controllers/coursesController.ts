@@ -40,32 +40,33 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.initDashBoardTab = async function () {
-        $scope.displayMessageLoader = true;
         $scope.currentTab = 'dashboard';
         template.open('main', 'dashboard/dashboard_home');
+        await $scope.courses.getChoice();
         Utils.safeApply($scope);
         // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
 
         if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
+            $scope.displayMessageLoader = true;
+            Utils.safeApply($scope);
             await $scope.courses.getCoursesbyUser(model.me.userId);
+            $scope.displayMessageLoader = false;
         }
 
-        await $scope.courses.getChoice();
-
-        $scope.displayMessageLoader = false;
         Utils.safeApply($scope);
     };
 
     $scope.initCoursesTab = async function () {
-        $scope.displayMessageLoader = true;
         $scope.currentTab = 'courses';
         template.open('main', 'my-courses');
         Utils.safeApply($scope);
         // TODO ne charger que si besoin
         if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
+            $scope.displayMessageLoader = true;
+            Utils.safeApply($scope);
             await $scope.courses.getCoursesbyUser(model.me.userId);
+            $scope.displayMessageLoader = false;
         }
-
         Utils.safeApply($scope);
     };
 
@@ -267,7 +268,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.initCoursesbyuser = async function () {
-        await $scope.courses.getCoursesbyUser();
+        await $scope.courses.getCoursesbyUser(model.me.userId);
         Utils.safeApply($scope);
     };
 
@@ -499,8 +500,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
             $scope.courses.folderid = ($scope.courses.allCourses.filter(course => course.selectConfirm))[0].folderid;
             await $scope.courses.coursesDuplicate();
-            await $scope.courses.getCoursesbyUser(model.me.userId);
         }
+        $timeout(() =>
+                $scope.initCoursesbyuser
+            , 2000)
         $scope.initFolders();
     };
 
@@ -716,8 +719,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.resetSelect();
         $scope.closePopUp();
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
-        await $scope.courses.getCoursesbyUser(model.me.userId);
         Utils.safeApply($scope);
+        $timeout(() =>
+            $scope.initCoursesbyuser()
+            , 1500)
 
     };
 
@@ -726,24 +731,26 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.updateCourse = async function () {
             let duplicateCourses = await $scope.courses.getDuplicateCourse();
+            let needToGetCourses = false;
             let needRefresh = false;
-        $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
+        duplicateCourses.forEach(async function (duplicateCourse){
             let findDuplicate = false;
-            duplicateCourses.forEach(async function (duplicateCourse){
-                    if(duplicateCourse.id == course.courseid){
-                        findDuplicate = true;
-                        if(duplicateCourse.status != course.duplication){
-                            course.duplication = duplicateCourse.status;
-                            needRefresh=true;
-                        }
+            $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
+                if(duplicateCourse.id == course.courseid){
+                    findDuplicate = true;
+                    if(duplicateCourse.status != course.duplication){
+                        course.duplication = duplicateCourse.status;
+                        needRefresh=true;
                     }
-                });
+                }
+            });
             if(!findDuplicate && !$scope.openLightbox) {
-                await $scope.courses.getCoursesbyUser(model.me.userId);
-                needRefresh = true;
+                needToGetCourses = true;
             }
         });
-        if(needRefresh && !$scope.openLightbox)
+        if(needToGetCourses && !$scope.openLightbox)
+            $scope.initCoursesbyuser();
+        else if(needRefresh && !$scope.openLightbox)
             Utils.safeApply($scope);
     };
 
