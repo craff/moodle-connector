@@ -114,7 +114,7 @@ export class Folders {
         return [];
     }
 
-    /*getAllsubfolders() {
+    getAllsubfolders() {
         if (this.all) {
             this.listOfSubfolders.length = 0;
             var that = this;
@@ -139,7 +139,7 @@ export class Folders {
                 }
             });
         }
-    }*/
+    }
 
     async moveToFolder(targetId : number) {
         try {

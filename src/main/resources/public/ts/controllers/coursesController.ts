@@ -283,6 +283,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.resetSelect();
         $scope.showToaster();
         $scope.isPrintSubFolderNumber($scope.currentfolderid)
+        $scope.folders.getAllsubfolders();
         Utils.safeApply($scope);
     };
 
@@ -309,6 +310,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.course = new Course();
         template.open('ligthBoxContainer', 'courses/createCourseLightbox');
         $scope.typeActivity.selectedOption.id = undefined;
+        $scope.folders.folderIdMoveIn = $scope.currentfolderid;
         $scope.openLightbox = true;
     };
 
@@ -319,6 +321,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.openLightbox = false;
         $scope.folders.all.filter(folder => folder.select).map(folder => folder.selectConfirm = false);
         $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = false);
+        $scope.folders.folderIdMoveIn = undefined;
     };
 
     /**
@@ -326,13 +329,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.createCourse = async function () {
         // TODO get current folder id
-        $scope.course.folderid = $scope.currentfolderid;
+        $scope.course.folderid = parseInt($scope.folders.folderIdMoveIn);
         $scope.course.submitWait = true;
         await $scope.course.create();
         await $scope.courses.getCoursesbyUser(model.me.userId);
         $scope.openLightbox = false;
         $scope.showToaster();
+        $scope.currentfolderid = $scope.folders.folderIdMoveIn;
+        $scope.initFolders();
         $scope.course.submitWait = false;
+        $scope.folders.folderIdMoveIn = undefined;
         Utils.safeApply($scope);
     };
 

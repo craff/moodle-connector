@@ -26,22 +26,24 @@
         </label>
     </div>
     <div class="row horizontal-spacing">
-        <span class="row label-input-row"><i18n>moodle.course.image</i18n></span>
-        <image-select class="three cell" default="/img/illustrations/image-default.svg" ng-change="getTypeImage()"
-                      ng-model="course.imageurl" on-close=""/>
+        <div class="three cell">
+            <span class="row label-input-row"><i18n>moodle.course.image</i18n></span>
+            <image-select class="cell" default="/img/illustrations/image-default.svg" ng-change="getTypeImage()"
+                          ng-model="course.imageurl" on-close=""/>
+        </div>
+        <div class="three cell horizontal-spacing inside-margin">
+            <span class="row label-input-row"><i18n>moodle.course.folder</i18n></span>
+            <div  class="three cell"
+                  static-include="/moodle/public/template/courses/folderTargetDropDownList.html">
+            </div>
+        </div>
     </div>
 <p ng-if="imgCompatibleMoodle">
     <i18n class="textError">moodle.course.error.type</i18n>
 </p>
-<div class="row horizontal-spacing" ng-if="course.type == 2">
+<div class="row horizontal-spacing vertical-spacing" ng-if="course.type == 2">
         <label>
             <span class="row label-input-row"><i18n>moodle.activity.type</i18n>*</span>
-            <!-- <select ng-model="course.typeA" ng-required="course.type == 2">
-                 <option>Quizz</option><span><i18n>moodle.activity.type.quiz</i18n></span>
-                <option><span><i18n>Fichier</i18n></span></option><span><i18n>moodle.activity.type.file</i18n></span>
-                <option><span><i18n>Page</i18n></span></option><span><i18n>moodle.activity.type.page</i18n></span>
-                <option><span><i18n>Devoir</i18n></span></option><span><i18n>moodle.activity.type.assignement</i18n></span>
-            </select>-->
             <select ng-required="course.type == 2" ng-model="typeActivity.selectedOption"
                     ng-options="option.name for option in typeActivity.availableOptions track by option.id"
                     ng-change="changeTypeA(course)" >

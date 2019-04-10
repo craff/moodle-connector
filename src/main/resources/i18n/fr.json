@@ -91,6 +91,7 @@
 	"moodle.course.author" : "Auteur",
 	"moodle.course.image": "Image",
 	"moodle.course.error.type": "Ce type d'image n'est pas pris en charge par moodle ",
+    "moodle.course.folder": "Dans le dossier ",
 	"moodle.activity.type": "Type d'activité",
 	"moodle.activity.type.quiz": "Quizz",
 	"moodle.activity.type.file": "Fichier",
