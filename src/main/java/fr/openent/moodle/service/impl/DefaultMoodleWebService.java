@@ -9,14 +9,11 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
 import static fr.openent.moodle.Moodle.*;
-
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
 
@@ -142,29 +139,6 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void getCoursInEnt(final long id_folder, String id_user, final Handler<Either<String, JsonArray>> handler) {
-        String query = "SELECT moodle_id, folder_id  " +
-                "FROM " + Moodle.moodleSchema + ".course " +
-                "WHERE folder_id = ? and  user_id = ?;";
-
-        JsonArray values = new JsonArray();
-        values.add(id_folder)
-                .add(id_user);
-        sql.prepared(query, values, SqlResult.validResultHandler(handler));
-    }
-
-    @Override
-    public boolean getValueMoodleIdinEnt(Integer courid, JsonArray object) {
-        for (int i = 0; i < object.size(); i++) {
-            JsonObject o = object.getJsonObject(i);
-            if (o.getInteger("moodle_id").equals(courid)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public void getFoldersInEnt(String id_user, Handler<Either<String, JsonArray>> handler) {
         String query = "SELECT * " +
                 "FROM " + Moodle.moodleSchema + ".folder " +
@@ -266,7 +240,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                 "UNWIND TAIL(sb.{sharedBookMarkId}) as vid " +
                 "MATCH (v:Visible {id : vid}) " +
                 "WHERE not(has(v.deleteDate)) " +
-                "RETURN{group: {id: \"SB\" + \" {sharedBookMarkId} \", name: HEAD(sb.{sharedBookMarkId}), " +
+                "RETURN {group: {id: \"SB\" + \" {sharedBookMarkId} \", name: HEAD(sb.{sharedBookMarkId}), " +
                 "users: COLLECT(DISTINCT " +
                 "{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}} " +
                 "as sharedBookMark;";
@@ -289,8 +263,8 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> eitherHandler){
-        String query = "SELECT id, id_course, id_users, id_folder FROM " + Moodle.moodleSchema + ".duplication WHERE status = ? ";
+    public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> handler){
+        String query = "SELECT id, id_course, id_users, id_folder, nombre_tentatives FROM " + Moodle.moodleSchema + ".duplication WHERE status = ?";
 
         if(status == WAITING)
             query+= "LIMIT 1";
@@ -300,17 +274,17 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         JsonArray values = new JsonArray();
         values.add(status);
 
-        sql.prepared(query, values, SqlResult.validResultHandler(eitherHandler));
+        sql.prepared(query, values, SqlResult.validResultHandler(handler));
     }
 
     @Override
-    public void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> eitherHandler){
+    public void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> handler){
         String query = "SELECT * FROM " + Moodle.moodleSchema + ".duplication WHERE id_users = ? ;";
 
         JsonArray values = new JsonArray();
         values.add(userId);
 
-        sql.prepared(query, values, SqlResult.validResultHandler(eitherHandler));
+        sql.prepared(query, values, SqlResult.validResultHandler(handler));
     }
 
     @Override
@@ -318,7 +292,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         JsonArray values = new JsonArray();
         String query = "UPDATE " + Moodle.moodleSchema + ".duplication SET ";
         if(status == WAITING){
-            if(numberOfTentatives == Moodle.moodleConfig.getInteger("numberOfMaxDuplicationTentatives"))
+            if(numberOfTentatives == moodleConfig.getInteger("numberOfMaxDuplicationTentatives"))
                 status=ERROR;
             query += "nombre_tentatives = ?, ";
 
@@ -335,10 +309,10 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void deleteFinisedCoursesDuplicate ( Handler<Either<String, JsonObject>> handler){
+    public void deleteFinishedCoursesDuplicate ( Handler<Either<String, JsonObject>> handler){
         String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status = '"+FINISHED+"' ;"+
                 "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status != '"+WAITING+"' AND status != '"+ERROR+"' AND now()-date > interval '"+
-                Moodle.moodleConfig.getString("timeDuplicationBeforeDelete")+"' ;";
+                moodleConfig.getString("timeDuplicationBeforeDelete")+"' ;";
 
         sql.raw(query, SqlResult.validUniqueResultHandler(handler));
     }

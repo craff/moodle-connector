@@ -16,10 +16,10 @@
         "entcore.port" : 8009,
         "sql": true,
         "db-schema": "moodle",
-        "timeMinuteSynchCron": "1",
-        "numberOfMaxDuplicationTentatives": 3,
-        "numberOfMaxPendingDuplication":1,
-        "timeDuplicationBeforeDelete": "10 minutes",
+        "timeSecondSynchCron": "${timeSecondSynchCron}",
+        "numberOfMaxDuplicationTentatives": ${numberOfMaxDuplicationTentatives},
+        "numberOfMaxPendingDuplication": ${numberOfMaxPendingDuplication},
+        "timeDuplicationBeforeDelete": "${timeDuplicationBeforeDelete}",
         "address_moodle": "${moodleServer}",
         "ws-path": "${moodleWsPath}"
       }

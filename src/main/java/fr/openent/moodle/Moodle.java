@@ -18,6 +18,7 @@ import java.text.ParseException;
 public class Moodle extends BaseServer {
 
 	public static String DIRECTORY_BUS_ADDRESS = "directory";
+	public static String ZIMBRA_BUS_ADDRESS = "fr.openent.zimbra";
 	public static String WSTOKEN = "ce7f30ccedfaaa24485629872671200a";
 	public static String WS_CREATE_FUNCTION = "local_entcgi_services_createcourse";
 	public static String WS_DELETE_FUNCTION = "core_course_delete_courses";
@@ -64,10 +65,10 @@ public class Moodle extends BaseServer {
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
 
-		final String cronExpression = config().getString("$yourProperty$Cron", "*/30 * * * * ? *");
+//		final String cronExpression = config().getString("$yourProperty$Cron", "*/30 * * * * ? *");
 		try {
-			new CronTrigger(vertx, cronExpression).schedule(
-					new synchDuplicationMoodle(vertx,moodleController)
+			new CronTrigger(vertx, config.getString("timeSecondSynchCron")).schedule(
+					new synchDuplicationMoodle(vertx, moodleController)
 			);
 		} catch (ParseException e) {
 			log.fatal("Invalid cron expression.", e);

@@ -513,7 +513,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
         $timeout(() =>
                 $scope.initCoursesbyuser
-            , 2000)
+            , 2000);
         $scope.initFolders();
     };
 

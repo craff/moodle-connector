@@ -46,7 +46,6 @@ export class Course implements Shareable{
         this.submitWait = false;
     }
 
-
     toJson() {
         return {
             role: "edit"
@@ -205,7 +204,6 @@ export class Courses {
         try {
             let courses = await http.get(`/moodle/duplicateCourses`);
             return courses.data;
-
         } catch (e) {
             throw e;
         }

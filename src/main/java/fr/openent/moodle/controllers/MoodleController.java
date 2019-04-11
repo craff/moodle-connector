@@ -833,14 +833,6 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-    @Put("/contrib")
-    @ApiDoc("Adds rights for a given course.")
-    @ResourceFilter(CanShareResoourceFilter.class)
-    @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
-    public void contrib(final HttpServerRequest request) {
-
-    }
-
     @Put("/share/resource/:id")
     @ApiDoc("Adds rights for a given course.")
     @ResourceFilter(CanShareResoourceFilter.class)
@@ -1069,7 +1061,7 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 if (user != null) {
-                    moodleWebService.deleteFinisedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                    moodleWebService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
                         @Override
                         public void handle(Either<String, JsonObject> event) {
                             if (event.isRight()) {
@@ -1091,17 +1083,56 @@ public class MoodleController extends ControllerHelper {
     @Delete("/courseDuplicate/:id")
     @ApiDoc("delete a duplicateFailed folder")
     public void deleteDuplicateCourse(final HttpServerRequest request) {
+	    UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+	        @Override
+            public void handle(UserInfos user) {
+	            if (user != null) {
+	                final String status = FINISHED;
+                    Integer id = Integer.parseInt(request.params().get("id"));
+                    moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
+                        @Override
+                        public void handle(Either<String, JsonObject> event) {
+                            if (event.isRight()) {
+                                moodleWebService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                                    @Override
+                                    public void handle(Either<String, JsonObject> event) {
+                                        if (event.isRight()) {
+                                            request.response()
+                                                    .setStatusCode(200)
+                                                    .end();
+                                        } else {
+                                            log.error("Problem to delete finished duplicate courses !");
+                                            renderError(request);
+                                        }
+                                    }
+                                });
+                            } else {
+                                log.error("Update Duplicate course database didn't work!");
+                                renderError(request);
+                            }
+                        }
+                    });
+	            } else {
+	                log.debug("User not found in session.");
+	                unauthorized(request);
+	            }
+	        }
+	    });
+    }
+
+    @Post("/course/duplicate/response")
+    @ApiDoc("Duplicate courses")
+    public void getMoodleResponse (HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "duplicate", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject duplicateResponse) {
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
                     @Override
                     public void handle(UserInfos user) {
-                        if (user != null) {
-                            final String status = FINISHED;
-                            Integer id = Integer.parseInt(request.params().get("id"));
-                            moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
-                                @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if (event.isRight()) {
-                                        moodleWebService.deleteFinisedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                        switch(duplicateResponse.getString("status")) {
+                            case "pending":
+                                moodleWebService.updateStatusCourseToDuplicate(duplicateResponse.getString("status"),
+                                        duplicateResponse.getInteger("ident"), 1, new Handler<Either<String, JsonObject>>() {
                                             @Override
                                             public void handle(Either<String, JsonObject> event) {
                                                 if (event.isRight()) {
@@ -1109,39 +1140,96 @@ public class MoodleController extends ControllerHelper {
                                                             .setStatusCode(200)
                                                             .end();
                                                 } else {
-                                                    log.error("Problem to delete finished duplicate courses !");
-                                                    renderError(request);                                                }
+                                                    log.error("Cannot update the status of the course in duplication table");
+                                                    unauthorized(request);
+                                                }
                                             }
                                         });
-                                    } else {
-                                        log.error("Update Duplicate course database didn't work!");
-                                        renderError(request);                                    }
-                                }
-                            });
-                        } else {
-                            log.debug("User not found in session.");
-                            unauthorized(request);
+                                break;
+                            case "finish":
+                                moodleWebService.updateStatusCourseToDuplicate(duplicateResponse.getString("status"),
+                                        duplicateResponse.getInteger("ident"), 1, new Handler<Either<String, JsonObject>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonObject> event) {
+                                                if (event.isRight()) {
+                                                    duplicateResponse.put("userid", duplicateResponse.getString("userid"));
+                                                    duplicateResponse.put("folderid", duplicateResponse.getValue("folderid"));
+                                                    duplicateResponse.put("moodleid", duplicateResponse.getValue("courseid"));
+                                                    moodleWebService.createCourse(duplicateResponse, new Handler<Either<String, JsonObject>>() {
+                                                        @Override
+                                                        public void handle(Either<String, JsonObject> event) {
+                                                            if (event.isRight()) {
+                                                                moodleWebService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                                                                    @Override
+                                                                    public void handle(Either<String, JsonObject> event) {
+                                                                        if (event.isRight()) {
+                                                                            request.response()
+                                                                                    .setStatusCode(200)
+                                                                                    .end();
+                                                                        } else {
+                                                                            log.error("Problem to delete finished duplicate courses !");
+                                                                            unauthorized(request);
+                                                                        }
+                                                                    }
+                                                                });
+                                                            } else {
+                                                                log.error("Problem to insert in course database !");
+                                                                unauthorized(request);
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                break;
+                            case "busy":
+                                log.info("A duplication is already in progress");
+                                break;
+                            case "error":
+                                moodleWebService.getCourseToDuplicate(duplicateResponse.getString("userid"),
+                                        new Handler<Either<String, JsonArray>>() {
+                                            @Override
+                                            public void handle(Either<String, JsonArray> event) {
+                                                if (event.isRight()) {
+                                                    if (event.right().getValue().getInteger(6) == 3) {
+                                                        moodleWebService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
+                                                            @Override
+                                                            public void handle(Either<String, JsonObject> event) {
+                                                                if (event.isRight()) {
+                                                                    request.response()
+                                                                            .setStatusCode(200)
+                                                                            .end();
+                                                                } else {
+                                                                    log.error("Problem to delete the duplicate course in database !");
+                                                                    unauthorized(request);
+                                                                }
+                                                            }
+                                                        });
+                                                    } else if (event.right().getValue().getInteger(6) < 3) {
+                                                        log.error("Duplication web-service failed !");
+                                                        final String status = WAITING;
+                                                        Integer id = duplicateResponse.getInteger("id");
+                                                        Integer nbrTentatives =  duplicateResponse.getInteger("numberOfTentatives");
+                                                        moodleWebService.updateStatusCourseToDuplicate(status, id, nbrTentatives, new Handler<Either<String, JsonObject>>() {
+                                                            @Override
+                                                            public void handle(Either<String, JsonObject> event) {
+                                                                if (event.isRight()) {
+                                                                    log.error("Duplication web-service failed");
+                                                                    unauthorized(request);
+                                                                } else {
+                                                                    log.error("Failed to access database");
+                                                                    unauthorized(request);
+                                                                }
+                                                            }
+                                                        });
+                                                    }
+                                                }
+                                            }
+                                        });
+                                break;
+                            default:
+                                log.error("Failed to read the Moodle response");
                         }
-                    }
-                });
-    }
-
-
-    @Post("/course/duplicate/response")
-    @ApiDoc("Duplicate courses")
-    public void getMoodleResponse (HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "duplicate", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject entries) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos userInfos) {
-                        JsonObject testGetResponse = new JsonObject();
-                        testGetResponse.put("courseid", 900);
-                        testGetResponse.put("userid", "7a0eff20-1dc3-4cf4-9174-ece177e6b7f5");
-                        testGetResponse.put("originalcourseid", 745);
-                        testGetResponse.put("ident", 900);
-                        testGetResponse.put("status", "finish");
                     }
                 });
             }
@@ -1154,23 +1242,24 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(Either<String, JsonArray> event) {
                 if (event.isRight()) {
-                    if(event.right().getValue().size() < moodleConfig.getInteger("numberOfMaxPendingDuplication")) {
+                    if(event.right().getValue().size() < config.getInteger("numberOfMaxPendingDuplication")) {
                         String status = WAITING;
                         moodleWebService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonArray>>() {
                             @Override
                             public void handle(Either<String, JsonArray> event) {
                                 if (event.isRight()) {
                                     if (event.right().getValue().size() != 0) {
+                                        JsonObject courseDuplicate = event.right().getValue().getJsonObject(0);
                                         JsonObject courseToDuplicate = new JsonObject();
-                                        courseToDuplicate.put("courseid", event.right().getValue().getJsonObject(0).getInteger("id_course"));
-                                        courseToDuplicate.put("userid", event.right().getValue().getJsonObject(0).getString("id_users"));
-                                        courseToDuplicate.put("folderid", event.right().getValue().getJsonObject(0).getInteger("id_folder"));
-                                        courseToDuplicate.put("id", event.right().getValue().getJsonObject(0).getInteger("id"));
-                                        courseToDuplicate.put("numberOfTentatives", event.right().getValue().getJsonObject(0).getInteger("nombre_tentatives"));
+                                        courseToDuplicate.put("courseid", courseDuplicate.getInteger("id_course"));
+                                        courseToDuplicate.put("userid", courseDuplicate.getString("id_users"));
+                                        courseToDuplicate.put("folderid", courseDuplicate.getInteger("id_folder"));
+                                        courseToDuplicate.put("id", courseDuplicate.getInteger("id"));
+                                        courseToDuplicate.put("numberOfTentatives", courseDuplicate.getInteger("nombre_tentatives"));
                                         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                         URI moodleUri = null;
                                         try {
-                                            final String service = moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path");
+                                            final String service = config.getString("address_moodle") + config.getString("ws-path");
                                             final String urlSeparator = service.endsWith("") ? "" : "/";
                                             moodleUri = new URI(service + urlSeparator);
                                         } catch (URISyntaxException e) {
@@ -1184,91 +1273,32 @@ public class MoodleController extends ControllerHelper {
                                                     "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
                                                     "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
                                                     "&moodlewsrestformat=" + JSON;
-                                            final String status = PENDING;
-                                            Integer id = courseToDuplicate.getInteger("id");
-                                            moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
+
+                                            JsonObject shareSend = new JsonObject();
+                                            shareSend = null;
+                                            httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
                                                 @Override
-                                                public void handle(Either<String, JsonObject> event) {
+                                                public void handle(Either<String, Buffer> event) {
                                                     if (event.isRight()) {
-                                                        JsonObject shareSend = new JsonObject();
-                                                        shareSend = null;
-                                                        httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                                            @Override
-                                                            public void handle(Either<String, Buffer> event) {
-                                                                if (event.isRight()) {
-                                                                    final String status = FINISHED;
-                                                                    JsonObject duplicateCourse = event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0);
-                                                                    Integer id = courseToDuplicate.getInteger("id");
-                                                                    moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
-                                                                        @Override
-                                                                        public void handle(Either<String, JsonObject> event) {
-                                                                            if (event.isRight()) {
-                                                                                duplicateCourse.put("userid", courseToDuplicate.getString("userid"));
-                                                                                duplicateCourse.put("folderid", courseToDuplicate.getValue("folderid"));
-                                                                                duplicateCourse.put("moodleid", duplicateCourse.getValue("courseid"));
-                                                                                moodleWebService.createCourse(duplicateCourse, new Handler<Either<String, JsonObject>>() {
-                                                                                    @Override
-                                                                                    public void handle(Either<String, JsonObject> event) {
-                                                                                        if (event.isRight()) {
-                                                                                            moodleWebService.deleteFinisedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
-                                                                                                @Override
-                                                                                                public void handle(Either<String, JsonObject> event) {
-                                                                                                    if (event.isRight()) {
-                                                                                                        eitherHandler.handle(new Either.Right<>(event.right().getValue()));
-                                                                                                    } else {
-                                                                                                        log.error("Problem to delete finished duplicate courses !");
-                                                                                                        eitherHandler.handle(new Either.Left<>("Problem to delete finished duplicate courses"));
-                                                                                                    }
-                                                                                                }
-                                                                                            });
-                                                                                        } else {
-                                                                                            log.error("Problem to insert in course database !");
-                                                                                            eitherHandler.handle(new Either.Left<>("Problem to insert in course database"));
-                                                                                        }
-                                                                                    }
-                                                                                });
-                                                                            } else {
-                                                                                log.info("There are no course waiting to be duplicate!");
-                                                                                eitherHandler.handle(new Either.Left<>("There are no course waiting to be duplicate"));
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                } else {
-                                                                    log.error("Duplication web-service failed !");
-                                                                    final String status = WAITING;
-                                                                    Integer id = courseToDuplicate.getInteger("id");
-                                                                    Integer nbrTentatives =  courseToDuplicate.getInteger("numberOfTentatives");
-                                                                    moodleWebService.updateStatusCourseToDuplicate(status, id, nbrTentatives, new Handler<Either<String, JsonObject>>() {
-                                                                        @Override
-                                                                        public void handle(Either<String, JsonObject> event) {
-                                                                            if (event.isRight()) {
-                                                                                eitherHandler.handle(new Either.Left<>("Duplication web-service failed"));
-                                                                            } else {
-                                                                                eitherHandler.handle(new Either.Left<>("Update database doesn't work"));
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                }
-                                                            }
-                                                        });
+                                                        eitherHandler.handle(new Either.Right<>(event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
                                                     } else {
-                                                        log.error("Update duplication databse failed !");
-                                                        eitherHandler.handle(new Either.Left<>("Update duplication databse failed "));
+                                                        log.info("Failed to contact Moodle");
+                                                        eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
                                                     }
                                                 }
                                             });
                                         }
                                     } else {
-                                        log.error("There are no course to duplicate in the duplication table !");
+                                        log.info("There are no course to duplicate in the duplication table !");
                                         eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
                                     }
-                                }else{
+                                } else {
                                     log.error("the access to duplicate database failed !");
                                     eitherHandler.handle(new Either.Left<>("the access to duplicate database failed"));
                                 }
                             }
                         });
-                    }else {
+                    } else {
                         log.error("The quota of duplication in same time is reached, you have to wait !");
                         eitherHandler.handle(new Either.Left<>("The quota of duplication in same time is reached, you have to wait"));
                     }

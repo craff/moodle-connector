@@ -29,7 +29,6 @@ public interface MoodleWebService{
      */
     void moveFolder(JsonObject folders, Handler<Either<String, JsonObject>> handler);
 
-
     /**
      * Create a course
      * @param course course to create
@@ -64,20 +63,6 @@ public interface MoodleWebService{
      * @param handler function handler returning data
      */
     void setPreferences(JsonObject course, Handler<Either<String, JsonObject>> handler);
-
-    /**
-     * get list courses ant shared by folder
-     * @param id_folder
-     * @param id_user
-     * @param handler
-     */
-    void getCoursInEnt(long id_folder, String id_user, Handler<Either<String, JsonArray>> handler);
-    /**
-     * is containt a object with value of courid
-     * @param courid
-     * @return
-     */
-    boolean getValueMoodleIdinEnt(Integer courid,JsonArray object);
 
     /**
      * get list folders by user
@@ -155,16 +140,16 @@ public interface MoodleWebService{
     /**
      * get courseid to duplicate
      * @param status state of the course to duplicate
-     * @param eitherHandler function handler returning data
+     * @param handler function handler returning data
      */
-    void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> eitherHandler);
+    void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> handler);
 
     /**
      * get course of the user to duplicate
      * @param userId
-     * @param eitherHandler function handler returning data
+     * @param handler function handler returning data
      */
-    void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> eitherHandler);
+    void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> handler);
 
     /**
      * get courseid to duplicate
@@ -173,14 +158,11 @@ public interface MoodleWebService{
      * @param numberOfTentatives in order to increment the number of duplication when the processus failed
      * @param handler function handler returning data
      */
-
     void updateStatusCourseToDuplicate (String status, Integer id, Integer numberOfTentatives, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * updtae database in order to delete finished duplication
+     * Delete finished duplication
      * @param handler function handler returning data
      */
-
-    void deleteFinisedCoursesDuplicate (Handler<Either<String, JsonObject>> handler);
-
+    void deleteFinishedCoursesDuplicate (Handler<Either<String, JsonObject>> handler);
 }
