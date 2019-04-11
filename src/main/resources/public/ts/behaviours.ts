@@ -4,9 +4,6 @@ console.log('moodle behaviours loaded');
 
 var moodleBehaviours = {
 	resources: {
-		read: {
-			right: "fr-openent-moodle-controllers-MoodleController|read"
-		},
 		contrib: {
 			right: "fr-openent-moodle-controllers-MoodleController|contrib"
 		},
@@ -66,7 +63,7 @@ Behaviours.register('moodle', {
 	 * without the prefix <code>xxx</code>.
 	 */
 	resourceRights : function() {
-		return [ 'read', 'contrib', 'manager' ];
+		return [ 'contrib', 'manager' ];
 	},
 
 	loadResources: function (callback) { }
