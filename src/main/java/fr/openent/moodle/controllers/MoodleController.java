@@ -1272,6 +1272,7 @@ public class MoodleController extends ControllerHelper {
                                                     "&wsfunction=" + WS_POST_DUPLICATECOURSE +
                                                     "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
                                                     "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
+                                                    "&parameters[course][0][ident]=" + courseDuplicate.getInteger("id") +
                                                     "&moodlewsrestformat=" + JSON;
 
                                             JsonObject shareSend = new JsonObject();
