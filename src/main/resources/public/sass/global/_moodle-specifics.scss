@@ -287,6 +287,10 @@ body.moodle {
     text-overflow: ellipsis;
   }
 
+  .initialFloat{
+    float: initial;
+  }
+
   .next-previous-courses {
     margin-top: 15px;
   }
@@ -379,6 +383,17 @@ body.moodle {
         padding-left: unset;
       }
     }
+  }
+
+  label.chip.checkbox-activity.selected {
+    background-color: $accent;
+  }
+  label.chip.checkbox-activity.selected:hover {
+    color: white;
+  }
+
+  label.chip.checkbox-course.selected {
+    background-color: #e20037;
   }
 
   .switch input[type=checkbox]:checked+.tick {

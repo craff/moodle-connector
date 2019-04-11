@@ -4,21 +4,65 @@
             <i18n>moodle.todo.courses</i18n>
         </span>
         <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
+        <div class="dropdown zero-desktop">
+            <i ng-click="showDropDownMenu()" class="dropbtn"></i>
+            <div id="myDropdown" class="dropdown-content">
+                <a data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
+                    <span>
+                        <i18n>moodle.dashboard.dashboard</i18n>
+                    </span>
+                </a>
+                <a data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
+                    <span>
+                        <i18n>moodle.dashboard.coures</i18n>
+                    </span>
+                </a>
+                <a data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
+                    <span>
+                        <i18n>moodle.dashboard.libraries</i18n>
+                    </span>
+                </a>
+            </div>
+        </div>
         <div class="row">
             <input type="search" class="six cell ellipsis" i18n-placeholder="search.coursesToDoCome" ng-model="courses.searchInput.toDo" />
         </div>
     </div>
     <div ng-if="courses.printcoursestodo">
         <div class="row list-dashboard">
-            <select class="cell left-magnet special-selected" ng-model="typeShow.selectedToDoOption"
+            <select class="cell left-magnet special-selected zero-mobile" ng-model="typeShow.selectedToDoOption"
                     ng-options="option.name for option in typeShow.availableOptions track by option.id"
-                    ng-change="changeShowCoursesToDo()">
+                    ng-change="changeShowCoursesToDoDesktop()">
             </select>
-            <div class="cell right-magnet title-dashboard">
+            <div class="zero-desktop twelve-mobile">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToDoOption.id == 'masked'}">
+                <span>
+                    <i class="eye-open ">
+                    </i>
+                    <i18n>masked</i18n>
+                </span>
+                    <input type="checkbox" ng-click="changeShowCoursesToDo('masked')" >
+                </label>
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToDoOption.id == 'favorites'}">
+                <span>
+                    <i class="favorite">
+                    </i>
+                    <i18n>favorites</i18n>
+                </span>
+                    <input type="checkbox" ng-click="changeShowCoursesToDo('favorites')" >
+                </label>
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToDoOption.id == 'all'}">
+                <span>
+                    <i18n>all</i18n>
+                </span>
+                    <input type="checkbox" ng-click="changeShowCoursesToDo('all')" >
+                </label>
+            </div>
+            <div class="cell right-magnet title-dashboard zero-mobile">
                 <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewModeToDo('list')"></i>
             </div>
             <span> </span>
-            <div class="cell right-magnet">
+            <div class="cell right-magnet zero-mobile">
                 <i class="show-icons" ng-class="{ selected: viewModeToDo == 'icons' }" ng-click="changeViewModeToDo('icons')"></i>
             </div>
         </div>
@@ -60,16 +104,40 @@
     </div>
     <div ng-if="courses.printcoursestocome">
         <div class="row  list-dashboard">
-            <select class="cell left-magnet special-selected" ng-model="typeShow.selectedToComeOption"
+            <select class="cell left-magnet special-selected zero-mobile" ng-model="typeShow.selectedToComeOption"
                     ng-options="option.name for option in typeShow.availableOptions.slice(0, 1).concat(typeShow.availableOptions.slice(2, 3)).concat(typeShow.availableOptions.slice(4, 5)) track by option.id"
-                    ng-change="changeShowCoursesToCome()">
+                    ng-change="changeShowCoursesToComeDesktop()">
             </select>
                 <!--[[translate('moodle.views.libelle')]]-->
-            <div class="cell right-magnet title-dashboard">
+            <div class="zero-desktop twelve-mobile">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToComeOption.id == 'masked'}">
+                <span>
+                    <i class="eye-open ">
+                    </i>
+                    <i18n>masked</i18n>
+                </span>
+                    <input type="checkbox" ng-click="changeShowCoursesToCome('masked')" >
+                </label>
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToComeOption.id == 'favorites'}">
+                <span>
+                    <i class="favorite">
+                    </i>
+                    <i18n>favorites</i18n>
+                </span>
+                    <input type="checkbox" ng-click="changeShowCoursesToCome('favorites')" >
+                </label>
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToComeOption.id == 'all'}">
+                <span>
+                    <i18n>all</i18n>
+                </span>
+                    <input type="checkbox" ng-click="changeShowCoursesToCome('all')" >
+                </label>
+            </div>
+            <div class="cell right-magnet title-dashboard zero-mobile">
                 <i class="show-list" ng-class="{ selected: viewModeToCome == 'list' }" ng-click="changeViewModeToCome('list')"></i>
             </div>
             <span> </span>
-            <div class="cell right-magnet">
+            <div class="cell right-magnet zero-mobile">
                  <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewModeToCome('icons')"></i>
             </div>
         </div>

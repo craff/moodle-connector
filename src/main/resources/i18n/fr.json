@@ -1,6 +1,6 @@
 {
 	"moodle.title": "Moodle",
-
+	"moodle.subtitle": "Cours en ligne",
 	"moodle.notify.saved": "La donnée a été sauvegardée",
 	"moodle.notify.modified": "La donnée a été modifiée",
 	"moodle.notify.deleted": "La donnée a été supprimée",
@@ -150,5 +150,9 @@
 	"moodle.toaster.text.title.move": "Déplacer la sélection ",
     "moodle.toaster.text.name.move": "Déplacer le dossier ",
 	"moodle.toaster.text.name.moves": "Déplacer les dossiers ",
-    "moodle.toaster.text.target.move": " dans le dossier cible : "
+    "moodle.toaster.text.target.move": " dans le dossier cible : ",
+
+	"masked": "Masqués",
+	"favorites": "Favoris",
+	"all": "Tous"
 }

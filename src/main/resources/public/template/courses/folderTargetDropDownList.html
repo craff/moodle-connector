@@ -1,10 +1,9 @@
 <div>
-    <select ng-model="folders.folderIdMoveIn" ng-change="selectFolder()" >
-        <option value="" disabled selected hidden>Sélectionner un dossier</option>
+    <select ng-model="folders.folderIdMoveIn" >
         <option value=0>Mes cours</option>
-            <option ng-repeat="folder in folders.listOfSubfolders track by $index" class="left-padding"
-                    value=[[folder.id]]>
-                [[folder.name]]
-            </option>
+        <option ng-repeat="folder in folders.listOfSubfolders track by $index"
+                value=[[folder.id]]>
+            [[folder.name]]
+        </option>
     </select>
 </div>

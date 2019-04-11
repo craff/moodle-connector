@@ -1,11 +1,11 @@
 <label ng-show="false">[[folder.id]]</label>
-<div class="cell" ng-click="isPrintSubFolder(folder,false)">
+<div class="cell" ng-click="isPrintSubFolder(folder)">
     <i class="foldericon big-folder-size"></i></br>
 </div>
 <div class="margin-left-file">
-    <span class="text-font ellipsis" ng-click="isPrintSubFolder(folder,false)">[[folder.name]]</span></br>
+    <span class="text-font ellipsis" ng-click="isPrintSubFolder(folder)">[[folder.name]]</span></br>
     <div class="row">
-        <label class="size-font" ng-click="isPrintSubFolder(folder,false)">
+        <label class="size-font" ng-click="isPrintSubFolder(folder)">
             [[countItems(folder)]]
             <i18n ng-if="countItems(folder) > 1">moodle.folder.items</i18n>
             <i18n ng-if="countItems(folder) < 2">moodle.folder.item</i18n>

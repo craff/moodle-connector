@@ -10,27 +10,32 @@
 <body ng-controller="MoodleController" class="moodle">
 <portal>
     <div class="row">
-        <h1><i18n>moodle.title</i18n></h1>
-        <div class="row twelve cell tabs" style="min-height: 60px;">
-            <div class="cell">
-                <header class="horizontal-spacing selected" data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
-							<span>
-								<i18n>moodle.dashboard.dashboard</i18n>
-							</span>
-                </header>
-                <header class="horizontal-spacing " data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
-							<span>
-								<i18n>moodle.dashboard.coures</i18n>
-							</span>
-                </header>
-                <header class="horizontal-spacing" data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
-							<span>
-								<i18n>moodle.dashboard.libraries</i18n>
-							</span>
-                </header>
+        <app-title>
+            <h1>
+                <span class="zero-mobile twelve-desktop"><i18n>moodle.title</i18n></span>
+                <span class="twelve-mobile zero-desktop"><i18n>moodle.subtitle</i18n></span>
+            </h1>
+        </app-title>
+            <div class="row twelve cell tabs zero-mobile" style="min-height: 60px;">
+                <div class="cell">
+                        <header class="horizontal-spacing selected" data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
+                                    <span>
+                                        <i18n>moodle.dashboard.dashboard</i18n>
+                                    </span>
+                        </header>
+                        <header class="horizontal-spacing " data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
+                                    <span>
+                                        <i18n>moodle.dashboard.coures</i18n>
+                                    </span>
+                        </header>
+                        <header class="horizontal-spacing" data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
+                                    <span>
+                                        <i18n>moodle.dashboard.libraries</i18n>
+                                    </span>
+                        </header>
+                </div>
+                <input type="submit" i18n-value="moodle.course.new" ng-click="openPopUp()" class="right-magnet">
             </div>
-            <input type="submit" i18n-value="moodle.course.new" ng-click="openPopUp()" class="right-magnet">
-        </div>
     </div>
     <lightbox class="row" show="openLightbox === true"  on-close="closePopUp()">
         <container template="ligthBoxContainer"></container>
@@ -39,6 +44,22 @@
     <div ng-show="successDelete" class="info"><i18n>moodle.info.deleteTextConfirmSuccess</i18n></div>
     <container template="main"></container>
     <container template="toaster"></container>
+    <div ng-click="openPopUp()" ng-if="!toasterShow && currentTab != 'courses'" class="fab zero-desktop"> + </div>
+    <div class="fabDouble zero-desktop" ng-if="!toasterShow && currentTab == 'courses'">
+      <span class="fab-action-button">+</span>
+        <ul class="fab-buttons">
+            <li class="fab-buttons__item">
+                <a ng-click="openPopUp()" class="fab-buttons__link" data-tooltip="Cours">
+                    <i class="icon-material foldericon"></i>
+                </a>
+            </li>
+            <li class="fab-buttons__item">
+                <a ng-click="openPopUpFolder()" class="fab-buttons__link" data-tooltip="Dossier">
+                    <i class="icon-material foldericon"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
 </portal>
 </body>
 </html>

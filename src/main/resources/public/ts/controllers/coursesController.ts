@@ -178,22 +178,22 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
     };
 
-    $scope.isPrintSubFolder= function(folder:Folder, toDisplay: boolean){
-        if(toDisplay)
-            folder.printsubfolder=true;
-        else {
-            $scope.folders.all.forEach(function (e) {
-                if (e.id == folder.id) {
-                    e.printsubfolder = !e.printsubfolder;
-                    folder.printsubfolder = e.printsubfolder;
-                }
-            });
-        }
+    $scope.isPrintSubFolder= function(folder:Folder){
+        $scope.folders.all.forEach(function (e) {
+            if (e.id == folder.id) {
+                e.printsubfolder = !e.printsubfolder;
+                folder.printsubfolder = e.printsubfolder;
+            }
+        });
        $scope.printfolders = true;
-       if(folder.printsubfolder)
-            $scope.currentfolderid=folder.id;
-       else
-           $scope.currentfolderid=folder.parent_id;
+       if(folder.printsubfolder) {
+           $scope.currentfolderid = folder.id;
+           $scope.folders.folderIdMoveIn = $scope.currentfolderid;
+       }
+       else {
+           $scope.currentfolderid = folder.parent_id;
+           $scope.folders.folderIdMoveIn = $scope.currentfolderid;
+       }
        $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
 
     };
@@ -316,6 +316,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.course = new Course();
         template.open('ligthBoxContainer', 'courses/createCourseLightbox');
         $scope.openLightbox = true;
+        $scope.folders.folderIdMoveIn = $scope.currentfolderid;
+        Utils.safeApply($scope);
     };
 
     /**
@@ -684,12 +686,22 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.viewModeToDo = view;
     };
 
-    $scope.changeShowCoursesToDo = function() {
+    $scope.changeShowCoursesToDoDesktop = function() {
         $scope.firstCoursesToDo=0;
     };
 
-    $scope.changeShowCoursesToCome = function() {
+    $scope.changeShowCoursesToDo = function(id:string) {
+        $scope.firstCoursesToDo=0;
+        $scope.typeShow.selectedToDoOption.id = id;
+    };
+
+    $scope.changeShowCoursesToComeDesktop = function() {
         $scope.firstCoursesToCome=0;
+    };
+
+    $scope.changeShowCoursesToCome = function(id:string) {
+        $scope.firstCoursesToCome=0;
+        $scope.typeShow.selectedToComeOption.id = id;
     };
 
     $scope.getSelectedCourses = function () {
@@ -765,5 +777,30 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $interval( function(){ $scope.updateCourse(); }, 5000, $scope.courses != undefined);
+
+    /* When the user clicks on the button, toggle between hiding and showing the dropdown content */
+    $scope.showDropDownMenu = function() {
+        document.getElementById("myDropdown").classList.toggle("show");
+    }
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+        if (!event.target.classList.contains('dropbtn')) {
+            var dropdowns = document.getElementsByClassName("dropdown-content");
+            var i;
+            for (i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+
+    $(window).resize(function(){
+        if ($(window).width() < 800) {
+            if($scope.typeShow.selectedToDoOption.id == 'doing' || $scope.typeShow.selectedToDoOption.id == 'finished')
+                $scope.typeShow.selectedToDoOption.id = "all";
+        }
+    })
 
 }]);
