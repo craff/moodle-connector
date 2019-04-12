@@ -628,9 +628,15 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             return 5;
         } else {
             if($scope.firstCoursesToDo==0)
-                return 7;
+                if($(window).width() < 800)
+                    return 4;
+                else
+                    return 7;
             else
-                return 8;
+                if($(window).width() < 800)
+                    return 4;
+                else
+                    return 8;
         }
     };
 
@@ -778,29 +784,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $interval( function(){ $scope.updateCourse(); }, 5000, $scope.courses != undefined);
 
-    /* When the user clicks on the button, toggle between hiding and showing the dropdown content */
-    $scope.showDropDownMenu = function() {
-        document.getElementById("myDropdown").classList.toggle("show");
-    }
-    // Close the dropdown if the user clicks outside of it
-    window.onclick = function(event) {
-        if (!event.target.classList.contains('dropbtn')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            var i;
-            for (i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                    openDropdown.classList.remove('show');
-                }
-            }
-        }
-    }
-
     $(window).resize(function(){
         if ($(window).width() < 800) {
             if($scope.typeShow.selectedToDoOption.id == 'doing' || $scope.typeShow.selectedToDoOption.id == 'finished')
                 $scope.typeShow.selectedToDoOption.id = "all";
+            $scope.viewModeToDo = "icons";
+            $scope.viewModeToCome = "icons";
         }
-    })
+    });
 
 }]);

@@ -281,7 +281,7 @@ export class Courses {
     }
 
     isTheFirst(courseFirst : Course, id : string){
-        if(this.coursesToShow(id,"coursesToDo").indexOf(courseFirst) == 0)
+        if(this.coursesToShow(id,"coursesToDo").indexOf(courseFirst) == 0 || $(window).width() < 800)
             return true;
         else
             return false;
@@ -293,25 +293,18 @@ export class Courses {
                 this.showCourses = this.coursesToDo.filter(course => this.searchCoursesToDo(course));
         }else if (place == "coursesToCome"){
             if(this.coursesToCome)
-                this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));;
+                this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));
         }
-
-        if(id == "all"){
-            this.showCourses = _.filter(this.showCourses, function(cours) { return !(cours.masked); });
-            return this.showCourses
-        }else if (id =="doing"){
+         if (id =="doing")
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && !(cours.masked)) });
-            return this.showCourses
-        }else if (id == "favorites"){
+        else if (id == "favorites")
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.favorites); });
-            return this.showCourses
-        }else if (id == "finished"){
+        else if (id == "finished")
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress == "100%" && !(cours.masked)); });
-            return this.showCourses
-        }else if (id == "masked"){
+        else if (id == "masked")
             this.showCourses = _.filter(this.showCourses, function(cours) { return cours.masked; });
-            return this.showCourses
-        }
+
+        return this.showCourses;
     }
 
     orderCourses(coursesToOrder : Course[]) {

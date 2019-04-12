@@ -1,0 +1,20 @@
+<p class="dropdown zero-desktop">
+    <i ng-click="showDropDownMenu()" class="dropbtn"></i>
+    <div id="myDropdown" class="dropdown-content">
+        <a data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
+                    <span>
+                        <i18n>moodle.dashboard.dashboard</i18n>
+                    </span>
+        </a>
+        <a data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
+                    <span>
+                        <i18n>moodle.dashboard.coures</i18n>
+                    </span>
+        </a>
+        <a data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
+                    <span>
+                        <i18n>moodle.dashboard.libraries</i18n>
+                    </span>
+        </a>
+    </div>
+</p>

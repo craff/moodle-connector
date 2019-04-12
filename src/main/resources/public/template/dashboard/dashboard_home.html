@@ -4,29 +4,7 @@
             <i18n>moodle.todo.courses</i18n>
         </span>
         <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
-        <div class="dropdown zero-desktop">
-            <i ng-click="showDropDownMenu()" class="dropbtn"></i>
-            <div id="myDropdown" class="dropdown-content">
-                <a data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
-                    <span>
-                        <i18n>moodle.dashboard.dashboard</i18n>
-                    </span>
-                </a>
-                <a data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
-                    <span>
-                        <i18n>moodle.dashboard.coures</i18n>
-                    </span>
-                </a>
-                <a data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
-                    <span>
-                        <i18n>moodle.dashboard.libraries</i18n>
-                    </span>
-                </a>
-            </div>
-        </div>
-        <div class="row">
-            <input type="search" class="six cell ellipsis" i18n-placeholder="search.coursesToDoCome" ng-model="courses.searchInput.toDo" />
-        </div>
+        <drop-down-navigation></drop-down-navigation>
     </div>
     <div ng-if="courses.printcoursestodo">
         <div class="row list-dashboard">
@@ -34,6 +12,16 @@
                     ng-options="option.name for option in typeShow.availableOptions track by option.id"
                     ng-change="changeShowCoursesToDoDesktop()">
             </select>
+            <div class="search-pagination zero-mobile">
+                <div class="five cell ellipsis infoBackground style-bord searchBar">
+                    <i class="search searchIcon" ></i>
+                    <input class="twelve noBorder"
+                           type="text"
+                           translate attr="placeholder"
+                           ng-model="courses.searchInput.toDo"
+                           placeholder="search.coursesToDoCome"/>
+                </div>
+            </div>
             <div class="zero-desktop twelve-mobile">
                 <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToDoOption.id == 'masked'}">
                 <span>
@@ -73,7 +61,7 @@
                 </div>
             </div>
             <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin"
-            ng-class="{'defined-image-small-toDo-width cell' : courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
+            ng-class="{'definedImageSmallToDoWidth cell' : courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
              'right-course-margin' : viewModeToDo == 'icons'}">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course,typeShow.selectedToDoOption.id)"></courses-item>
             </div>
@@ -98,9 +86,6 @@
             <i18n>moodle.tocome.courses</i18n>
         </span>
         <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
-        <div class="row">
-            <input type="search" class="six cell ellipsis" i18n-placeholder="search.coursesToDoCome" ng-model="courses.searchInput.toCome" />
-        </div>
     </div>
     <div ng-if="courses.printcoursestocome">
         <div class="row  list-dashboard">
@@ -108,7 +93,16 @@
                     ng-options="option.name for option in typeShow.availableOptions.slice(0, 1).concat(typeShow.availableOptions.slice(2, 3)).concat(typeShow.availableOptions.slice(4, 5)) track by option.id"
                     ng-change="changeShowCoursesToComeDesktop()">
             </select>
-                <!--[[translate('moodle.views.libelle')]]-->
+            <div class="search-pagination zero-mobile">
+                <div class="five cell ellipsis infoBackground style-bord searchBar">
+                    <i class="search searchIcon" ></i>
+                    <input class="twelve noBorder"
+                           type="text"
+                           translate attr="placeholder"
+                           ng-model="courses.searchInput.toCome"
+                           placeholder="search.coursesToDoCome"/>
+                </div>
+            </div>
             <div class="zero-desktop twelve-mobile">
                 <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToComeOption.id == 'masked'}">
                 <span>

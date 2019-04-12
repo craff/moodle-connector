@@ -30,6 +30,12 @@ body.moodle {
     }
   }
 
+  section.main {
+    padding: 0 !important;
+    padding-bottom: 50px !important;
+    top: 52px !important;
+  }
+
   .filter-course {
     width: 97%;
 
@@ -114,8 +120,12 @@ body.moodle {
 
   .coursesBackground-dashboard {
     background: #eee;
-    padding: 15px 60px;
-    min-width: 425px;
+    @media screen and (min-width: 800px) {
+      padding: 15px 60px;
+    }
+    @media screen and (max-width: 800px) {
+      padding: 20px 15px;
+    }
   }
 
   .duplicateCourse{
@@ -185,14 +195,21 @@ body.moodle {
     min-width: 211px;
   }
 
-  .defined-image-small-toDo-width {
-    width: 48.705%;
-    min-width: 380px;
+  .definedImageSmallToDoWidth {
+    @media screen and (min-width: 800px) {
+      width: 48.705%;
+      min-width: 380px;
+    }
   }
 
   .small-eleven {
     right: 10px;
-    width: 63%;
+    @media screen and (min-width: 800px) {
+      width: 63%;
+    }
+    @media screen and (max-width: 800px) {
+      width: 75%;
+    }
     position: absolute;
   }
 
@@ -247,7 +264,13 @@ body.moodle {
   }
 
   .minimal-mine-recent-width {
-    min-width: 340px;
+    @media screen and (min-width: 800px) {
+      min-width: 340px;
+    }
+    @media screen and (max-width: 800px) {
+      width: 100%;
+    }
+
   }
 
   .big-right-margin {
@@ -412,6 +435,22 @@ body.moodle {
     cursor:auto;
   }
 
+  .searchBar{
+    margin: 0px 15px;
+    height: 35px;
+    padding: 5px;
+  }
+
+  .searchIcon{
+    margin-left: 5px;
+    opacity: 0.2;
+    font-size: 20px;
+  }
+
+  .noBorder{
+    border:none;
+  }
+
   .courseButton {
     display: block;
     height: 100px;
@@ -444,6 +483,22 @@ body.moodle {
   .textError {
     color: #e20037;
   }
+
+  .green-color{
+    color:#92d36e
+  }
+  .yellow-color{
+    color:#ffcc00
+  }
+
+  .grey-color{
+    color: #aaa
+  }
+
+  .littleMarginTop{
+    margin-top:-5px;
+  }
+
 }
 
 //TEMP FIX
