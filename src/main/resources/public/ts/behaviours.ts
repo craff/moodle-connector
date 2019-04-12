@@ -4,6 +4,9 @@ console.log('moodle behaviours loaded');
 
 var moodleBehaviours = {
 	resources: {
+		read: {
+			right: "fr-openent-moodle-controllers-MoodleController|read"
+		},
 		contrib: {
 			right: "fr-openent-moodle-controllers-MoodleController|contrib"
 		},
@@ -44,18 +47,6 @@ Behaviours.register('moodle', {
 		return resource;
 	},
 
-	/*resource: {
-		manager: {
-			right: 'fr-openent-moodle-controllers-MoodleController|shareSubmit'
-		},
-		contrib: {
-			right: 'fr-openent-moodle-controllers-MoodleController|contrib',
-		},
-		read: {
-			right: 'fr-openent-moodle-controllers-MoodleController|read'
-		}
-	},*/
-
 	/**
 	 * Allows to define all rights to display in the share windows. Names are
 	 * defined in the server part with
@@ -67,19 +58,4 @@ Behaviours.register('moodle', {
 	},
 
 	loadResources: function (callback) { }
-
-	/*loadResources: async function(callback){
-		const response = await http.get('/moodle/list');
-		this.resources = response.data.filter(e => e.trashed === 0).map((moodle) => {
-			moodle.icon = moodle.icon || '/img/illustrations/moodle-default.png';
-			return {
-				title: moodle.title,
-				owner: moodle.owner,
-				icon: moodle.icon,
-				path: '/moodle#/view-moodle/' + moodle._id,
-				_id: moodle._id
-			};
-		});
-		return this.resources;
-	}*/
 });

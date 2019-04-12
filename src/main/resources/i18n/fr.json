@@ -22,6 +22,7 @@
 	"folder.trash": "Corbeille",
 	"show": "Afficher",
 	"moodle.contrib": "Apprenant",
+	"moodle.read": "Lecteur",
 	"moodle.manager": "Editeur",
 
 	"group.Teacher": "Tous les enseignants du groupe {0}.",

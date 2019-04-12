@@ -67,6 +67,7 @@ public class MoodleController extends ControllerHelper {
 
     //Permissions
     private static final String
+            resource_read = "moodle.read",
             resource_contrib = "moodle.contrib",
             resource_manager = "moodle.manager",
             workflow_create = "moodle.create",
@@ -660,7 +661,7 @@ public class MoodleController extends ControllerHelper {
     @Get("/share/json/:id")
     @ApiDoc("Lists rights for a given course.")
     @ResourceFilter(CanShareResoourceFilter.class)
-    @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
+    @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
     public void share(final HttpServerRequest request) {
         final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
         UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -763,7 +764,7 @@ public class MoodleController extends ControllerHelper {
                                     }
 
                                     for (Object group : groupEnroled) {
-                                        JsonArray tabToAdd = new JsonArray().add("fr-openent-moodle-controllers-MoodleController|contrib").add("fr-openent-moodle-controllers-MoodleController|shareSubmit");
+                                        JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
                                         if(((JsonObject)group).getInteger("role") == student){
                                             tabToAdd.remove(2);
                                         }
@@ -810,7 +811,7 @@ public class MoodleController extends ControllerHelper {
                                 }
 
                                 for (Object userEnroled : usersEnroled) {
-                                    JsonArray tabToAdd = new JsonArray().add("fr-openent-moodle-controllers-MoodleController|contrib").add("fr-openent-moodle-controllers-MoodleController|shareSubmit");
+                                    JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
                                     if (((JsonObject) userEnroled).getInteger("role") == student) {
                                         tabToAdd.remove(2);
                                     }
@@ -830,6 +831,14 @@ public class MoodleController extends ControllerHelper {
                 }
             }
         });
+    }
+
+    @Put("/contrib")
+    @ApiDoc("Adds rights for a given course.")
+    @ResourceFilter(CanShareResoourceFilter.class)
+    @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
+    public void contrib(final HttpServerRequest request) {
+
     }
 
     @Put("/share/resource/:id")
