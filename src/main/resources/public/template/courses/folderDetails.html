@@ -10,7 +10,7 @@
             <i18n ng-if="countItems(folder) > 1">moodle.folder.items</i18n>
             <i18n ng-if="countItems(folder) < 2">moodle.folder.item</i18n>
         </label>
-        <label class="checkbox right-magnet">
+        <label class="checkbox right-magnet folderCheckbox">
             <input type="checkbox" ng-change="showToaster()" ng-model="folder.select">
             <span></span>
         </label>

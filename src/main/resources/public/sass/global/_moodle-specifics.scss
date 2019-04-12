@@ -31,9 +31,11 @@ body.moodle {
   }
 
   section.main {
-    padding: 0 !important;
-    padding-bottom: 50px !important;
-    top: 52px !important;
+    @media screen and (max-width: 800px) {
+      padding: 0 !important;
+      padding-bottom: 50px !important;
+      top: 52px !important;
+    }
   }
 
   .filter-course {
@@ -250,7 +252,9 @@ body.moodle {
 
   .all-width {
     width: 100%;
-    margin-right: 12px;
+    @media screen and (min-width: 800px) {
+      margin-right: 12px;
+    }
   }
 
   .small-width {
@@ -278,7 +282,7 @@ body.moodle {
   }
 
   .margin-left-file {
-    margin-left:50px;
+    margin-left: 80px;
   }
 
   .right-magnet {
@@ -406,6 +410,10 @@ body.moodle {
         padding-left: unset;
       }
     }
+  }
+
+  label.chip {
+    width:auto;
   }
 
   label.chip.checkbox-activity.selected {

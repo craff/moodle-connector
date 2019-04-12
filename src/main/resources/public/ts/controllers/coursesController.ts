@@ -129,6 +129,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             selectedOption: {id: undefined, name: 'Choisissez votre type'}
         };
         $scope.nameFolder="";
+        if ($(window).width() < 800) {
+            if($scope.typeShow.selectedToDoOption.id == 'doing' || $scope.typeShow.selectedToDoOption.id == 'finished')
+                $scope.typeShow.selectedToDoOption.id = "all";
+            $scope.viewModeToDo = "icons";
+            $scope.viewModeToCome = "icons";
+        }
     };
 
     $scope.isPrintMenuFolder = function () {

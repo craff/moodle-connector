@@ -22,6 +22,12 @@
     margin-right: 10px;
   }
 }
+
+.folderCheckbox{
+  right: -15px;
+  position: absolute;
+}
+
 .summary-list{
   border-bottom-right-radius: 6%;
   border-bottom-left-radius: 6%;
@@ -364,7 +370,12 @@ i.orderArrow {
   font-style: italic;
 }
 .size-font{
-  font-size: 13px;
+  @media screen and (min-width: 800px) {
+    font-size: 13px;
+  }
+  @media screen and (max-width: 800px) {
+    font-size: 12px;
+  }
 }
 .padding-left-corp{
   @media screen and (min-width: 800px) {
@@ -375,21 +386,39 @@ i.orderArrow {
   }
 }
 .left-margin{
-  margin-left: 15px;
+  @media screen and (min-width: 800px) {
+    margin-left: 15px;
+  }
+  @media screen and (max-width: 800px) {
+    margin-left: 33px;
+  }
 }
 .bottom-margin{
   margin-bottom: 5px;
 }
 
 .right-course-margin{
-  margin-right:15px;
+  @media screen and (min-width: 800px) {
+    margin-right:15px;
+  }
 }
 
 .left-magnet{
   float: left;
   color: #555;
   font-weight: bold;
-  font-size: 20px;
+  @media screen and (min-width: 800px) {
+    font-size: 20px;
+  }
+  @media screen and (max-width: 800px) {
+    @media screen and (min-width: 360px) {
+      font-size: 17px;
+    }
+    @media screen and (max-width: 360px) {
+      font-size: 13px;
+    }
+  }
+
 }
 
 .big-folder{
@@ -401,6 +430,7 @@ i.orderArrow {
 
 .topFolder{
   top:15px;
+  left: 13px;
 }
 
 .folder-size{
@@ -422,9 +452,13 @@ i.orderArrow {
   font-size: 16px;
 }
 
+.autoHeight{
+  height: auto;
+}
+
 i.dropbtn {
   color: black;
-  padding: 16px;
+  padding: 0px 16px;
   font-size: 25px;
   border: none;
   cursor: pointer;
@@ -435,9 +469,11 @@ i.dropbtn::before{
 }
 
 .dropdown {
-  float: right;
-  position: relative;
+  position: absolute;
   display: inline-block;
+  right: 0;
+  top: 15px;
+  z-index: 1000;
 }
 
 .dropdown-content {
