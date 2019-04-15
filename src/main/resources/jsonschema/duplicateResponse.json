@@ -10,7 +10,7 @@
 			"type": "string"
 		},
 		"originalcourseid": {
-			"type": "string"
+			"type": "integer"
 		},
 		"ident": {
 			"type": "string"
