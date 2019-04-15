@@ -1157,7 +1157,7 @@ public class MoodleController extends ControllerHelper {
                                             }
                                         });
                                 break;
-                            case "finish":
+                            case "finished":
                                 moodleWebService.updateStatusCourseToDuplicate(duplicateResponse.getString("status"),
                                         duplicateResponse.getInteger("ident"), 1, new Handler<Either<String, JsonObject>>() {
                                             @Override
