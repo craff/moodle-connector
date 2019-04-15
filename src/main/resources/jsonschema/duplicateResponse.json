@@ -1,0 +1,22 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"type": "object",
+	"additionalProperties": false,
+	"properties": {
+        "courseid": {
+            "type" : "number"
+        },
+		"userid": {
+			"type": "string"
+		},
+		"originalcourseid": {
+			"type": "number"
+		},
+		"ident": {
+			"type": "number"
+		},
+		"status": {
+			"type": "string"
+		}
+	}
+}

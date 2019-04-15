@@ -1131,7 +1131,7 @@ public class MoodleController extends ControllerHelper {
     @Post("/course/duplicate/response")
     @ApiDoc("Duplicate courses")
     public void getMoodleResponse (HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "duplicate", new Handler<JsonObject>() {
+        RequestUtils.bodyToJson(request, pathPrefix + "duplicateResponse", new Handler<JsonObject>() {
             @Override
             public void handle(JsonObject duplicateResponse) {
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
