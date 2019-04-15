@@ -3,12 +3,12 @@
         <span class="left-magnet title-dashboard">
             <i18n>moodle.todo.courses</i18n>
         </span>
-        <switch ng-model="courses.printcoursestodo" ng-click="courses.setChoice(2)"></switch>
+        <switch ng-model="courses.todo" ng-click="courses.setChoice(2)"></switch>
     </div>
-    <div ng-if="courses.printcoursestodo">
+    <div ng-if="courses.todo">
         <div class="row list-dashboard">
-            <select class="cell left-magnet special-selected zero-mobile" ng-model="typeShow.selectedToDoOption"
-                    ng-options="option.name for option in typeShow.availableOptions track by option.id"
+            <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestodosort"
+                    ng-options="option.name for option in courses.typeShow track by option.id"
                     ng-change="changeShowCoursesToDoDesktop()">
             </select>
             <div class="search-pagination zero-mobile">
@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="zero-desktop twelve-mobile">
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToDoOption.id == 'masked'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort.id == 'masked'}">
                 <span>
                     <i class="eye-open ">
                     </i>
@@ -30,7 +30,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('masked')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToDoOption.id == 'favorites'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort.id == 'favorites'}">
                 <span>
                     <i class="favorite">
                     </i>
@@ -38,7 +38,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('favorites')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToDoOption.id == 'all'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort.id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>
@@ -59,10 +59,10 @@
                     <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin"
-            ng-class="{'definedImageSmallToDoWidth cell' : courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course,typeShow.selectedToDoOption.id) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
+            <div ng-repeat="course in courses.coursesToShow('coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin"
+            ng-class="{'definedImageSmallToDoWidth cell' : courses.isTheFirst(course) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
              'right-course-margin' : viewModeToDo == 'icons'}">
-                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course,typeShow.selectedToDoOption.id)"></courses-item>
+                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course)"></courses-item>
             </div>
         </div>
         <div class="row next-previous-courses">
@@ -72,7 +72,7 @@
                     <button ng-if="!(firstCoursesToDo == 0)" class="pagination-button" ng-click="previousCoursesToDoButton()" >
                         <i class="left-open"></i>
                     </button>
-                    <button ng-if="!(lastCoursesToDo >= courses.coursesToShow(typeShow.selectedToDoOption.id,'coursesToDo').length)" class="pagination-button" ng-click="nextCoursesToDoButton()">
+                    <button ng-if="!(lastCoursesToDo >= courses.coursesToShow('coursesToDo').length)" class="pagination-button" ng-click="nextCoursesToDoButton()">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -84,12 +84,12 @@
         <span class="left-magnet title-dashboard">
             <i18n>moodle.tocome.courses</i18n>
         </span>
-        <switch ng-model="courses.printcoursestocome" ng-click="courses.setChoice(3)"></switch>
+        <switch ng-model="courses.tocome" ng-click="courses.setChoice(3)"></switch>
     </div>
-    <div ng-if="courses.printcoursestocome">
+    <div ng-if="courses.tocome">
         <div class="row  list-dashboard">
-            <select class="cell left-magnet special-selected zero-mobile" ng-model="typeShow.selectedToComeOption"
-                    ng-options="option.name for option in typeShow.availableOptions.slice(0, 1).concat(typeShow.availableOptions.slice(2, 3)).concat(typeShow.availableOptions.slice(4, 5)) track by option.id"
+            <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestocomesort"
+                    ng-options="option.name for option in courses.typeShow.slice(0, 1).concat(courses.typeShow.slice(2, 3)).concat(courses.typeShow.slice(4, 5)) track by option.id"
                     ng-change="changeShowCoursesToComeDesktop()">
             </select>
             <div class="search-pagination zero-mobile">
@@ -103,7 +103,7 @@
                 </div>
             </div>
             <div class="zero-desktop twelve-mobile">
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToComeOption.id == 'masked'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort.id == 'masked'}">
                 <span>
                     <i class="eye-open ">
                     </i>
@@ -111,7 +111,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToCome('masked')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToComeOption.id == 'favorites'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort.id == 'favorites'}">
                 <span>
                     <i class="favorite">
                     </i>
@@ -119,7 +119,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToCome('favorites')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeShow.selectedToComeOption.id == 'all'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort.id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>
@@ -140,7 +140,7 @@
                     <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)" ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}"
+            <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)" ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}"
                  class="twelve-mobile style-bord infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
@@ -151,7 +151,7 @@
                     <button  ng-if=" !(firstCoursesToCome == 0)" class="pagination-button" ng-click="previousCoursesToComeButton()">
                         <i class="left-open"></i>
                     </button>
-                    <button ng-if=" !(lastCoursesToCome >= courses.coursesToShow(typeShow.selectedToComeOption.id,'coursesToCome').length)" class="pagination-button" ng-click="nextCoursesToComeButton()">
+                    <button ng-if=" !(lastCoursesToCome >= courses.coursesToShow('coursesToCome').length)" class="pagination-button" ng-click="nextCoursesToComeButton()">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -164,9 +164,9 @@
             <span class="left-magnet title-dashboard">
                 <i18n>moodle.create.courses.recent</i18n>
             </span>
-            <switch ng-model="courses.printcourseslastcreation" ng-click="courses.setChoice(1)"></switch>
+            <switch ng-model="courses.lastcreation" ng-click="courses.setChoice(1)"></switch>
         </div>
-        <div ng-if="courses.printcourseslastcreation" class="row center-courses">
+        <div ng-if="courses.lastcreation" class="row center-courses">
             <div ng-show="displayMessageLoader">
                 <div>
                     <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>

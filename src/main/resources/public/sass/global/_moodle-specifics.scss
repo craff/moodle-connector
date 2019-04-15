@@ -30,6 +30,24 @@ body.moodle {
     }
   }
 
+  nav.vertical[side-nav].slide {
+    width: 155px;
+    padding: 0px 10px;
+    overflow: unset;
+
+  }
+
+  nav.vertical[side-nav] {
+    background-color: #F0F0F0;
+    border-radius: 2px;
+    border-left: none;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.26);
+  }
+
+  .heightNavBar{
+    height: 110px !important;
+  }
+
   section.main {
     @media screen and (max-width: 800px) {
       padding: 0 !important;
@@ -294,7 +312,9 @@ body.moodle {
   }
 
   .inside-margin {
-    margin-left: 80px;
+    @media screen and (min-width: 800px) {
+      margin-left: 80px;
+    }
   }
 
   .center-courses {
@@ -506,6 +526,55 @@ body.moodle {
   .littleMarginTop{
     margin-top:-5px;
   }
+
+  .sideNavMyCourses {
+    height: 100%;
+    width: 0;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #F0F0F0;
+    overflow-x: hidden;
+    transition: 0.5s;
+    top: 52px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.26);
+    border-radius: 3px;
+  }
+
+  .sideNavMyCourses a {
+    padding: 8px 8px 8px 32px;
+    text-decoration: none;
+    font-size: 25px;
+    color: #818181;
+    display: block;
+    transition: 0.3s;
+  }
+
+  .sideNavMyCourses a:hover {
+    color: black;
+  }
+
+  .sideNavMyCourses .closebtn {
+    position: absolute;
+    top: 0;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+    cursor:pointer;
+  }
+
+  i.dropbtn {
+    color: black;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+  }
+
+  i.dropbtn::before{
+    content: '\e912';
+  }
+
 
 }
 

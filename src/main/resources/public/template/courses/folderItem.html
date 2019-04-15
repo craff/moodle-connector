@@ -25,20 +25,6 @@
 <div class="vertical-spacing zero-mobile">
     <input ng-disabled="!printfolders" type="button" ng-click="openPopUpFolder()" i18n-value="moodle.folder.new" class="colorButton responsive-button">
 </div>
-<div class="vertical-spacing zero-desktop">
-    <label class="chip margin-left checkbox-course middleVertical" ng-class="{ selected: typeFilter[0]}">
-            <span>
-                <i18n>course</i18n>
-            </span>
-        <input type="checkbox" ng-click="checkTypeFilterSelected(0)">
-    </label>
-    <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeFilter[1]}">
-            <span>
-                <i18n>activity</i18n>
-            </span>
-        <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
-    </label>
-</div>
 
 <script type="text/ng-template"  id="tree_item_renderer.html">
     <div ng-repeat="folder in folder.subFolders">

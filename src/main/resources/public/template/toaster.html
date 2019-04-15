@@ -10,7 +10,7 @@
             <button ng-show="nbFoldersSelect === 1 && nbCoursesSelect === 0"  ng-click="" class="cell zero-mobile">
                 <i18n>moodle.toaster.rename</i18n>
             </button>
-            <button  ng-click="openPopUpDuplicate()" class="cell">
+            <button  ng-click="openPopUpDuplicate()" class="cell" ng-show="nbFoldersSelect === 0">
                 <i18n>moodle.toaster.duplicate</i18n>
             </button>
             <button  ng-click="openPopUpMove()" class="cell">

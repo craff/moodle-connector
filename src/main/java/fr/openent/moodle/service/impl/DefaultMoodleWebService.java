@@ -181,7 +181,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void getChoices(String userId, final Handler<Either<String, JsonArray>> eitherHandler) {
-        String query = "SELECT lastcreation, todo, tocome " +
+        String query = "SELECT * " +
                 "FROM " + Moodle.moodleSchema + ".choices " +
                 "WHERE user_id = ?;";
 
@@ -192,15 +192,17 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void setChoice(final JsonObject courses, String view, Handler<Either<String, JsonObject>> handler) {
-        String query = "INSERT INTO " + Moodle.moodleSchema + ".choices (user_id, lastcreation, todo, tocome)" +
-                " VALUES (?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET " + view + "=" + courses.getBoolean("printcourses" + view) + "; " +
-                "DELETE FROM " + Moodle.moodleSchema + ".choices WHERE lastcreation=true AND todo=true AND tocome=true;";
+        String query = "INSERT INTO " + Moodle.moodleSchema + ".choices (user_id, lastcreation, todo, tocome, coursestodosort, coursestocomesort)" +
+                " VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET " + view + "='" + courses.getValue(view) + "'; " +
+                "DELETE FROM " + Moodle.moodleSchema + ".choices WHERE lastcreation=true AND todo=true AND tocome=true AND coursestodosort='doing' AND coursestocomesort='all';";
 
         JsonArray values = new JsonArray();
         values.add(courses.getString("userId"));
-        values.add(courses.getBoolean("printcourseslastcreation"));
-        values.add(courses.getBoolean("printcoursestodo"));
-        values.add(courses.getBoolean("printcoursestocome"));
+        values.add(courses.getBoolean("lastcreation"));
+        values.add(courses.getBoolean("todo"));
+        values.add(courses.getBoolean("tocome"));
+        values.add(courses.getString("coursestodosort"));
+        values.add(courses.getString("coursestocomesort"));
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }

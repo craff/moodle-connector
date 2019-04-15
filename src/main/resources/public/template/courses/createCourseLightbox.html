@@ -25,13 +25,13 @@
             <input type="text" class="twelve" i18n-placeholder="write.here" ng-model="course.summary">
         </label>
     </div>
-    <div class="row horizontal-spacing">
+    <div class="row horizontal-spacing vertical-spacing">
         <div class="three cell">
             <span class="row label-input-row"><i18n>moodle.course.image</i18n></span>
             <image-select class="initialFloat cell" default="/img/illustrations/image-default.svg" ng-change="getTypeImage()"
                           ng-model="course.imageurl" on-close=""/>
         </div>
-        <div class="four cell horizontal-spacing inside-margin">
+        <div class="six twelve-mobile cell vertical-spacing inside-margin">
             <span class="row label-input-row"><i18n>moodle.course.folder</i18n></span>
             <div  class="three cell"
                   static-include="/moodle/public/template/courses/folderTargetDropDownList.html">

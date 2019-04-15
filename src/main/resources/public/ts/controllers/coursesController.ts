@@ -99,17 +99,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.nbCoursesSelect = 0;
         $scope.disableDeleteSend = true;
         $scope.disableDuplicateSend = true;
-        $scope.typeShow = {
-            availableOptions: [
-                {id: 'all', name: 'Tout'},
-                {id: 'doing', name: 'En cours'},
-                {id: 'favorites', name: 'Favoris'},
-                {id: 'finished', name: 'Terminés'},
-                {id: 'masked', name: 'Masqués'}
-            ],
-            selectedToDoOption: {id: 'doing', name: 'En cours'},
-            selectedToComeOption: {id: 'all', name: 'Tout'}
-        };
         $scope.firstCoursesToDo = 0;
         $scope.lastCoursesToDo = $scope.countToDo();
         $scope.firstCoursesToCome = 0;
@@ -130,8 +119,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         };
         $scope.nameFolder="";
         if ($(window).width() < 800) {
-            if($scope.typeShow.selectedToDoOption.id == 'doing' || $scope.typeShow.selectedToDoOption.id == 'finished')
-                $scope.typeShow.selectedToDoOption.id = "all";
+            if($scope.courses.coursestodosort.id == 'doing' || $scope.courses.coursestodosort.id == 'finished')
+                $scope.courses.coursestodosort = $scope.courses.typeShow[0];
             $scope.viewModeToDo = "icons";
             $scope.viewModeToCome = "icons";
         }
@@ -698,22 +687,26 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.viewModeToDo = view;
     };
 
-    $scope.changeShowCoursesToDoDesktop = function() {
+    $scope.changeShowCoursesToDoDesktop = async function() {
         $scope.firstCoursesToDo=0;
+        await $scope.courses.setChoice(4);
     };
 
-    $scope.changeShowCoursesToDo = function(id:string) {
+    $scope.changeShowCoursesToDo = async function(id:string) {
         $scope.firstCoursesToDo=0;
-        $scope.typeShow.selectedToDoOption.id = id;
+        $scope.courses.coursestodosort = $scope.courses.typeShow.filter(type => type.id == id );
+        await $scope.courses.setChoice(4);
     };
 
-    $scope.changeShowCoursesToComeDesktop = function() {
+    $scope.changeShowCoursesToComeDesktop = async function() {
         $scope.firstCoursesToCome=0;
+        await $scope.courses.setChoice(5);
     };
 
-    $scope.changeShowCoursesToCome = function(id:string) {
+    $scope.changeShowCoursesToCome = async function(id:string) {
         $scope.firstCoursesToCome=0;
-        $scope.typeShow.selectedToComeOption.id = id;
+        $scope.courses.coursestocomesort = $scope.courses.typeShow.filter(type => type.id == id );
+        await $scope.courses.setChoice(5);
     };
 
     $scope.getSelectedCourses = function () {
@@ -792,11 +785,19 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $(window).resize(function(){
         if ($(window).width() < 800) {
-            if($scope.typeShow.selectedToDoOption.id == 'doing' || $scope.typeShow.selectedToDoOption.id == 'finished')
-                $scope.typeShow.selectedToDoOption.id = "all";
+            if($scope.courses.coursestodosort == 'doing' || $scope.courses.coursestodosort == 'finished')
+                $scope.courses.coursestodosort = $scope.courses.typeShow[0];
             $scope.viewModeToDo = "icons";
             $scope.viewModeToCome = "icons";
         }
     });
+
+    $scope.openNavMyCourses = function() {
+        document.getElementById("mySidenavCourses").style.width = "200px";
+    }
+
+    $scope.closeNavMyCourses = function() {
+        document.getElementById("mySidenavCourses").style.width = "0";
+    }
 
 }]);

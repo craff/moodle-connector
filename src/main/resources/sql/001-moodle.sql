@@ -31,6 +31,8 @@ CREATE TABLE moodle.choices (
   lastCreation boolean,
   toDo boolean,
   toCome boolean,
+  coursestodosort character varying(36),
+  coursestocomesort character varying(36),
   CONSTRAINT choices_pkey PRIMARY KEY (user_id)
 );
 

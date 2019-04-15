@@ -3,14 +3,20 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"printcourseslastcreation": {
+		"lastcreation": {
 			"type" : ["boolean"]
 		},
-		"printcoursestodo": {
+		"todo": {
 			"type" : ["boolean"]
 		},
-		"printcoursestocome": {
+		"tocome": {
 			"type" : ["boolean"]
+		},
+		"coursestodosort": {
+			"type" : ["string"]
+		},
+		"coursestocomesort": {
+			"type" : ["string"]
 		},
 		"coursesId": {
 			"type" : "array"

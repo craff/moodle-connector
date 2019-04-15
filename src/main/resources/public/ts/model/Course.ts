@@ -141,15 +141,18 @@ export class Courses {
     coursesByUser: Course[];
     isSynchronized: Boolean;
     allCourses: Course[];
-    printcourseslastcreation : boolean;
-    printcoursestodo : boolean;
-    printcoursestocome : boolean;
+    lastcreation : boolean;
+    todo : boolean;
+    tocome : boolean;
+    coursestodosort : any;
+    coursestocomesort : any;
     coursesToDo : Course[];
     coursesToCome : Course[];
     showCourses : Course[];
     folderid : number;
     searchInput : any;
     order : any;
+    typeShow : any;
 
     constructor() {
         this.allbyfolder = [];
@@ -167,6 +170,13 @@ export class Courses {
             field: "modificationDate",
             desc: false
         };
+        this.typeShow = [
+            {id: 'all', name: 'Tout'},
+            {id: 'doing', name: 'En cours'},
+            {id: 'favorites', name: 'Favoris'},
+            {id: 'finished', name: 'Terminés'},
+            {id: 'masked', name: 'Masqués'}
+        ];
         this.getChoice();
 
     }
@@ -211,9 +221,11 @@ export class Courses {
 
     toJSON() {
         return {
-            printcourseslastcreation : this.printcourseslastcreation,
-            printcoursestodo : this.printcoursestodo,
-            printcoursestocome : this.printcoursestocome
+            lastcreation : this.lastcreation,
+            todo : this.todo,
+            tocome : this.tocome,
+            coursestodosort : this.coursestodosort.id,
+            coursestocomesort : this.coursestocomesort.id
         }
     }
     /*async getCoursesbyFolder (folder_id: number) {
@@ -280,22 +292,26 @@ export class Courses {
         return this.coursesByUser.filter(course => course.duplication == 'non').slice(0,5);
     }
 
-    isTheFirst(courseFirst : Course, id : string){
-        if(this.coursesToShow(id,"coursesToDo").indexOf(courseFirst) == 0 || $(window).width() < 800)
+    isTheFirst(courseFirst : Course){
+        if(this.coursesToShow("coursesToDo").indexOf(courseFirst) == 0 || $(window).width() < 800)
             return true;
         else
             return false;
     }
 
-    coursesToShow(id : string, place : string){
+    coursesToShow(place : string){
         if(place == "coursesToDo"){
-            if(this.coursesToDo)
+            if(this.coursesToDo) {
                 this.showCourses = this.coursesToDo.filter(course => this.searchCoursesToDo(course));
+                var id = this.coursestodosort.id;
+            }
         }else if (place == "coursesToCome"){
-            if(this.coursesToCome)
+            if(this.coursesToCome) {
                 this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));
+                var id = this.coursestocomesort.id;
+            }
         }
-         if (id =="doing")
+        if (id =="doing")
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && !(cours.masked)) });
         else if (id == "favorites")
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.favorites); });
@@ -403,15 +419,19 @@ export class Courses {
         try {
             const {data} = await http.get('/moodle/choices');
             if(data.length != 0) {
-                this.printcourseslastcreation = data[0].lastcreation;
-                this.printcoursestodo = data[0].todo;
-                this.printcoursestocome = data[0].tocome;
+                this.lastcreation = data[0].lastcreation;
+                this.todo = data[0].todo;
+                this.tocome = data[0].tocome;
+                this.coursestodosort = this.typeShow.filter(type => type.id == data[0].coursestodosort );
+                this.coursestocomesort = this.typeShow.filter(type => type.id == data[0].coursestocomesort );
             }
             else
             {
-                this.printcourseslastcreation = true;
-                this.printcoursestodo = true;
-                this.printcoursestocome = true;
+                this.lastcreation = true;
+                this.todo = true;
+                this.tocome = true;
+                this.coursestodosort = this.typeShow[1];
+                this.coursestocomesort = this.typeShow[0];
             }
         } catch (e) {
             notify.error("Get Choice function didn't work");
@@ -436,6 +456,18 @@ export class Courses {
                 await http.put(`/moodle/choices/tocome`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice toCome function didn't work");
+            }
+        }else if (view ==4){
+            try {
+                await http.put(`/moodle/choices/coursestodosort`, this.toJSON());
+            } catch (e) {
+                notify.error("Set Choice coursesToDo sorting function didn't work");
+            }
+        }else if (view ==5){
+            try {
+                await http.put(`/moodle/choices/coursestocomesort`, this.toJSON());
+            } catch (e) {
+                notify.error("Set Choice coursesToCome sorting  function didn't work");
             }
         }
     }
