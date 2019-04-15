@@ -33,7 +33,6 @@ import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 
-import javax.print.attribute.standard.Finishings;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -717,7 +716,7 @@ public class MoodleController extends ControllerHelper {
                                     }
                                 }
                             });
-                        }        //getUsersEnrolementsFuture.fail( response.statusMessage());
+                        }
                     };
 
                     final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, getUsersEnrolementsHandler);
@@ -966,7 +965,11 @@ public class MoodleController extends ControllerHelper {
                                         share.put("users", usersFuture);
                                         for (Object userObj : usersFuture) {
                                             JsonObject userJson = ((JsonObject) userObj);
-                                            userJson.put("role", mapInfo.get(userJson.getString("id")));
+                                            if (userJson.getString("id").equals(user.getUserId())) {
+                                                userJson.put("role", auditeur);
+                                            } else {
+                                                userJson.put("role", mapInfo.get(userJson.getString("id")));
+                                            }
                                         }
                                     }
                                     if (groupsFuture != null && !groupsFuture.isEmpty()) {

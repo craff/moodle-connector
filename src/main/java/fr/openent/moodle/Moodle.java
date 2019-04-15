@@ -29,7 +29,7 @@ public class Moodle extends BaseServer {
 	public static String JSON = "json";
 	public static String MOODLE_READ = "fr-openent-moodle-controllers-MoodleController|read";
 	public static String MOODLE_CONTRIB = "fr-openent-moodle-controllers-MoodleController|contrib";
-	public static String MOODLE_MANAGER = "fr-openent-moodle-controllers-MoodleController|manager";
+	public static String MOODLE_MANAGER = "fr-openent-moodle-controllers-MoodleController|shareSubmit";
 
 	public static String WAITING = "en attente";
 	public static String PENDING = "en cours";
@@ -45,6 +45,7 @@ public class Moodle extends BaseServer {
 	public static Integer user = 7;
 	public static Integer frontpage = 8;
 	public static Integer entcgi = 9;
+	public static Integer auditeur = 10;
 
 	public static String moodleSchema;
     public static JsonObject moodleConfig;
