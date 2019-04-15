@@ -4,16 +4,16 @@
 	"additionalProperties": false,
 	"properties": {
         "courseid": {
-            "type" : "number"
+            "type" : "string"
         },
 		"userid": {
 			"type": "string"
 		},
 		"originalcourseid": {
-			"type": "number"
+			"type": "string"
 		},
 		"ident": {
-			"type": "number"
+			"type": "string"
 		},
 		"status": {
 			"type": "string"
