@@ -37,6 +37,7 @@ export class Course implements Shareable{
     };
     duplication: string;
     submitWait: boolean;
+    usernumber: number;
 
     constructor(){
         this.type = "1";
@@ -361,12 +362,12 @@ export class Courses {
                         else
                             return 1;
                 } else if(that.order.field == "numberEnrolment") {
-                    if (a.fullname < b.fullname)
+                    if (a.usernumber < b.usernumber)
                         if(that.order.desc)
                             return 1;
                         else
                             return -1;
-                    if (a.fullname > b.fullname)
+                    if (a.usernumber > b.usernumber)
                         if(that.order.desc)
                             return -1;
                         else
