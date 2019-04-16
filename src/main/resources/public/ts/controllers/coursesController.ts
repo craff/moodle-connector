@@ -119,7 +119,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         };
         $scope.nameFolder="";
         if ($(window).width() < 800) {
-            if($scope.courses.coursestodosort.id == 'doing' || $scope.courses.coursestodosort.id == 'finished')
+            if($scope.courses.coursestodosort[0].id == 'finished')
                 $scope.courses.coursestodosort = $scope.courses.typeShow[0];
             $scope.viewModeToDo = "icons";
             $scope.viewModeToCome = "icons";
@@ -127,6 +127,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.isPrintMenuFolder = function () {
+        $scope.closeNavMyCourses();
         if($scope.currentfolderid != 0 || $scope.printmenucourseShared) {
             $scope.initFolders();
             $scope.printmenufolder = true;
@@ -136,6 +137,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
     };
     $scope.isPrintMenuCoursesShared = function () {
+        $scope.closeNavMyCourses();
         $scope.printmenucourseShared = true;
         $scope.printmenufolder = false;
         $scope.printfolders = false;
@@ -174,6 +176,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.isPrintSubFolder= function(folder:Folder){
+        $scope.closeNavMyCourses();
         $scope.folders.all.forEach(function (e) {
             if (e.id == folder.id) {
                 e.printsubfolder = !e.printsubfolder;
@@ -441,6 +444,26 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.createFolder = async function () {
         $scope.folder.parent_id = $scope.currentfolderid;
         await $scope.folder.create();
+        $scope.initFolders();
+        $scope.openLightbox = false;
+        Utils.safeApply($scope);
+
+    };
+
+    /**
+     * rename folder
+     * */
+    $scope.openPopUpFolderRename = function () {
+        $scope.folder = new Folder();
+        $scope.folder = $scope.folders.all.filter(folder => folder.select);
+        template.open('ligthBoxContainer', 'courses/renameFolderLightbox');
+        $scope.openLightbox = true;
+    };
+
+    $scope.renameFolder = async function () {
+        $scope.folders.all.filter(folder => folder.select).forEach(async function (folder) {
+            await folder.rename();
+        });
         $scope.initFolders();
         $scope.openLightbox = false;
         Utils.safeApply($scope);
@@ -789,28 +812,34 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $(window).resize(function(){
         if ($(window).width() < 800) {
-            if($scope.courses.coursestodosort[0].id == 'doing' || $scope.courses.coursestodosort[0].id == 'finished')
+            if($scope.courses.coursestodosort[0].id == 'finished')
                 $scope.courses.coursestodosort = $scope.courses.typeShow.filter(type => type.id == "all" );
             $scope.viewModeToDo = "icons";
             $scope.viewModeToCome = "icons";
-            $scope.firstCoursesToCome=0;
-            $scope.lastCoursesToCome = $scope.countToCome();
-            $scope.firstCoursesToDo=0;
-            $scope.lastCoursesToDo = $scope.countToDo();
-        } else {
-            $scope.firstCoursesToCome=0;
-            $scope.lastCoursesToCome = $scope.countToCome();
-            $scope.firstCoursesToDo=0;
-            $scope.lastCoursesToDo = $scope.countToDo();
         }
+        $scope.firstCoursesToCome=0;
+        $scope.lastCoursesToCome = $scope.countToCome();
+        $scope.firstCoursesToDo=0;
+        $scope.lastCoursesToDo = $scope.countToDo();
+
     });
 
     $scope.openNavMyCourses = function() {
         document.getElementById("mySidenavCourses").style.width = "200px";
-    }
+    };
 
     $scope.closeNavMyCourses = function() {
         document.getElementById("mySidenavCourses").style.width = "0";
-    }
+    };
+
+    $scope.initSearchToCome = function() {
+        $scope.firstCoursesToCome=0;
+        $scope.lastCoursesToCome = $scope.countToCome();
+    };
+
+    $scope.initSearchToDo = function() {
+        $scope.firstCoursesToDo=0;
+        $scope.lastCoursesToDo = $scope.countToDo();
+    };
 
 }]);

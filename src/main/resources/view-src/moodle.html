@@ -36,15 +36,15 @@
                                     </span>
                         </header>-->
                 </div>
-                <input type="submit" i18n-value="moodle.course.new" ng-click="openPopUp()" class="right-magnet">
+                <input type="submit" i18n-value="moodle.course.new" ng-click="openPopUp()" class="right-magnet" workflow="moodle.createCourse">
             </div>
         <nav class="vertical mobile-navigation tabs zero-desktop heightNavBar" side-nav >
-            <header class="horizontal-spacing selected row" data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
+            <header class="horizontal-spacing selected row ellipsis" data-ng-click="switchTab('dashboard')" data-ng-class="{ selected: currentTab === 'dashboard' }">
                                     <span>
                                         <i18n>moodle.dashboard.dashboard</i18n>
                                     </span>
             </header>
-            <header class="horizontal-spacing row" data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
+            <header class="horizontal-spacing row ellipsis" data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
                                     <span>
                                         <i18n>moodle.dashboard.coures</i18n>
                                     </span>

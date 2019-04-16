@@ -312,7 +312,9 @@ export class Courses {
                 var id = this.coursestocomesort[0].id;
             }
         }
-        if (id =="doing")
+        if (id =="all")
+            this.showCourses = _.filter(this.showCourses, function(cours) { return !(cours.masked) });
+        else if (id =="doing")
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && !(cours.masked)) });
         else if (id == "favorites")
             this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.favorites); });

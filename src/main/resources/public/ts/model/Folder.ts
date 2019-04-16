@@ -41,6 +41,22 @@ export class Folder {
         }
     }
 
+    toJsonRename() {
+        return {
+            id : this.id,
+            name : this.name
+        }
+    }
+
+    async rename() {
+        try {
+            await http.put('/moodle/folder/rename', this.toJsonRename());
+        } catch (e) {
+            notify.error("rename function didn't work");
+            throw e;
+        }
+    }
+
 }
 
 export class Folders {

@@ -5,7 +5,8 @@
                 <p>
                     <label class="vertical-spacing">
                         <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
-                        <i18n class="text-font">moodle.folders</i18n>
+                        <i18n class="zero-mobile">moodle.folders</i18n>
+                        <span class="text-font zero-desktop">[[folderName()]]</span>
                         <input type="search" class="twelve zero-mobile cell ellipsis" i18n-placeholder="search.folder" />
                         <div class="vertical-spacing zero-desktop twelve-mobile row">
                             <label class="chip margin-left checkbox-course middleVertical" ng-class="{ selected: typeFilter[0]}">

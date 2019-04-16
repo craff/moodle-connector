@@ -152,6 +152,17 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
+    @Put("/folder/rename")
+    @ApiDoc("rename a folder")
+    public void renameFolder(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject folder) {
+                moodleWebService.renameFolder(folder, defaultResponseHandler(request));
+            }
+        });
+    }
+
     @Get("/folder/countsFolders/:id")
     @ApiDoc("Get cours in database by folder id")
     //@SecuredAction("moodle.list")

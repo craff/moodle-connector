@@ -418,9 +418,6 @@ i.orderArrow {
   @media screen and (min-width: 800px) {
     margin-left: 15px;
   }
-  @media screen and (max-width: 800px) {
-    margin-left: 33px;
-  }
 }
 .bottom-margin{
   margin-bottom: 5px;
@@ -428,7 +425,7 @@ i.orderArrow {
 
 .right-course-margin{
   @media screen and (min-width: 800px) {
-    margin-right:15px;
+    margin-right:7px;
   }
 }
 

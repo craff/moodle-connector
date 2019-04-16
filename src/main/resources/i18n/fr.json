@@ -44,6 +44,7 @@
 	"cancel": "Annuler",
 	"validate": "Valider",
 	"create": "Créer",
+	"rename": "Renommer",
 	"move": "Déplacer",
 	"share.search.title": "Rechercher des utilisateurs et des groupes",
 	"tuto.title": "Naviguez au sein de vos documents en vue vignettes : ",
@@ -80,12 +81,14 @@
 	"moodle.toaster.text.name.course.moves": "Déplacer les cours ",
 	"moodle.course.new": "Créer un cours",
 	"moodle.folder.information": "Créer un dossier",
+	"moodle.folder.rename": "Renommer le nom d'un dossier",
 	"moodle.course.delete": "Supprimer un cours",
 	"moodle.folder.delete": "Supprimer un dossier",
 	"delete": "Supprimer",
 	"moodle.course.information": "Que voulez-vous créer ?",
 	"moodle.course.name.long" : "Titre",
 	"moodle.folder.name.long" : "Nom du dossier",
+	"moodle.folder.name.rename" : "Nouveau nom du dossier",
 	"moodle.course.name.short" : "Titre court",
 	"moodle.course.description" : "Descriptif",
 	"moodle.course.author" : "Auteur",
@@ -141,7 +144,7 @@
 	"course.oneEnrolment": " inscrit ",
 	"course.numberEnrolments": " inscrits ",
 
-	"search.coursesToDoCome": "Nom d'enseignant, date, titre..",
+	"search.coursesToDoCome": "Nom d'enseignant, titre...",
 	"search.folder": "Rechercher",
 
     "moodle.importation": "en cours de récupération",
@@ -155,5 +158,6 @@
 
 	"masked": "Masqués",
 	"favorites": "Favoris",
-	"all": "Tous"
+	"all": "Tous",
+	"doing": "En cours"
 }

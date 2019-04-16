@@ -11,6 +11,9 @@
     },
     "parentId": {
       "type": "number"
+    },
+    "id": {
+      "type": "number"
     }
   }
 }

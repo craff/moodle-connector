@@ -11,20 +11,10 @@
                     ng-options="option.name for option in courses.typeShow track by option.id"
                     ng-change="changeShowCoursesToDoDesktop()">
             </select>
-            <div class="search-pagination zero-mobile">
-                <div class="five cell ellipsis infoBackground style-bord searchBar">
-                    <i class="search searchIcon" ></i>
-                    <input class="twelve noBorder"
-                           type="text"
-                           translate attr="placeholder"
-                           ng-model="courses.searchInput.toDo"
-                           placeholder="search.coursesToDoCome"/>
-                </div>
-            </div>
             <div class="zero-desktop twelve-mobile">
                 <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'masked'}">
                 <span>
-                    <i class="eye-open ">
+                    <i class="eye-slash">
                     </i>
                     <i18n>masked</i18n>
                 </span>
@@ -44,6 +34,24 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('all')" >
                 </label>
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'doing'}">
+                <span>
+                    <i18n>doing</i18n>
+                </span>
+                    <input type="checkbox" ng-click="changeShowCoursesToDo('doing')" >
+                </label>
+            </div>
+            <div class="search-pagination">
+                <div class="five twelve-mobile cell ellipsis infoBackground style-bord searchBar">
+                    <i class="search searchIcon" ></i>
+                    <input class="twelve noBorder"
+                           type="text"
+                           translate attr="placeholder"
+                           ng-model="courses.searchInput.toDo"
+                           placeholder="search.coursesToDoCome"
+                           ng-change="initSearchToDo()"
+                    />
+                </div>
             </div>
             <div class="cell right-magnet title-dashboard zero-mobile">
                 <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewModeToDo('list')"></i>
@@ -92,20 +100,10 @@
                     ng-options="option.name for option in courses.typeShow.slice(0, 1).concat(courses.typeShow.slice(2, 3)).concat(courses.typeShow.slice(4, 5)) track by option.id"
                     ng-change="changeShowCoursesToComeDesktop()">
             </select>
-            <div class="search-pagination zero-mobile">
-                <div class="five cell ellipsis infoBackground style-bord searchBar">
-                    <i class="search searchIcon" ></i>
-                    <input class="twelve noBorder"
-                           type="text"
-                           translate attr="placeholder"
-                           ng-model="courses.searchInput.toCome"
-                           placeholder="search.coursesToDoCome"/>
-                </div>
-            </div>
             <div class="zero-desktop twelve-mobile">
                 <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort[0].id == 'masked'}">
                 <span>
-                    <i class="eye-open ">
+                    <i class="eye-slash">
                     </i>
                     <i18n>masked</i18n>
                 </span>
@@ -125,6 +123,18 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToCome('all')" >
                 </label>
+            </div>
+            <div class="search-pagination">
+                <div class="five twelve-mobile cell ellipsis infoBackground style-bord searchBar">
+                    <i class="search searchIcon" ></i>
+                    <input class="twelve noBorder"
+                           type="text"
+                           translate attr="placeholder"
+                           ng-model="courses.searchInput.toCome"
+                           placeholder="search.coursesToDoCome"
+                           ng-change="initSearchToCome()"
+                    />
+                </div>
             </div>
             <div class="cell right-magnet title-dashboard zero-mobile">
                 <i class="show-list" ng-class="{ selected: viewModeToCome == 'list' }" ng-click="changeViewModeToCome('list')"></i>

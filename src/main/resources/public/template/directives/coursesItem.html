@@ -104,7 +104,9 @@
                 <span class="date">[[ printDate(course,"enddate") ]]</span>
             </label>
             <div class="right-magnet zero-desktop">
-                <i class="eye-open import" ng-class="{'green-color' : course.masked, 'grey-color': !course.masked}" ng-click="course.setPreferences('masked')">
+                <i class="eye-slash import" class="grey-color" ng-if="!course.masked" ng-click="course.setPreferences('masked')">
+                </i>
+                <i class="eye-open import" class="grey-color" ng-if="course.masked" ng-click="course.setPreferences('masked')">
                 </i>
                 <i class="favorite rightTop-margin import" ng-class="{'yellow-color' : course.favorites, 'grey-color': !course.favorites}" ng-click="course.setPreferences('favorites')">
                 </i>

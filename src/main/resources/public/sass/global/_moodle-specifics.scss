@@ -45,7 +45,7 @@ body.moodle {
   }
 
   .heightNavBar{
-    height: 110px !important;
+    height: 80px !important;
   }
 
   section.main {
@@ -297,7 +297,7 @@ body.moodle {
 
   .minimal-mine-recent-width {
     @media screen and (min-width: 800px) {
-      min-width: 340px;
+      min-width: 300px;
     }
     @media screen and (max-width: 800px) {
       width: 100%;
@@ -448,6 +448,7 @@ body.moodle {
 
   label.chip {
     width:auto;
+    padding: 0px 10px;
   }
 
   label.chip.checkbox-activity.selected {
@@ -478,7 +479,9 @@ body.moodle {
   }
 
   .searchBar{
-    margin: 0px 15px;
+    @media screen and (min-width: 800px) {
+      margin: 0px 15px;
+    }
     height: 35px;
     padding: 5px;
   }
@@ -526,9 +529,6 @@ body.moodle {
     color: #e20037;
   }
 
-  .green-color{
-    color:#92d36e
-  }
   .yellow-color{
     color:#ffcc00
   }
