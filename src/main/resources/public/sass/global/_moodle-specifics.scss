@@ -229,6 +229,9 @@ body.moodle {
     }
     @media screen and (max-width: 800px) {
       width: 75%;
+      @media screen and (max-width: 450px) {
+        width: 64%;
+      }
     }
     position: absolute;
   }
@@ -264,7 +267,12 @@ body.moodle {
 
   .specific-small-toCome-width {
     right: 10px;
-    max-width: 70%;
+    @media screen and (min-width: 350px) {
+      max-width: 70%;
+    }
+    @media screen and (max-width: 350px) {
+      max-width: 65%;
+    }
     position: absolute;
   }
 
@@ -276,9 +284,11 @@ body.moodle {
   }
 
   .small-width {
-    width: 48%;
-    min-width: 425px;
-    margin-right: 15px;
+    @media screen and (min-width: 800px) {
+      width: 48%;
+      min-width: 425px;
+      margin-right: 15px;
+    }
   }
 
   .specific-mine-shared-width {
@@ -312,6 +322,10 @@ body.moodle {
   }
 
   .inside-margin {
+      margin-left: 80px;
+  }
+
+  .inside-margin-create {
     @media screen and (min-width: 800px) {
       margin-left: 80px;
     }
@@ -527,6 +541,14 @@ body.moodle {
     margin-top:-5px;
   }
 
+  .titleSideNav{
+    padding-left: 25px;
+  }
+
+  .upNav{
+    margin-top:-40px;
+  }
+
   .sideNavMyCourses {
     height: 100%;
     width: 0;
@@ -543,7 +565,6 @@ body.moodle {
   }
 
   .sideNavMyCourses a {
-    padding: 8px 8px 8px 32px;
     text-decoration: none;
     font-size: 25px;
     color: #818181;

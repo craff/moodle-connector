@@ -1,7 +1,7 @@
 <div class="row coursesBackground">
     <div class="twelve twelve-mobile">
         <div class="row-mobile">
-            <div class="cell two-desktop twelve-mobile horizontal-spacing">
+            <div class="cell three twelve-mobile horizontal-spacing">
                 <p>
                     <label class="vertical-spacing">
                         <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
@@ -26,13 +26,15 @@
                 <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
                 </div>
                 <div id="mySidenavCourses" class="sideNavMyCourses">
-                    <i18n class="text-font">moodle.folders</i18n>
-                    <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
-                    <div class="horizontal-spacing" static-include="/moodle/public/template/courses/folderItem.html">
+                    <div class="vertical-spacing row">
+                        <i18n class="text-font titleSideNav">moodle.folders</i18n>
+                        <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
+                    </div>
+                    <div class="horizontal-spacing upNav" static-include="/moodle/public/template/courses/folderItem.html">
                 </div>
             </div>
         </div>
-        <div class="responsiveLeftMargin eight cell horizontal-spacing padding-left-corp" >
+        <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp" >
             <p class="zero-mobile"><i class="foldericon folder-size"></i><span class="big-folder ellipsis">[[folderName()]]</span></br></p>
             <p  class ="row zero-mobile" static-include="/moodle/public/template/courses/filters.html"></p>
             <div class="row center-courses" static-include="/moodle/public/template/courses/folders.html" ng-if="printfolders"></div>

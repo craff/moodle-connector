@@ -15,7 +15,7 @@ var moodleBehaviours = {
 		}
 	},
 	workflow: {
-		create: 'fr.openent.moodle.controllers.MoodleController|create',
+		createCourse: 'fr.openent.moodle.controllers.MoodleController|create',
 		delete: 'fr.openent.moodle.controllers.MoodleController|delete',
 		view: 'fr.openent.moodle.controllers.MoodleController|view'
 	}
@@ -23,7 +23,7 @@ var moodleBehaviours = {
 
 
 Behaviours.register('moodle', {
-	behaviours: moodleBehaviours,
+	rights: moodleBehaviours,
 	dependencies: {},
 	/**
 	 * Allows to set rights for behaviours.

@@ -224,8 +224,8 @@ export class Courses {
             lastcreation : this.lastcreation,
             todo : this.todo,
             tocome : this.tocome,
-            coursestodosort : this.coursestodosort.id,
-            coursestocomesort : this.coursestocomesort.id
+            coursestodosort : this.coursestodosort[0].id,
+            coursestocomesort : this.coursestocomesort[0].id
         }
     }
     /*async getCoursesbyFolder (folder_id: number) {
@@ -303,12 +303,12 @@ export class Courses {
         if(place == "coursesToDo"){
             if(this.coursesToDo) {
                 this.showCourses = this.coursesToDo.filter(course => this.searchCoursesToDo(course));
-                var id = this.coursestodosort.id;
+                var id = this.coursestodosort[0].id;
             }
         }else if (place == "coursesToCome"){
             if(this.coursesToCome) {
                 this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));
-                var id = this.coursestocomesort.id;
+                var id = this.coursestocomesort[0].id;
             }
         }
         if (id =="doing")
@@ -430,8 +430,8 @@ export class Courses {
                 this.lastcreation = true;
                 this.todo = true;
                 this.tocome = true;
-                this.coursestodosort = this.typeShow[1];
-                this.coursestocomesort = this.typeShow[0];
+                this.coursestodosort = this.typeShow.filter(type => type.id == "doing" );
+                this.coursestocomesort = this.typeShow.filter(type => type.id == "all" );
             }
         } catch (e) {
             notify.error("Get Choice function didn't work");

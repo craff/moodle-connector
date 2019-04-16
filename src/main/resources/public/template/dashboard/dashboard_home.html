@@ -7,7 +7,7 @@
     </div>
     <div ng-if="courses.todo">
         <div class="row list-dashboard">
-            <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestodosort"
+            <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestodosort[0]"
                     ng-options="option.name for option in courses.typeShow track by option.id"
                     ng-change="changeShowCoursesToDoDesktop()">
             </select>
@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="zero-desktop twelve-mobile">
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort.id == 'masked'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'masked'}">
                 <span>
                     <i class="eye-open ">
                     </i>
@@ -30,7 +30,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('masked')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort.id == 'favorites'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'favorites'}">
                 <span>
                     <i class="favorite">
                     </i>
@@ -38,7 +38,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('favorites')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort.id == 'all'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>
@@ -88,7 +88,7 @@
     </div>
     <div ng-if="courses.tocome">
         <div class="row  list-dashboard">
-            <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestocomesort"
+            <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestocomesort[0]"
                     ng-options="option.name for option in courses.typeShow.slice(0, 1).concat(courses.typeShow.slice(2, 3)).concat(courses.typeShow.slice(4, 5)) track by option.id"
                     ng-change="changeShowCoursesToComeDesktop()">
             </select>
@@ -103,7 +103,7 @@
                 </div>
             </div>
             <div class="zero-desktop twelve-mobile">
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort.id == 'masked'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort[0].id == 'masked'}">
                 <span>
                     <i class="eye-open ">
                     </i>
@@ -111,7 +111,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToCome('masked')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort.id == 'favorites'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort[0].id == 'favorites'}">
                 <span>
                     <i class="favorite">
                     </i>
@@ -119,7 +119,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToCome('favorites')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort.id == 'all'}">
+                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort[0].id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>
@@ -140,8 +140,9 @@
                     <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)" ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}"
-                 class="twelve-mobile style-bord infoBackground bottom-margin">
+            <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)"
+                 class="twelve-mobile style-bord infoBackground bottom-margin"
+                 ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
         </div>

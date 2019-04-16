@@ -21,7 +21,7 @@
                 sharedPicture : place == 'coursesShared'}"
              ng-show="course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-' "/>
         <img ng-src="moodle/public/img/logo_image_ent.png" class="image-dashboard" ng-class="{ 'NoImagePicture' : place=='coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list'),
-        'NoImageMine' : place=='coursesMine', 'NoImageShared' : place=='coursesShared', 'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons'}"
+        'NoImageMine' : place=='coursesMine', 'NoImageShared' : place=='coursesShared', 'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons', 'NoImageToCome' : place == 'coursesToCome' && view == 'icons'}"
              ng-show="course.imageurl === null || course.imageurl === undefined || course.imageurl === '-' "/>
     </div>
 
@@ -114,7 +114,7 @@
                 <progress-bar class="progress" ng-class="{activityProgress : course.course_type == 'singleactivity', courseProgress : course.course_type == 'topics'}"
                               max="100" filled="course.progress.slice(0,course.progress.length-1)" unit="%" ng-if="place == 'coursesToDo'" ng-click="course.goTo()">
                 </progress-bar>
-                <dots-menu class="cell right-magnet" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
+                <dots-menu class="cell right-magnet top-margin" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
                     <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
                         <i class="eye-slash">
                         </i>

@@ -3,7 +3,9 @@
     <i class="foldericon big-folder-size"></i></br>
 </div>
 <div class="margin-left-file">
-    <span class="text-font ellipsis" ng-click="isPrintSubFolder(folder)">[[folder.name]]</span></br>
+    <div class="ellipsis">
+        <span class="text-font" ng-click="isPrintSubFolder(folder)">[[folder.name]]</span>
+    </div>
     <div class="row">
         <label class="size-font" ng-click="isPrintSubFolder(folder)">
             [[countItems(folder)]]

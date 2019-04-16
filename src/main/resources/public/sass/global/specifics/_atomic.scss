@@ -75,7 +75,12 @@
 }
 
 .activityToComePicture{
-  width: 125px;
+  @media screen and (min-width: 800px) {
+    width:125px;
+  }
+  @media screen and (max-width: 800px) {
+    width: 100px;
+  }
   padding-left: 10px;
   background-color: #ff8500;
 }
@@ -101,7 +106,12 @@
 }
 
 .courseToComePicture{
-  width:125px;
+  @media screen and (min-width: 800px) {
+    width:125px;
+  }
+  @media screen and (max-width: 800px) {
+    width: 100px;
+  }
   padding-left: 10px;
   background-color: #e20037;
 }
@@ -182,6 +192,17 @@
   }
 }
 
+.NoImageToCome{
+  @media screen and (min-width: 800px) {
+    width: 105px;
+    height: 115px;
+  }
+  @media screen and (max-width: 800px) {
+    width: 80px;
+    height: 90px;
+  }
+}
+
 .toDoPicture{
   @media screen and (min-width: 800px) {
     width: 130px;
@@ -194,8 +215,15 @@
 }
 
 .toComePicture{
-  width: 115px;
-  height: 115px;
+  @media screen and (min-width: 800px) {
+    width: 115px;
+    height: 115px;
+  }
+  @media screen and (max-width: 800px) {
+    width: 90px;
+    height: 90px;
+  }
+
 }
 
 .defaultPicture{
@@ -305,6 +333,7 @@ i.orderArrow {
 
 .left-padding{
   padding-left: 15px;
+  display: inline-block;
 }
 .left-border-menu{
   border-left-color: #ff8500;
@@ -451,64 +480,6 @@ i.orderArrow {
   font-weight: bold;
   font-size: 16px;
 }
-
-.responsiveLeftMargin{
-  @media screen and (min-width: 1100px) {
-    margin-left:5%;
-    @media screen and (min-width: 1300px) {
-      margin-right:7%;
-    }
-  }
-  @media screen and (max-width: 900px) {
-    width:58.333%;
-    @media screen and (max-width: 800px) {
-      width:100%;
-    }
-  }
-}
-
-i.dropbtn {
-  color: black;
-  padding: 0px 16px;
-  font-size: 25px;
-  border: none;
-  cursor: pointer;
-}
-
-i.dropbtn::before{
-    content: '\e84f';
-}
-
-.dropdown {
-  position: absolute;
-  display: inline-block;
-  right: 0;
-  top: 15px;
-  z-index: 999;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #f1f1f1;
-  min-width: 160px;
-  overflow: auto;
-  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-  right: 0;
-  top:0;
-  z-index: 999;
-}
-
-.dropdown-content a {
-  color: black;
-  padding: 12px 16px;
-  text-decoration: none;
-  display: block;
-}
-
-.dropdown a:hover {background-color: #ddd;}
-
-.show {display: block;}
 
 .fab {
   width: 45px;
