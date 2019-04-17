@@ -2,24 +2,24 @@
   width: 48%;
   height: auto;
   @media screen and (min-width: 800px) {
-    margin-right: 15px;
-    margin-top: 15px;
+    margin-right: 1.296%;
+    margin-top: 1.296%;
   }
   @media screen and (max-width: 800px) {
-    margin-right: 10px;
-    margin-top: 10px;
+    margin-right: 1%;
+    margin-top: 1%;
   }
-  margin-top: 10px;
 }
+
 .folder-article{
   width: 48%;
   height: auto;
   padding: 15px;
   @media screen and (min-width: 800px) {
-    margin-right: 15px;
+    margin-right: 1.296%;
   }
   @media screen and (max-width: 800px) {
-    margin-right: 10px;
+    margin-right: 1%;
   }
 }
 
@@ -50,15 +50,21 @@
    width: 70px;
    height: 70px;
  }
-.style-bord{
+.style-bord-with-over-effect{
   box-shadow: 0 1px 3px rgba(0,0,0,0.26);
   border-radius: 2px;
 }
 
-.style-bord:hover{
+.style-bord-with-over-effect:hover{
   box-shadow: 0 6px 18px rgba(0,0,0,0.26);
   transition : all 0.3s cubic-bezier(.25, .8, .25, 1)
 }
+
+.style-bord-without-over-effect{
+  box-shadow: 0 1px 3px rgba(0,0,0,0.26);
+  border-radius: 2px;
+}
+
 .image-dashboard{
   display: block;
   object-fit: cover;
@@ -83,6 +89,7 @@
   }
   padding-left: 10px;
   background-color: #ff8500;
+  cursor: auto;
 }
 
 .activityToDoSmallWidthPicture{
@@ -114,6 +121,7 @@
   }
   padding-left: 10px;
   background-color: #e20037;
+  cursor: auto;
 }
 
 .activityToDoPicture{
@@ -376,8 +384,8 @@ i.orderArrow {
 .coursesInfoBackgroundList{
   background: #ffffff;
   width : 48%;
-  margin-right: 15px;
-  margin-bottom: 15px;
+  margin-right: 1.296%;
+  margin-bottom: 1.296%;
 }
 .infoBackground{
   background: #ffffff;
@@ -425,7 +433,7 @@ i.orderArrow {
 
 .right-course-margin{
   @media screen and (min-width: 800px) {
-    margin-right:7px;
+    margin-right: 1.296%;;
   }
 }
 

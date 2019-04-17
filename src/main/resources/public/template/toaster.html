@@ -1,13 +1,13 @@
 <section class="toggle-buttons" ng-if="toasterShow">
     <div class="toggle">
         <div class="row">
-            <button ng-show="showShareButton()" ng-click="OpenShareLightBox()" workflow="moodle.createCourse">
+            <button class="cell" ng-show="showShareButton()" ng-click="OpenShareLightBox()" workflow="moodle.createCourse">
                 <i18n>moodle.toaster.registration</i18n>
             </button>
             <button  ng-click="" class="cell" ng-disabled="true">
                 <i18n>moodle.toaster.publish</i18n>
             </button>
-            <button ng-show="nbFoldersSelect === 1 && nbCoursesSelect === 0"  ng-click="openPopUpFolderRename()" class="cell zero-mobile">
+            <button ng-show="nbFoldersSelect === 1 && nbCoursesSelect === 0"  ng-click="openPopUpFolderRename()" class="cell">
                 <i18n>moodle.toaster.rename</i18n>
             </button>
             <button  ng-click="openPopUpDuplicate()" class="cell" ng-show="nbFoldersSelect === 0" workflow="moodle.createCourse">

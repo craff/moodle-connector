@@ -36,13 +36,9 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void renameFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
-        JsonArray values = new JsonArray();
-        values.add(folder.getValue("name"));
-        values.add(folder.getValue("id"));
 
-        String renameFolder = "UPDATE " + Moodle.moodleSchema + ".folder SET name=? WHERE id=?" +
-                " VALUES (?, ?)";
-        sql.prepared(renameFolder,values , SqlResult.validUniqueResultHandler(handler));
+        String renameFolder = "UPDATE " + Moodle.moodleSchema + ".folder SET name='"+folder.getValue("name")+"' WHERE id="+folder.getValue("id");
+        sql.raw(renameFolder , SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override

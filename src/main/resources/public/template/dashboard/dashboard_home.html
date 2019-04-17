@@ -42,7 +42,7 @@
                 </label>
             </div>
             <div class="search-pagination">
-                <div class="five twelve-mobile cell ellipsis infoBackground style-bord searchBar">
+                <div class="five twelve-mobile cell ellipsis infoBackground style-bord-with-over-effect searchBar">
                     <i class="search searchIcon" ></i>
                     <input class="twelve noBorder"
                            type="text"
@@ -67,7 +67,7 @@
                     <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.coursesToShow('coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord infoBackground bottom-margin"
+            <div ng-repeat="course in courses.coursesToShow('coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord-with-over-effect infoBackground bottom-margin"
             ng-class="{'definedImageSmallToDoWidth cell' : courses.isTheFirst(course) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
              'right-course-margin' : viewModeToDo == 'icons'}">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course)"></courses-item>
@@ -125,7 +125,7 @@
                 </label>
             </div>
             <div class="search-pagination">
-                <div class="five twelve-mobile cell ellipsis infoBackground style-bord searchBar">
+                <div class="five twelve-mobile cell ellipsis infoBackground style-bord-with-over-effect searchBar">
                     <i class="search searchIcon" ></i>
                     <input class="twelve noBorder"
                            type="text"
@@ -151,7 +151,7 @@
                 </div>
             </div>
             <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)"
-                 class="twelve-mobile style-bord infoBackground bottom-margin"
+                 class="twelve-mobile style-bord-without-over-effect infoBackground bottom-margin grey-color"
                  ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
@@ -183,7 +183,7 @@
                     <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.lastCreation()" class="all-width cell twelve-mobile style-bord infoBackground bottom-margin">
+            <div ng-repeat="course in courses.lastCreation()" class="all-width cell twelve-mobile style-bord-with-over-effect infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>

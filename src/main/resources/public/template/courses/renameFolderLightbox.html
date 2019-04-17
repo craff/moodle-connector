@@ -4,13 +4,13 @@
         <h2 class="row twelve"><i18n>moodle.folder.rename</i18n></h2>
         <br>
         <label class="row twelve">
-            <input type="text" class="twelve" required i18n-placeholder="moodle.folder.name.rename" ng-model="folder.name">
+            <input type="text" class="twelve" required i18n-placeholder="moodle.folder.name.rename" ng-model="folder.name" ng-pattern="/^[a-zA-Z. \-\+\*,;:0-9éèà]*[a-zA-Z. \-\+\*,;:0-9éèà]{1,60}$/" autofocus>
         </label>
     </div>
     <br>
     <div class="row">
         <div class="right-magnet">
             <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
-            <input type="submit" class="button" i18n-value="rename" ng-click="renameFolder()" ng-disabled="folder.name == ''"/>
+            <input type="submit" class="button" i18n-value="rename" ng-click="renameFolder()" ng-disabled="folder.name == '' || folder.name == undefined"/>
         </div>
     </div>

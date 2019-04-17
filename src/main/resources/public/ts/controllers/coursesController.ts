@@ -455,7 +455,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * */
     $scope.openPopUpFolderRename = function () {
         $scope.folder = new Folder();
-        $scope.folder = $scope.folders.all.filter(folder => folder.select);
+        $scope.folder = $scope.folders.all.filter(folder => folder.select)[0];
         template.open('ligthBoxContainer', 'courses/renameFolderLightbox');
         $scope.openLightbox = true;
     };
@@ -464,9 +464,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.folders.all.filter(folder => folder.select).forEach(async function (folder) {
             await folder.rename();
         });
-        $scope.initFolders();
         $scope.openLightbox = false;
         Utils.safeApply($scope);
+        $timeout(() =>
+            $scope.initFolders()
+            , 1500);
+
 
     };
 
