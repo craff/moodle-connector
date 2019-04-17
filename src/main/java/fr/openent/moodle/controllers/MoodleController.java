@@ -1153,7 +1153,7 @@ public class MoodleController extends ControllerHelper {
                     public void handle(UserInfos user) {
                         switch(duplicateResponse.getString("status")) {
                             case "pending":
-                                moodleWebService.updateStatusCourseToDuplicate(duplicateResponse.getString("status"),
+                                moodleWebService.updateStatusCourseToDuplicate(PENDING,
                                         Integer.parseInt(duplicateResponse.getString("ident")), 1, new Handler<Either<String, JsonObject>>() {
                                             @Override
                                             public void handle(Either<String, JsonObject> event) {
@@ -1169,12 +1169,12 @@ public class MoodleController extends ControllerHelper {
                                         });
                                 break;
                             case "finished":
-                                moodleWebService.updateStatusCourseToDuplicate(duplicateResponse.getString("status"),
+                                moodleWebService.updateStatusCourseToDuplicate(FINISHED,
                                         Integer.parseInt(duplicateResponse.getString("ident")), 1, new Handler<Either<String, JsonObject>>() {
                                             @Override
                                             public void handle(Either<String, JsonObject> event) {
                                                 if (event.isRight()) {
-                                                    moodleWebService.getCourseIdToDuplicate(duplicateResponse.getString("status"), new Handler<Either<String, JsonArray>>() {
+                                                    moodleWebService.getCourseIdToDuplicate(FINISHED, new Handler<Either<String, JsonArray>>() {
                                                         @Override
                                                         public void handle(Either<String, JsonArray> event) {
                                                             JsonObject createCourseDuplicate = new JsonObject();
