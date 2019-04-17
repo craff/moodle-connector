@@ -284,7 +284,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         await $scope.folders.sync();
         $scope.resetSelect();
         $scope.showToaster();
-        $scope.isPrintSubFolderNumber($scope.currentfolderid)
+        $scope.isPrintSubFolderNumber($scope.currentfolderid);
         $scope.folders.getAllsubfolders();
         Utils.safeApply($scope);
     };
@@ -787,27 +787,21 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * set timeout in order to update the status of duplicate course
      */
     $scope.updateCourse = async function () {
-            let duplicateCourses = await $scope.courses.getDuplicateCourse();
-            let needToGetCourses = false;
-            let needRefresh = false;
+        let duplicateCourses = await $scope.courses.getDuplicateCourse();
+        let needRefresh = false;
+        if(duplicateCourses.length != $scope.courses.coursesByUser.filter(course => course.duplication != "non").length && !$scope.openLightbox)
+            $scope.initCoursesbyuser();
         duplicateCourses.forEach(async function (duplicateCourse){
-            let findDuplicate = false;
             $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
                 if(duplicateCourse.id == course.courseid){
-                    findDuplicate = true;
                     if(duplicateCourse.status != course.duplication){
                         course.duplication = duplicateCourse.status;
                         needRefresh=true;
                     }
                 }
             });
-            if(!findDuplicate && !$scope.openLightbox) {
-                needToGetCourses = true;
-            }
         });
-        if(needToGetCourses && !$scope.openLightbox)
-            $scope.initCoursesbyuser();
-        else if(needRefresh && !$scope.openLightbox)
+        if(needRefresh && !$scope.openLightbox)
             Utils.safeApply($scope);
     };
 

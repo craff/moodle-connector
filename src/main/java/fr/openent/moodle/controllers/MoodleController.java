@@ -1180,7 +1180,7 @@ public class MoodleController extends ControllerHelper {
                                                             JsonObject createCourseDuplicate = new JsonObject();
                                                             createCourseDuplicate.put("userid", event.right().getValue().getJsonObject(0).getString("id_users"));
                                                             createCourseDuplicate.put("folderid", event.right().getValue().getJsonObject(0).getInteger("id_folder"));
-                                                            createCourseDuplicate.put("moodleid", event.right().getValue().getJsonObject(0).getInteger("id_course"));
+                                                            createCourseDuplicate.put("moodleid", Integer.parseInt(duplicateResponse.getString("courseid")));
                                                             moodleWebService.createCourse(createCourseDuplicate, new Handler<Either<String, JsonObject>>() {
                                                                 @Override
                                                                 public void handle(Either<String, JsonObject> event) {
