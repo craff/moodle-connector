@@ -247,7 +247,7 @@ public class MoodleController extends ControllerHelper {
                                             String idImage = course.getString("imageurl");
                                             String urlImage = "";
                                             if (idImage != null) {
-                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request) + "://" + getHost(request) + "/moodle/files/" + idImage + "/" + course.getString("nameImgUrl"), "UTF-8");
+                                                urlImage = "&parameters[imageurl]=" + getScheme(request) + "://" + getHost(request) + "/moodle/files/" + idImage + "/" +  URLEncoder.encode(course.getString("nameImgUrl"), "UTF-8");
                                             }
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                             final String moodleUrl = moodleUri.toString() +
@@ -279,7 +279,6 @@ public class MoodleController extends ControllerHelper {
                                                     }
                                                 }
                                             });
-
                                         } catch (UnsupportedEncodingException e) {
                                             e.printStackTrace();
                                         }
