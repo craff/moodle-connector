@@ -409,7 +409,7 @@ public class MoodleController extends ControllerHelper {
                                                         else{
                                                             coursArray.getJsonObject(i).put("moodleid", coursArray.getJsonObject(i).getValue("courseid"))
                                                                     .put("userid", user.getUserId()).put("folderid",0);
-                                                            if(coursArray.getJsonObject(i).getJsonArray("auteur").getJsonObject(0).getString("entidnumber") ==  user.getUserId()) {
+                                                            if(coursArray.getJsonObject(i).getJsonArray("auteur").getJsonObject(0).getString("entidnumber").equals(user.getUserId())) {
                                                                     moodleWebService.createCourse(coursArray.getJsonObject(i), defaultResponseHandler(request));
                                                             }
                                                         }

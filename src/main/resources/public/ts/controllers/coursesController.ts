@@ -779,7 +779,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         Utils.safeApply($scope);
         $timeout(() =>
             $scope.initCoursesbyuser()
-            , 2000)
+            , 5000)
 
     };
 

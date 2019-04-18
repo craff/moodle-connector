@@ -23,40 +23,40 @@
             </span>
             <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
         </label>
-        <label class="order middleVertical" ng-click="courses.orderByField('creationDate')">
-            <span class="icons right-spacing">
-                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('creationDate')}"></i>
-                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('creationDate')}"></i>
+        <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.isOrderedAsc('creationDate') || courses.isOrderedDesc('creationDate')}" ng-click="courses.orderByField('creationDate')">
+            <span translate content="creationDate"></span>
+            <span class="icons">
+                    <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('creationDate')"></i>
+                    <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('creationDate')"></i>
             </span>
-                <span translate content="creationDate"></span>
         </label>
-        <label class="order middleVertical" ng-click="courses.orderByField('modificationDate')">
-            <span class="icons right-spacing">
-                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('modificationDate')}"></i>
-                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('modificationDate')}"></i>
+        <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.isOrderedAsc('modificationDate') || courses.isOrderedDesc('modificationDate')}" ng-click="courses.orderByField('modificationDate')">
+            <span translate content="modificationDate"></span>
+            <span class="icons">
+                    <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('modificationDate')"></i>
+                    <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('modificationDate')"></i>
             </span>
-                <span translate content="modificationDate"></span>
         </label>
-        <label class="order middleVertical" ng-click="courses.orderByField('name')">
-            <span class="icons right-spacing">
-                    <i class="arrow orderArrow " ng-class="{'icon-off':!courses.isOrderedAsc('name')}"></i>
-                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('name')}"></i>
+        <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.isOrderedAsc('name') || courses.isOrderedDesc('name')}" ng-click="courses.orderByField('name')">
+            <span translate content="name"></span>
+            <span class="icons">
+                    <i class="arrow orderArrow " ng-if="courses.isOrderedAsc('name')"></i>
+                    <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('name')"></i>
             </span>
-                <span translate content="name"></span>
         </label>
-        <label class="order middleVertical" ng-click="courses.orderByField('numberEnrolment')">
-            <span class="icons right-spacing">
-                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('numberEnrolment')}"></i>
-                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('numberEnrolment')}"></i>
+        <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.isOrderedAsc('numberEnrolment') || courses.isOrderedDesc('numberEnrolment')}" ng-click="courses.orderByField('numberEnrolment')">
+            <span translate content="numberEnrolment"></span>
+            <span class="icons">
+                    <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('numberEnrolment')"></i>
+                    <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('numberEnrolment')"></i>
             </span>
-                <span translate content="numberEnrolment"></span>
         </label>
-        <label class="order middleVertical" ng-click="courses.orderByField('achievment')">
-            <span class="icons right-spacing">
-                    <i class="arrow orderArrow" ng-class="{'icon-off':!courses.isOrderedAsc('achievment')}"></i>
-                    <i class="arrow orderArrow bottom" ng-class="{'icon-off':!courses.isOrderedDesc('achievment')}"></i>
+        <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.isOrderedAsc('achievment') || courses.isOrderedDesc('achievment')}" ng-click="courses.orderByField('achievment')">
+            <span translate content="achievment"></span>
+            <span class="icons">
+                    <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('achievment')"></i>
+                    <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('achievment')"></i>
             </span>
-                <span translate content="achievment"></span>
         </label>
     </div>
 </div>

@@ -326,13 +326,15 @@ i.course::before {
   float: left;
 }
 
-i.orderArrow:before {
-   font-size: 10px;
-   color: black;
- }
-
 i.orderArrow {
-  margin: -6px;
+  margin: -3px -5px 0px 0px;
+}
+
+i.arrow:before {
+  font-family: none;
+  content: '\25B2';
+  font-size: 15px;
+  font-weight: bold;
 }
 
 .top-margin{
