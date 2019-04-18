@@ -6,7 +6,7 @@
         <i18n>moodle.courses</i18n></br>
     </div>
     <div ng-repeat="folder in getFolderParent()" ng-if="printfolders">
-        <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
+        <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding row" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
               ng-click="isPrintSubFolder(folder)" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
             <label ng-show="false">[[folder.id]]</label>
             <i class="icon-play" ng-if="!folder.printsubfolder"></i>
@@ -28,7 +28,7 @@
 
 <script type="text/ng-template"  id="tree_item_renderer.html">
     <div ng-repeat="folder in folder.subFolders">
-            <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
+            <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding row" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
                   ng-click="isPrintSubFolder(folder)" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
                 <label ng-show="false">[[folder.id]]</label>
                 <i class="icon-play" ng-if="!folder.printsubfolder"></i>

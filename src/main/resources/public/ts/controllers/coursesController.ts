@@ -28,6 +28,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.toasterShow = false;
         $scope.currentTab = current;
         $scope.resetSelect();
+        $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         if ($scope.currentTab == 'courses') {
             $scope.initCoursesTab();
         } else if ($scope.currentTab == 'dashboard') {
@@ -128,6 +129,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.isPrintMenuFolder = function () {
         $scope.closeNavMyCourses();
+        $scope.resetSelect();
+        $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         if($scope.currentfolderid != 0 || $scope.printmenucourseShared) {
             $scope.initFolders();
             $scope.printmenufolder = true;
@@ -137,6 +140,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
     };
     $scope.isPrintMenuCoursesShared = function () {
+        $scope.resetSelect();
+        $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         $scope.closeNavMyCourses();
         $scope.printmenucourseShared = true;
         $scope.printmenufolder = false;
@@ -176,6 +181,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.isPrintSubFolder= function(folder:Folder){
+        $scope.resetSelect();
+        $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         $scope.closeNavMyCourses();
         $scope.folders.all.forEach(function (e) {
             if (e.id == folder.id) {
@@ -284,6 +291,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         await $scope.folders.sync();
         $scope.resetSelect();
         $scope.showToaster();
+        $scope.folders.folderIdMoveIn = $scope.currentfolderid;
         $scope.isPrintSubFolderNumber($scope.currentfolderid);
         $scope.folders.getAllsubfolders();
         Utils.safeApply($scope);
@@ -310,11 +318,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.openPopUp = function () {
         $scope.folders.folderIdMoveIn = $scope.currentfolderid;
-        Utils.safeApply($scope);
         $scope.course = new Course();
         template.open('ligthBoxContainer', 'courses/createCourseLightbox');
         $scope.openLightbox = true;
-        $scope.folders.folderIdMoveIn = $scope.currentfolderid;
         Utils.safeApply($scope);
     };
 
@@ -535,7 +541,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.coursesDuplicate();
         }
         $timeout(() =>
-                $scope.initCoursesbyuser
+                $scope.initCoursesbyuser()
             , 2000);
         $scope.initFolders();
     };

@@ -1,4 +1,4 @@
-<div class="Course" lvl-draggable="[[place == 'coursesMine']]" ng-class="{notDraggable : !(place == 'coursesMine' && course.duplication == 'non')}">
+<div class="Course" lvl-draggable="[[place == 'coursesMine']]" ng-class="{notDraggable : !(place == 'coursesMine' && course.duplication == 'non')}" ng-click="place == 'coursesShared' && course.goTo()">
     <!--<div id="background" ng-if="place=='coursesToCome'">
         <p id="bg-text"><i18n>toCome</i18n></p>
     </div>-->
@@ -92,7 +92,7 @@
             <label class="size-font" ng-if="(place == 'coursesMine' && course.duplication != 'echec') || place == 'coursesShared' || place == 'coursesRecent'" ng-click="place != 'coursesToCome' && course.goTo()">
                 <span class="date">[[ printDate(course, "modified" ) ]]</span>
             </label>
-            <label class="checkbox right-magnet" ng-if="(place == 'coursesMine') || place == 'coursesShared'">
+            <label class="checkbox right-magnet" ng-if="place == 'coursesMine'">
                 <label ng-if="place == 'coursesMine' && course.duplication =='non' && course.usernumber > 1" class="size-font title-dashboard"><i class="share"></i><span>[[ course.usernumber - 1 ]]</span></label>
                 <span></span>
                 <input type="checkbox" ng-change="checkCourse()" ng-model="course.select" ng-if="course.duplication == 'non'">

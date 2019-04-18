@@ -1,45 +1,46 @@
 <div class="row coursesBackground">
-    <div class="twelve twelve-mobile">
-        <div class="row-mobile">
-            <div class="cell three twelve-mobile horizontal-spacing">
-                <p>
-                    <label class="vertical-spacing">
-                        <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
-                        <i18n class="zero-mobile">moodle.folders</i18n>
-                        <span class="text-font zero-desktop">[[folderName()]]</span>
-                        <input type="search" class="twelve zero-mobile cell ellipsis" i18n-placeholder="search.folder" />
-                        <div class="vertical-spacing zero-desktop twelve-mobile row">
-                            <label class="chip margin-left checkbox-course middleVertical" ng-class="{ selected: typeFilter[0]}">
-                                <span>
-                                    <i18n>course</i18n>
-                                </span>
-                                <input type="checkbox" ng-click="checkTypeFilterSelected(0)">
-                            </label>
-                            <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeFilter[1]}">
-                                <span>
-                                    <i18n>activity</i18n>
-                                </span>
-                                <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
-                            </label>
-                        </div>
-                    </label>
-                </p>
-                <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
-                </div>
-                <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">
-                    <div class="vertical-spacing row">
-                        <i18n class="text-font titleSideNav">moodle.folders</i18n>
-                        <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
+        <div class="twelve twelve-mobile">
+            <div class="row-mobile">
+                <div class="cell three twelve-mobile horizontal-spacing">
+                    <p>
+                        <label class="vertical-spacing">
+                            <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
+                            <i18n class="zero-mobile">moodle.folders</i18n>
+                            <span class="text-font zero-desktop">[[folderName()]]</span>
+                            <input type="search" class="twelve zero-mobile cell ellipsis" i18n-placeholder="search.folder" />
+                            <div class="vertical-spacing zero-desktop twelve-mobile row">
+                                <label class="chip margin-left checkbox-course middleVertical" ng-class="{ selected: typeFilter[0]}">
+                                    <span>
+                                        <i18n>course</i18n>
+                                    </span>
+                                    <input type="checkbox" ng-click="checkTypeFilterSelected(0)">
+                                </label>
+                                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: typeFilter[1]}">
+                                    <span>
+                                        <i18n>activity</i18n>
+                                    </span>
+                                    <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
+                                </label>
+                            </div>
+                        </label>
+                    </p>
+                    <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
                     </div>
-                    <div class="horizontal-spacing upNav" static-include="/moodle/public/template/courses/folderItem.html">
+                    <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">
+                        <div class="vertical-spacing row">
+                            <i18n class="text-font titleSideNav">moodle.folders</i18n>
+                            <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
+                        </div>
+                        <div class="horizontal-spacing upNav" static-include="/moodle/public/template/courses/folderItem.html">
+                    </div>
                 </div>
             </div>
-        </div>
-        <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp" >
-            <p class="zero-mobile"><i class="foldericon folder-size"></i><span class="big-folder ellipsis">[[folderName()]]</span></br></p>
-            <p  class ="row zero-mobile" static-include="/moodle/public/template/courses/filters.html"></p>
-            <div class="row center-courses" static-include="/moodle/public/template/courses/folders.html" ng-if="printfolders"></div>
-            <div class="row center-courses" static-include="/moodle/public/template/courses/courses.html"></div>
+            <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp" >
+                <p class="zero-mobile"><i class="foldericon folder-size"></i><span class="big-folder ellipsis">[[folderName()]]</span></br></p>
+                <p  class ="row zero-mobile" static-include="/moodle/public/template/courses/filters.html"></p>
+                <div class="row center-courses coursesBottomPadding" static-include="/moodle/public/template/courses/folders.html" ng-if="printfolders"></div>
+                <div class="row center-courses coursesBottomPadding" static-include="/moodle/public/template/courses/courses.html"></div>
+            </div>
         </div>
     </div>
 </div>
