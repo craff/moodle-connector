@@ -1,7 +1,7 @@
 <div class="Course" lvl-draggable="[[place == 'coursesMine']]" ng-class="{notDraggable : !(place == 'coursesMine' && course.duplication == 'non')}" ng-click="place == 'coursesShared' && course.goTo()">
-    <!--<div id="background" ng-if="place=='coursesToCome'">
+    <div id="background" ng-if="place=='coursesToCome' && view == 'icons'">
         <p id="bg-text"><i18n>toCome</i18n></p>
-    </div>-->
+    </div>
     <label ng-show="false">[[course.courseid]]</label>
     <div class="cell" ng-class="{ activityRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list')) && course.course_type == 'singleactivity',
                                     activityToDoPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && view == 'icons' && first,

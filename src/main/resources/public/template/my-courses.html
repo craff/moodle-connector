@@ -1,7 +1,7 @@
 <div class="row coursesBackground">
         <div class="twelve twelve-mobile">
             <div class="row-mobile">
-                <div class="cell three twelve-mobile horizontal-spacing">
+                <div class="cell three twelve-mobile horizontal-spacing fixedPosition">
                     <p>
                         <label class="vertical-spacing">
                             <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             </div>
-            <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp" >
+            <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp coursesLeftMargin" >
                 <p class="zero-mobile"><i class="foldericon folder-size"></i><span class="big-folder ellipsis">[[folderName()]]</span></br></p>
                 <p  class ="row zero-mobile" static-include="/moodle/public/template/courses/filters.html"></p>
                 <div class="row center-courses coursesBottomPadding" static-include="/moodle/public/template/courses/folders.html" ng-if="printfolders"></div>

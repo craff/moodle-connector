@@ -619,19 +619,31 @@ body.moodle {
   #background{
     position:absolute;
     z-index:0;
-    left: 125px;
     display:block;
     min-height:50%;
     min-width:50%;
+    @media screen and (max-width: 800px) {
+      left: 105px;
+    }
+    @media screen and (min-width: 800px) {
+      left: 130px;
+    }
   }
 
   #bg-text
   {
     color:lightgrey;
-    font-size:50px;
-    margin-top: 62px;
-    transform:rotate(352deg);
-    -webkit-transform:rotate(352deg);
+    @media screen and (max-width: 800px) {
+      font-size: 40px;
+      margin-top: 60px;
+      @media screen and (max-width: 370px) {
+        font-size: 25px;
+      }
+    }
+    @media screen and (min-width: 800px) {
+      font-size:50px;
+      margin-top: 80px;
+    }
   }
 
   .coursesBottomPadding{

@@ -483,6 +483,18 @@ i.arrow:before {
   font-size: 16px;
 }
 
+.fixedPosition{
+  @media screen and (min-width: 800px) {
+    position:fixed;
+  }
+}
+
+.coursesLeftMargin{
+  @media screen and (min-width: 800px) {
+    margin-left:25%;
+  }
+}
+
 .fab {
   width: 45px;
   height: 45px;
