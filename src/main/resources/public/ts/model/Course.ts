@@ -36,7 +36,6 @@ export class Course implements Shareable{
         compatibleMoodle: boolean;
     };
     duplication: string;
-    submitWait: boolean;
     usernumber: number;
 
     constructor(){
@@ -44,7 +43,6 @@ export class Course implements Shareable{
         this.select = false;
         this.selectConfirm = false;
         this.myRights = new Rights<Course>(this);
-        this.submitWait = false;
     }
 
     toJson() {
@@ -354,12 +352,12 @@ export class Courses {
                         else
                             return 1;
                 } else if(that.order.field == "name") {
-                    if (a.fullname < b.fullname)
+                    if (a.fullname.toLowerCase() < b.fullname.toLowerCase())
                         if(that.order.desc)
                             return 1;
                         else
                             return -1;
-                    if (a.fullname > b.fullname)
+                    if (a.fullname.toLowerCase() > b.fullname.toLowerCase())
                         if(that.order.desc)
                             return -1;
                         else

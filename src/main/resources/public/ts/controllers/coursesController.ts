@@ -125,6 +125,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.viewModeToDo = "icons";
             $scope.viewModeToCome = "icons";
         }
+        $scope.submitWait=false;
     };
 
     $scope.isPrintMenuFolder = function () {
@@ -338,16 +339,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * Create a course
      */
     $scope.createCourse = async function () {
-        // TODO get current folder id
+        // TODO get current folder id the first time we open the create lightbox
         $scope.course.folderid = parseInt($scope.folders.folderIdMoveIn);
-        $scope.course.submitWait = true;
+        $scope.submitWait = true;
         await $scope.course.create();
         await $scope.courses.getCoursesbyUser(model.me.userId);
         $scope.openLightbox = false;
         $scope.showToaster();
         $scope.currentfolderid = $scope.folders.folderIdMoveIn;
         $scope.initFolders();
-        $scope.course.submitWait = false;
+        $scope.submitWait = false;
         $scope.folders.folderIdMoveIn = undefined;
         Utils.safeApply($scope);
     };
@@ -496,7 +497,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.deleteElements = async function () {
         $scope.disableDeleteSend = false;
-        $scope.openLightbox = false;
+        $scope.submitWait = true;
         if ($scope.folders.all.some(folder => folder.selectConfirm)) {
             await $scope.folders.foldersDelete();
             let idAllFoldersToDelete = $scope.folders.all.filter(folder => folder.selectConfirm).map(folder => folder.id);
@@ -515,6 +516,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.coursesDelete();
             await $scope.courses.getCoursesbyUser(model.me.userId);
         }
+        $scope.openLightbox = false;
+        $scope.submitWait = false;
         $scope.successDelete = true;
         $timeout(() =>
                 $scope.hideSuccessDelete()

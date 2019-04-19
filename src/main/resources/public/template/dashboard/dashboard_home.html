@@ -12,7 +12,7 @@
                     ng-change="changeShowCoursesToDoDesktop()">
             </select>
             <div class="zero-desktop twelve-mobile">
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'masked'}">
+                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'masked'}">
                 <span>
                     <i class="eye-slash">
                     </i>
@@ -20,7 +20,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('masked')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'favorites'}">
+                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'favorites'}">
                 <span>
                     <i class="favorite">
                     </i>
@@ -28,13 +28,13 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('favorites')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'all'}">
+                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToDo('all')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestodosort[0].id == 'doing'}">
+                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'doing'}">
                 <span>
                     <i18n>doing</i18n>
                 </span>
@@ -101,7 +101,7 @@
                     ng-change="changeShowCoursesToComeDesktop()">
             </select>
             <div class="zero-desktop twelve-mobile">
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort[0].id == 'masked'}">
+                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestocomesort[0].id == 'masked'}">
                 <span>
                     <i class="eye-slash">
                     </i>
@@ -109,7 +109,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToCome('masked')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort[0].id == 'favorites'}">
+                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestocomesort[0].id == 'favorites'}">
                 <span>
                     <i class="favorite">
                     </i>
@@ -117,7 +117,7 @@
                 </span>
                     <input type="checkbox" ng-click="changeShowCoursesToCome('favorites')" >
                 </label>
-                <label class="chip margin-left checkbox-activity middleVertical" ng-class="{ selected: courses.coursestocomesort[0].id == 'all'}">
+                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestocomesort[0].id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>

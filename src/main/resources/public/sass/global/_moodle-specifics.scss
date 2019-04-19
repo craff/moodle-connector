@@ -82,6 +82,11 @@ body.moodle {
     }
   }
 
+  .leftMarginLetter{
+    margin-left: 5px;
+    font-weight: bolder;
+  }
+
   .select-type-buttons {
     margin: 30px 0;
   }
@@ -163,6 +168,14 @@ body.moodle {
 
   .greyfilter{
     filter: grayscale(100%);
+  }
+
+  .greyLoading{
+    background: #555 !important;
+  }
+
+  .bottomMarginLoading{
+    margin-bottom: 35px;
   }
 
   .lds-facebook {
@@ -449,6 +462,8 @@ body.moodle {
   label.chip {
     width:auto;
     padding: 0px 10px;
+    display: inline-flex;
+    margin: 4px 0px 0px 0px;
   }
 
   label.chip.checkbox-activity.selected {
