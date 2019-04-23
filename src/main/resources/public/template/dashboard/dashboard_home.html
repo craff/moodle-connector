@@ -9,7 +9,7 @@
         <div class="row list-dashboard">
             <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestodosort[0]"
                     ng-options="option.name for option in courses.typeShow track by option.id"
-                    ng-change="changeShowCoursesToDoDesktop()">
+                    ng-change="changeShowCoursesDesktop('ToDo')">
             </select>
             <div class="zero-desktop twelve-mobile">
                 <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'masked'}">
@@ -18,7 +18,7 @@
                     </i>
                     <i18n>masked</i18n>
                 </span>
-                    <input type="checkbox" ng-click="changeShowCoursesToDo('masked')" >
+                    <input type="checkbox" ng-click="changeShowCourses('ToDo','masked')" >
                 </label>
                 <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'favorites'}">
                 <span>
@@ -26,19 +26,19 @@
                     </i>
                     <i18n>favorites</i18n>
                 </span>
-                    <input type="checkbox" ng-click="changeShowCoursesToDo('favorites')" >
+                    <input type="checkbox" ng-click="changeShowCourses('ToDo','favorites')" >
                 </label>
                 <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>
-                    <input type="checkbox" ng-click="changeShowCoursesToDo('all')" >
+                    <input type="checkbox" ng-click="changeShowCourses('ToDo','all')" >
                 </label>
                 <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestodosort[0].id == 'doing'}">
                 <span>
                     <i18n>doing</i18n>
                 </span>
-                    <input type="checkbox" ng-click="changeShowCoursesToDo('doing')" >
+                    <input type="checkbox" ng-click="changeShowCourses('ToDo','doing')" >
                 </label>
             </div>
             <div class="search-pagination">
@@ -49,16 +49,16 @@
                            translate attr="placeholder"
                            ng-model="courses.searchInput.toDo"
                            placeholder="search.coursesToDoCome"
-                           ng-change="initSearchToDo()"
+                           ng-change="initSearch('ToDo')"
                     />
                 </div>
             </div>
             <div class="cell right-magnet title-dashboard zero-mobile">
-                <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewModeToDo('list')"></i>
+                <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewMode('ToDo','list')"></i>
             </div>
             <span> </span>
             <div class="cell right-magnet zero-mobile">
-                <i class="show-icons" ng-class="{ selected: viewModeToDo == 'icons' }" ng-click="changeViewModeToDo('icons')"></i>
+                <i class="show-icons" ng-class="{ selected: viewModeToDo == 'icons' }" ng-click="changeViewMode('ToDo','icons')"></i>
             </div>
         </div>
         <div class="row center-courses">
@@ -68,8 +68,9 @@
                 </div>
             </div>
             <div ng-repeat="course in courses.coursesToShow('coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord-with-over-effect infoBackground bottom-margin"
-            ng-class="{'definedImageSmallToDoWidth cell' : courses.isTheFirst(course) && viewModeToDo == 'icons', 'undefined-image-small-toDo-width cell' : !courses.isTheFirst(course) && viewModeToDo == 'icons', 'all-width cell' : viewModeToDo == 'list',
-             'right-course-margin' : viewModeToDo == 'icons'}">
+            ng-class="{'definedImageSmallToDoWidth cell infoBackgroundTopMargin right-course-margin' : courses.isTheFirst(course) && viewModeToDo == 'icons',
+             'undefined-image-small-toDo-width cell infoBackgroundTopMargin right-course-margin' : !courses.isTheFirst(course) && viewModeToDo == 'icons',
+              'all-width cell' : viewModeToDo == 'list'}">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course)"></courses-item>
             </div>
         </div>
@@ -77,10 +78,10 @@
 
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button ng-if="!(firstCoursesToDo == 0)" class="pagination-button" ng-click="previousCoursesToDoButton()" >
+                    <button ng-if="!(firstCoursesToDo == 0)" class="pagination-button" ng-click="previousCoursesButton('ToDo')" >
                         <i class="left-open"></i>
                     </button>
-                    <button ng-if="!(lastCoursesToDo >= courses.coursesToShow('coursesToDo').length)" class="pagination-button" ng-click="nextCoursesToDoButton()">
+                    <button ng-if="!(lastCoursesToDo >= courses.coursesToShow('coursesToDo').length)" class="pagination-button" ng-click="nextCoursesButton('ToDo')">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -98,7 +99,7 @@
         <div class="row  list-dashboard">
             <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestocomesort[0]"
                     ng-options="option.name for option in courses.typeShow.slice(0, 1).concat(courses.typeShow.slice(2, 3)).concat(courses.typeShow.slice(4, 5)) track by option.id"
-                    ng-change="changeShowCoursesToComeDesktop()">
+                    ng-change="changeShowCoursesDesktop('ToCome')">
             </select>
             <div class="zero-desktop twelve-mobile">
                 <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestocomesort[0].id == 'masked'}">
@@ -107,7 +108,7 @@
                     </i>
                     <i18n>masked</i18n>
                 </span>
-                    <input type="checkbox" ng-click="changeShowCoursesToCome('masked')" >
+                    <input type="checkbox" ng-click="changeShowCourses('ToCome','masked')" >
                 </label>
                 <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestocomesort[0].id == 'favorites'}">
                 <span>
@@ -115,13 +116,13 @@
                     </i>
                     <i18n>favorites</i18n>
                 </span>
-                    <input type="checkbox" ng-click="changeShowCoursesToCome('favorites')" >
+                    <input type="checkbox" ng-click="changeShowCourses('ToCome','favorites')" >
                 </label>
                 <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.coursestocomesort[0].id == 'all'}">
                 <span>
                     <i18n>all</i18n>
                 </span>
-                    <input type="checkbox" ng-click="changeShowCoursesToCome('all')" >
+                    <input type="checkbox" ng-click="changeShowCourses('ToCome','all')" >
                 </label>
             </div>
             <div class="search-pagination">
@@ -132,16 +133,16 @@
                            translate attr="placeholder"
                            ng-model="courses.searchInput.toCome"
                            placeholder="search.coursesToDoCome"
-                           ng-change="initSearchToCome()"
+                           ng-change="initSearch('ToCome')"
                     />
                 </div>
             </div>
             <div class="cell right-magnet title-dashboard zero-mobile">
-                <i class="show-list" ng-class="{ selected: viewModeToCome == 'list' }" ng-click="changeViewModeToCome('list')"></i>
+                <i class="show-list" ng-class="{ selected: viewModeToCome == 'list' }" ng-click="changeViewMode('ToCome','list')"></i>
             </div>
             <span> </span>
             <div class="cell right-magnet zero-mobile">
-                 <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewModeToCome('icons')"></i>
+                 <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewMode('ToCome','icons')"></i>
             </div>
         </div>
         <div class="row center-courses">
@@ -152,17 +153,17 @@
             </div>
             <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)"
                  class="twelve-mobile style-bord-without-over-effect infoBackground bottom-margin grey-color"
-                 ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell' : viewModeToCome == 'icons'}">
+                 ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell infoBackgroundTopMargin' : viewModeToCome == 'icons'}">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
         </div>
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button  ng-if=" !(firstCoursesToCome == 0)" class="pagination-button" ng-click="previousCoursesToComeButton()">
+                    <button  ng-if=" !(firstCoursesToCome == 0)" class="pagination-button" ng-click="previousCoursesButton('ToCome')">
                         <i class="left-open"></i>
                     </button>
-                    <button ng-if=" !(lastCoursesToCome >= courses.coursesToShow('coursesToCome').length)" class="pagination-button" ng-click="nextCoursesToComeButton()">
+                    <button ng-if=" !(lastCoursesToCome >= courses.coursesToShow('coursesToCome').length)" class="pagination-button" ng-click="nextCoursesButton('ToCome')">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -171,7 +172,7 @@
     </div>
     <br/>
     <div class="row">
-        <div>
+        <div class="row bottomMarginTitle">
             <span class="left-magnet title-dashboard">
                 <i18n>moodle.create.courses.recent</i18n>
             </span>

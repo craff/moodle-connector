@@ -101,12 +101,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.disableDeleteSend = true;
         $scope.disableDuplicateSend = true;
         $scope.firstCoursesToDo = 0;
-        $scope.lastCoursesToDo = $scope.countToDo();
+        $scope.lastCoursesToDo = $scope.count("ToDo");
         $scope.firstCoursesToCome = 0;
-        $scope.lastCoursesToCome = $scope.countToCome();
+        $scope.lastCoursesToCome = $scope.count("ToCome");
         $scope.showInfoSharePanel = false;
         $scope.viewModeToDo = "icons";
         $scope.viewModeToCome = "icons";
+        $scope.viewModeMyCourses = "icons";
         $scope.initFolders();
         $scope.imgCompatibleMoodle = false;
         $scope.typeActivity = {
@@ -631,58 +632,57 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * next and previous button to show courses
      * */
-    $scope.previousCoursesToDoButton = function () {
-        $scope.firstCoursesToDo -= $scope.countToDo();
-        $scope.lastCoursesToDo -= $scope.countToDo();
-        if ($scope.firstCoursesToDo < 0) {
-            $scope.firstCoursesToDo = 0;
-            $scope.lastCoursesToDo = $scope.countToDo();
+    $scope.previousCoursesButton = function (place : string) {
+        if(place == "ToDo") {
+            $scope.firstCoursesToDo -= $scope.count("ToDo");
+            $scope.lastCoursesToDo -= $scope.count("ToDo");
+            if ($scope.firstCoursesToDo < 0) {
+                $scope.firstCoursesToDo = 0;
+                $scope.lastCoursesToDo = $scope.count("ToDo");
+            }
+        }else if (place == "ToCome"){
+            $scope.firstCoursesToCome -= $scope.count("ToCome");
+            $scope.lastCoursesToCome -= $scope.count("ToCome");
+            if($scope.firstCoursesToCome < 0){
+                $scope.firstCoursesToCome = 0;
+                $scope.lastCoursesToCome = $scope.count("ToCome");
+            }
         }
     };
 
-    $scope.nextCoursesToDoButton = function () {
-        $scope.firstCoursesToDo = $scope.lastCoursesToDo;
-        $scope.lastCoursesToDo += $scope.countToDo();
-    };
-
-    $scope.countToCome = function () {
-        if ($scope.viewModeToCome == 'list') {
-            return 5;
-        } else {
-            return 4;
+    $scope.nextCoursesButton = function (place : string) {
+        if(place == "ToDo") {
+            $scope.firstCoursesToDo = $scope.lastCoursesToDo;
+            $scope.lastCoursesToDo += $scope.count("ToDo");
+        }else if(place == "ToCome"){
+            $scope.firstCoursesToCome = $scope.lastCoursesToCome ;
+            $scope.lastCoursesToCome += $scope.count("ToCome");
         }
     };
 
-    $scope.countToDo = function () {
-        if ($scope.viewModeToDo == 'list') {
-            return 5;
-        } else {
-            if($scope.firstCoursesToDo==0)
-                if($(window).width() < 800)
-                    return 4;
+    $scope.count = function (place : string) {
+        if(place == "ToCome") {
+            if ($scope.viewModeToCome == 'list') {
+                return 5;
+            } else {
+                return 4;
+            }
+        }else if(place == "ToDo"){
+            if ($scope.viewModeToDo == 'list') {
+                return 5;
+            } else {
+                if($scope.firstCoursesToDo==0)
+                    if($(window).width() < 800)
+                        return 4;
+                    else
+                        return 7;
                 else
-                    return 7;
-            else
                 if($(window).width() < 800)
                     return 4;
                 else
                     return 8;
+            }
         }
-    };
-
-
-    $scope.previousCoursesToComeButton = function () {
-        $scope.firstCoursesToCome -= $scope.countToCome();
-        $scope.lastCoursesToCome -= $scope.countToCome();
-        if($scope.firstCoursesToCome < 0){
-            $scope.firstCoursesToCome = 0;
-            $scope.lastCoursesToCome = $scope.countToCome();
-        }
-    };
-
-    $scope.nextCoursesToComeButton = function () {
-        $scope.firstCoursesToCome = $scope.lastCoursesToCome ;
-        $scope.lastCoursesToCome += $scope.countToCome();
     };
 
     /**
@@ -713,39 +713,41 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * change and get the view mode of courses to do and to come
      * */
 
-    $scope.changeViewModeToCome = function (view : string) {
-        $scope.viewModeToCome = view;
-        $scope.lastCoursesToCome = $scope.firstCoursesToCome + $scope.countToCome();
+    $scope.changeViewMode = function (place : string, view : string) {
+        if (place == 'ToCome') {
+            $scope.viewModeToCome = view;
+            $scope.lastCoursesToCome = $scope.firstCoursesToCome + $scope.count("ToCome");
+        } else if (place == 'ToDo'){
+            $scope.viewModeToDo = view;
+        } else if (place == "MyCourses"){
+            $scope.viewModeMyCourses = view;
+        }
     };
 
-    $scope.changeViewModeToDo = function (view : string) {
-        $scope.viewModeToDo = view;
+    $scope.changeShowCoursesDesktop = async function(place : string) {
+        if(place == "ToDo") {
+            $scope.firstCoursesToDo = 0;
+            $scope.lastCoursesToDo = $scope.count("ToDo");
+            await $scope.courses.setChoice(4);
+        } else if (place == "ToCome"){
+            $scope.firstCoursesToCome=0;
+            $scope.lastCoursesToCome = $scope.count("ToCome");
+            await $scope.courses.setChoice(5);
+        }
     };
 
-    $scope.changeShowCoursesToDoDesktop = async function() {
-        $scope.firstCoursesToDo=0;
-        $scope.lastCoursesToDo = $scope.countToDo();
-        await $scope.courses.setChoice(4);
-    };
-
-    $scope.changeShowCoursesToDo = async function(id:string) {
-        $scope.firstCoursesToDo=0;
-        $scope.lastCoursesToDo = $scope.countToDo();
-        $scope.courses.coursestodosort = $scope.courses.typeShow.filter(type => type.id == id );
-        await $scope.courses.setChoice(4);
-    };
-
-    $scope.changeShowCoursesToComeDesktop = async function() {
-        $scope.firstCoursesToCome=0;
-        $scope.lastCoursesToCome = $scope.countToCome();
-        await $scope.courses.setChoice(5);
-    };
-
-    $scope.changeShowCoursesToCome = async function(id:string) {
-        $scope.firstCoursesToCome=0;
-        $scope.lastCoursesToCome = $scope.countToCome();
-        $scope.courses.coursestocomesort = $scope.courses.typeShow.filter(type => type.id == id );
-        await $scope.courses.setChoice(5);
+    $scope.changeShowCourses = async function(place : string, id:string) {
+        if(place == "ToDo") {
+            $scope.firstCoursesToDo = 0;
+            $scope.lastCoursesToDo = $scope.count("ToDo");
+            $scope.courses.coursestodosort = $scope.courses.typeShow.filter(type => type.id == id);
+            await $scope.courses.setChoice(4);
+        } else if (place == "ToCome"){
+            $scope.firstCoursesToCome=0;
+            $scope.lastCoursesToCome = $scope.count("ToCome");
+            $scope.courses.coursestocomesort = $scope.courses.typeShow.filter(type => type.id == id );
+            await $scope.courses.setChoice(5);
+        }
     };
 
     $scope.getSelectedCourses = function () {
@@ -824,9 +826,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.viewModeToCome = "icons";
         }
         $scope.firstCoursesToCome=0;
-        $scope.lastCoursesToCome = $scope.countToCome();
+        $scope.lastCoursesToCome = $scope.count("ToCome");
         $scope.firstCoursesToDo=0;
-        $scope.lastCoursesToDo = $scope.countToDo();
+        $scope.lastCoursesToDo = $scope.count("ToDo");
 
     });
 
@@ -838,14 +840,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         document.getElementById("mySidenavCourses").style.width = "0";
     };
 
-    $scope.initSearchToCome = function() {
-        $scope.firstCoursesToCome=0;
-        $scope.lastCoursesToCome = $scope.countToCome();
-    };
-
-    $scope.initSearchToDo = function() {
-        $scope.firstCoursesToDo=0;
-        $scope.lastCoursesToDo = $scope.countToDo();
+    $scope.initSearch = function(place : string) {
+        if(place == "ToCome") {
+            $scope.firstCoursesToCome = 0;
+            $scope.lastCoursesToCome = $scope.count("ToCome");
+        } else if (place == "ToDo"){
+            $scope.firstCoursesToDo=0;
+            $scope.lastCoursesToDo = $scope.count("ToDo");
+        }
     };
 
 }]);

@@ -27,6 +27,10 @@
   right: -15px;
   position: absolute;
 }
+.folderCheckboxList{
+  top: -3px;
+  right: 0px;
+}
 
 .summary-list{
   border-bottom-right-radius: 6%;
@@ -386,12 +390,17 @@ i.arrow:before {
 }
 .infoBackground{
   background: #ffffff;
+}
+.infoBackgroundTopMargin{
   @media screen and (min-width: 800px) {
     margin-top: 15px;
   }
   @media screen and (max-width: 800px) {
     margin-top: 10px;
   }
+}
+bottomMarginTitle{
+  margin-bottom: 15px;
 }
 .coursesText{
  width: 85%;
@@ -459,9 +468,13 @@ i.arrow:before {
   margin-left: 10px;
 }
 
-.topFolder{
+.topFolderIcons{
   top:15px;
   left: 13px;
+}
+.topFolderList{
+  top: 17px;
+  left: 22px;
 }
 
 .folder-size{
