@@ -123,8 +123,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         if ($(window).width() < 800) {
             if($scope.courses.coursestodosort[0].id == 'finished')
                 $scope.courses.coursestodosort = $scope.courses.typeShow[0];
-            $scope.viewModeToDo = "icons";
-            $scope.viewModeToCome = "icons";
         }
         $scope.submitWait=false;
     };
@@ -824,6 +822,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                 $scope.courses.coursestodosort = $scope.courses.typeShow.filter(type => type.id == "all" );
             $scope.viewModeToDo = "icons";
             $scope.viewModeToCome = "icons";
+            $scope.viewModeMyCourses = "icons";
         }
         $scope.firstCoursesToCome=0;
         $scope.lastCoursesToCome = $scope.count("ToCome");

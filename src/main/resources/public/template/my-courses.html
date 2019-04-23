@@ -76,15 +76,15 @@
                 <p class="zero-mobile">
                     <i class="foldericon folder-size"></i>
                     <span class="big-folder ellipsis">[[folderName()]]</span>
+                    <label class="cell right-magnet title-dashboard zero-mobile">
+                        <i class="show-list" ng-class="{ selected: viewModeMyCourses == 'list' }" ng-click="changeViewMode('MyCourses','list')"></i>
+                    </label>
+                    <span> </span>
+                    <label class="cell right-magnet zero-mobile">
+                        <i class="show-icons" ng-class="{ selected: viewModeMyCourses == 'icons' }" ng-click="changeViewMode('MyCourses','icons')"></i>
+                    </label>
                     </br>
                 </p>
-                <div class="cell right-magnet title-dashboard zero-mobile">
-                    <i class="show-list" ng-class="{ selected: viewModeMyCourses == 'list' }" ng-click="changeViewMode('MyCourses','list')"></i>
-                </div>
-                <span> </span>
-                <div class="cell right-magnet zero-mobile">
-                    <i class="show-icons" ng-class="{ selected: viewModeMyCourses == 'icons' }" ng-click="changeViewMode('MyCourses','icons')"></i>
-                </div>
                 <p  class ="row zero-mobile" static-include="/moodle/public/template/courses/filters.html"></p>
                 <div class="row center-courses coursesBottomPadding" static-include="/moodle/public/template/courses/folders.html" ng-if="printfolders"></div>
                 <div class="row center-courses coursesBottomPadding" static-include="/moodle/public/template/courses/courses.html"></div>

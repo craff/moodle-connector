@@ -4,14 +4,16 @@
     </div>
 </div>
 <div ng-if="printmenufolder && showCourse(course.course_type)"
-     class="minimal-mine-recent-width cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin infoBackgroundTopMargin"
-     ng-class="{duplicateCourse: course.duplication != 'non', greyfilter: course.duplication !='non', duplicationFailed: course.duplication == 'echec'}"
+     class="cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin"
+     ng-class="{duplicateCourse: course.duplication != 'non', greyfilter: course.duplication !='non', duplicationFailed: course.duplication == 'echec',
+     'minimal-mine-recent-width infoBackgroundTopMargin': viewModeMyCourses == 'icons', 'all-width': viewModeMyCourses == 'list'}"
      ng-repeat="course in courses.getCourseInFolder(courses.orderCourses(courses.coursesByUser),currentfolderid)">
-    <courses-item course="course" place="'coursesMine'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" refresh-function="updateCourse"></courses-item>
+    <courses-item course="course" place="'coursesMine'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" refresh-function="updateCourse" view ="viewModeMyCourses"></courses-item>
 </div>
 
 <div ng-if="printmenucourseShared && showCourse(course.course_type)"
-     class="minimal-mine-recent-width cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin infoBackgroundTopMargin"
+     class="cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin"
+     ng-class="{'minimal-mine-recent-width infoBackgroundTopMargin': viewModeMyCourses == 'icons', 'all-width': viewModeMyCourses == 'list'}"
      ng-repeat="course in courses.orderCourses(courses.coursesShared)">
-    <courses-item course="course" place="'coursesShared'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
+    <courses-item course="course" place="'coursesShared'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeMyCourses"></courses-item>
 </div>

@@ -3,28 +3,28 @@
         <p id="bg-text"><i18n>toCome</i18n></p>
     </div>
     <label ng-show="false">[[course.courseid]]</label>
-    <div class="cell" ng-class="{ activityRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list')) && course.course_type == 'singleactivity',
+    <div class="cell" ng-class="{ activityRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list')) && course.course_type == 'singleactivity',
                                     activityToDoPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && view == 'icons' && first,
                                     activityToComePicture : place == 'coursesToCome' && course.course_type == 'singleactivity' && view == 'icons',
-                                    activityPictureBackground : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'singleactivity',
-                                    activitySharedPicture : place == 'coursesShared' && course.course_type == 'singleactivity',
+                                    activityPictureBackground : place == 'coursesMine' && view == 'icons' && course.course_type == 'singleactivity',
+                                    activitySharedPicture : place == 'coursesShared' && view == 'icons' && course.course_type == 'singleactivity',
                                     activityToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'singleactivity' && view == 'icons' && !first,
-                                    courseRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list')) && course.course_type == 'topics',
+                                    courseRecentPicture : (place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list')) && course.course_type == 'topics',
                                     courseToComePicture : place == 'coursesToCome' && course.course_type == 'topics' && view == 'icons',
                                     courseToDoPicture : place == 'coursesToDo' && course.course_type == 'topics' && view == 'icons' && first,
                                     courseToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'topics' && view == 'icons' && !first,
-                                    coursePictureBackground : (place == 'coursesShared' || place == 'coursesMine') && course.course_type == 'topics' ,
-                                    courseSharedPicture : place == 'coursesShared' && course.course_type == 'topics'}"
-         ng-click="place != 'coursesToCome' && course.goTo()">
+                                    coursePictureBackground : place == 'coursesMine' && view == 'icons' && course.course_type == 'topics' ,
+                                    courseSharedPicture : place == 'coursesShared' && view == 'icons' && course.course_type == 'topics'}"
+         ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
         <img ng-src="[[course.imageurl]]" class="image-dashboard"
-             ng-class="{ recentPicture : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list') ,
+             ng-class="{ recentPicture : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list') ,
                 toDoPicture : place == 'coursesToDo' && first && view == 'icons',
                 toComePicture : place == 'coursesToCome' && view == 'icons',
-                defaultPicture : place == 'coursesMine',
-                sharedPicture : place == 'coursesShared'}"
+                defaultPicture : place == 'coursesMine' && view == 'icons',
+                sharedPicture : place == 'coursesShared' && view == 'icons'}"
              ng-show="course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-' "/>
-        <img ng-src="moodle/public/img/logo_image_ent.png" class="image-dashboard" ng-class="{ 'NoImagePicture' : place=='coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list'),
-        'NoImageMine' : place=='coursesMine', 'NoImageShared' : place=='coursesShared', 'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons', 'NoImageToCome' : place == 'coursesToCome' && view == 'icons'}"
+        <img ng-src="moodle/public/img/logo_image_ent.png" class="image-dashboard" ng-class="{ 'NoImagePicture' : place=='coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list'),
+        'NoImageMine' : place=='coursesMine' && view == 'icons', 'NoImageShared' : place=='coursesShared' && view == 'icons', 'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons', 'NoImageToCome' : place == 'coursesToCome' && view == 'icons'}"
              ng-show="course.imageurl === null || course.imageurl === undefined || course.imageurl === '-' "/>
     </div>
 
@@ -33,16 +33,16 @@
                       'specific-small-toCome-width cell' : place == 'coursesToCome' && view == 'icons'}">
         <div ng-class="{ 'right-align' : (place == 'coursesToDo' || place == 'coursesToCome') && view == 'icons',
                          'rightTop-margin' : (place == 'coursesToDo' || place == 'coursesToCome'),
-                          'big-right-margin' : place == 'coursesMine',
-                          'shared-margin-left' : place == 'coursesShared',
-                          'inside-margin' : place=='coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome') && view == 'list')}">
+                          'big-right-margin' : place == 'coursesMine' && view == 'icons',
+                          'shared-margin-left' : place == 'coursesShared' && view == 'icons',
+                          'inside-margin' : place=='coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list')}">
             <div ng-class="{'specific-mine-shared-width' : place == 'coursesMine' || place == 'coursesShared'}">
-                <label class="text-font notDraggable" ng-if="place == 'coursesToCome' && view=='icons' && course.startdate != null" ng-click="place != 'coursesToCome' && course.goTo()">
+                <label class="text-font notDraggable" ng-if="place == 'coursesToCome' && view=='icons' && course.startdate != null" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
                     <i18n>toBegin.at</i18n>
                     <span class="date">[[ printDate(course,"begindate") ]]</span></br>
                 </label>
                 <div class="ellipsis">
-                    <span class="text-font" ng-class="{notDraggable : place=='coursesToCome'}" ng-click="place != 'coursesToCome' && course.goTo()">[[course.fullname]]</span>
+                    <span class="text-font" ng-class="{notDraggable : place=='coursesToCome'}" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">[[course.fullname]]</span>
                 </div>
                 <label class="rightDotsMenu" ng-if="place == 'coursesMine' && course.duplication == 'echec'">
                     <i class="close-2x" ng-click="deleteDuplicateFailed(course)"></i>
@@ -74,7 +74,7 @@
                         </div>
                     </opt>
                 </dots-menu>
-                <div class="title-dashboard" ng-class="{notDraggable : place=='coursesToCome'}" ng-click="place != 'coursesToCome' && course.goTo()">
+                <div class="title-dashboard" ng-class="{notDraggable : place=='coursesToCome'}" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
                     <span class="summary-list size-font" ng-if="place != 'coursesMine' && place != 'coursesRecent'">[[ printAuthor(course) ]]</span>
                     <label class="size-font right-magnet title-dashboard" ng-if="place == 'coursesToDo' && course.enddate != '0' && view == 'list'">
                         <i18n>toDo.before</i18n>
@@ -85,11 +85,11 @@
                         <span class="date">[[ printDate(course,"begindate") ]]</span>
                     </label>
                 </div>
-                <div ng-if="place == 'coursesMine' || place == 'coursesShared' || (place=='coursesToDo' && view == 'icons')" class="ellipsis" ng-click="course.goTo()">
+                <div ng-if="(place == 'coursesMine' || place == 'coursesShared' || place=='coursesToDo') && view == 'icons'" class="ellipsis" ng-click="place != 'coursesShared' && course.goTo()">
                     <span class="summary-list summary-color size-font" ng-class="{duplicateCourse : course.duplication != 'non'}">[[course.summary]]</span></br>
                 </div>
             </div>
-            <label class="size-font" ng-if="(place == 'coursesMine' && course.duplication != 'echec') || place == 'coursesShared' || place == 'coursesRecent'" ng-click="place != 'coursesToCome' && course.goTo()">
+            <label class="size-font" ng-if="(place == 'coursesMine' && course.duplication != 'echec') || (place == 'coursesShared' && view == 'icons') || place == 'coursesRecent'" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
                 <span class="date">[[ printDate(course, "modified" ) ]]</span>
             </label>
             <label class="checkbox right-magnet" ng-if="place == 'coursesMine'">
@@ -101,8 +101,8 @@
             </label>
             <div class="lds-facebook right-magnet" ng-if="place == 'coursesMine' && course.duplication == 'en cours'"><div></div><div></div><div></div></div>
         </div>
-        <div class="left-margin littleMarginTop" ng-if="view =='icons'">
-            <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != '0'" ng-click="place != 'coursesToCome' && course.goTo()">
+        <div class="left-margin littleMarginTop" ng-if="view =='icons' && (place == 'coursesToDo' || place == 'coursesToCome')">
+            <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != '0'" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
                 <i18n>toDo.before</i18n>
                 <span class="date">[[ printDate(course,"enddate") ]]</span>
             </label>
