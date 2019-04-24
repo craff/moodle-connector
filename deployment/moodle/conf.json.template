@@ -21,6 +21,11 @@
         "numberOfMaxPendingDuplication": ${numberOfMaxPendingDuplication},
         "timeDuplicationBeforeDelete": "${timeDuplicationBeforeDelete}",
         "address_moodle": "${moodleServer}",
-        "ws-path": "${moodleWsPath}"
+        "ws-path": "${moodleWsPath}",
+        "wsToken": "${wstoken}",
+        "idStudent": ${idStudent},
+        "idEditingTeacher": ${idEditingTeacher},
+        "idAuditeur": ${idAuditeur},
+        "header": "${header}"
       }
     }

@@ -107,7 +107,6 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-
     @Delete("/folder")
     @ApiDoc("delete a folder")
     public void deleteFolder(final HttpServerRequest request) {
@@ -251,7 +250,7 @@ public class MoodleController extends ControllerHelper {
                                             }
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                             final String moodleUrl = moodleUri.toString() +
-                                                    "?wstoken=" + WSTOKEN +
+                                                    "?wstoken=" + config.getString("wsToken") +
                                                     "&wsfunction=" + WS_CREATE_FUNCTION +
                                                     "&parameters[username]=" + URLEncoder.encode(user.getLogin(), "UTF-8") +
                                                     "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
@@ -358,7 +357,7 @@ public class MoodleController extends ControllerHelper {
                                 final JsonArray sqlCoursArray = sqlCours.right().getValue();
                                 final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                 final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
-                                        "?wstoken=" + WSTOKEN +
+                                        "?wstoken=" + config.getString("wsToken") +
                                         "&wsfunction=" + WS_GET_USERCOURSES +
                                         "&parameters[userid]=" + user.getUserId() +
                                         "&moodlewsrestformat=" + JSON;
@@ -575,7 +574,7 @@ public class MoodleController extends ControllerHelper {
                     shareSend = null;
                     final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                     final String moodleDeleteUrl = moodleDeleteUri.toString() +
-                            "?wstoken=" + WSTOKEN +
+                            "?wstoken=" + config.getString("wsToken") +
                             "&wsfunction=" + WS_DELETE_FUNCTION +
                             idsDeletes +
                             "&moodlewsrestformat=" + JSON;
@@ -695,7 +694,7 @@ public class MoodleController extends ControllerHelper {
                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                     Buffer wsResponse = new BufferImpl();
                     final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
-                            "?wstoken=" + WSTOKEN +
+                            "?wstoken=" + config.getString("wsToken") +
                             "&wsfunction=" + WS_GET_SHARECOURSE +
                             "&parameters[courseid]=" + request.getParam("id") +
                             "&moodlewsrestformat=" + JSON;
@@ -774,7 +773,7 @@ public class MoodleController extends ControllerHelper {
 
                                     for (Object group : groupEnroled) {
                                         JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
-                                        if(((JsonObject)group).getInteger("role") == student){
+                                        if(((JsonObject)group).getInteger("role") == config.getInteger("idStudent")){
                                             tabToAdd.remove(2);
                                         }
                                         shareInfosFuture.getJsonObject("groups").getJsonObject("checked").put(((JsonObject) group).getString("id"),tabToAdd);
@@ -810,7 +809,7 @@ public class MoodleController extends ControllerHelper {
                                         jsonobjctToAdd.put("login", prenom.toLowerCase() + "." + nom.toLowerCase());
                                         jsonobjctToAdd.put("username", nom + " " + prenom.charAt(0) + prenom.substring(1).toLowerCase());
                                         String profile = "Relative";
-                                        if (jsonobjctToAdd.getInteger("role") == student) {
+                                        if (jsonobjctToAdd.getInteger("role") == config.getInteger("idStudent")) {
                                             profile = "Student";
                                         }
                                         jsonobjctToAdd.put("profile", profile);
@@ -821,7 +820,7 @@ public class MoodleController extends ControllerHelper {
 
                                 for (Object userEnroled : usersEnroled) {
                                     JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
-                                    if (((JsonObject) userEnroled).getInteger("role") == student) {
+                                    if (((JsonObject) userEnroled).getInteger("role") == config.getInteger("idStudent")) {
                                         tabToAdd.remove(2);
                                     }
                                     shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"), tabToAdd);
@@ -885,41 +884,41 @@ public class MoodleController extends ControllerHelper {
                                 for (Map.Entry<String, Object> mapShareUsers : idUsers.entrySet()) {
                                     IdFront.put(mapShareUsers.getKey(), mapShareUsers.getValue());
                                     if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 2) {
-                                        keyShare.put(mapShareUsers.getKey(), editingteacher);
+                                        keyShare.put(mapShareUsers.getKey(), config.getString("idEditingTeacher"));
                                     }
                                     if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 1) {
-                                        keyShare.put(mapShareUsers.getKey(), student);
+                                        keyShare.put(mapShareUsers.getKey(), config.getInteger("idStudent"));
                                         Map<String, Object> mapInfo = keyShare.getMap();
                                     }
                                 }
                             } else if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() == 1) {
                                 if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(usersIds.getString(0), editingteacher);
+                                    keyShare.put(usersIds.getString(0), config.getString("idEditingTeacher"));
                                 }
                                 if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 1) {
-                                    keyShare.put(usersIds.getString(0), student);
+                                    keyShare.put(usersIds.getString(0), config.getInteger("idStudent"));
                                 }
                             }
                             if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() > 1) {
                                 for (Map.Entry<String, Object> mapShareGroups : idGroups.entrySet()) {
                                     IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
                                     if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
-                                        keyShare.put(mapShareGroups.getKey(), editingteacher);
+                                        keyShare.put(mapShareGroups.getKey(), config.getString("idEditingTeacher"));
                                     }
                                     if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 1) {
-                                        keyShare.put(mapShareGroups.getKey(), student);
+                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idStudent"));
                                     }
                                 }
                             } else if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() == 1) {
                                 if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(groupsIds.getString(0), editingteacher);
+                                    keyShare.put(groupsIds.getString(0), config.getString("idEditingTeacher"));
                                 }
                                 if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 1) {
-                                    keyShare.put(groupsIds.getString(0), student);
+                                    keyShare.put(groupsIds.getString(0), config.getInteger("idStudent"));
                                 }
                             }
                             final Map<String, Object> mapInfo = keyShare.getMap();
-                            mapInfo.put(user.getUserId(), editingteacher);
+                            mapInfo.put(user.getUserId(), config.getString("idEditingTeacher"));
                             share.put("courseid", request.params().entries().get(0).getValue());
 
                             Future<JsonArray> getUsersFuture = Future.future();
@@ -976,7 +975,7 @@ public class MoodleController extends ControllerHelper {
                                         for (Object userObj : usersFuture) {
                                             JsonObject userJson = ((JsonObject) userObj);
                                             if (userJson.getString("id").equals(user.getUserId())) {
-                                                userJson.put("role", auditeur);
+                                                userJson.put("role", config.getInteger("idAuditeur"));
                                             } else {
                                                 userJson.put("role", mapInfo.get(userJson.getString("id")));
                                             }
@@ -994,7 +993,7 @@ public class MoodleController extends ControllerHelper {
                                     }
                                     JsonObject shareSend = new JsonObject();
                                     shareSend.put("parameters", share)
-                                            .put("wstoken", WSTOKEN)
+                                            .put("wstoken", config.getString("wsToken"))
                                             .put("wsfunction", WS_CREATE_SHARECOURSE)
                                             .put("moodlewsrestformat", JSON);
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
@@ -1295,7 +1294,7 @@ public class MoodleController extends ControllerHelper {
                                         if (moodleUri != null) {
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                             final String moodleUrl = moodleUri.toString() +
-                                                    "?wstoken=" + WSTOKEN +
+                                                    "?wstoken=" + config.getString("wsToken") +
                                                     "&wsfunction=" + WS_POST_DUPLICATECOURSE +
                                                     "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
                                                     "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +

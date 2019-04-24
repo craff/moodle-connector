@@ -16,6 +16,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static fr.openent.moodle.Moodle.moodleConfig;
+
 public class HttpClientHelper extends ControllerHelper {
 
     private final MoodleWebService moodleWebService;
@@ -97,7 +99,7 @@ public class HttpClientHelper extends ControllerHelper {
                     .write("&moodlewsrestformat=").write(shareSend.getString("moodlewsrestformat"));
         }
 
-        httpClientRequest.putHeader("Host", "moodle-dev.preprod-ent.fr");
+        httpClientRequest.putHeader("Host", moodleConfig.getString("header"));
         httpClientRequest.putHeader("Content-type", "application/x-www-form-urlencoded");
         //Typically an unresolved Address, a timeout about connection or response
         httpClientRequest.exceptionHandler(new Handler<Throwable>() {

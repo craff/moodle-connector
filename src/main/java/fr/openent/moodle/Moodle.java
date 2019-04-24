@@ -19,7 +19,6 @@ public class Moodle extends BaseServer {
 
 	public static String DIRECTORY_BUS_ADDRESS = "directory";
 	public static String ZIMBRA_BUS_ADDRESS = "fr.openent.zimbra";
-	public static String WSTOKEN = "ce7f30ccedfaaa24485629872671200a";
 	public static String WS_CREATE_FUNCTION = "local_entcgi_services_createcourse";
 	public static String WS_DELETE_FUNCTION = "core_course_delete_courses";
 	public static String WS_GET_USERCOURSES = "local_entcgi_services_usercourses";
@@ -27,6 +26,7 @@ public class Moodle extends BaseServer {
 	public static String WS_GET_SHARECOURSE = "local_entcgi_services_getcourseenrolment";
 	public static String WS_POST_DUPLICATECOURSE = "local_entcgi_services_duplicatecourse";
 	public static String JSON = "json";
+
 	public static String MOODLE_READ = "fr-openent-moodle-controllers-MoodleController|read";
 	public static String MOODLE_CONTRIB = "fr-openent-moodle-controllers-MoodleController|contrib";
 	public static String MOODLE_MANAGER = "fr-openent-moodle-controllers-MoodleController|shareSubmit";
@@ -35,17 +35,6 @@ public class Moodle extends BaseServer {
 	public static String PENDING = "en cours";
 	public static String FINISHED = "finis";
 	public static String ERROR = "echec";
-
-	public static Integer manager = 1;
-	public static Integer coursecreator = 2;
-	public static Integer editingteacher = 3;
-	public static Integer teacher = 4;
-	public static Integer student = 5;
-	public static Integer guest = 6;
-	public static Integer user = 7;
-	public static Integer frontpage = 8;
-	public static Integer entcgi = 9;
-	public static Integer auditeur = 10;
 
 	public static String moodleSchema;
     public static JsonObject moodleConfig;
@@ -58,7 +47,6 @@ public class Moodle extends BaseServer {
 		EventBus eb = getEventBus(vertx);
 
 		final Storage storage = new StorageFactory(vertx, config, /*new ExercizerStorage()*/ null).getStorage();
-
 
 		SqlConf courseConf = SqlConfs.createConf(MoodleController.class.getName());
 		courseConf.setSchema("moodle");
