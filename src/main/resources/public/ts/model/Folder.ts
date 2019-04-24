@@ -61,6 +61,7 @@ export class Folder {
 
 export class Folders {
     folderIdMoveIn: number;
+    myCourses: Folder;
     all: Folder[];
     isSynchronized: Boolean;
     selectedFolders: number[];
@@ -74,6 +75,9 @@ export class Folders {
         this.listOfSubfolders = [];
         this.folderIdMoveIn = undefined;
         this.isSynchronized = false;
+        this.myCourses = new Folder();
+        this.myCourses.id = 0;
+        this.myCourses.name = "Mes cours";
     }
 
     toJsonForMove(targetId : number){
@@ -134,6 +138,7 @@ export class Folders {
     getAllsubfolders() {
         if (this.all) {
             this.listOfSubfolders.length = 0;
+            this.listOfSubfolders.push(this.myCourses);
             var that = this;
             this.getparentFolder().forEach(function (folder) {
                 if (!folder.select) {

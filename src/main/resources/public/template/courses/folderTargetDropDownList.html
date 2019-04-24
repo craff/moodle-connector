@@ -1,9 +1,4 @@
 <div>
-    <select ng-model="folders.folderIdMoveIn" >
-        <option value=0>Mes cours</option>
-        <option ng-repeat="folder in folders.listOfSubfolders track by $index"
-                value=[[folder.id]]>
-            [[folder.name]]
-        </option>
+    <select ng-model="folders.folderIdMoveIn" ng-options="folder.id as folder.name for folder in folders.listOfSubfolders">
     </select>
 </div>

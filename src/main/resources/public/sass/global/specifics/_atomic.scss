@@ -379,7 +379,6 @@ i.arrow:before {
 }
 .coursesBackground{
   background: #eee;
-  min-height: 225px;
 }
 .coursesInfoBackgroundList{
   background: #ffffff;
@@ -498,6 +497,12 @@ i.arrow:before {
 .fixedPosition{
   @media screen and (min-width: 800px) {
     position:fixed;
+  }
+}
+
+.rightPaddingMenu{
+  @media screen and (min-width: 800px) {
+    padding-right: 30px;
   }
 }
 

@@ -767,6 +767,7 @@ public class MoodleController extends ControllerHelper {
                                             jsonobjctToAdd.put("id", id);
                                             //jsonobjctToAdd.put("groupDisplayName", null);
                                             //jsonobjctToAdd.put("structureName",null);
+                                            UserUtils.groupDisplayName(jsonobjctToAdd, I18n.acceptLanguage(request));
                                             shareInfosFuture.getJsonObject("groups").getJsonArray("visibles").add(jsonobjctToAdd);
                                         }
                                     }
@@ -986,6 +987,7 @@ public class MoodleController extends ControllerHelper {
                                         for (Object groupObj : groupsFuture) {
                                             JsonObject groupJson = ((JsonObject) groupObj);
                                             groupJson.put("role", mapInfo.get(groupJson.getString("id").substring(3)));
+                                            UserUtils.groupDisplayName(groupJson, I18n.acceptLanguage(request));
                                         }
                                     }
                                     if (shareGroups != null && !shareGroups.isEmpty()) {
