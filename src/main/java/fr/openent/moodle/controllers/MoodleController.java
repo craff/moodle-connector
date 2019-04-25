@@ -884,7 +884,7 @@ public class MoodleController extends ControllerHelper {
                                 for (Map.Entry<String, Object> mapShareUsers : idUsers.entrySet()) {
                                     IdFront.put(mapShareUsers.getKey(), mapShareUsers.getValue());
                                     if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 2) {
-                                        keyShare.put(mapShareUsers.getKey(), config.getString("idEditingTeacher"));
+                                        keyShare.put(mapShareUsers.getKey(), config.getInteger("idEditingTeacher"));
                                     }
                                     if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 1) {
                                         keyShare.put(mapShareUsers.getKey(), config.getInteger("idStudent"));
@@ -893,7 +893,7 @@ public class MoodleController extends ControllerHelper {
                                 }
                             } else if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() == 1) {
                                 if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(usersIds.getString(0), config.getString("idEditingTeacher"));
+                                    keyShare.put(usersIds.getString(0), config.getInteger("idEditingTeacher"));
                                 }
                                 if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 1) {
                                     keyShare.put(usersIds.getString(0), config.getInteger("idStudent"));
@@ -903,7 +903,7 @@ public class MoodleController extends ControllerHelper {
                                 for (Map.Entry<String, Object> mapShareGroups : idGroups.entrySet()) {
                                     IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
                                     if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
-                                        keyShare.put(mapShareGroups.getKey(), config.getString("idEditingTeacher"));
+                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idEditingTeacher"));
                                     }
                                     if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 1) {
                                         keyShare.put(mapShareGroups.getKey(), config.getInteger("idStudent"));
@@ -911,14 +911,14 @@ public class MoodleController extends ControllerHelper {
                                 }
                             } else if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() == 1) {
                                 if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(groupsIds.getString(0), config.getString("idEditingTeacher"));
+                                    keyShare.put(groupsIds.getString(0), config.getInteger("idEditingTeacher"));
                                 }
                                 if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 1) {
                                     keyShare.put(groupsIds.getString(0), config.getInteger("idStudent"));
                                 }
                             }
                             final Map<String, Object> mapInfo = keyShare.getMap();
-                            mapInfo.put(user.getUserId(), config.getString("idEditingTeacher"));
+                            mapInfo.put(user.getUserId(), config.getInteger("idEditingTeacher"));
                             share.put("courseid", request.params().entries().get(0).getValue());
 
                             Future<JsonArray> getUsersFuture = Future.future();
