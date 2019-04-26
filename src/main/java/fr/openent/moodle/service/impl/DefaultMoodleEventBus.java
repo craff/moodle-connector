@@ -53,11 +53,19 @@ public class DefaultMoodleEventBus extends SqlCrudService implements MoodleEvent
     }
 
     @Override
-    public void getUsers(final JsonArray groupIds, final Handler<Either<String,JsonArray>> handler){
+    public void getUsers(final JsonArray groupIds, final Handler<Either<String, JsonArray>> handler){
         JsonObject action = new JsonObject()
                 .put("action", "list-users")
                 .put("groupIds", groupIds);
 
         eb.send(Moodle.DIRECTORY_BUS_ADDRESS, action, handlerToAsyncHandler(validResultHandler(handler)));
+    }
+
+    @Override
+    public void getZimbraEmail(final JsonArray zimbraEmail, final Handler<Either<String, JsonArray>> handler){
+        JsonObject action = new JsonObject()
+                .put("action", "getMailUser")
+                .put("zimbraEmail", zimbraEmail);
+        eb.send(Moodle.ZIMBRA_BUS_ADDRESS, action, handlerToAsyncHandler(validResultHandler(handler)));
     }
 }

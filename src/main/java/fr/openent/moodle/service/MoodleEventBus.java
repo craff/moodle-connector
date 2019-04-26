@@ -29,4 +29,12 @@ public interface MoodleEventBus {
      */
 
     void getUsers (JsonArray groupIds, Handler<Either<String,JsonArray>> handler);
+
+    /**
+     * get users & groups to bus
+     * @param zimbraEmail Array with user(s) id
+     * @param handler function handler returning data
+     */
+
+    void getZimbraEmail (JsonArray zimbraEmail, Handler<Either<String,JsonArray>> handler);
 }
