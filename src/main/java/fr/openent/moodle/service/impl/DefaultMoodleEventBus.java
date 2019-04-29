@@ -65,7 +65,7 @@ public class DefaultMoodleEventBus extends SqlCrudService implements MoodleEvent
     public void getZimbraEmail(final JsonArray zimbraEmail, final Handler<Either<String, JsonArray>> handler){
         JsonObject action = new JsonObject()
                 .put("action", "getMailUser")
-                .put("zimbraEmail", zimbraEmail);
+                .put("idList", zimbraEmail);
         eb.send(Moodle.ZIMBRA_BUS_ADDRESS, action, handlerToAsyncHandler(validResultHandler(handler)));
     }
 }

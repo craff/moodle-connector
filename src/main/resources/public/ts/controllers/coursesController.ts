@@ -436,7 +436,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             } else
                 nameToReturn = "Mes cours";
         return nameToReturn;
-    }
+    };
 
     /**
      * create folder
