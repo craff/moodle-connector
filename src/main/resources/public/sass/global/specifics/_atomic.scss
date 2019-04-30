@@ -324,7 +324,7 @@ i.course::before {
 }
 
 i.orderArrow {
-  margin: -3px -5px 0px 0px;
+  margin: 0px -5px 0px 0px;
 }
 
 i.arrow:before {
@@ -494,21 +494,23 @@ i.arrow:before {
   font-size: 16px;
 }
 
-.fixedPosition{
-  @media screen and (min-width: 800px) {
-    position:fixed;
-  }
-}
-
 .rightPaddingMenu{
   @media screen and (min-width: 800px) {
     padding-right: 30px;
   }
 }
 
-.coursesLeftMargin{
+.stickyParent{
   @media screen and (min-width: 800px) {
-    margin-left:25%;
+    display: flex;
+    align-items: flex-start;
+  }
+}
+
+.sticky{
+  @media screen and (min-width: 800px) {
+    position: sticky;
+    top: 50px;
   }
 }
 

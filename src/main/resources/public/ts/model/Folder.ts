@@ -139,25 +139,23 @@ export class Folders {
         if (this.all) {
             this.listOfSubfolders.length = 0;
             this.listOfSubfolders.push(this.myCourses);
-            var that = this;
-            this.getparentFolder().forEach(function (folder) {
+            this.getparentFolder().forEach(folder => {
                 if (!folder.select) {
-                    that.listOfSubfolders.push(folder);
-                    folder.subFolders = that.getSubFolder(folder.id);
-                    that.insertSubFolders(folder);
+                    this.listOfSubfolders.push(folder);
+                    folder.subFolders = this.getSubFolder(folder.id);
+                    this.insertSubFolders(folder);
                 }
             });
         }
     }
 
     insertSubFolders(folder:Folder){
-        var that = this;
         if (folder.subFolders && folder.subFolders.length) {
-            this.getSubFolder(folder.id).forEach(function (subFolder) {
+            this.getSubFolder(folder.id).forEach(subFolder => {
                 if(!(subFolder.select)) {
-                    that.listOfSubfolders.push(subFolder);
-                    subFolder.subFolders = that.getSubFolder(subFolder.id);
-                    that.insertSubFolders(subFolder);
+                    this.listOfSubfolders.push(subFolder);
+                    subFolder.subFolders = this.getSubFolder(subFolder.id);
+                    this.insertSubFolders(subFolder);
                 }
             });
         }

@@ -14,6 +14,7 @@ import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
 import static fr.openent.moodle.Moodle.*;
+import static java.util.Objects.isNull;
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
 
@@ -79,7 +80,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         values.add(course.getValue("moodleid"));
 
         Integer folderId = course.getInteger("folderid");
-        if (folderId == null) {
+        if (isNull(folderId)) {
             values.addNull();
         } else {
             values.add(folderId);
@@ -241,18 +242,16 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void getSharedBookMark(String sharedBookMarkId, Handler<Either<String, JsonArray>> handler) {
+    public void getSharedBookMark(final JsonArray bookmarksIds, Handler<Either<String, JsonArray>> handler) {
         JsonObject params = new JsonObject()
-                .put("sharedBookMarkId", sharedBookMarkId);
+                .put("bookmarksIds", bookmarksIds);
 
-        String queryNeo4j = "MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) " +
-                "UNWIND TAIL(sb.{sharedBookMarkId}) as vid " +
-                "MATCH (v:Visible {id : vid}) " +
-                "WHERE not(has(v.deleteDate)) " +
-                "RETURN {group: {id: \"SB\" + \" {sharedBookMarkId} \", name: HEAD(sb.{sharedBookMarkId}), " +
-                "users: COLLECT(DISTINCT " +
-                "{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}} " +
-                "as sharedBookMark;";
+        String queryNeo4j = "WITH {bookmarksIds} AS shareBookmarkIds " +
+                "UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) " +
+                "UNWIND TAIL(sb[shareBookmarkId]) as vid MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) " +
+                "WITH {group: {id: \"SB\" + shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, " +
+                "email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}}as sharedBookMark "+
+                "RETURN COLLECT(sharedBookMark) as sharedBookMarks;";
 
         Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
     }
@@ -275,8 +274,8 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> handler){
         String query = "SELECT id, id_course, id_users, id_folder, nombre_tentatives FROM " + Moodle.moodleSchema + ".duplication WHERE status = ?";
 
-        if(status == WAITING)
-            query+= "LIMIT 1";
+        if(status.equals(WAITING))
+            query+= " LIMIT 1";
 
         query += ";";
 
@@ -300,8 +299,8 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     public void updateStatusCourseToDuplicate (String status, Integer id, Integer numberOfTentatives, Handler<Either<String, JsonObject>> handler){
         JsonArray values = new JsonArray();
         String query = "UPDATE " + Moodle.moodleSchema + ".duplication SET ";
-        if(status == WAITING){
-            if(numberOfTentatives == moodleConfig.getInteger("numberOfMaxDuplicationTentatives"))
+        if(status.equals(WAITING)){
+            if(numberOfTentatives.equals(moodleConfig.getInteger("numberOfMaxDuplicationTentatives")))
                 status=ERROR;
             query += "nombre_tentatives = ?, ";
 

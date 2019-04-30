@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.*;
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
+import static java.util.Objects.isNull;
 import static org.entcore.common.http.response.DefaultResponseHandler.defaultResponseHandler;
 
 public class MoodleController extends ControllerHelper {
@@ -98,7 +99,7 @@ public class MoodleController extends ControllerHelper {
                         if (user != null) {
                             moodleWebService.moveFolder(folders, defaultResponseHandler(request));
                         } else {
-                            log.debug("User not found in session.");
+                            log.error("User not found in session.");
                             unauthorized(request);
                         }
                     }
@@ -119,7 +120,7 @@ public class MoodleController extends ControllerHelper {
                         if (user != null) {
                             moodleWebService.deleteFolders(folder, defaultResponseHandler(request));
                         } else {
-                            log.debug("User not found in session.");
+                            log.error("User not found in session.");
                             unauthorized(request);
                         }
                     }
@@ -142,7 +143,7 @@ public class MoodleController extends ControllerHelper {
                             folder.put("structureId", user.getStructures().get(0));
                             moodleWebService.createFolder(folder, defaultResponseHandler(request));
                         } else {
-                            log.debug("User not found in session.");
+                            log.error("User not found in session.");
                             unauthorized(request);
                         }
                     }
@@ -175,7 +176,7 @@ public class MoodleController extends ControllerHelper {
                     moodleWebService.countItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
                 }
                 else {
-                    log.debug("User not found in session.");
+                    log.error("User not found in session.");
                     unauthorized(request);
                 }
             }
@@ -195,7 +196,7 @@ public class MoodleController extends ControllerHelper {
                     moodleWebService.countCoursesItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
                 }
                 else {
-                    log.debug("User not found in session.");
+                    log.error("User not found in session.");
                     unauthorized(request);
                 }
             }
@@ -213,7 +214,7 @@ public class MoodleController extends ControllerHelper {
 	            if ("1".equals(course.getString("type"))) {
                     course.put("typeA", "");
                 }
-                if (course.getString("summary") == null) {
+                if (isNull(course.getString("summary"))) {
 	                course.put("summary", "");
 	            }
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
@@ -237,7 +238,7 @@ public class MoodleController extends ControllerHelper {
                                         final String urlSeparator = service.endsWith("") ? "" : "/";
                                         moodleUri = new URI(service + urlSeparator);
                                     } catch (URISyntaxException e) {
-                                        log.debug("Invalid moodle web service uri", e);
+                                        log.error("Invalid moodle web service creating a course uri",e);
                                     }
                                     if (moodleUri != null) {
                                         JsonObject shareSend = new JsonObject();
@@ -274,12 +275,12 @@ public class MoodleController extends ControllerHelper {
                                                                 .put("userid", user.getUserId());
                                                         moodleWebService.createCourse(course, defaultResponseHandler(request));
                                                     } else {
-                                                        log.debug("Post service failed");
+                                                        log.error("fail to call create course webservice" + event.left().getValue());
                                                     }
                                                 }
                                             });
                                         } catch (UnsupportedEncodingException e) {
-                                            e.printStackTrace();
+                                            log.error("fail to create course by sending the URL to the WS", e);
                                         }
                                     }
                                 } else {
@@ -333,7 +334,7 @@ public class MoodleController extends ControllerHelper {
                     moodleWebService.getFoldersInEnt(user.getUserId(), arrayResponseHandler(request));
                 }
                 else {
-                    log.debug("User not found in session.");
+                    log.error("User not found in session.");
                     unauthorized(request);
                 }
             }
@@ -378,7 +379,7 @@ public class MoodleController extends ControllerHelper {
                                                     for (Object course : DuplicatesCours) {
                                                         boolean findDuplicates = false;
                                                         for(int i = 0; i < coursArray.size(); i++){
-                                                            if (((JsonObject)course).getValue("courseid").toString().compareTo(coursArray.getJsonObject(i).getValue("courseid").toString()) == 0){
+                                                            if (((JsonObject)course).getValue("courseid").toString().equals(coursArray.getJsonObject(i).getValue("courseid").toString())){
                                                                 findDuplicates = true;
                                                                 if(Integer.parseInt(((JsonObject)course).getValue("role").toString()) > Integer.parseInt(coursArray.getJsonObject(i).getValue("role").toString())){
                                                                     coursArray.remove(i);
@@ -454,13 +455,13 @@ public class MoodleController extends ControllerHelper {
                                                                         for (int j = 0; j < list.size(); j++) {
                                                                             JsonObject PreferencesCours = list.getJsonObject(j);
                                                                             if(cours.containsKey("courseid")) {
-                                                                                if (PreferencesCours.getValue("moodle_id").toString().compareTo(cours.getValue("courseid").toString()) == 0) {
+                                                                                if (PreferencesCours.getValue("moodle_id").toString().equals(cours.getValue("courseid").toString())) {
                                                                                     coursArray.getJsonObject(i).put("masked", PreferencesCours.getValue("masked"));
                                                                                     coursArray.getJsonObject(i).put("favorites", PreferencesCours.getValue("favorites"));
                                                                                 }
                                                                             }
                                                                         }
-                                                                        if(coursArray.getJsonObject(i).containsKey("masked") == false){
+                                                                        if(!(coursArray.getJsonObject(i).containsKey("masked"))){
                                                                             coursArray.getJsonObject(i).put("masked", false);
                                                                             coursArray.getJsonObject(i).put("favorites", false);
                                                                         }
@@ -484,7 +485,7 @@ public class MoodleController extends ControllerHelper {
                                                 }
                                             });
                                         } else {
-                                            log.debug(response.statusMessage());
+                                            log.error("fail to call get courses webservice" + response.statusMessage());
                                             response.bodyHandler(new Handler<Buffer>() {
                                                 @Override
                                                 public void handle(Buffer event) {
@@ -537,7 +538,7 @@ public class MoodleController extends ControllerHelper {
                         if (user != null) {
                             moodleWebService.moveCourse(courses, defaultResponseHandler(request));
                         } else {
-                            log.debug("User not found in session.");
+                            log.error("User not found in session.");
                             unauthorized(request);
                         }
                     }
@@ -567,7 +568,7 @@ public class MoodleController extends ControllerHelper {
                     final String urlSeparator = service.endsWith("") ? "" : "/";
                     moodleDeleteUri = new URI(service + urlSeparator);
                 } catch (URISyntaxException e) {
-                    log.debug("Invalid moodle web service uri", e);
+                    log.error("Invalid moodle web service deleting course uri",e);
                 }
                 if (moodleDeleteUri != null) {
                     JsonObject shareSend = new JsonObject();
@@ -584,7 +585,7 @@ public class MoodleController extends ControllerHelper {
                             if (event.isRight()) {
                                 moodleWebService.deleteCourse(courses, defaultResponseHandler(request));
                             } else {
-                                log.debug("Post service failed");
+                                log.error("Post service failed"  + event.left().getValue());
                             }
                         }
                     });
@@ -612,7 +613,7 @@ public class MoodleController extends ControllerHelper {
 	                String userId = user.getUserId();
 	                moodleWebService.getChoices(userId, arrayResponseHandler(request));
 	            } else {
-	                log.debug("User not found in session.");
+	                log.error("User not found in session.");
 	                unauthorized(request);
 	            }
 	        }
@@ -634,7 +635,7 @@ public class MoodleController extends ControllerHelper {
                             String view = request.getParam("view");
                             moodleWebService.setChoice(courses, view, defaultResponseHandler(request));
                         } else {
-                            log.debug("User not found in session.");
+                            log.error("User not found in session.");
                             unauthorized(request);
                         }
                     }
@@ -657,7 +658,7 @@ public class MoodleController extends ControllerHelper {
                             coursePreferences.put("userId", user.getUserId());
                             moodleWebService.setPreferences(coursePreferences, defaultResponseHandler(request));
                         } else {
-                            log.debug("User not found in session.");
+                            log.error("User not found in session.");
                             unauthorized(request);
                         }
                     }
@@ -714,7 +715,7 @@ public class MoodleController extends ControllerHelper {
                                 }
                             });
                         } else {
-                            log.debug(response.statusMessage());
+                            log.error("fail to call get share course right webservice" + response.statusMessage());
                             response.bodyHandler(new Handler<Buffer>() {
                                 @Override
                                 public void handle(Buffer event) {
@@ -774,14 +775,14 @@ public class MoodleController extends ControllerHelper {
 
                                     for (Object group : groupEnroled) {
                                         JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
-                                        if(((JsonObject)group).getInteger("role") == config.getInteger("idStudent")){
+                                        if(((JsonObject)group).getInteger("role").equals(config.getInteger("idStudent"))){
                                             tabToAdd.remove(2);
                                         }
                                         shareInfosFuture.getJsonObject("groups").getJsonObject("checked").put(((JsonObject) group).getString("id"),tabToAdd);
                                     }
 
                                     for(Object userEnroled : usersEnroled.copy()) {
-                                        if (!(Objects.isNull(((JsonObject) userEnroled).getValue("idnumber")))) {
+                                        if (!(isNull(((JsonObject) userEnroled).getValue("idnumber")))) {
                                             usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(usersEnroledId.indexOf(((JsonObject) userEnroled).getString("id")));
                                             usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
                                             usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
@@ -810,7 +811,7 @@ public class MoodleController extends ControllerHelper {
                                         jsonobjctToAdd.put("login", prenom.toLowerCase() + "." + nom.toLowerCase());
                                         jsonobjctToAdd.put("username", nom + " " + prenom.charAt(0) + prenom.substring(1).toLowerCase());
                                         String profile = "Relative";
-                                        if (jsonobjctToAdd.getInteger("role") == config.getInteger("idStudent")) {
+                                        if (jsonobjctToAdd.getInteger("role").equals(config.getInteger("idStudent"))) {
                                             profile = "Student";
                                         }
                                         jsonobjctToAdd.put("profile", profile);
@@ -821,7 +822,7 @@ public class MoodleController extends ControllerHelper {
 
                                 for (Object userEnroled : usersEnroled) {
                                     JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
-                                    if (((JsonObject) userEnroled).getInteger("role") == config.getInteger("idStudent")) {
+                                    if (((JsonObject) userEnroled).getInteger("role").equals(config.getInteger("idStudent"))) {
                                         tabToAdd.remove(2);
                                     }
                                     shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"), tabToAdd);
@@ -863,8 +864,12 @@ public class MoodleController extends ControllerHelper {
                     public void handle(UserInfos user) {
                         if (user != null) {
                             for (Object idGroup : shareCourse.copy().getJsonObject("groups").getMap().keySet().toArray() ) {
-                                if(idGroup.toString().substring(0,3).compareTo("GR_") == 0){
+                                if(idGroup.toString().substring(0,3).equals("GR_")){
                                     shareCourse.getJsonObject("groups").put(idGroup.toString().substring(3),shareCourse.getJsonObject("groups").getValue(idGroup.toString()));
+                                    shareCourse.getJsonObject("groups").remove(idGroup.toString());
+                                }
+                                if(idGroup.toString().substring(0,3).equals("SB_")){
+                                    shareCourse.getJsonObject("bookmarks").put(idGroup.toString().substring(2),shareCourse.getJsonObject("groups").getValue(idGroup.toString()));
                                     shareCourse.getJsonObject("groups").remove(idGroup.toString());
                                 }
                             }
@@ -918,6 +923,24 @@ public class MoodleController extends ControllerHelper {
                                     keyShare.put(groupsIds.getString(0), config.getInteger("idStudent"));
                                 }
                             }
+                            if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() > 1) {
+                                for (Map.Entry<String, Object> mapShareGroups : idBookmarks.entrySet()) {
+                                    IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
+                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
+                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idEditingTeacher"));
+                                    }
+                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 1) {
+                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idStudent"));
+                                    }
+                                }
+                            } else if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() == 1) {
+                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 2) {
+                                    keyShare.put(bookmarksIds.getString(0), config.getInteger("idEditingTeacher"));
+                                }
+                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 1) {
+                                    keyShare.put(bookmarksIds.getString(0), config.getInteger("idStudent"));
+                                }
+                            }
                             final Map<String, Object> mapInfo = keyShare.getMap();
                             mapInfo.put(user.getUserId(), config.getInteger("idEditingTeacher"));
                             share.put("courseid", request.params().entries().get(0).getValue());
@@ -951,19 +974,16 @@ public class MoodleController extends ControllerHelper {
                             }
 
                             Future<JsonArray> getShareGroupsFuture = Future.future();
+                            Handler<Either<String, JsonArray>> getShareGroupsHandler = finalShareGroups -> {
+                                if (finalShareGroups.isRight()) {
+                                    getShareGroupsFuture.complete(finalShareGroups.right().getValue());
+                                } else {
+                                    getShareGroupsFuture.fail("Share groups problem");
+                                }
+                            };
                             if (!bookmarksIds.isEmpty()) {
                                 listeFutures.add(getShareGroupsFuture);
-                                for (int i = 0; i < bookmarksIds.size(); i++) {
-                                    String sharedBookMarkId = bookmarksIds.getString(i);
-                                    Handler<Either<String, JsonArray>> getShareGroupsHandler = finalShareGroups -> {
-                                        if (finalShareGroups.isRight()) {
-                                            getShareGroupsFuture.complete(finalShareGroups.right().getValue());
-                                        } else {
-                                            getShareGroupsFuture.fail("Share groups problem");
-                                        }
-                                    };
-                                    moodleWebService.getSharedBookMark(sharedBookMarkId, getShareGroupsHandler);
-                                }
+                                moodleWebService.getSharedBookMark(bookmarksIds, getShareGroupsHandler);
                             }
 
                             CompositeFuture.all(listeFutures).setHandler(event -> {
@@ -990,41 +1010,76 @@ public class MoodleController extends ControllerHelper {
                                             UserUtils.groupDisplayName(groupJson, I18n.acceptLanguage(request));
                                         }
                                     }
+                                    List<Future> listeUsersFutures = new ArrayList<>();
+                                    List<Integer> listeRankGroup = new ArrayList<>();
+                                    int i = 0;
                                     if (shareGroups != null && !shareGroups.isEmpty()) {
-                                        share.getJsonArray("groups").add(getShareGroupsFuture.result().getJsonObject(0).getJsonObject("sharedBookMark").getJsonObject("group"));
+                                        for (Object shareGroup : shareGroups.getJsonObject(0).getJsonArray("sharedBookMarks")) {
+                                            JsonArray shareJson = ((JsonObject) shareGroup).getJsonObject("group").getJsonArray("users");
+                                            JsonArray groupsId = new JsonArray();
+                                            for(Object userOrGroup : shareJson){
+                                                JsonObject userJson = ((JsonObject) userOrGroup);
+                                                if(isNull(userJson.getValue("email")))
+                                                    groupsId.add(userJson.getValue("id"));
+                                            }
+                                            if(groupsId.size() > 0){
+                                                Future<JsonArray> getUsersGroupsFuture = Future.future();
+                                                Handler<Either<String, JsonArray>> getUsersGroupsHandler = finalUsersGroups -> {
+                                                    if (finalUsersGroups.isRight()) {
+                                                        getUsersGroupsFuture.complete(finalUsersGroups.right().getValue());
+                                                    } else {
+                                                        getUsersGroupsFuture.fail("Share groups problem");
+                                                    }
+                                                };
+                                                listeUsersFutures.add(getUsersGroupsFuture);
+                                                listeRankGroup.add(i);
+                                                moodleWebService.getGroups(groupsId, getUsersGroupsHandler);
+                                            }
+                                            ((JsonObject) shareGroup).getJsonObject("group").put("role", mapInfo.get(((JsonObject) shareGroup).getJsonObject("group").getString("id").substring(2)));
+                                            if (share.containsKey("groups"))
+                                                share.getJsonArray("groups").add(((JsonObject) shareGroup).getJsonObject("group"));
+                                            else {
+                                                JsonArray jsonArrayToAdd = new JsonArray();
+                                                jsonArrayToAdd.add(((JsonObject) shareGroup).getJsonObject("group"));
+                                                share.put("groups", jsonArrayToAdd);
+                                            }
+                                            i++;
+                                        }
                                     }
-                                    JsonObject shareSend = new JsonObject();
-                                    shareSend.put("parameters", share)
-                                            .put("wstoken", config.getString("wsToken"))
-                                            .put("wsfunction", WS_CREATE_SHARECOURSE)
-                                            .put("moodlewsrestformat", JSON);
-                                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                                    URI moodleUri = null;
-                                    try {
-                                        final String service = (config.getString("address_moodle") + config.getString("ws-path"));
-                                        final String urlSeparator = service.endsWith("") ? "" : "/";
-                                        moodleUri = new URI(service + urlSeparator);
-                                    } catch (URISyntaxException e) {
-                                        log.debug("Invalid moodle web service uri", e);
-                                    }
-                                    if (moodleUri != null) {
-                                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                                        final String moodleUrl = moodleUri.toString();
-                                        HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                            @Override
-                                            public void handle(Either<String, Buffer> event) {
-                                                if (event.isRight()) {
-                                                    log.info("Cours partager");
-                                                    request.response()
-                                                            .setStatusCode(200)
-                                                            .end();
-                                                } else {
-                                                    log.error("Share service didn't work");
-                                                    unauthorized(request);
+                                    if(listeUsersFutures.size() > 0) {
+                                        CompositeFuture.all(listeUsersFutures).setHandler(finished -> {
+                                            if (finished.succeeded()) {
+                                                JsonArray usersBookMarkGroups = new JsonArray();
+                                                for (int j = 0; j < listeUsersFutures.size(); j++) {
+                                                    usersBookMarkGroups = (JsonArray) listeUsersFutures.get(j).result();
+                                                    for (Object group : usersBookMarkGroups) {
+                                                        share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).getJsonArray("users").addAll(((JsonObject) group).getJsonArray("users"));
+                                                        JsonArray duplicatesUsers = share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).getJsonArray("users").copy();
+                                                        share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).remove("users");
+                                                        JsonArray usersArray = new JsonArray();
+                                                        for (Object userToShare : duplicatesUsers) {
+                                                            boolean findDuplicate = false;
+                                                            for(int k = 0; k < usersArray.size(); k++){
+                                                                if (((JsonObject)userToShare).getValue("id").toString().equals(usersArray.getJsonObject(k).getValue("id").toString()))
+                                                                    findDuplicate = true;
+                                                            }
+                                                            if(!findDuplicate){
+                                                                if(!isNull(((JsonObject)userToShare).getValue("firstname")))
+                                                                    usersArray.add(userToShare);
+                                                            }
+                                                        }
+                                                        share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).put("users",usersArray);
+                                                    }
                                                 }
+                                                sendRightShare(share, request);
+                                            } else {
+                                                badRequest(request, event.cause().getMessage());
                                             }
                                         });
+                                    }else {
+                                        sendRightShare(share, request);
                                     }
+
                                 } else {
                                     badRequest(request, event.cause().getMessage());
                                 }
@@ -1037,6 +1092,41 @@ public class MoodleController extends ControllerHelper {
                 });
             }
         });
+    }
+
+    private void sendRightShare(JsonObject share, HttpServerRequest request){
+        JsonObject shareSend = new JsonObject();
+        shareSend.put("parameters", share)
+                .put("wstoken", config.getString("wsToken"))
+                .put("wsfunction", WS_CREATE_SHARECOURSE)
+                .put("moodlewsrestformat", JSON);
+        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+        URI moodleUri = null;
+        try {
+            final String service = (config.getString("address_moodle") + config.getString("ws-path"));
+            final String urlSeparator = service.endsWith("") ? "" : "/";
+            moodleUri = new URI(service + urlSeparator);
+        } catch (URISyntaxException e) {
+            log.error("Invalid moodle web service sending right share uri",e);
+        }
+        if (moodleUri != null) {
+            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+            final String moodleUrl = moodleUri.toString();
+            HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                @Override
+                public void handle(Either<String, Buffer> event) {
+                    if (event.isRight()) {
+                        log.info("Cours partager");
+                        request.response()
+                                .setStatusCode(200)
+                                .end();
+                    } else {
+                        log.error("Share service didn't work");
+                        unauthorized(request);
+                    }
+                }
+            });
+        }
     }
 
     @Post("/course/duplicate")
@@ -1095,7 +1185,7 @@ public class MoodleController extends ControllerHelper {
                         }
                     });
                 } else {
-                    log.debug("User not found in session.");
+                    log.error("User not found in session.");
                     unauthorized(request);
                 }
             }
@@ -1135,7 +1225,7 @@ public class MoodleController extends ControllerHelper {
                         }
                     });
 	            } else {
-	                log.debug("User not found in session.");
+	                log.error("User not found in session.");
 	                unauthorized(request);
 	            }
 	        }
@@ -1291,7 +1381,7 @@ public class MoodleController extends ControllerHelper {
                                             final String urlSeparator = service.endsWith("") ? "" : "/";
                                             moodleUri = new URI(service + urlSeparator);
                                         } catch (URISyntaxException e) {
-                                            log.debug("Invalid moodle web service uri", e);
+                                            log.error("Invalid moodle web service sending demand of duplication uri",e);
                                         }
                                         if (moodleUri != null) {
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);

@@ -326,61 +326,60 @@ export class Courses {
     }
 
     orderCourses(coursesToOrder : Course[]) {
-        var that = this;
         return coursesToOrder.sort(
-            function compare(a, b) {
-                if(that.order.field == "creationDate") {
+            (a, b) => {
+                if(this.order.field == "creationDate") {
                     if (a.date > b.date)
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.date < b.date)
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(that.order.field == "modificationDate") {
+                } else if(this.order.field == "modificationDate") {
                     if (a.timemodified > b.timemodified)
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.timemodified < b.timemodified)
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(that.order.field == "name") {
+                } else if(this.order.field == "name") {
                     if (a.fullname.toLowerCase() < b.fullname.toLowerCase())
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.fullname.toLowerCase() > b.fullname.toLowerCase())
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(that.order.field == "numberEnrolment") {
+                } else if(this.order.field == "numberEnrolment") {
                     if (a.usernumber < b.usernumber)
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.usernumber > b.usernumber)
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(that.order.field == "achievment") {
+                } else if(this.order.field == "achievment") {
                     if (a.progress.slice(0,a.progress.length-1) < b.progress.slice(0,b.progress.length-1))
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.progress.slice(0,a.progress.length-1) > b.progress.slice(0,b.progress.length-1))
-                        if(that.order.desc)
+                        if(this.order.desc)
                             return -1;
                         else
                             return 1;

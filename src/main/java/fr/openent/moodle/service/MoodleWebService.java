@@ -132,10 +132,10 @@ public interface MoodleWebService{
 
     /**
      * get sharedbookmark
-     * @param sharedBookMarkId
+     * @param bookmarksIds
      * @param handler
      */
-    void getSharedBookMark(String sharedBookMarkId, Handler<Either<String, JsonArray>> handler);
+    void getSharedBookMark(JsonArray bookmarksIds, Handler<Either<String, JsonArray>> handler);
 
     /**
      * insert duplication table

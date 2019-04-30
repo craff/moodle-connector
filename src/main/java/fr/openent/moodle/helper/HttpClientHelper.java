@@ -77,7 +77,7 @@ public class HttpClientHelper extends ControllerHelper {
                         }
                     });
                 } else {
-                    log.error(response.statusMessage());
+                    log.error("fail to post webservice" + response.statusMessage());
                     response.bodyHandler(new Handler<Buffer>() {
                         @Override
                         public void handle(Buffer event) {
@@ -132,7 +132,7 @@ public class HttpClientHelper extends ControllerHelper {
                         }
                     });
                 } else {
-                    log.debug(response.statusMessage());
+                    log.error("fail to call create course webservice" + response.statusMessage());
                     response.bodyHandler(new Handler<Buffer>() {
                         @Override
                         public void handle(Buffer event) {

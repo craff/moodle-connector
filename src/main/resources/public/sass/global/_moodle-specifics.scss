@@ -5,6 +5,11 @@ body.moodle {
     z-index: 999;
   }
 
+  section.lightbox>div.content{
+    height: auto;
+    min-height: 0px;
+  }
+
   .lds-dual-ring {
     display: inline-block;
     height: 64px;
