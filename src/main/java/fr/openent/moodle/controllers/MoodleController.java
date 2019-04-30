@@ -224,11 +224,11 @@ public class MoodleController extends ControllerHelper {
                         course.put("shortname", ((GregorianCalendar) calendar).toZonedDateTime().toString().substring(0, 7) +
                                 user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
                                 course.getString("fullname").substring(0, 4) + uniqueID);
-                        JsonArray zimbraEmail = new JsonArray();
-                        zimbraEmail.add(user.getUserId());
-                        moodleEventBus.getZimbraEmail(zimbraEmail, new Handler<Either<String, JsonArray>>() {
+                      JsonObject action = new JsonObject();
+                      action.put("action", "getUserInfos").put("userId", user.getUserId());
+                      moodleEventBus.getParams(action, new Handler<Either<String, JsonObject>>() {
                             @Override
-                            public void handle(Either<String, JsonArray> event) {
+                            public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                     URI moodleUri = null;
@@ -254,7 +254,7 @@ public class MoodleController extends ControllerHelper {
                                                     "&wsfunction=" + WS_CREATE_FUNCTION +
                                                     "&parameters[username]=" + URLEncoder.encode(user.getLogin(), "UTF-8") +
                                                     "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
-                                                    "&parameters[email]=" + URLEncoder.encode(event.right().getValue().getString(0), "UTF-8") +
+                                                    "&parameters[email]=" + URLEncoder.encode(event.right().getValue().getString("email"), "UTF-8") +
                                                     "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
                                                     "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
                                                     "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +
