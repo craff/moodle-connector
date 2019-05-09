@@ -24,6 +24,7 @@ export class Folder {
         this.selectConfirm=false;
         this.printTargetsubfolder=false;
     }
+
     toJson() {
         return {
             parentId : this.parent_id,
@@ -32,6 +33,7 @@ export class Folder {
             structureId : this.structure_id,
         }
     }
+
     async create() {
         try {
             await http.post('/moodle/folder', this.toJson());
@@ -56,7 +58,6 @@ export class Folder {
             throw e;
         }
     }
-
 }
 
 export class Folders {
@@ -98,6 +99,7 @@ export class Folders {
             foldersId: this.all.filter(folder => folder.selectConfirm).map(folder => folder.id ),
         }
     }
+
     async foldersDelete() {
         try {
             await http.delete('/moodle/folder', { data: this.toJsonForDelete() } );
@@ -106,6 +108,7 @@ export class Folders {
             throw e;
         }
     }
+
     async sync () {
         try {
             let folders = await http.get(`/moodle/folders`);
@@ -116,18 +119,21 @@ export class Folders {
             throw e;
         }
     }
+
     getSubFolder(folderId:number): Folder[]  {
         if(this.all){
             return this.all.filter(folder=>folder.parent_id == folderId &&  folder.id != folderId);
         }
         return [];
     }
+
     getparentFolder(): Folder[]  {
         if(this.all){
             return this.all.filter(folder=>folder.parent_id === 0);
         }
         return [];
     }
+
     getAllFoldersModel(): Folder[]  {
         if(this.all){
             return this.all;

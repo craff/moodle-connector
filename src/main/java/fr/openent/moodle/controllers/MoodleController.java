@@ -203,7 +203,6 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-
     @Post("/course")
     @ApiDoc("create a course")
     @SecuredAction(workflow_create)
@@ -225,9 +224,9 @@ public class MoodleController extends ControllerHelper {
                         course.put("shortname", ((GregorianCalendar) calendar).toZonedDateTime().toString().substring(0, 7) +
                                 user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
                                 course.getString("fullname").substring(0, 4) + uniqueID);
-                      JsonObject action = new JsonObject();
-                      action.put("action", "getUserInfos").put("userId", user.getUserId());
-                      moodleEventBus.getParams(action, new Handler<Either<String, JsonObject>>() {
+                        JsonObject action = new JsonObject();
+                        action.put("action", "getUserInfos").put("userId", user.getUserId());
+                        moodleEventBus.getParams(action, new Handler<Either<String, JsonObject>>() {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {

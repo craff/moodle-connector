@@ -30,7 +30,7 @@
 	"name": "Nom",
 	"from": "De",
 	"date": "Date",
-	"cancel": "Annuler",
+	"cancel": "Fermer",
 	"validate": "Valider",
 	"create": "Créer",
 	"rename": "Renommer",
@@ -133,7 +133,7 @@
 	"course.numberEnrolments": " inscrits ",
 
 	"search.coursesToDoCome": "Nom d'enseignant, titre...",
-	"search.folder": "Rechercher",
+	"search.folder": "Rechercher dans mes dossiers",
 
     "moodle.importation": "en cours de récupération",
 

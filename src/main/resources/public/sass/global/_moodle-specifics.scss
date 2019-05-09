@@ -15,6 +15,7 @@ body.moodle {
     height: 64px;
     transform: scale(0.65);
   }
+
   .lds-dual-ring:after {
     content: " ";
     display: block;
@@ -26,6 +27,7 @@ body.moodle {
     border-color: #555 transparent #555 transparent;
     animation: lds-dual-ring 1.2s linear infinite;
   }
+
   @keyframes lds-dual-ring {
     0% {
       transform: rotate(0deg);
@@ -63,7 +65,6 @@ body.moodle {
 
   .filter-course {
     width: 97%;
-
     .drop-down-block, .drop-down-block .drop-down-label {
       margin-bottom: 0px;
     }
@@ -190,6 +191,7 @@ body.moodle {
     margin-top: -5px;
     transform: scale(0.5);
   }
+
   .lds-facebook div {
     display: inline-block;
     position: absolute;
@@ -198,17 +200,21 @@ body.moodle {
     background: #fff;
     animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
   }
+
   .lds-facebook div:nth-child(1) {
     left: 6px;
     animation-delay: -0.24s;
   }
+
   .lds-facebook div:nth-child(2) {
     left: 26px;
     animation-delay: -0.12s;
   }
+
   .lds-facebook div:nth-child(3) {
     left: 45px;
   }
+
   @keyframes lds-facebook {
     0% {
       top: 6px;
@@ -382,7 +388,6 @@ body.moodle {
   dots-menu {
     vertical-align: top;
     .options {
-
       right: 0px;
       left: 15px;
       background:  #fff;
@@ -431,9 +436,7 @@ body.moodle {
     color: #fff;
   }
 
-
   progress-bar {
-
     &.courseProgress{
       .progress-bar {
         background: #F6B3C3;
@@ -474,6 +477,7 @@ body.moodle {
   label.chip.checkbox-activity.selected {
     background-color: $accent;
   }
+
   label.chip.checkbox-activity.selected:hover {
     color: white;
   }
@@ -500,7 +504,7 @@ body.moodle {
 
   .searchBar{
     @media screen and (min-width: 800px) {
-      margin: 0px 15px;
+      margin: 0px 10px;
     }
     height: 35px;
     padding: 5px;
@@ -541,6 +545,7 @@ body.moodle {
       }
     }
   }
+
   ul.list-element-delete{
     list-style-type: none;
   }
@@ -635,8 +640,7 @@ body.moodle {
     }
   }
 
-  #bg-text
-  {
+  #bg-text {
     color:lightgrey;
     @media screen and (max-width: 800px) {
       font-size: 40px;
@@ -654,8 +658,6 @@ body.moodle {
   .coursesBottomPadding{
     padding-bottom: 30px;
   }
-
-
 }
 
 //TEMP FIX
