@@ -121,7 +121,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             if($scope.courses.coursestodosort[0].id == 'finished')
                 $scope.courses.coursestodosort = $scope.courses.typeShow[0];
         }
-        $scope.submitWait=false;
+        $scope.submitWait = false;
     };
 
     $scope.isPrintMenuFolder = function () {
