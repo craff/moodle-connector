@@ -6,13 +6,13 @@ import * as modules from './modules';
 for (let directive in directives) {
     ng.directives.push(directives[directive]);
 }
+
 for(let controller in controllers){
     ng.controllers.push(controllers[controller]);
 }
 
 for (let module in modules){
     ng.addRequiredModule(module);
-
 }
 //declare let require: any;
 

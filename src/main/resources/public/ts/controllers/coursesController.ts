@@ -1,11 +1,9 @@
-import {_, model, moment, ng, notify, template, idiom} from "entcore";
+import {_, model, moment, ng, notify, template} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
-import http from "axios";
 
 export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', '$rootScope', '$interval', ($scope, $timeout, route, $rootScope, $interval) => {
-
 
     route({
         dashboard: function (params) {
@@ -314,10 +312,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      */
     $scope.openPopUp = function () {
         $scope.folders.folderIdMoveIn = $scope.currentfolderid;
-        $scope.course = new Course();
-        template.open('ligthBoxContainer', 'courses/createCourseLightbox');
-        $scope.openLightbox = true;
-        Utils.safeApply($scope);
+        if ($scope.submitWait == false) {
+            $scope.course = new Course();
+            template.open('ligthBoxContainer', 'courses/createCourseLightbox');
+            $scope.openLightbox = true;
+            Utils.safeApply($scope);
+        } else if ($scope.submitWait == true) {
+            template.open('ligthBoxContainer', 'courses/createCourseLightbox');
+            $scope.openLightbox = true;
+            Utils.safeApply($scope);
+        }
     };
 
     /**
@@ -338,14 +342,20 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.course.folderid = parseInt($scope.folders.folderIdMoveIn);
         if ($scope.course.fullname.length >= 4) {
             $scope.submitWait = true;
-            await $scope.course.create();
-            await $scope.courses.getCoursesbyUser(model.me.userId);
-            $scope.openLightbox = false;
-            $scope.showToaster();
-            $scope.currentfolderid = $scope.folders.folderIdMoveIn;
-            $scope.initFolders();
-            $scope.submitWait = false;
-            $scope.folders.folderIdMoveIn = undefined;
+            try {
+                await $scope.course.create();
+                await $scope.courses.getCoursesbyUser(model.me.userId);
+                $scope.openLightbox = false;
+                $scope.showToaster();
+                $scope.currentfolderid = $scope.folders.folderIdMoveIn;
+                $scope.initFolders();
+                $scope.submitWait = false;
+                $scope.folders.folderIdMoveIn = undefined;
+            } catch (e){
+                $scope.submitWait = false;
+                notify.error("La création du cours n'a pas abouti");
+                throw (e)
+            }
         } else {
             notify.error("Le Titre est trop court");
         }

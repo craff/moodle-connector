@@ -35,8 +35,9 @@
             <span class="row label-input-row">
                 <i18n>moodle.course.image</i18n>
             </span>
-            <image-select class="initialFloat cell" default="/img/illustrations/image-default.svg" ng-change="getTypeImage()"
-                          ng-model="course.imageurl" on-close=""/>
+            <div class="twelve cell" ng-class="{ hidder: submitWait == true }"></div>
+            <image-select id="image" class="initialFloat cell" default="/img/illustrations/image-default.svg" ng-change="getTypeImage()"
+                              ng-model="course.imageurl" on-close=""/>
         </div>
         <div class="six twelve-mobile cell vertical-spacing inside-margin-create">
             <span class="row label-input-row">
@@ -70,7 +71,7 @@
 </div>
 <div class="row">
     <div class="right-magnet">
-        <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()" ng-disabled="submitWait"/>
+        <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
         <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()"
                ng-disabled="submitWait || course.fullname === undefined" ng-if="course.type == 1"/>
         <input type="submit" class="button" i18n-value="validate" ng-click="createCourse()"

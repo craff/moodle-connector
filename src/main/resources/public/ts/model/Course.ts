@@ -1,7 +1,6 @@
-import {_, idiom, model, moment, notify, Rights, Shareable} from "entcore";
+import {_, idiom, moment, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
-import {Folder} from "./Folder";
 
 export class Course implements Shareable{
     shared : any;
@@ -98,7 +97,8 @@ export class Course implements Shareable{
             this.duplication = "non";
             this.goTo('view');
         } catch (e) {
-            notify.error("Save function didn't work");
+            this.fullname = undefined;
+            this.summary = undefined;
             throw e;
         }
     }

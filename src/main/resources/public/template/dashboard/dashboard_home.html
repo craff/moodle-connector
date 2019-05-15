@@ -64,7 +64,10 @@
         <div class="row center-courses">
             <div ng-show="displayMessageLoader">
                 <div>
-                    <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
+                    <div class="row">
+                        <i18n class="import">moodle.importation</i18n>
+                    </div>
+                    <div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
             <div ng-repeat="course in courses.coursesToShow('coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord-with-over-effect infoBackground bottom-margin"
@@ -147,7 +150,10 @@
         <div class="row center-courses">
             <div ng-show="displayMessageLoader">
                 <div>
-                    <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
+                    <div class="row">
+                        <i18n class="import">moodle.importation</i18n>
+                    </div>
+                    <div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
             <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)"
@@ -180,7 +186,10 @@
         <div ng-if="courses.lastcreation" class="row center-courses">
             <div ng-show="displayMessageLoader">
                 <div>
-                    <div class="row"><i18n class="import">moodle.importation</i18n></div><div class="lds-dual-ring row center-courses"></div>
+                    <div class="row">
+                        <i18n class="import">moodle.importation</i18n>
+                    </div>
+                    <div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
             <div ng-repeat="course in courses.lastCreation()" class="all-width cell twelve-mobile style-bord-with-over-effect infoBackground bottom-margin">

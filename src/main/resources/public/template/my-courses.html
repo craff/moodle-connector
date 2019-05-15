@@ -1,15 +1,15 @@
 <div class="row">
-        <div class="twelve twelve-mobile">
-            <div class="row-mobile stickyParent">
-                <div class="cell three twelve-mobile horizontal-spacing rightPaddingMenu sticky">
-                    <p>
-                        <label class="vertical-spacing">
-                            <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
-                            <i18n class="zero-mobile">moodle.folders</i18n>
-                            <span class="text-font zero-desktop">[[folderName()]]</span>
-                            <input type="search" class="twelve zero-mobile cell ellipsis" i18n-placeholder="search.folder" />
-                            <div class="vertical-spacing zero-desktop twelve-mobile row">
-                                <div class="row">
+    <div class="twelve twelve-mobile">
+        <div class="row-mobile stickyParent">
+            <div class="cell three twelve-mobile horizontal-spacing rightPaddingMenu sticky">
+                <p>
+                    <label class="vertical-spacing">
+                        <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
+                        <i18n class="zero-mobile">moodle.folders</i18n>
+                        <span class="text-font zero-desktop">[[folderName()]]</span>
+                        <input type="search" class="twelve zero-mobile cell ellipsis" i18n-placeholder="search.folder" />
+                        <div class="vertical-spacing zero-desktop twelve-mobile row">
+                            <div class="row">
                                 <label class="chip margin-left checkbox-course" ng-class="{ selected: typeFilter[0]}">
                                     <span>
                                         <i18n>course</i18n>
@@ -22,53 +22,53 @@
                                     </span>
                                     <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
                                 </label>
-                                </div>
-                                <div class="row top-margin">
-                                    <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('creationDate') || courses.isOrderedDesc('creationDate')}" ng-click="courses.orderByField('creationDate')">
-                                        <span translate content="creationDate"></span>
-                                        <span class="icons">
-                                                <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('creationDate')"></i>
-                                                <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('creationDate')"></i>
-                                        </span>
-                                    </label>
-                                    <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('modificationDate') || courses.isOrderedDesc('modificationDate')}" ng-click="courses.orderByField('modificationDate')">
-                                        <span translate content="modificationDate"></span>
-                                        <span class="icons">
-                                                <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('modificationDate')"></i>
-                                                <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('modificationDate')"></i>
-                                        </span>
-                                    </label>
-                                    <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('name') || courses.isOrderedDesc('name')}" ng-click="courses.orderByField('name')">
-                                        <span translate content="name"></span>
-                                        <span ng-if="courses.isOrderedAsc('name')" class="leftMarginLetter"> A-Z </span>
-                                        <span ng-if="courses.isOrderedDesc('name')" class="leftMarginLetter"> Z-A </span>
-                                    </label>
-                                    <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('numberEnrolment') || courses.isOrderedDesc('numberEnrolment')}" ng-click="courses.orderByField('numberEnrolment')">
-                                        <span translate content="numberEnrolment"></span>
-                                        <span class="icons">
-                                                <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('numberEnrolment')"></i>
-                                                <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('numberEnrolment')"></i>
-                                        </span>
-                                    </label>
-                                    <!--<label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('achievment') || courses.isOrderedDesc('achievment')}" ng-click="courses.orderByField('achievment')">
-                                        <span translate content="achievment"></span>
-                                        <span class="icons">
-                                                <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('achievment')"></i>
-                                                <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('achievment')"></i>
-                                        </span>
-                                    </label>-->
-                                </div>
                             </div>
-                        </label>
-                    </p>
-                    <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
-                    </div>
-                    <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">
-                        <div class="vertical-spacing row">
-                            <i18n class="text-font titleSideNav">moodle.folders</i18n>
-                            <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
+                            <div class="row top-margin">
+                                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('creationDate') || courses.isOrderedDesc('creationDate')}" ng-click="courses.orderByField('creationDate')">
+                                    <span translate content="creationDate"></span>
+                                    <span class="icons">
+                                        <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('creationDate')"></i>
+                                        <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('creationDate')"></i>
+                                    </span>
+                                </label>
+                                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('modificationDate') || courses.isOrderedDesc('modificationDate')}" ng-click="courses.orderByField('modificationDate')">
+                                    <span translate content="modificationDate"></span>
+                                    <span class="icons">
+                                        <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('modificationDate')"></i>
+                                        <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('modificationDate')"></i>
+                                    </span>
+                                </label>
+                                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('name') || courses.isOrderedDesc('name')}" ng-click="courses.orderByField('name')">
+                                    <span translate content="name"></span>
+                                    <span ng-if="courses.isOrderedAsc('name')" class="leftMarginLetter"> A-Z </span>
+                                    <span ng-if="courses.isOrderedDesc('name')" class="leftMarginLetter"> Z-A </span>
+                                </label>
+                                <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('numberEnrolment') || courses.isOrderedDesc('numberEnrolment')}" ng-click="courses.orderByField('numberEnrolment')">
+                                    <span translate content="numberEnrolment"></span>
+                                    <span class="icons">
+                                        <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('numberEnrolment')"></i>
+                                        <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('numberEnrolment')"></i>
+                                    </span>
+                                </label>
+                                <!--<label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('achievment') || courses.isOrderedDesc('achievment')}" ng-click="courses.orderByField('achievment')">
+                                     <span translate content="achievment"></span>
+                                     <span class="icons">
+                                        <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('achievment')"></i>
+                                        <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('achievment')"></i>
+                                     </span>
+                                </label>-->
+                            </div>
                         </div>
-                        <div class="horizontal-spacing upNav" static-include="/moodle/public/template/courses/folderItem.html">
+                    </label>
+                </p>
+                <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
+                </div>
+                <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">
+                    <div class="vertical-spacing row">
+                        <i18n class="text-font titleSideNav">moodle.folders</i18n>
+                        <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
+                    </div>
+                    <div class="horizontal-spacing upNav" static-include="/moodle/public/template/courses/folderItem.html">
                     </div>
                 </div>
             </div>

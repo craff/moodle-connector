@@ -1,7 +1,6 @@
 import http from "axios";
 import {Mix} from 'entcore-toolkit';
 import {notify} from "entcore";
-import {Author} from "./Course";
 
 export interface Folder {
     id : number;
@@ -54,7 +53,6 @@ export class Folder {
         try {
             await http.put('/moodle/folder/rename', this.toJsonRename());
         } catch (e) {
-            notify.error("rename function didn't work");
             throw e;
         }
     }

@@ -1,11 +1,10 @@
 /**
  * Created by jolloiss on 21/02/2019.
  */
-import {ng, appPrefix, template,_} from 'entcore';
-import {Utils} from "../utils/Utils";
-//import shave from 'yaclamp';
+import {ng, appPrefix} from 'entcore';
 
 export let coursesItem = ng.directive("coursesItem", function(){
+
     return {
         restrict : 'E',
         scope : {
