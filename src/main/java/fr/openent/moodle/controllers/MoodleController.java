@@ -246,7 +246,7 @@ public class MoodleController extends ControllerHelper {
                                             String idImage = course.getString("imageurl");
                                             String urlImage = "";
                                             if (idImage != null) {
-                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request), "UTF-8") + "://" + URLEncoder.encode(getHost(request), "UTF-8") + "/moodle/files/" + URLEncoder.encode(idImage, "UTF-8") + "/" + URLEncoder.encode(course.getString("nameImgUrl"), "UTF-8");
+                                                urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request), "UTF-8") + "://" + URLEncoder.encode(getHost(request), "UTF-8") + "/moodle/files/" + URLEncoder.encode(idImage, "UTF-8");
                                             }
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                             final String moodleUrl = moodleUri.toString() +
@@ -294,7 +294,7 @@ public class MoodleController extends ControllerHelper {
 	}
 
     @ApiDoc("public Get pictutre for moodle webside")
-    @Get("/files/:id/:name")
+    @Get("/files/:id")
     public void getFile(HttpServerRequest request) {
         moodleEventBus.getImage(request.getParam("id"), event -> {
             if (event.isRight()) {
@@ -391,13 +391,6 @@ public class MoodleController extends ControllerHelper {
                                                         }
                                                     }
 
-                                                    /*for(int i = 0; i < coursArray.size(); i++){
-                                                        JsonObject cours = coursArray.getJsonObject(i);
-                                                        if(moodleWebService.getValueMoodleIdinEnt(cours.getInteger("courseid"),sqlCoursArray)){
-                                                            mydata.add(cours);
-                                                        }
-                                                    }*/
-
                                                     List<String> sqlCoursId = sqlCoursArray.stream().map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
 
                                                     for(int i = 0; i < coursArray.size(); i++){
@@ -442,7 +435,6 @@ public class MoodleController extends ControllerHelper {
                                                             }
                                                         }
                                                     });
-
                                                     moodleWebService.getPreferences(user.getUserId(), new Handler<Either<String, JsonArray>>() {
                                                         @Override
                                                         public void handle(Either<String, JsonArray> event) {
