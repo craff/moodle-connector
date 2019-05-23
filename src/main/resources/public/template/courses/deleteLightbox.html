@@ -1,9 +1,13 @@
 <!-- alert for delete folders and courses -->
 <form ng-submit="deleteElements()">
     <div class="twelve cell horizontal-spacing">
-        <h2 class="row twelve"><i18n>moodle.lightBox.delete.title</i18n></h2>
+        <h2 class="row twelve">
+            <i18n>moodle.lightBox.delete.title</i18n>
+        </h2>
         <br>
-        <p><i18n>moodle.lightBox.delete.content</i18n></p>
+        <p>
+            <i18n>moodle.lightBox.delete.content</i18n>
+        </p>
         <ul class="list-element-delete">
             <li class="ellipsis" ng-repeat="folderList in getAllFolders()" ng-if="folderList.select">
                 <label class="checkbox" >

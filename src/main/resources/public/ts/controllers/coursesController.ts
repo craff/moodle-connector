@@ -534,7 +534,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * duplicate elements
      * */
     $scope.openPopUpDuplicate = function () {
-        $scope.courses.numberDuplication=undefined;
+        $scope.courses.numberDuplication = undefined;
         template.open('ligthBoxContainer', 'courses/duplicateLightbox');
         $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = true);
         $scope.confirmDuplicateSend();
@@ -549,8 +549,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.coursesDuplicate();
         }
         $timeout(() =>
-                $scope.initCoursesbyuser()
-            , 2000);
+                $scope.initCoursesbyuser());
         $scope.initFolders();
     };
 

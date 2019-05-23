@@ -408,7 +408,7 @@ public class MoodleController extends ControllerHelper {
 
                                                     List<String> coursId = coursArray.stream().map(obj -> (((JsonObject) obj).getValue("courseid")).toString()).collect(Collectors.toList());
 
-                                                    moodleWebService.getCourseToDuplicate(user.getUserId(),  new Handler<Either<String, JsonArray>> () {
+                                                    moodleWebService.getCourseToDuplicate(user.getUserId(), new Handler<Either<String, JsonArray>> () {
                                                         @Override
                                                         public void handle(Either<String, JsonArray> event) {
                                                             if (event.right().getValue().size() != 0) {
@@ -416,7 +416,7 @@ public class MoodleController extends ControllerHelper {
                                                                 for(int i = 0; i < coursesInDuplication.size(); i++){
                                                                     JsonObject courseToAdd = new JsonObject();
                                                                     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                                                                    courseToAdd.put("fullname",coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("fullname")+"_"+LocalDateTime.now().getYear()+"-"+LocalDateTime.now().getMonthValue()+"-"+LocalDateTime.now().getDayOfMonth());
+                                                                    courseToAdd.put("fullname",coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("fullname") + "_" + LocalDateTime.now().getYear() + "-" + LocalDateTime.now().getMonthValue() + "-" + LocalDateTime.now().getDayOfMonth());
                                                                     courseToAdd.put("summary", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("summary"));
                                                                     courseToAdd.put("auteur", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getJsonArray("auteur"));
                                                                     courseToAdd.put("type", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("type"));
@@ -1403,8 +1403,8 @@ public class MoodleController extends ControllerHelper {
                                         eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
                                     }
                                 } else {
-                                    log.error("the access to duplicate database failed !");
-                                    eitherHandler.handle(new Either.Left<>("the access to duplicate database failed"));
+                                    log.error("The access to duplicate database failed !");
+                                    eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
                                 }
                             }
                         });
@@ -1413,8 +1413,8 @@ public class MoodleController extends ControllerHelper {
                         eitherHandler.handle(new Either.Left<>("The quota of duplication in same time is reached, you have to wait"));
                     }
                 } else {
-                    log.error("the access to duplicate database failed !");
-                    eitherHandler.handle(new Either.Left<>("the access to duplicate database failed"));
+                    log.error("The access to duplicate database failed !");
+                    eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
                 }
             }
         });
