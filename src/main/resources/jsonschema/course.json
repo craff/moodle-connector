@@ -27,6 +27,10 @@
 		"typeA": {
 			"type" : "string"
 		},
+
+		"activityType": {
+			"type" : "string"
+		},
 		"folderid": {
 			"type" : ["number", "null"]
 		},

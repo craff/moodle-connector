@@ -103,6 +103,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.viewModeToCome = "icons";
         $scope.viewModeMyCourses = "icons";
         $scope.initFolders();
+        $scope.activityType = undefined;
         $scope.imgCompatibleMoodle = false;
         $scope.typeActivity = {
             availableOptions: [
@@ -114,7 +115,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             ],
             selectedOption: {id: undefined, name: 'Choisissez votre type'}
         };
-        $scope.nameFolder="";
+        $scope.nameFolder = "";
         if ($(window).width() < 800) {
             if($scope.courses.coursestodosort[0].id == 'finished')
                 $scope.courses.coursestodosort = $scope.courses.typeShow[0];
@@ -313,10 +314,18 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.openPopUp = function () {
         $scope.folders.folderIdMoveIn = $scope.currentfolderid;
         if ($scope.submitWait == false) {
-            $scope.course = new Course();
-            template.open('ligthBoxContainer', 'courses/createCourseLightbox');
-            $scope.openLightbox = true;
-            Utils.safeApply($scope);
+            if ($scope.activityType == undefined) {
+                $scope.course = new Course();
+                template.open('ligthBoxContainer', 'courses/createCourseLightbox');
+                $scope.openLightbox = true;
+                Utils.safeApply($scope);
+            } else {
+                $scope.course = new Course();
+                $scope.course.typeA = $scope.activityType;
+                template.open('ligthBoxContainer', 'courses/createCourseLightbox');
+                $scope.openLightbox = true;
+                Utils.safeApply($scope);
+            }
         } else if ($scope.submitWait == true) {
             template.open('ligthBoxContainer', 'courses/createCourseLightbox');
             $scope.openLightbox = true;
@@ -344,6 +353,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.submitWait = true;
             try {
                 await $scope.course.create();
+                $scope.activityType = $scope.course.typeA;
                 await $scope.courses.getCoursesbyUser(model.me.userId);
                 $scope.openLightbox = false;
                 $scope.showToaster();
