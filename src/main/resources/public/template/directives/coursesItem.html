@@ -105,6 +105,12 @@
                 </label>
                 <span></span>
             </label>
+            <div class="right-magnet horizontal-spacing" ng-if="place == 'coursesMine' && course.duplication == 'en attente'">
+                <i18n>waiting</i18n>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
             <div class="lds-facebook right-magnet" ng-if="place == 'coursesMine' && course.duplication == 'en cours'">
                 <div></div>
                 <div></div>
