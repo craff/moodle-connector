@@ -380,7 +380,7 @@ public class MoodleController extends ControllerHelper {
                                                         for(int i = 0; i < coursArray.size(); i++){
                                                             if (((JsonObject)course).getValue("courseid").toString().equals(coursArray.getJsonObject(i).getValue("courseid").toString())){
                                                                 findDuplicates = true;
-                                                                if(Integer.parseInt(((JsonObject)course).getValue("role").toString()) > Integer.parseInt(coursArray.getJsonObject(i).getValue("role").toString())){
+                                                                if(Integer.parseInt(((JsonObject)course).getValue("role").toString()) < Integer.parseInt(coursArray.getJsonObject(i).getValue("role").toString())){
                                                                     coursArray.remove(i);
                                                                     coursArray.add(course);
                                                                 }
