@@ -7,6 +7,7 @@ import fr.openent.moodle.service.MoodleEventBus;
 import fr.openent.moodle.service.MoodleWebService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.impl.DefaultMoodleWebService;
+import fr.openent.moodle.utils.Utils;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -277,7 +278,7 @@ public class MoodleController extends ControllerHelper {
                                                         log.error("fail to call create course webservice" + event.left().getValue());
                                                     }
                                                 }
-                                            });
+                                            }, true);
                                         } catch (UnsupportedEncodingException e) {
                                             log.error("fail to create course by sending the URL to the WS", e);
                                         }
@@ -370,24 +371,9 @@ public class MoodleController extends ControllerHelper {
                                                 @Override
                                                 public void handle(Void end) {
                                                     JsonArray object = new JsonArray(wsResponse);
-                                                    JsonArray DuplicatesCours = object.getJsonObject(0).getJsonArray("enrolments");
+                                                    JsonArray duplicatesCours = object.getJsonObject(0).getJsonArray("enrolments");
 
-                                                    JsonArray coursArray = new JsonArray();
-                                                    for (Object course : DuplicatesCours) {
-                                                        boolean findDuplicates = false;
-                                                        for(int i = 0; i < coursArray.size(); i++){
-                                                            if (((JsonObject)course).getValue("courseid").toString().equals(coursArray.getJsonObject(i).getValue("courseid").toString())){
-                                                                findDuplicates = true;
-                                                                if(Integer.parseInt(((JsonObject)course).getValue("role").toString()) < Integer.parseInt(coursArray.getJsonObject(i).getValue("role").toString())){
-                                                                    coursArray.remove(i);
-                                                                    coursArray.add(course);
-                                                                }
-                                                            }
-                                                        }
-                                                        if(!findDuplicates){
-                                                            coursArray.add(course);
-                                                        }
-                                                    }
+                                                    JsonArray coursArray = Utils.removeDuplicateCourses(duplicatesCours);
 
                                                     List<String> sqlCoursId = sqlCoursArray.stream().map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
 
@@ -575,7 +561,7 @@ public class MoodleController extends ControllerHelper {
                                 log.error("Post service failed"  + event.left().getValue());
                             }
                         }
-                    });
+                    }, true);
                 }
             }
         });
@@ -1112,7 +1098,7 @@ public class MoodleController extends ControllerHelper {
                         unauthorized(request);
                     }
                 }
-            });
+            }, true);
         }
     }
 
@@ -1392,7 +1378,7 @@ public class MoodleController extends ControllerHelper {
                                                         eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
                                                     }
                                                 }
-                                            });
+                                            }, true);
                                         }
                                     } else {
                                         log.debug("There are no course to duplicate in the duplication table !");

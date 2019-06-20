@@ -5,6 +5,8 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
+import java.util.Map;
+
 public interface MoodleWebService{
 
     /**
@@ -136,6 +138,9 @@ public interface MoodleWebService{
      * @param handler
      */
     void getSharedBookMark(JsonArray bookmarksIds, Handler<Either<String, JsonArray>> handler);
+
+
+    void getDistinctSharedBookMarkUsers(JsonArray bookmarksIds, boolean addPrefix, Handler<Either<String, Map<String, JsonObject>>> handler);
 
     /**
      * insert duplication table

@@ -7,16 +7,24 @@ import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import static fr.openent.moodle.Moodle.*;
 import static java.util.Objects.isNull;
 
 public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
+
+    private final Logger log = LoggerFactory.getLogger(DefaultMoodleWebService.class);
 
     public DefaultMoodleWebService(String schema, String table) {
         super(schema, table);
@@ -252,6 +260,62 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                 "WITH {group: {id: \"SB\" + shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, " +
                 "email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}}as sharedBookMark "+
                 "RETURN COLLECT(sharedBookMark) as sharedBookMarks;";
+
+        Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void getDistinctSharedBookMarkUsers(final JsonArray bookmarksIds, boolean addPrefix, Handler<Either<String, Map<String, JsonObject>>> handler) {
+        getSharedBookMarkUsers(bookmarksIds, new Handler<Either<String, JsonArray>>() {
+            @Override
+            public void handle(Either<String, JsonArray> resultSharedBookMark) {
+                if(resultSharedBookMark.isLeft()) {
+                    log.error("Error getting getSharedBookMarkUsers", resultSharedBookMark.left());
+                    handler.handle(new Either.Left<>("Error getting getSharedBookMarkUsers"));
+                } else {
+                    JsonArray results = resultSharedBookMark.right().getValue();
+                    Map<String, JsonObject> uniqResults = new HashMap<String, JsonObject>();
+                    if(results != null && !results.isEmpty()) {
+                        for(Object objShareBook : results) {
+                            JsonObject jsonShareBook = ((JsonObject)objShareBook).getJsonObject("sharedBookMark");
+                            JsonObject shareBookToMerge = uniqResults.get(jsonShareBook.getString("id"));
+                            if(shareBookToMerge != null) {
+                                List<JsonObject> users = jsonShareBook.getJsonArray("users").getList();
+                                List<JsonObject> usersToMerge = shareBookToMerge.getJsonArray("users").getList();
+
+                                // fusion des listes sans doublon
+                                users.removeAll(usersToMerge);
+                                users.addAll(usersToMerge);
+                                jsonShareBook.put("users", new JsonArray(users));
+                                uniqResults.put(jsonShareBook.getString("id"), jsonShareBook);
+
+                            } else {
+                                String idShareBook = jsonShareBook.getString("id");
+                                if(addPrefix) {
+                                    idShareBook = "SB_" + idShareBook;
+                                    jsonShareBook.put("id", idShareBook);
+                                }
+                                uniqResults.put(idShareBook, jsonShareBook);
+                            }
+                        }
+                    }
+                    handler.handle(new Either.Right<String, Map<String, JsonObject>>(uniqResults));
+                }
+            }
+        });
+    }
+
+    private void getSharedBookMarkUsers(final JsonArray bookmarksIds, Handler<Either<String, JsonArray>> handler) {
+        JsonObject params = new JsonObject()
+                .put("bookmarksIds", bookmarksIds);
+
+        String queryNeo4j = "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
+                "MATCH (v:Visible {id : vid})<-[:IN]-(us:User) WHERE not(has(v.deleteDate)) and v:ProfileGroup WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: us.id, email: us.email, lastname: us.lastName, firstname: us.firstName, username: us.login})} as sharedBookMark " +
+                "RETURN sharedBookMark " +
+                    "UNION " +
+                "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
+                "MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) and v:User WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})} as sharedBookMark " +
+                "RETURN sharedBookMark";
 
         Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
     }

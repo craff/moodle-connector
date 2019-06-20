@@ -1,6 +1,7 @@
 package fr.openent.moodle;
 
 import fr.openent.moodle.controllers.MoodleController;
+import fr.openent.moodle.controllers.SynchController;
 import fr.openent.moodle.cron.synchDuplicationMoodle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
@@ -25,6 +26,16 @@ public class Moodle extends BaseServer {
 	public static String WS_CREATE_SHARECOURSE = "local_entcgi_services_shareenrolment";
 	public static String WS_GET_SHARECOURSE = "local_entcgi_services_getcourseenrolment";
 	public static String WS_POST_DUPLICATECOURSE = "local_entcgi_services_duplicatecourse";
+	public static String WS_POST_CREATE_OR_UPDATE_USER = "local_entcgi_services_createuser";
+	public static String WS_POST_DELETE_USER = "local_entcgi_services_deleteuser";
+	public static String WS_POST_ENROLL_USERS_COURSES = "local_entcgi_services_enrolluserscourses";
+	public static String WS_POST_UPDATE_COHORTS = "local_entcgi_services_updatecohort";
+	public static String WS_POST_DELETE_COHORTS = "local_entcgi_services_deletecohortes";
+
+	public static Integer ROLE_AUDITEUR;
+	public static Integer ROLE_EDITEUR;
+	public static Integer ROLE_APPRENANT;
+
 	public static String JSON = "json";
 
 	public static String MOODLE_READ = "fr-openent-moodle-controllers-MoodleController|read";
@@ -42,6 +53,10 @@ public class Moodle extends BaseServer {
 	public void start() throws Exception {
 		super.start();
 
+		ROLE_AUDITEUR = config.getInteger("idAuditeur");
+		ROLE_EDITEUR = config.getInteger("idEditingTeacher");
+		ROLE_APPRENANT = config.getInteger("idStudent");
+
 		moodleSchema = config.getString("db-schema");
         moodleConfig = config;
 		EventBus eb = getEventBus(vertx);
@@ -56,6 +71,8 @@ public class Moodle extends BaseServer {
 		MoodleController moodleController = new MoodleController(storage, eb);
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
+		SynchController synchController = new SynchController(storage, eb, vertx, config);
+
 
 		try {
 			new CronTrigger(vertx, config.getString("timeSecondSynchCron")).schedule(
@@ -66,5 +83,6 @@ public class Moodle extends BaseServer {
 		}
 
 		addController(moodleController);
+		addController(synchController);
 	}
 }

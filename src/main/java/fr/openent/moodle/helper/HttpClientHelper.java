@@ -8,6 +8,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
 import fr.openent.moodle.service.MoodleWebService;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.ProxyOptions;
 import org.entcore.common.controller.ControllerHelper;
@@ -47,7 +48,8 @@ public class HttpClientHelper extends ControllerHelper {
         return vertx.createHttpClient(options);
     }
 
-    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, HttpClient httpClient, AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler) {
+    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, HttpClient httpClient,
+                                            AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler, boolean closeHttpClient) {
         URI url = null;
         try {
             url = new URI(moodleUrl);
@@ -71,8 +73,10 @@ public class HttpClientHelper extends ControllerHelper {
                         @Override
                         public void handle(Void end) {
                             handler.handle(new Either.Right<>(buff));
-                            if (!responseIsSent.getAndSet(true)) {
-                                httpClient.close();
+                            if(closeHttpClient) {
+                                if (!responseIsSent.getAndSet(true)) {
+                                    httpClient.close();
+                                }
                             }
                         }
                     });
@@ -82,8 +86,10 @@ public class HttpClientHelper extends ControllerHelper {
                         @Override
                         public void handle(Buffer event) {
                             log.error("Returning body after POST CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                            if (!responseIsSent.getAndSet(true)) {
-                                httpClient.close();
+                            if(closeHttpClient) {
+                                if (!responseIsSent.getAndSet(true)) {
+                                    httpClient.close();
+                                }
                             }
                         }
                     });
@@ -92,11 +98,24 @@ public class HttpClientHelper extends ControllerHelper {
         });
 
         if (shareSend != null) {
-            httpClientRequest.setChunked(true)
-                    .write("parameters=").write(shareSend.getJsonObject("parameters").encode())
-                    .write("&wstoken=").write(shareSend.getString("wstoken"))
-                    .write("&wsfunction=").write(shareSend.getString("wsfunction"))
-                    .write("&moodlewsrestformat=").write(shareSend.getString("moodlewsrestformat"));
+            httpClientRequest.setChunked(true);
+
+            Object parameters = shareSend.getMap().get("parameters");
+            String encodedParameters = "";
+            if(parameters instanceof JsonObject) {
+                encodedParameters = ((JsonObject) parameters).encode();
+            } else if(parameters instanceof JsonArray) {
+                encodedParameters = ((JsonArray) parameters).encode();
+            } else {
+                log.error("unknow parameters format");
+                handler.handle(new Either.Left<>("unknow parameters format"));
+                return;
+            }
+
+            httpClientRequest.write("parameters=").write(encodedParameters);
+            httpClientRequest.write("&wstoken=").write(shareSend.getString("wstoken"));
+            httpClientRequest.write("&wsfunction=").write(shareSend.getString("wsfunction"));
+            httpClientRequest.write("&moodlewsrestformat=").write(shareSend.getString("moodlewsrestformat"));
         }
 
         httpClientRequest.putHeader("Host", moodleConfig.getString("header"));
