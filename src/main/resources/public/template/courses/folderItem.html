@@ -1,5 +1,5 @@
 <div class="vertical-spacing left-border-menu noWrapSideNav-mobile">
-    <div ng-click="isPrintMenuFolder()" ng-class="{colorActivity:printmenufolder, colorCourse : !printmenufolder}" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
+    <div ng-click="isPrintMenuFolder()" ng-class="{colorActivity:printmenufolder, colorCourse : !printmenufolder}" class="eleven" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
         <label ng-show="false">0</label>
         <i class="sort-desc" ng-if="printmenufolder"></i>
         <i class="icon-play" ng-if="!printmenufolder"></i>
@@ -29,7 +29,7 @@
 
 <script type="text/ng-template"  id="tree_item_renderer.html">
     <div ng-repeat="folder in folder.subFolders">
-        <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding row" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
+        <span ng-init="folder.subFolders = getSubFolder(folder);" class="left-padding row" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
               ng-click="isPrintSubFolder(folder)" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
             <label ng-show="false">[[folder.id]]</label>
             <i class="icon-play" ng-if="!folder.printsubfolder"></i>

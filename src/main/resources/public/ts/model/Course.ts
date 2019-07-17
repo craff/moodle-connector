@@ -1,6 +1,7 @@
 import {_, idiom, moment, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
+import {Folders} from "./Folder";
 
 export class Course implements Shareable{
     shared : any;
@@ -29,13 +30,13 @@ export class Course implements Shareable{
     selectConfirm : boolean;
     masked : boolean;
     favorites : boolean;
-    infoImg: {
-        name: string;
-        type: string;
-        compatibleMoodle: boolean;
+    infoImg : {
+        name : string;
+        type : string;
+        compatibleMoodle : boolean;
     };
-    duplication: string;
-    usernumber: number;
+    duplication : string;
+    usernumber : number;
 
     constructor(){
         this.type = "1";
@@ -103,7 +104,7 @@ export class Course implements Shareable{
         }
     }
 
-    async  deleteDuplication() {
+    async deleteDuplication() {
         try{
             await http.delete(`/moodle/courseDuplicate/${this.courseid}`);
         }catch(e){
@@ -134,12 +135,12 @@ export class Course implements Shareable{
 }
 
 export class Courses {
-    allbyfolder: Course[];
-    coursesShared: Course[];
-    coursesSharedToFollow: Course[];
-    coursesByUser: Course[];
-    isSynchronized: Boolean;
-    allCourses: Course[];
+    allbyfolder : Course[];
+    coursesShared : Course[];
+    coursesSharedToFollow : Course[];
+    coursesByUser : Course[];
+    isSynchronized : Boolean;
+    allCourses : Course[];
     lastcreation : boolean;
     todo : boolean;
     tocome : boolean;
@@ -147,6 +148,7 @@ export class Courses {
     coursestocomesort : any;
     coursesToDo : Course[];
     coursesToCome : Course[];
+    coursesMyCourse : Course[];
     showCourses : Course[];
     folderid : number;
     searchInput : any;
@@ -163,7 +165,8 @@ export class Courses {
         this.isSynchronized = false;
         this.searchInput = {
             toDo: "",
-            toCome: ""
+            toCome: "",
+            MyCourse: ""
         };
         this.order = {
             field: "modificationDate",
@@ -177,7 +180,6 @@ export class Courses {
             {id: 'masked', name: 'Masqués'}
         ];
         this.getChoice();
-
     }
 
     toJsonForDelete(){
@@ -185,6 +187,7 @@ export class Courses {
             coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid )
         }
     }
+
     async coursesDelete() {
         try {
             await http.delete('/moodle/course', { data: this.toJsonForDelete() } );
@@ -200,6 +203,7 @@ export class Courses {
             folderId: this.folderid
         }
     }
+
     async coursesDuplicate() {
         try {
             await http.post('/moodle/course/duplicate', this.toJsonForDuplicate());
@@ -227,14 +231,6 @@ export class Courses {
             coursestocomesort : this.coursestocomesort[0].id
         }
     }
-    /*async getCoursesbyFolder (folder_id: number) {
-        try {
-            let courses = await http.get(`/moodle/courses/${folder_id}`);
-            this.allbyfolder = Mix.castArrayAs(Course, courses.data);
-        } catch (e) {
-            throw e;
-        }
-    }*/
 
     async getCoursesbyUser (userId: string) {
         try {
@@ -244,7 +240,7 @@ export class Courses {
             _.each(this.allCourses,function(course) {
                 course.id = course.courseid;
                 course._id = course.courseid;
-                course.owner = {userId: course.auteur[0].entidnumber, displayName:course.auteur[0].firstname+" "+ course.auteur[0].lastname};
+                course.owner = {userId: course.auteur[0].entidnumber, displayName:course.auteur[0].firstname + " " + course.auteur[0].lastname};
                 course.summary = course.summary.replace(/<\/p><p>/g, " ; ").replace(/<p>/g, "").replace(/<\/p>/g, "");
             });
             this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
@@ -266,12 +262,18 @@ export class Courses {
             let now = moment();
             this.coursesToCome = _.filter(this.coursesSharedToFollow, function (course) {
                 let coursDate = moment(course.startdate + "000", "x");
-                return now.isBefore(coursDate);});
+                return now.isBefore(coursDate);
+            });
 
             this.coursesToDo = _.filter(this.coursesSharedToFollow, function (course) {
                 let coursDate = moment(course.startdate + "000", "x");
-                return coursDate.isBefore(now);});
+                return coursDate.isBefore(now);
+            });
 
+            this.coursesMyCourse = _.filter(this.coursesByUser, function (course) {
+                let coursDate = moment(course.startdate + "000", "x");
+                return coursDate.isBefore(now);
+            });
 
             this.isSynchronized = true;
         } catch (e) {
@@ -279,6 +281,7 @@ export class Courses {
             throw e;
         }
     }
+
     async getCoursesAndSharedByFolder () {
         try {
             let courses = await http.get(`/moodle/users/coursesAndShared`);
@@ -309,6 +312,10 @@ export class Courses {
             if(this.coursesToCome) {
                 this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));
                 var id = this.coursestocomesort[0].id;
+            }
+        }else if (place == "coursesMyCourse"){
+            if(this.coursesMyCourse) {
+                this.showCourses = this.coursesByUser.filter(course => this.searchMyCourses(course));
             }
         }
         if (id =="all")
@@ -398,6 +405,12 @@ export class Courses {
             idiom.removeAccents(this.searchInput.toDo).toLowerCase()) !== -1;
     };
 
+    searchMyCourses = (item: Course) => {
+        return !this.searchInput.MyCourse || idiom.removeAccents(item.fullname.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.MyCourse).toLowerCase()) !== -1 || idiom.removeAccents(item.summary.toLowerCase()).indexOf(
+            idiom.removeAccents(this.searchInput.MyCourse).toLowerCase()) !== -1;
+    };
+
     searchCoursesToCome = (item: Course) => {
         return !this.searchInput.toCome || idiom.removeAccents(item.auteur[0].lastname.toLowerCase()).indexOf(
             idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1 || idiom.removeAccents(item.fullname.toLowerCase()).indexOf(
@@ -405,8 +418,39 @@ export class Courses {
             idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1;
     };
 
-    getCourseInFolder(courses : Course[], folder : number){
-        return _.filter(courses, function(cours){return cours.folderid == folder});
+    courseInFolderSearch (folders : Folders, currentFolder) {
+        currentFolder = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
+        let subFoldersSearchForCourse = [];
+        for (let i = 0; i < currentFolder.subFolders.length; i++) {
+            subFoldersSearchForCourse.push(currentFolder.subFolders[i]);
+            if (currentFolder.subFolders[i].subFolders.length != 0) {
+                subFoldersSearchForCourse.push(...this.courseInFolderSearch(folders, currentFolder.subFolders[i].id));
+            }
+        }
+        return subFoldersSearchForCourse;
+    }
+
+    getCourseInFolder(coursesToPrint : Course[], currentFolder, searching : string, folders : Folders) {
+        let folderToSearch = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
+        if (folderToSearch.id == 0) {
+            return _.filter(coursesToPrint, function (course) {
+                return !!searching ? (course.fullname.includes(searching)|| course.summary.includes(searching)) : course.folderid == 0;
+            });
+        } else {
+            if (searching == '') {
+                return _.filter(coursesToPrint, function (course) {
+                    return (course.folderid == folderToSearch.id)
+                });
+            } else {
+                let subFoldersSearchForCourse = this.courseInFolderSearch(folders, currentFolder);
+                subFoldersSearchForCourse.push(currentFolder);
+                let searchCourseToReturn = [];
+                for (let j = 0; j < subFoldersSearchForCourse.length; j++) {
+                    searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint => coursesToPrint.folderid == subFoldersSearchForCourse[j].id));
+                }
+                return searchCourseToReturn;
+            }
+        }
     }
 
     getAllCoursesModel(): Course[]  {
@@ -452,19 +496,19 @@ export class Courses {
             } catch (e) {
                 notify.error("Set Choice toDo function didn't work");
             }
-        }else if (view ==3){
+        }else if (view == 3){
             try {
                 await http.put(`/moodle/choices/tocome`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice toCome function didn't work");
             }
-        }else if (view ==4){
+        }else if (view == 4){
             try {
                 await http.put(`/moodle/choices/coursestodosort`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice coursesToDo sorting function didn't work");
             }
-        }else if (view ==5){
+        }else if (view == 5){
             try {
                 await http.put(`/moodle/choices/coursestocomesort`, this.toJSON());
             } catch (e) {

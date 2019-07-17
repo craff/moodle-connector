@@ -340,8 +340,6 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-
-
     @Get("/users/courses")
     @ApiDoc("Get cours by user in database")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
@@ -431,7 +429,7 @@ public class MoodleController extends ControllerHelper {
                                                                     coursArray.add(courseToAdd);
                                                                 }
                                                             } else {
-                                                                log.error("There are no course to duplicate in the duplication table !");
+                                                                log.debug("There are no course to duplicate in the duplication table !");
                                                             }
                                                         }
                                                     });
@@ -537,8 +535,6 @@ public class MoodleController extends ControllerHelper {
             }
         });
     }
-
-
 
     @Delete("/course")
     @ApiDoc("Delete a course")
@@ -1292,7 +1288,7 @@ public class MoodleController extends ControllerHelper {
                                         });
                                 break;
                             case "busy":
-                                log.info("A duplication is already in progress");
+                                log.debug("A duplication is already in progress");
                                 break;
                             case "error":
                                 moodleWebService.getCourseToDuplicate(duplicateResponse.getString("userid"),
@@ -1392,14 +1388,14 @@ public class MoodleController extends ControllerHelper {
                                                     if (event.isRight()) {
                                                         eitherHandler.handle(new Either.Right<>(event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
                                                     } else {
-                                                        log.info("Failed to contact Moodle");
+                                                        log.error("Failed to contact Moodle");
                                                         eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
                                                     }
                                                 }
                                             });
                                         }
                                     } else {
-                                        log.info("There are no course to duplicate in the duplication table !");
+                                        log.debug("There are no course to duplicate in the duplication table !");
                                         eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
                                     }
                                 } else {

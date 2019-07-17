@@ -62,7 +62,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         JsonArray folders = folder.getJsonArray("foldersId");
         values.add(folder.getValue("parentId"));
 
-        for (int i = 0;i<folders.size();i++){
+        for (int i = 0; i<folders.size(); i++){
             values.add(folders.getValue(i));
         }
 
@@ -102,8 +102,8 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     @Override
     public void setPreferences(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
         String query = "INSERT INTO " + Moodle.moodleSchema + ".preferences (moodle_id, user_id, masked, favorites)" +
-                " VALUES (?, ?, ?, ?) ON CONFLICT (moodle_id, user_id) DO UPDATE SET masked =" + course.getBoolean("masked")+
-                ", favorites ="+course.getBoolean("favorites")+" ; "+
+                " VALUES (?, ?, ?, ?) ON CONFLICT (moodle_id, user_id) DO UPDATE SET masked =" + course.getBoolean("masked") +
+                ", favorites =" + course.getBoolean("favorites") + " ; " +
                 "DELETE FROM " + Moodle.moodleSchema + ".preferences WHERE masked=false AND favorites=false;";
 
         JsonArray values = new JsonArray();
@@ -122,7 +122,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         JsonArray courses = course.getJsonArray("coursesId");
         values.add(course.getValue("folderId"));
 
-        for (int i = 0;i<courses.size();i++){
+        for (int i = 0; i<courses.size(); i++){
             values.add(courses.getValue(i));
         }
 

@@ -25,6 +25,7 @@
   right: -15px;
   position: absolute;
 }
+
 .folderCheckboxList{
   top: -3px;
   right: 0px;
@@ -35,6 +36,7 @@
   border-bottom-left-radius: 6%;
   height: 100px;
 }
+
 .summary-color{
     color: #757575;
 }
@@ -43,15 +45,14 @@
   color: #ff8500;
 }
 
-
-
 .image{
    display: block;
    margin-left: auto;
    margin-right: auto;
    width: 70px;
    height: 70px;
- }
+}
+
 .style-bord-with-over-effect{
   box-shadow: 0 1px 3px rgba(0,0,0,0.26);
   border-radius: 2px;
@@ -259,6 +260,7 @@ i.sort-desc::before {
   background-image:none;
   font-size: 28px;
 }
+
 .icon-play::before {
   content: '\e85d';
   -webkit-font-smoothing:antialiased;
@@ -266,6 +268,7 @@ i.sort-desc::before {
   background-image:none;
   font-size: 16px;
 }
+
 .foldericon::before {
   content: '\e81b';
   -webkit-font-smoothing:antialiased;
@@ -342,6 +345,7 @@ i.arrow:before {
   padding-left: 15px;
   display: inline-block;
 }
+
 .left-border-menu{
   border-left-color: #ff8500;
   border-left-style: outset;
@@ -364,10 +368,12 @@ i.arrow:before {
 .colorActivity{
    color: #ff8500;
   font-weight: bold;
- }
+}
+
 .colorCourse{
    color: #e20037;
 }
+
 .colorCourse:hover{
   color: #ff8500;
   font-weight: bold;
@@ -377,18 +383,22 @@ i.arrow:before {
   color: #e20037;
   background: $white ;
 }
+
 .coursesBackground{
   background: #eee;
 }
+
 .coursesInfoBackgroundList{
   background: #ffffff;
   width : 48%;
   margin-right: 1.296%;
   margin-bottom: 1.296%;
 }
+
 .infoBackground{
   background: #ffffff;
 }
+
 .infoBackgroundTopMargin{
   @media screen and (min-width: 800px) {
     margin-top: 15px;
@@ -397,12 +407,15 @@ i.arrow:before {
     margin-top: 10px;
   }
 }
+
 .bottomMarginTitle{
   margin-bottom: 15px;
 }
+
 .coursesText{
  width: 85%;
 }
+
 .text-font{
   font-weight: bolder;
 }
@@ -410,6 +423,7 @@ i.arrow:before {
 .text-italic{
   font-style: italic;
 }
+
 .size-font{
   @media screen and (min-width: 800px) {
     font-size: 13px;
@@ -418,6 +432,7 @@ i.arrow:before {
     font-size: 12px;
   }
 }
+
 .padding-left-corp{
   @media screen and (min-width: 800px) {
     padding-left: 50px;
@@ -426,11 +441,13 @@ i.arrow:before {
     padding-right:0;
   }
 }
+
 .left-margin{
   @media screen and (min-width: 800px) {
     margin-left: 15px;
   }
 }
+
 .bottom-margin{
   margin-bottom: 5px;
 }
@@ -456,7 +473,6 @@ i.arrow:before {
       font-size: 13px;
     }
   }
-
 }
 
 .big-folder{
@@ -470,6 +486,7 @@ i.arrow:before {
   top:15px;
   left: 13px;
 }
+
 .topFolderList{
   top: 17px;
   left: 22px;

@@ -1,13 +1,6 @@
 <div class="cell twelve-mobile style-bord-with-over-effect infoBackground"
      ng-class="{'minimal-mine-recent-width five folder-article infoBackgroundTopMargin' : viewModeMyCourses == 'icons',
-      'all-width bottom-margin' : viewModeMyCourses == 'list'}"
-         ng-repeat="folder in folders.getparentFolder() track by $index" ng-if="(currentfolderid==0 || currentfolderid==null)">
-    <div static-include="/moodle/public/template/courses/folderDetails.html" lvl-draggable lvl-drop-target class="Folder" on-drop="dropped(dragEl, dropEl)"></div>
-</div>
-
-<div class="cell twelve-mobile style-bord-with-over-effect infoBackground"
-     ng-class="{'minimal-mine-recent-width five folder-article infoBackgroundTopMargin' : viewModeMyCourses == 'icons',
-      'all-width bottom-margin' : viewModeMyCourses == 'list'}"
-         ng-repeat="folder in folders.getSubFolder(currentfolderid) track by $index" ng-if="currentfolderid>0">
+     'all-width bottom-margin' : viewModeMyCourses == 'list'}"
+     ng-repeat="folder in folders.getFoldersToShow(currentfolderid, courses.searchInput.MyCourse) track by $index">
     <div static-include="/moodle/public/template/courses/folderDetails.html" lvl-draggable lvl-drop-target class="Folder" on-drop="dropped(dragEl, dropEl)"></div>
 </div>

@@ -10,9 +10,9 @@ export interface Folder {
     structure_id : string;
     subFolders : Folder[];
     printsubfolder : boolean;
-    printTargetsubfolder: boolean;
-    select: boolean;
-    selectConfirm: boolean;
+    printTargetsubfolder : boolean;
+    select : boolean;
+    selectConfirm : boolean;
 }
 
 export class Folder {
@@ -20,8 +20,8 @@ export class Folder {
         this.printsubfolder = false;
         this.select = false;
         this.parent_id = 0;
-        this.selectConfirm=false;
-        this.printTargetsubfolder=false;
+        this.selectConfirm = false;
+        this.printTargetsubfolder = false;
     }
 
     toJson() {
@@ -59,13 +59,15 @@ export class Folder {
 }
 
 export class Folders {
-    folderIdMoveIn: number;
-    myCourses: Folder;
-    all: Folder[];
-    isSynchronized: Boolean;
-    selectedFolders: number[];
-    listSelectedFolders: Folder[];
-    listOfSubfolders: Folder[];
+    folderIdMoveIn : number;
+    myCourses : Folder;
+    all : Folder[];
+    search : Folder[];
+    isSynchronized : Boolean;
+    selectedFolders : number[];
+    listSelectedFolders : Folder[];
+    listOfSubfolders : Folder[];
+    searchInFolders : Folder[];
 
     constructor() {
         this.all = [];
@@ -79,7 +81,7 @@ export class Folders {
         this.myCourses.name = "Mes cours";
     }
 
-    toJsonForMove(targetId : number){
+    toJsonForMove(targetId : number) {
         if(targetId == undefined)
             return {
                 parentId: this.folderIdMoveIn,
@@ -92,7 +94,7 @@ export class Folders {
             }
     }
 
-    toJsonForDelete(){
+    toJsonForDelete() {
         return {
             foldersId: this.all.filter(folder => folder.selectConfirm).map(folder => folder.id ),
         }
@@ -118,21 +120,43 @@ export class Folders {
         }
     }
 
-    getSubFolder(folderId:number): Folder[]  {
+    getSubFolder(folderId : number): Folder[] {
         if(this.all){
-            return this.all.filter(folder=>folder.parent_id == folderId &&  folder.id != folderId);
+            return this.all.filter(folder => folder.parent_id == folderId && folder.id != folderId);
         }
         return [];
     }
 
-    getparentFolder(): Folder[]  {
+    getparentFolder(): Folder[] {
         if(this.all){
-            return this.all.filter(folder=>folder.parent_id === 0);
+            return this.all.filter(folder => folder.parent_id === 0);
         }
         return [];
     }
 
-    getAllFoldersModel(): Folder[]  {
+    getFoldersToShow(currentFolder, searching): Folder[] {
+        currentFolder = this.listOfSubfolders.filter(folder => folder.id == currentFolder);
+        if (searching !== null && searching !== undefined && searching !== '') {
+            if (currentFolder[0].id == 0 ){
+                return this.all.filter(folder => folder.name.includes(searching));
+            } else {
+                let subFoldersSearch = [];
+                for (let i = 0; i < currentFolder[0].subFolders.length; i++) {
+                    subFoldersSearch.push(currentFolder[0].subFolders[i]);
+                    if (currentFolder[0].subFolders[i].subFolders.length != 0) {
+                        subFoldersSearch.push(...this.getFoldersToShow(currentFolder[0].subFolders[i].id, searching));
+                    }
+                }
+                return subFoldersSearch.filter(folder => folder.name.includes(searching));
+            }
+        } else if (currentFolder[0].id == 0) {
+            return this.getparentFolder();
+        } else {
+            return this.getSubFolder(currentFolder[0].id);
+        }
+    }
+
+    getAllFoldersModel(): Folder[] {
         if(this.all){
             return this.all;
         }
@@ -153,7 +177,7 @@ export class Folders {
         }
     }
 
-    insertSubFolders(folder:Folder){
+    insertSubFolders(folder:Folder) {
         if (folder.subFolders && folder.subFolders.length) {
             this.getSubFolder(folder.id).forEach(subFolder => {
                 if(!(subFolder.select)) {

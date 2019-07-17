@@ -20,7 +20,7 @@ public class Moodle extends BaseServer {
 	public static String DIRECTORY_BUS_ADDRESS = "directory";
 	public static String ZIMBRA_BUS_ADDRESS = "fr.openent.zimbra";
 	public static String WS_CREATE_FUNCTION = "local_entcgi_services_createcourse";
-	public static String WS_DELETE_FUNCTION = "core_course_delete_courses";
+	public static String WS_DELETE_FUNCTION = "local_entcgi_services_movecourse";
 	public static String WS_GET_USERCOURSES = "local_entcgi_services_usercourses";
 	public static String WS_CREATE_SHARECOURSE = "local_entcgi_services_shareenrolment";
 	public static String WS_GET_SHARECOURSE = "local_entcgi_services_getcourseenrolment";

@@ -55,7 +55,8 @@
             <i18n>moodle.activity.type</i18n>
             *
         </span>
-        <select ng-required="course.type == 2" ng-model="typeActivity.selectedOption"
+        <select ng-required="course.type == 2"
+                ng-model="typeActivity.selectedOption"
                 ng-options="option.name for option in typeActivity.availableOptions track by option.id"
                 ng-change="changeTypeA(course)"
                 ng-disabled="submitWait">
