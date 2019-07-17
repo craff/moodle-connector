@@ -26,6 +26,7 @@ import org.entcore.common.user.UserUtils;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.*;
 
@@ -289,10 +290,15 @@ public class DefaultSynchService {
     }
 
 
-    private void identifyUserToDelete (JsonArray arrUsersToDelete, String idUser, Boolean remove) {
+    private void identifyUserToDelete (JsonArray arrUsersToDelete, String idUser, boolean remove) {
         JsonObject userToDelete = new JsonObject();
         userToDelete.put("id", idUser);
-        userToDelete.put("remove", remove);
+        if(remove) {
+            userToDelete.put("remove", "hard");
+        } else {
+            userToDelete.put("remove", "soft");
+        }
+
         arrUsersToDelete.add(userToDelete);
     }
 
@@ -517,8 +523,8 @@ public class DefaultSynchService {
     private Map<String, JsonObject> mapCohortsMoodle;
     private Map<String, JsonObject> mapCohortsFound;
     private Map<String, JsonObject> mapCohortsNotFound;
-    private JsonArray arrCohortsToDelete = new JsonArray();
-    private JsonArray arrCohortsToUpdate = new JsonArray();
+    private JsonArray arrCohortsToDelete;
+    private JsonArray arrCohortsToUpdate;
 
     public void initSyncGroups() {
         mapCohortsMoodle = new HashMap<String, JsonObject>();
@@ -530,8 +536,8 @@ public class DefaultSynchService {
         arrUsersToDelete = new JsonArray();
         arrUsersToEnroll = new JsonArray();
 
-        JsonArray arrCohortsToDelete = new JsonArray();
-        JsonArray arrCohortsToUpdate = new JsonArray();
+        arrCohortsToDelete = new JsonArray();
+        arrCohortsToUpdate = new JsonArray();
 
         compositeFuturEnded = new AtomicInteger(3);
         httpClient = HttpClientHelper.createHttpClient(vertx);
@@ -547,8 +553,8 @@ public class DefaultSynchService {
 
                 // suppression prefixe
                 String idCohort = jsonCohort.getString("idnumber");
-                idCohort = idCohort.replace("GR_","");
-                idCohort = idCohort.replace("SB","");
+                /*idCohort = idCohort.replace("GR_","");
+                idCohort = idCohort.replace("SB","");*/
 
                 // stockage par id (id ENT classe/groupe/sharebookmark)
                 mapCohortsMoodle.put(idCohort, jsonCohort);
@@ -595,7 +601,8 @@ public class DefaultSynchService {
                             JsonObject jsonGroup = ((JsonObject)objGroup);
 
                             // suppression prefix
-                            String idGroup = jsonGroup.getString("id").replace("GR_","");
+                            String idGroup = jsonGroup.getString("id");
+                            //idGroup.replace("GR_","");
                             jsonGroup.put("id",idGroup);
                             mapCohortsFound.put(idGroup, jsonGroup);
                         }
@@ -646,14 +653,17 @@ public class DefaultSynchService {
                     mapCohortsNotFound = new HashMap<String, JsonObject>(mapCohortsMoodle);
                     mapCohortsNotFound.keySet().removeAll(mapCohortsFound.keySet());
 
-                    JsonArray usersToEnrrollIndivually = new JsonArray();
+                    JsonArray usersIdsToEnrrollIndivually = new JsonArray();
 
                     // Cohortes NON retrouvées ->
                     for (Map.Entry<String, JsonObject> entryCohort : mapCohortsNotFound.entrySet()) {
                         JsonObject jsonCohort = entryCohort.getValue();
                         JsonObject jsonMoodleCohort = mapCohortsMoodle.get(jsonCohort.getString("idnumber"));
 
-                        usersToEnrrollIndivually.addAll(jsonMoodleCohort.getJsonArray("users"));
+                        JsonArray moodleUsers = jsonMoodleCohort.getJsonArray("users");
+                        if(moodleUsers != null && !moodleUsers.isEmpty()) {
+                            usersIdsToEnrrollIndivually.addAll(moodleUsers);
+                        }
 
                         JsonObject cohortToDelete = new JsonObject().put("id", jsonCohort.getString("idnumber"));
                         arrCohortsToDelete.add(cohortToDelete);
@@ -671,7 +681,10 @@ public class DefaultSynchService {
                         // si plus aucun membre : suppression de la cohorte
                         if (arrUsersNeo == null || arrUsersNeo.isEmpty()) {
 
-                            usersToEnrrollIndivually.addAll(jsonMoodleCohort.getJsonArray("users"));
+                            JsonArray moodleUsers = jsonMoodleCohort.getJsonArray("users");
+                            if(moodleUsers != null && !moodleUsers.isEmpty()) {
+                                usersIdsToEnrrollIndivually.addAll(moodleUsers);
+                            }
 
                             JsonObject cohortToDelete = new JsonObject().put("id", jsonCohortNeo.getString("id"));
                             arrCohortsToDelete.add(cohortToDelete);
@@ -694,16 +707,15 @@ public class DefaultSynchService {
                                 if(!exist) {
                                     if(jsonCohorteWithUpdate == null) {
                                         jsonCohorteWithUpdate = new JsonObject();
-
-                                        JsonArray useradded = jsonCohorteWithUpdate.getJsonArray("useradded");
-
-                                        if(useradded == null) {
-                                            useradded = new JsonArray();
-                                        }
-
-                                        useradded.add(jsonUserNeo);
-                                        jsonCohorteWithUpdate.put("useradded", useradded);
                                     }
+                                    JsonArray useradded = jsonCohorteWithUpdate.getJsonArray("useradded");
+
+                                    if(useradded == null) {
+                                        useradded = new JsonArray();
+                                    }
+
+                                    useradded.add(jsonUserNeo);
+                                    jsonCohorteWithUpdate.put("useradded", useradded);
                                 }
                             }
 
@@ -716,20 +728,19 @@ public class DefaultSynchService {
                                 if(!exist) {
                                     if(jsonCohorteWithUpdate == null) {
                                         jsonCohorteWithUpdate = new JsonObject();
-
-                                        JsonArray userdeleted = jsonCohorteWithUpdate.getJsonArray("userdeleted");
-
-                                        if(userdeleted == null) {
-                                            userdeleted = new JsonArray();
-                                        }
-
-                                        JsonObject jsonUserMoodle = new JsonObject();
-                                        jsonUserMoodle.put("id", idUserMoodle);
-                                        userdeleted.add(jsonUserMoodle);
-                                        jsonCohorteWithUpdate.put("userdeleted", userdeleted);
-
-                                        usersToEnrrollIndivually.add(jsonUserMoodle);
                                     }
+                                    JsonArray userdeleted = jsonCohorteWithUpdate.getJsonArray("userdeleted");
+
+                                    if(userdeleted == null) {
+                                        userdeleted = new JsonArray();
+                                    }
+
+                                    JsonObject jsonUserMoodle = new JsonObject();
+                                    jsonUserMoodle.put("id", idUserMoodle);
+                                    userdeleted.add(jsonUserMoodle);
+                                    jsonCohorteWithUpdate.put("userdeleted", userdeleted);
+
+                                    usersIdsToEnrrollIndivually.add(jsonUserMoodle.getString("id"));
                                 }
                             }
 
@@ -741,7 +752,7 @@ public class DefaultSynchService {
 
                     // Inscription individuel de tous les utilisateurs à leurs cours
                     // s'ils sont identifiés comme sortant d'une cohorte
-                    getUsersCoursesAndEnroll(usersToEnrrollIndivually, handler);
+                    getUsersCoursesAndEnroll(usersIdsToEnrrollIndivually, handler);
                 }
             }
         };
@@ -751,54 +762,7 @@ public class DefaultSynchService {
             public void handle(Either<String, Buffer> event) {
                 if (event.isRight()) {
                     log.info("END enrolling users individually");
-                    if (arrCohortsToUpdate.isEmpty() && arrCohortsToDelete.isEmpty()) {
-                        String message = "Aucune cohorte à update/delete";
-                        log.info(message);
-                        endSyncGroups(handler);
-                    } else {
-                        Future updateCohortsFuture = Future.future();
-                        Future deleteCohortsFuture = Future.future();
-                        List<Future> listFuture = new ArrayList<>();
-
-                        if(!arrCohortsToUpdate.isEmpty()) {
-                            listFuture.add(updateCohortsFuture);
-                        }
-
-                        if(!arrCohortsToDelete.isEmpty()) {
-                            listFuture.add(deleteCohortsFuture);
-                        }
-
-
-                        CompositeFuture.all(listFuture).setHandler(handlerUpdateAndDeleteCohorts);
-
-                        if(!arrCohortsToUpdate.isEmpty()) {
-                            updateCohorts(arrCohortsToUpdate, resultUpdate -> {
-                                if (resultUpdate.isLeft()) {
-                                    httpClient.close();
-                                    handler.handle(new Either.Left<>("Error updating cohorts"));
-                                    log.error("Error updating cohorts", resultUpdate.left());
-                                    updateCohortsFuture.fail("Error updating cohorts");
-                                } else {
-                                    log.info("End updating cohorts");
-                                    updateCohortsFuture.complete();
-                                }
-                            });
-                        }
-
-                        if(!arrCohortsToDelete.isEmpty()) {
-                            deleteCohorts(arrCohortsToDelete, resultDelete -> {
-                                if (resultDelete.isLeft()) {
-                                    httpClient.close();
-                                    handler.handle(new Either.Left<>("Error deleting cohorts"));
-                                    log.error("Error deleting cohorts", resultDelete.left());
-                                    deleteCohortsFuture.fail("Error deleting cohorts");
-                                } else {
-                                    log.info("End deleting cohorts");
-                                    deleteCohortsFuture.complete();
-                                }
-                            });
-                        }
-                    }
+                    updateAnDeleteCohorts(handler);
                 } else {
                     httpClient.close();
                     handler.handle(new Either.Left<>(event.left().getValue()));
@@ -827,27 +791,84 @@ public class DefaultSynchService {
 
         CompositeFuture.all(getGroupsFuture, getSharedBookMarkFuture).setHandler(handlerGetAllGroups);
 
-        JsonArray groupsIds = new JsonArray(Arrays.asList(mapCohortsMoodle.keySet().toArray()));
-        // TODO virer prefix
+
+        List lstGroupIds = Arrays.asList(mapCohortsMoodle.keySet().toArray());
+        lstGroupIds = (List) lstGroupIds.stream().map(o -> {
+            return ((String) o).replace("SB", "").replace("GR_", "");
+        }).collect(Collectors.toList());
+
+        JsonArray groupsIds = new JsonArray(lstGroupIds);
         moodleWebService.getGroups(groupsIds, getGroupsHandler);
-        moodleWebService.getDistinctSharedBookMarkUsers(groupsIds, false, getSharedBookMarkHandler);
+        moodleWebService.getDistinctSharedBookMarkUsers(groupsIds, true, getSharedBookMarkHandler);
     }
 
-    private void getUsersCoursesAndEnroll(JsonArray usersToEnrrollIndivually, Handler<Either<String, JsonObject>> handler) {
+    private void updateAnDeleteCohorts(Handler<Either<String, JsonObject>> handler) {
+        if (arrCohortsToUpdate.isEmpty() && arrCohortsToDelete.isEmpty()) {
+            String message = "Aucune cohorte à update/delete";
+            log.info(message);
+            endSyncGroups(handler);
+        } else {
+            Future updateCohortsFuture = Future.future();
+            Future deleteCohortsFuture = Future.future();
+            List<Future> listFuture = new ArrayList<>();
 
-        if(usersToEnrrollIndivually.isEmpty()) {
+            if(!arrCohortsToUpdate.isEmpty()) {
+                listFuture.add(updateCohortsFuture);
+            }
+
+            if(!arrCohortsToDelete.isEmpty()) {
+                listFuture.add(deleteCohortsFuture);
+            }
+
+
+            CompositeFuture.all(listFuture).setHandler(handlerUpdateAndDeleteCohorts);
+
+            if(!arrCohortsToUpdate.isEmpty()) {
+                log.info(arrCohortsToUpdate.toString());
+                updateCohorts(arrCohortsToUpdate, resultUpdate -> {
+                    if (resultUpdate.isLeft()) {
+                        httpClient.close();
+                        handler.handle(new Either.Left<>("Error updating cohorts"));
+                        log.error("Error updating cohorts", resultUpdate.left());
+                        updateCohortsFuture.fail("Error updating cohorts");
+                    } else {
+                        log.info("End updating cohorts");
+                        updateCohortsFuture.complete();
+                    }
+                });
+            }
+
+            if(!arrCohortsToDelete.isEmpty()) {
+                deleteCohorts(arrCohortsToDelete, resultDelete -> {
+                    if (resultDelete.isLeft()) {
+                        httpClient.close();
+                        handler.handle(new Either.Left<>("Error deleting cohorts"));
+                        log.error("Error deleting cohorts", resultDelete.left());
+                        deleteCohortsFuture.fail("Error deleting cohorts");
+                    } else {
+                        log.info("End deleting cohorts");
+                        deleteCohortsFuture.complete();
+                    }
+                });
+            }
+        }
+    }
+
+    private void getUsersCoursesAndEnroll(JsonArray usersIdsToEnrrollIndivually, Handler<Either<String, JsonObject>> handler) {
+
+        if(usersIdsToEnrrollIndivually.isEmpty()) {
             String message = "No user to enrroll";
             log.info(message);
+            updateAnDeleteCohorts(handler);
             endSyncGroups(handler);
         } else {
 
             // Recupération des cours de tous ces utilisateurs
             List<Future> listGetFuture = new ArrayList<Future>();
-            for (Object objUser: usersToEnrrollIndivually) {
-                JsonObject jsonUser = ((JsonObject)objUser);
+            for (Object idUser: usersIdsToEnrrollIndivually) {
                 Future getCoursesFuture = Future.future();
                 listGetFuture.add(getCoursesFuture);
-                getCourses(jsonUser, getCoursesFuture);
+                getCourses(new JsonObject().put("id", idUser), getCoursesFuture);
             }
             CompositeFuture.all(listGetFuture).setHandler(eventFuture -> {
 
@@ -866,14 +887,13 @@ public class DefaultSynchService {
 
                     // Inscription individuel des utilisateurs à leurs cours
                     if (arrUsersToEnroll.isEmpty()) {
-                        String message = "Aucune inscription individuelle necessaire";
+                        String message = "Aucune inscription individuelle necessaire (pas de cours)";
                         log.info(message);
+                        updateAnDeleteCohorts(handler);
                         endSyncGroups(handler);
                     } else {
                         enrollUsersIndivudually(arrUsersToEnroll, handlerEnrollGroups);
                     }
-
-
                 } else {
                     httpClient.close();
                     handler.handle(new Either.Left<>("Error getting all courses in sync groups"));

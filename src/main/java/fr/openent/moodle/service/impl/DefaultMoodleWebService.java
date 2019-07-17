@@ -278,7 +278,13 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                     if(results != null && !results.isEmpty()) {
                         for(Object objShareBook : results) {
                             JsonObject jsonShareBook = ((JsonObject)objShareBook).getJsonObject("sharedBookMark");
-                            JsonObject shareBookToMerge = uniqResults.get(jsonShareBook.getString("id"));
+                            String idShareBook = jsonShareBook.getString("id");
+                            if(addPrefix) {
+                                idShareBook = "SB" + idShareBook;
+                                jsonShareBook.put("id", idShareBook);
+                            }
+
+                            JsonObject shareBookToMerge = uniqResults.get(idShareBook);
                             if(shareBookToMerge != null) {
                                 List<JsonObject> users = jsonShareBook.getJsonArray("users").getList();
                                 List<JsonObject> usersToMerge = shareBookToMerge.getJsonArray("users").getList();
@@ -287,16 +293,9 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                                 users.removeAll(usersToMerge);
                                 users.addAll(usersToMerge);
                                 jsonShareBook.put("users", new JsonArray(users));
-                                uniqResults.put(jsonShareBook.getString("id"), jsonShareBook);
-
-                            } else {
-                                String idShareBook = jsonShareBook.getString("id");
-                                if(addPrefix) {
-                                    idShareBook = "SB_" + idShareBook;
-                                    jsonShareBook.put("id", idShareBook);
-                                }
-                                uniqResults.put(idShareBook, jsonShareBook);
                             }
+
+                            uniqResults.put(idShareBook, jsonShareBook);
                         }
                     }
                     handler.handle(new Either.Right<String, Map<String, JsonObject>>(uniqResults));
