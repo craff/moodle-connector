@@ -419,12 +419,12 @@ export class Courses {
     };
 
     courseInFolderSearch (folders : Folders, currentFolder) {
-        currentFolder = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
+        let folderToSearch = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
         let subFoldersSearchForCourse = [];
-        for (let i = 0; i < currentFolder.subFolders.length; i++) {
-            subFoldersSearchForCourse.push(currentFolder.subFolders[i]);
-            if (currentFolder.subFolders[i].subFolders.length != 0) {
-                subFoldersSearchForCourse.push(...this.courseInFolderSearch(folders, currentFolder.subFolders[i].id));
+        for (let i = 0; i < folderToSearch.subFolders.length; i++) {
+            subFoldersSearchForCourse.push(folderToSearch.subFolders[i]);
+            if (folderToSearch.subFolders[i].subFolders.length != 0) {
+                subFoldersSearchForCourse.push(...this.courseInFolderSearch(folders, folderToSearch.subFolders[i].id));
             }
         }
         return subFoldersSearchForCourse;
@@ -443,7 +443,7 @@ export class Courses {
                 });
             } else {
                 let subFoldersSearchForCourse = this.courseInFolderSearch(folders, currentFolder);
-                subFoldersSearchForCourse.push(currentFolder);
+                subFoldersSearchForCourse.push(folderToSearch);
                 let searchCourseToReturn = [];
                 for (let j = 0; j < subFoldersSearchForCourse.length; j++) {
                     searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint => coursesToPrint.folderid == subFoldersSearchForCourse[j].id));
