@@ -696,13 +696,13 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.count = function (place : string) {
         if(place == "ToCome") {
             if ($scope.viewModeToCome == 'list') {
-                return 5;
+                return 7;
             } else {
                 return 4;
             }
         }else if(place == "ToDo"){
             if ($scope.viewModeToDo == 'list') {
-                return 5;
+                return 7;
             } else {
                 if($scope.firstCoursesToDo == 0)
                     if($(window).width() < 800)

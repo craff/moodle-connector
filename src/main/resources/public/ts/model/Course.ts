@@ -434,7 +434,8 @@ export class Courses {
         let folderToSearch = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
         if (folderToSearch.id == 0) {
             return _.filter(coursesToPrint, function (course) {
-                return !!searching ? (course.fullname.includes(searching)|| course.summary.includes(searching)) : course.folderid == 0;
+                return !!searching ? (course.fullname.toLowerCase().includes(searching) ||
+                    course.summary.toLowerCase().includes(searching)) : course.folderid == 0;
             });
         } else {
             if (searching == '') {
@@ -446,7 +447,8 @@ export class Courses {
                 subFoldersSearchForCourse.push(folderToSearch);
                 let searchCourseToReturn = [];
                 for (let j = 0; j < subFoldersSearchForCourse.length; j++) {
-                    searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint => coursesToPrint.folderid == subFoldersSearchForCourse[j].id));
+                    searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint =>
+                        coursesToPrint.folderid == subFoldersSearchForCourse[j].id));
                 }
                 return searchCourseToReturn;
             }

@@ -230,7 +230,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
         String queryUsersNeo4j =
                 "MATCH (u:User) WHERE  u.id IN {usersIds} " +
-                        "RETURN u.id AS id, u.login as username, u.email AS email, u.firstName AS firstname, u.lastName AS lastname";
+                        "RETURN u.id AS id, u.id as username, u.email AS email, u.firstName AS firstname, u.lastName AS lastname";
 
         Neo4j.getInstance().execute(queryUsersNeo4j, params, Neo4jResult.validResultHandler(handler));
     }
@@ -243,7 +243,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
         String queryGroupsNeo4j =
                 "MATCH(g:Group)-[:IN]-(ug:User) WHERE g.id  IN {groupsIds} " +
-                        "WITH g, collect({id: ug.id, username: ug.login, email: ug.email, firstname: ug.firstName, lastname: ug.lastName}) AS users " +
+                        "WITH g, collect({id: ug.id, username: ug.id, email: ug.email, firstname: ug.firstName, lastname: ug.lastName}) AS users " +
                         "return \"GR_\"+g.id AS id, g.name AS name, users";
 
         Neo4j.getInstance().execute(queryGroupsNeo4j, params, Neo4jResult.validResultHandler(handler));
@@ -258,7 +258,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                 "UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) " +
                 "UNWIND TAIL(sb[shareBookmarkId]) as vid MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) " +
                 "WITH {group: {id: \"SB\" + shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, " +
-                "email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})}}as sharedBookMark "+
+                "email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.id})}}as sharedBookMark "+
                 "RETURN COLLECT(sharedBookMark) as sharedBookMarks;";
 
         Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));

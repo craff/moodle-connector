@@ -138,7 +138,7 @@ export class Folders {
         currentFolder = this.listOfSubfolders.filter(folder => folder.id == currentFolder);
         if (searching !== null && searching !== undefined && searching !== '') {
             if (currentFolder[0].id == 0 ){
-                return this.all.filter(folder => folder.name.includes(searching));
+                return this.all.filter(folder => folder.name.toLowerCase().includes(searching));
             } else {
                 let subFoldersSearch = [];
                 for (let i = 0; i < currentFolder[0].subFolders.length; i++) {
@@ -147,7 +147,7 @@ export class Folders {
                         subFoldersSearch.push(...this.getFoldersToShow(currentFolder[0].subFolders[i].id, searching));
                     }
                 }
-                return subFoldersSearch.filter(folder => folder.name.includes(searching));
+                return subFoldersSearch.filter(folder => folder.name.toLowerCase().includes(searching));
             }
         } else if (currentFolder[0].id == 0) {
             return this.getparentFolder();
