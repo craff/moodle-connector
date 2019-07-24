@@ -510,6 +510,13 @@ body.moodle {
     padding: 5px;
   }
 
+  .selectSearchBar{
+    @media screen and (min-width: 800px) {
+      margin: 0px 10px;
+    }
+    height: 35px;
+  }
+
   .searchIcon{
     margin-left: 5px;
     opacity: 0.2;
@@ -548,10 +555,6 @@ body.moodle {
 
   ul.list-element-delete{
     list-style-type: none;
-  }
-
-  .selectSearch{
-    min-width: 263px;
   }
 
   .textError {

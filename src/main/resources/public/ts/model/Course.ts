@@ -434,8 +434,8 @@ export class Courses {
         let folderToSearch = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
         if (folderToSearch.id == 0) {
             return _.filter(coursesToPrint, function (course) {
-                return !!searching ? (course.fullname.toLowerCase().includes(searching) ||
-                    course.summary.toLowerCase().includes(searching)) : course.folderid == 0;
+                return !!searching ? (course.fullname.toLowerCase().includes(searching.toLowerCase()) ||
+                    course.summary.toLowerCase().includes(searching.toLowerCase())) : course.folderid == 0;
             });
         } else {
             if (searching == '') {

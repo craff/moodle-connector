@@ -6,7 +6,7 @@
                     <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
                     <i18n class="zero-mobile">moodle.folders</i18n>
                     <div class="search-pagination">
-                        <div class="twelve-mobile cell ellipsis infoBackground infoBackgroundTopMargin style-bord-with-over-effect searchBar">
+                        <div class="eleven twelve-mobile cell ellipsis infoBackground infoBackgroundTopMargin style-bord-with-over-effect searchBar">
                             <i class="search searchIcon" ></i>
                             <input class="noBorder ellipsis"
                                    type="text"
@@ -16,16 +16,17 @@
                                    ng-change="initSearch('MyCourse')"
                             />
                         </div>
-                        <div class="twelve-mobile cell ellipsis infoBackground infoBackgroundTopMargin style-bord-without-over-effect searchBar">
-                            <select ng-model="folders.searchInFolders"
-                                    ng-options="folder.id as folder.name for folder in folders.listOfSubfolders"
-                                    class="noBorder selectSearch"
-                                    ng-change="selectSearchFolder()">
-                            </select>
+                        <br/><br/>
+                        <select ng-model="folders.searchInFolders"
+                                ng-options="folder.id as folder.name for folder in folders.listOfSubfolders"
+                                class="eleven twelve-mobile cell ellipsis infoBackground infoBackgroundTopMargin style-bord-with-over-effect selectSearchBar noBorder"
+                                ng-change="selectSearchFolder()">
+                        </select>
+                        <div class="">
+
                         </div>
                     </div>
                 </p>
-                <br/>
                 <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
                 </div>
                 <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">
@@ -40,7 +41,8 @@
             <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp coursesBackground" >
                 <p class="zero-mobile">
                     <i class="foldericon folder-size"></i>
-                    <span class="big-folder ellipsis">[[folderName()]]</span>
+                    <span ng-if="courses.searchInput.MyCourse == ''" class="big-folder ellipsis">[[folderName()]]</span>
+                    <span ng-if="courses.searchInput.MyCourse != undefined" class="big-folder ellipsis">[[courses.searchInput.MyCourse]]</span>
                     <label class="cell right-magnet title-dashboard zero-mobile">
                         <i class="show-list" ng-class="{ selected: viewModeMyCourses == 'list' }" ng-click="changeViewMode('MyCourses','list')"></i>
                     </label>
