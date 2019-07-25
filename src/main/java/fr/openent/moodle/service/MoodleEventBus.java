@@ -36,5 +36,5 @@ public interface MoodleEventBus {
      * @param handler function handler returning data
      */
 
-    void getZimbraEmail (JsonArray zimbraEmail, Handler<Either<String,JsonArray>> handler);
+    void getZimbraEmail(final JsonArray zimbraEmail, final Handler<Either<String, JsonObject>> handler);
 }

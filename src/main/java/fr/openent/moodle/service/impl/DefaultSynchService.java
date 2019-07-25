@@ -230,51 +230,67 @@ public class DefaultSynchService {
                         mapUsersNotFound[0] = new HashMap<String, JsonObject>(mapUsersMoodle);
                         mapUsersNotFound[0].keySet().removeAll(mapUsersFound.keySet());
 
-                        for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
-                            JsonObject jsonUser = entryUser.getValue();
-                            if(jsonUser.getValue("deleteDate") != null) {
-                                Future getCoursesFuture = Future.future();
-                                listGetFuture.add(getCoursesFuture);
-                                getCourses(jsonUser, getCoursesFuture);
-                            }
-                        }
 
-                        JsonArray arrUsersToUpdate = new JsonArray();
-                        for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
-                            JsonObject jsonUserFromNeo = entryUser.getValue();
-                            if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
-                                arrUsersToUpdate.add(jsonUserFromNeo);
-                            }
-                        }
+                        JsonArray idUsersFound = new JsonArray(Arrays.asList(mapUsersFound.keySet().toArray()));
+                        moodleEventBus.getZimbraEmail(idUsersFound, res -> {
+                            if(res.isLeft()) {
+                                handler.handle(new Either.Left<>("Error getting users mail"));
+                                log.error("Error getting users mail", res.left());
+                            } else {
+                                JsonObject jsonUsersMail = res.right().getValue();
+                                Set<String> keysUsers = jsonUsersMail.getMap().keySet();
+                                for (String idUser : keysUsers) {
+                                    JsonObject userNeo = mapUsersFound.get(idUser);
+                                    userNeo.put("email", jsonUsersMail.getJsonObject(idUser).getString("email"));
+                                    mapUsersFound.put(idUser, userNeo);
+                                }
 
-                        if (arrUsersToUpdate.isEmpty()) {
-                            String message = "Aucune mise à jour necessaire";
-                            log.info(message);
-                            endSyncUsers(handler);
-                        } else {
-                            updateUsers(arrUsersToUpdate, new Handler<Either<String, Buffer>>() {
-                                @Override
-                                public void handle(Either<String, Buffer> event) {
-                                    if (event.isRight()) {
-                                        log.info("END updating users");
-                                        endSyncUsers(handler);
-                                    } else {
-                                        httpClient.close();
-                                        handler.handle(new Either.Left<>(event.left().getValue()));
-                                        log.error("Error updating users", event.left());
+                                JsonArray arrUsersToUpdate = new JsonArray();
+                                for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
+                                    JsonObject jsonUserFromNeo = entryUser.getValue();
+                                    if(jsonUserFromNeo.getValue("deleteDate") != null) {
+                                        Future getCoursesFuture = Future.future();
+                                        listGetFuture.add(getCoursesFuture);
+                                        getCourses(jsonUserFromNeo, getCoursesFuture);
                                     }
 
+                                    if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
+                                        arrUsersToUpdate.add(jsonUserFromNeo);
+                                    }
                                 }
-                            });
-                        }
 
-                        if(listGetFuture.isEmpty()) {
-                            String message = "Aucun utilisateur supprimé avec des cours";
-                            log.info(message);
-                            endSyncUsers(handler);
-                        } else {
-                            CompositeFuture.all(listGetFuture).setHandler(handlerGetCourses);
-                        }
+                                if (arrUsersToUpdate.isEmpty()) {
+                                    String message = "Aucune mise à jour necessaire";
+                                    log.info(message);
+                                    endSyncUsers(handler);
+                                } else {
+                                    updateUsers(arrUsersToUpdate, new Handler<Either<String, Buffer>>() {
+                                        @Override
+                                        public void handle(Either<String, Buffer> event) {
+                                            if (event.isRight()) {
+                                                log.info("END updating users");
+                                                endSyncUsers(handler);
+                                            } else {
+                                                httpClient.close();
+                                                handler.handle(new Either.Left<>(event.left().getValue()));
+                                                log.error("Error updating users", event.left());
+                                            }
+
+                                        }
+                                    });
+                                }
+
+                                if(listGetFuture.isEmpty()) {
+                                    String message = "Aucun utilisateur supprimé avec des cours";
+                                    log.info(message);
+                                    endSyncUsers(handler);
+                                } else {
+                                    CompositeFuture.all(listGetFuture).setHandler(handlerGetCourses);
+                                }
+
+
+                            }
+                        });
                     }
                 }catch (Throwable t) {
                     log.error("Erreur getUsersHandler : ", t);
@@ -473,8 +489,8 @@ public class DefaultSynchService {
     private boolean areUsersEquals(JsonObject jsonUserFromNeo, JsonObject jsonUserFromMoodle) {
         return jsonUserFromMoodle.getString("id").equals(jsonUserFromNeo.getString("id")) &&
                 jsonUserFromMoodle.getString("firstname").equals(jsonUserFromNeo.getString("firstName")) &&
-                jsonUserFromMoodle.getString("lastname").equals(jsonUserFromNeo.getString("lastName")) /*&&
-                jsonUserFromMoodle.getString("id").equals(jsonUserFromNeo.getString("email"))*/;
+                jsonUserFromMoodle.getString("lastname").equals(jsonUserFromNeo.getString("lastName")) &&
+                jsonUserFromMoodle.getString("email").equals(jsonUserFromNeo.getString("email"));
     }
 
 
@@ -693,11 +709,11 @@ public class DefaultSynchService {
                             // identification changements
                             UserUtils.groupDisplayName(jsonCohortNeo, acceptLanguage);
                             boolean hasChangeName = !jsonCohortNeo.getString("name").equals(jsonMoodleCohort.getString("name"));
-                            JsonObject jsonCohorteWithUpdate = null;
+                            final JsonObject[] jsonCohorteWithUpdate = {null};
                             if (hasChangeName) {
-                                jsonCohorteWithUpdate = new JsonObject();
-                                jsonCohorteWithUpdate.put("id", jsonCohortNeo.getString("id"));
-                                jsonCohorteWithUpdate.put("newname", jsonCohortNeo.getString("name"));
+                                jsonCohorteWithUpdate[0] = new JsonObject();
+                                jsonCohorteWithUpdate[0].put("id", jsonCohortNeo.getString("id"));
+                                jsonCohorteWithUpdate[0].put("newname", jsonCohortNeo.getString("name"));
                             }
 
                             // identification des nouveaux utilisateurs dans la cohorte
@@ -705,17 +721,24 @@ public class DefaultSynchService {
                                 JsonObject jsonUserNeo = ((JsonObject) objUserNeo);
                                 boolean exist = arrUsersMoodle.stream().filter(u -> u.equals(jsonUserNeo.getString("id"))).count() > 0;
                                 if(!exist) {
-                                    if(jsonCohorteWithUpdate == null) {
-                                        jsonCohorteWithUpdate = new JsonObject();
-                                    }
-                                    JsonArray useradded = jsonCohorteWithUpdate.getJsonArray("useradded");
+                                    moodleEventBus.getZimbraEmail(new JsonArray().add(jsonUserNeo.getString("id")), res -> {
+                                        if (res.isLeft()) {
+                                            log.error("Error getting user mail "+jsonUserNeo.getString("id"), res.left());
+                                        } else {
+                                            if(jsonCohorteWithUpdate[0] == null) {
+                                                jsonCohorteWithUpdate[0] = new JsonObject();
+                                            }
+                                            JsonArray useradded = jsonCohorteWithUpdate[0].getJsonArray("useradded");
 
-                                    if(useradded == null) {
-                                        useradded = new JsonArray();
-                                    }
+                                            if(useradded == null) {
+                                                useradded = new JsonArray();
+                                            }
 
-                                    useradded.add(jsonUserNeo);
-                                    jsonCohorteWithUpdate.put("useradded", useradded);
+                                            jsonUserNeo.put("email", res.right().getValue().getJsonObject(jsonUserNeo.getString("id")).getString("email"));
+                                            useradded.add(jsonUserNeo);
+                                            jsonCohorteWithUpdate[0].put("useradded", useradded);
+                                        }
+                                    });
                                 }
                             }
 
@@ -726,10 +749,10 @@ public class DefaultSynchService {
                                 String idUserMoodle = ((String) objUserMoodle);
                                 boolean exist = arrUsersNeo.stream().filter(u -> ((JsonObject)u).getString("id").equals(idUserMoodle)).count() > 0;
                                 if(!exist) {
-                                    if(jsonCohorteWithUpdate == null) {
-                                        jsonCohorteWithUpdate = new JsonObject();
+                                    if(jsonCohorteWithUpdate[0] == null) {
+                                        jsonCohorteWithUpdate[0] = new JsonObject();
                                     }
-                                    JsonArray userdeleted = jsonCohorteWithUpdate.getJsonArray("userdeleted");
+                                    JsonArray userdeleted = jsonCohorteWithUpdate[0].getJsonArray("userdeleted");
 
                                     if(userdeleted == null) {
                                         userdeleted = new JsonArray();
@@ -738,14 +761,14 @@ public class DefaultSynchService {
                                     JsonObject jsonUserMoodle = new JsonObject();
                                     jsonUserMoodle.put("id", idUserMoodle);
                                     userdeleted.add(jsonUserMoodle);
-                                    jsonCohorteWithUpdate.put("userdeleted", userdeleted);
+                                    jsonCohorteWithUpdate[0].put("userdeleted", userdeleted);
 
                                     usersIdsToEnrrollIndivually.add(jsonUserMoodle.getString("id"));
                                 }
                             }
 
-                            if(jsonCohorteWithUpdate != null) {
-                                arrCohortsToUpdate.add(jsonCohorteWithUpdate);
+                            if(jsonCohorteWithUpdate[0] != null) {
+                                arrCohortsToUpdate.add(jsonCohorteWithUpdate[0]);
                             }
                         }
                     }

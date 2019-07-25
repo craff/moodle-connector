@@ -227,9 +227,9 @@ public class MoodleController extends ControllerHelper {
                                 course.getString("fullname").substring(0, 4) + uniqueID);
                         JsonArray zimbraEmail = new JsonArray();
                         zimbraEmail.add(user.getUserId());
-                        moodleEventBus.getZimbraEmail(zimbraEmail, new Handler<Either<String, JsonArray>>() {
+                        moodleEventBus.getZimbraEmail(zimbraEmail, new Handler<Either<String, JsonObject>>() {
                             @Override
-                            public void handle(Either<String, JsonArray> event) {
+                            public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                     URI moodleUri = null;
@@ -249,13 +249,16 @@ public class MoodleController extends ControllerHelper {
                                             if (idImage != null) {
                                                 urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request), "UTF-8") + "://" + URLEncoder.encode(getHost(request), "UTF-8") + "/moodle/files/" + URLEncoder.encode(idImage, "UTF-8");
                                             }
+
+                                            String userMail = event.right().getValue().getJsonObject(user.getUserId()).getString("email");
+                                            log.info("userMail : " + userMail);
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
                                             final String moodleUrl = moodleUri.toString() +
                                                     "?wstoken=" + config.getString("wsToken") +
                                                     "&wsfunction=" + WS_CREATE_FUNCTION +
                                                     "&parameters[username]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
                                                     "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
-                                                    "&parameters[email]=" + URLEncoder.encode(event.right().getValue().getString(0), "UTF-8") +
+                                                    "&parameters[email]=" + URLEncoder.encode(userMail, "UTF-8") +
                                                     "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
                                                     "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
                                                     "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +
@@ -1072,8 +1075,10 @@ public class MoodleController extends ControllerHelper {
             @Override
             public void handle(UserInfos user) {
                 JsonArray zimbraEmail = new JsonArray();
-                for (int i = 0; i < share.getJsonArray("users").size(); i++) {
-                    zimbraEmail.add(share.getJsonArray("users").getJsonObject(i).getString("id"));
+                if (share.getJsonArray("users") != null) {
+                    for (int i = 0; i < share.getJsonArray("users").size(); i++) {
+                        zimbraEmail.add(share.getJsonArray("users").getJsonObject(i).getString("id"));
+                    }
                 }
                 if (share.getJsonArray("groups") != null) {
                     for (int i = 0; i < share.getJsonArray("groups").size(); i++) {
@@ -1082,61 +1087,67 @@ public class MoodleController extends ControllerHelper {
                         }
                     }
                 }
-                moodleEventBus.getZimbraEmail(zimbraEmail, new Handler<Either<String, JsonArray>>() {
-                    @Override
-                    public void handle(Either<String, JsonArray> event) {
-                        JsonObject zimbraResult = event.right().getValue().getJsonObject(0);
-                        ArrayList zimbraArray = new ArrayList(zimbraResult.getMap().keySet());
-                        JsonObject zimbraObject = new JsonObject();
-                        for (int i = 0; i < zimbraArray.size(); i++) {
-                            zimbraObject.put(zimbraArray.get(i).toString(), zimbraResult.getJsonObject(zimbraArray.get(i)
-                                    .toString()).getString("email"));
-                        }
-                        Map<String, Object> zimbraMap = (zimbraObject.getMap());
-                        JsonArray users = share.getJsonArray("users");
+                moodleEventBus.getZimbraEmail(zimbraEmail, event -> {
+                    JsonObject zimbraResult = event.right().getValue();
+                    ArrayList zimbraArray = new ArrayList(zimbraResult.getMap().keySet());
+                    JsonObject zimbraObject = new JsonObject();
+                    for (int i = 0; i < zimbraArray.size(); i++) {
+                        zimbraObject.put(zimbraArray.get(i).toString(), zimbraResult.getJsonObject(zimbraArray.get(i)
+                                .toString()).getString("email"));
+                    }
+                    Map<String, Object> zimbraMap = (zimbraObject.getMap());
+                    JsonArray users = share.getJsonArray("users");
+                    if(users != null) {
                         for(int i = 0; i < users.size(); i++) {
-                            JsonObject user = users.getJsonObject(i);
-                            String idUser = user.getString("id");
-                            user.put("email", zimbraMap.get(idUser));
+                            JsonObject user1 = users.getJsonObject(i);
+                            String idUser = user1.getString("id");
+                            user1.put("email", zimbraMap.get(idUser));
                         }
-                        JsonArray groupsUsers = share.getJsonArray("groups");
-                        for(int i = 0; i < groupsUsers.size(); i++) {
-                            JsonObject groupsUser = users.getJsonObject(i);
-                            String idGroupUser = groupsUser.getString("id");
-                            groupsUser.put("email", zimbraMap.get(idGroupUser));
-                        }
-                        JsonObject shareSend = new JsonObject();
-                        shareSend.put("parameters", share)
-                                .put("wstoken", config.getString("wsToken"))
-                                .put("wsfunction", WS_CREATE_SHARECOURSE)
-                                .put("moodlewsrestformat", JSON);
-                        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                        URI moodleUri = null;
-                        try {
-                            final String service = (config.getString("address_moodle") + config.getString("ws-path"));
-                            final String urlSeparator = service.endsWith("") ? "" : "/";
-                            moodleUri = new URI(service + urlSeparator);
-                        } catch (URISyntaxException e) {
-                            log.error("Invalid moodle web service sending right share uri",e);
-                        }
-                        if (moodleUri != null) {
-                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                            final String moodleUrl = moodleUri.toString();
-                            HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                @Override
-                                public void handle(Either<String, Buffer> event) {
-                                    if (event.isRight()) {
-                                        log.info("Cours partager");
-                                        request.response()
-                                                .setStatusCode(200)
-                                                .end();
-                                    } else {
-                                        log.error("Share service didn't work");
-                                        unauthorized(request);
-                                    }
+                    }
+
+                    JsonArray groupsUsers = share.getJsonArray("groups");
+                    if(groupsUsers != null) {
+                        for (int i = 0; i < groupsUsers.size(); i++) {
+                            JsonArray usersInGroup = groupsUsers.getJsonObject(i).getJsonArray("users");
+                            if(usersInGroup != null) {
+                                for (int j = 0; j < usersInGroup.size(); j++) {
+                                    JsonObject userInGroupe = usersInGroup.getJsonObject(j);
+                                    userInGroupe.put("email", zimbraMap.get(userInGroupe.getString("id")));
                                 }
-                            }, true);
+                            }
                         }
+                    }
+                    JsonObject shareSend = new JsonObject();
+                    shareSend.put("parameters", share)
+                            .put("wstoken", config.getString("wsToken"))
+                            .put("wsfunction", WS_CREATE_SHARECOURSE)
+                            .put("moodlewsrestformat", JSON);
+                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                    URI moodleUri = null;
+                    try {
+                        final String service = (config.getString("address_moodle") + config.getString("ws-path"));
+                        final String urlSeparator = service.endsWith("") ? "" : "/";
+                        moodleUri = new URI(service + urlSeparator);
+                    } catch (URISyntaxException e) {
+                        log.error("Invalid moodle web service sending right share uri",e);
+                    }
+                    if (moodleUri != null) {
+                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                        final String moodleUrl = moodleUri.toString();
+                        HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                            @Override
+                            public void handle(Either<String, Buffer> event) {
+                                if (event.isRight()) {
+                                    log.info("Cours partagé");
+                                    request.response()
+                                            .setStatusCode(200)
+                                            .end();
+                                } else {
+                                    log.error("Share service didn't work");
+                                    unauthorized(request);
+                                }
+                            }
+                        }, true);
                     }
                 });
             }

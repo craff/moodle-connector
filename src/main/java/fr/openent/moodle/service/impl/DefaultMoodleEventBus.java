@@ -62,10 +62,31 @@ public class DefaultMoodleEventBus extends SqlCrudService implements MoodleEvent
     }
 
     @Override
-    public void getZimbraEmail(final JsonArray zimbraEmail, final Handler<Either<String, JsonArray>> handler){
+    public void getZimbraEmail(final JsonArray zimbraEmail, final Handler<Either<String, JsonObject>> handler) {
         JsonObject action = new JsonObject()
                 .put("action", "getMailUser")
                 .put("idList", zimbraEmail);
-        eb.send(Moodle.ZIMBRA_BUS_ADDRESS, action, handlerToAsyncHandler(validResultHandler(handler)));
+        eb.send(Moodle.ZIMBRA_BUS_ADDRESS, action, handlerToAsyncHandler(new Handler<Message<JsonObject>>() {
+            @Override
+            public void handle(Message<JsonObject> response) {
+                if ("ok".equals(response.body().getString("status"))) {
+                    handler.handle(new Either.Right<>(response.body().getJsonObject("message")));
+                } else {
+                    handler.handle(new Either.Left<>("Error getting zimbra mail during bus call"));
+                }
+            }
+        }));
+        /*JsonObject res = new fr.wseduc.webutils.collections.JsonObject();
+        JsonObject jsonMails = new JsonObject();
+
+        for (Object id : zimbraEmail) {
+            JsonObject userInfos = new JsonObject();
+            userInfos.put("email", "test"+id+"@cgi.com");
+            userInfos.put("displayName", "test");
+            jsonMails.put((String) id, userInfos);
+        }
+
+        res.put("status", "ok").put("message",jsonMails);
+        handler.handle(new Either.Right<>(res.getJsonObject("message")));*/
     }
 }

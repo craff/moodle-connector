@@ -309,11 +309,11 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
                 .put("bookmarksIds", bookmarksIds);
 
         String queryNeo4j = "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
-                "MATCH (v:Visible {id : vid})<-[:IN]-(us:User) WHERE not(has(v.deleteDate)) and v:ProfileGroup WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: us.id, email: us.email, lastname: us.lastName, firstname: us.firstName, username: us.login})} as sharedBookMark " +
+                "MATCH (v:Visible {id : vid})<-[:IN]-(us:User) WHERE not(has(v.deleteDate)) and v:ProfileGroup WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: us.id, email: us.email, lastname: us.lastName, firstname: us.firstName, username: us.id})} as sharedBookMark " +
                 "RETURN sharedBookMark " +
                     "UNION " +
                 "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
-                "MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) and v:User WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.login})} as sharedBookMark " +
+                "MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) and v:User WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.id})} as sharedBookMark " +
                 "RETURN sharedBookMark";
 
         Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
