@@ -227,10 +227,12 @@ public class MoodleController extends ControllerHelper {
                                 course.getString("fullname").substring(0, 4) + uniqueID);
                         JsonArray zimbraEmail = new JsonArray();
                         zimbraEmail.add(user.getUserId());
+                        log.info("getZimbraEmail : " + zimbraEmail.toString());
                         moodleEventBus.getZimbraEmail(zimbraEmail, new Handler<Either<String, JsonObject>>() {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
+                                    log.info("succes getZimbraEmail : ");
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                     URI moodleUri = null;
                                     try {
@@ -250,6 +252,7 @@ public class MoodleController extends ControllerHelper {
                                                 urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request), "UTF-8") + "://" + URLEncoder.encode(getHost(request), "UTF-8") + "/moodle/files/" + URLEncoder.encode(idImage, "UTF-8");
                                             }
 
+                                            log.info(event.right().getValue());
                                             String userMail = event.right().getValue().getJsonObject(user.getUserId()).getString("email");
                                             log.info("userMail : " + userMail);
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
@@ -269,15 +272,22 @@ public class MoodleController extends ControllerHelper {
                                                     "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type"), "UTF-8") +
                                                     "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA"), "UTF-8") +
                                                     "&moodlewsrestformat=" + JSON;
+
+
+                                            log.info("CALL WS create course : " + moodleUrl);
+
                                             httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
                                                 @Override
                                                 public void handle(Either<String, Buffer> event) {
                                                     if (event.isRight()) {
+                                                        log.info("SUCCESS creating course : ");
                                                         JsonObject object = event.right().getValue().toJsonArray().getJsonObject(0);
+                                                        log.info(object);
                                                         course.put("moodleid", object.getValue("courseid"))
                                                                 .put("userid", user.getUserId());
                                                         moodleWebService.createCourse(course, defaultResponseHandler(request));
                                                     } else {
+                                                        log.error("FAIL creating course : " + event.left().getValue());
                                                         log.error("fail to call create course webservice" + event.left().getValue());
                                                     }
                                                 }
@@ -287,6 +297,8 @@ public class MoodleController extends ControllerHelper {
                                         }
                                     }
                                 } else {
+                                    log.error("fail getZimbraEmail : ");
+                                    log.error(event.left().getValue());
                                     handle(new Either.Left<>("Failed to gets the http params"));
                                 }
                             }
@@ -365,10 +377,12 @@ public class MoodleController extends ControllerHelper {
                                         "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                 Buffer wsResponse = new BufferImpl();
+                                log.info("CALL WS_GET_USERCOURSES : "+moodleUrl);
                                 final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
                                     @Override
                                     public void handle(HttpClientResponse response) {
                                         if (response.statusCode() == 200) {
+                                            log.info("SUCCESS WS_GET_USERCOURSES : ");
                                             response.handler(wsResponse::appendBuffer);
                                             response.endHandler(new Handler<Void>() {
                                                 @Override
