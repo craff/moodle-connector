@@ -737,7 +737,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.printRightFormatAuthor = function (course: Course) {
-        let author = course.auteur[0].firstname[0] + ". " + course.auteur[0].lastname[0].toUpperCase() + course.auteur[0].lastname.slice(1).toLowerCase();
+        let author = "";
+        if(course.auteur[0] !== null &&  course.auteur[0] !== undefined && course.auteur[0].firstname !== null && course.auteur[0].lastname !== null) {
+            author = course.auteur[0].firstname[0] + ". " + course.auteur[0].lastname[0].toUpperCase() + course.auteur[0].lastname.slice(1).toLowerCase();
+        }
         return author;
     };
 

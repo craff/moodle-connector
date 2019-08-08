@@ -373,6 +373,7 @@ public class MoodleController extends ControllerHelper {
                                 final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
                                         "?wstoken=" + config.getString("wsToken") +
                                         "&wsfunction=" + WS_GET_USERCOURSES +
+                                        //"&parameters[userid]=" + "00d17c30-e693-42f8-a9ba-c2e3f7f62186" +
                                         "&parameters[userid]=" + user.getUserId() +
                                         "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
@@ -389,7 +390,7 @@ public class MoodleController extends ControllerHelper {
                                                 public void handle(Void end) {
                                                     JsonArray object = new JsonArray(wsResponse);
                                                     JsonArray duplicatesCours = object.getJsonObject(0).getJsonArray("enrolments");
-
+                                                    log.info(duplicatesCours.toString());
                                                     JsonArray coursArray = Utils.removeDuplicateCourses(duplicatesCours);
 
                                                     List<String> sqlCoursId = sqlCoursArray.stream().map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
@@ -401,7 +402,8 @@ public class MoodleController extends ControllerHelper {
                                                         else{
                                                             coursArray.getJsonObject(i).put("moodleid", coursArray.getJsonObject(i).getValue("courseid"))
                                                                     .put("userid", user.getUserId()).put("folderid",0);
-                                                            if(coursArray.getJsonObject(i).getJsonArray("auteur").getJsonObject(0).getString("entidnumber").equals(user.getUserId())) {
+                                                            String auteur = coursArray.getJsonObject(i).getJsonArray("auteur").getJsonObject(0).getString("entidnumber");
+                                                            if(auteur!= null && auteur.equals(user.getUserId())) {
                                                                     moodleWebService.createCourse(coursArray.getJsonObject(i), defaultResponseHandler(request));
                                                             }
                                                         }
