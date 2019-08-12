@@ -71,7 +71,7 @@ public class DefaultSynchService {
         arrUsersToEnroll = new JsonArray();
         mapUsersNotFound = new Map[]{new HashMap<String, JsonObject>()};
         compositeFuturEnded = new AtomicInteger(2);
-        httpClient = HttpClientHelper.createHttpClient(vertx);
+        httpClient = HttpClientHelper.createHttpClient(vertx,config);
     }
 
 
@@ -556,7 +556,7 @@ public class DefaultSynchService {
         arrCohortsToUpdate = new JsonArray();
 
         compositeFuturEnded = new AtomicInteger(3);
-        httpClient = HttpClientHelper.createHttpClient(vertx);
+        httpClient = HttpClientHelper.createHttpClient(vertx, config);
     }
 
 

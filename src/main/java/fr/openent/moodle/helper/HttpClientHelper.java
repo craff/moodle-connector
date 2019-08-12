@@ -32,9 +32,15 @@ public class HttpClientHelper extends ControllerHelper {
      * Create default HttpClient
      * @return new HttpClient
      */
-    public static HttpClient createHttpClient(Vertx vertx) {
+    public static HttpClient createHttpClient(Vertx vertx, JsonObject config) {
+        boolean setSsl = true;
+        try {
+            setSsl = "https".equals(new URI(config.getString("address_moodle")).getScheme());
+        } catch (URISyntaxException e) {
+            log.error("Invalid moodle uri",e);
+        }
         final HttpClientOptions options = new HttpClientOptions();
-        options.setSsl(true);
+        options.setSsl(setSsl);
         options.setTrustAll(true);
         options.setVerifyHost(false);
         if (System.getProperty("httpclient.proxyHost") != null) {

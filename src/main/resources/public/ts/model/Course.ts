@@ -241,9 +241,13 @@ export class Courses {
                 course.id = course.courseid;
                 course._id = course.courseid;
                 course.owner = {userId: course.auteur[0].entidnumber, displayName:course.auteur[0].firstname + " " + course.auteur[0].lastname};
-                course.summary = course.summary.replace(/<\/p><p>/g, " ; ").replace(/<p>/g, "").replace(/<\/p>/g, "");
+                if(course.summary == null) {
+                    course.summary = "";
+                } else {
+                    course.summary = course.summary.replace(/<\/p><p>/g, " ; ").replace(/<p>/g, "").replace(/<\/p>/g, "");
+                }
             });
-            this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.auteur[0].entidnumber === userId; });
+            this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.role === "10"; });
             this.coursesShared = _.filter(this.allCourses, function (cours) {
                 return cours.role === "3" && cours.auteur[0].entidnumber !== userId;
             });

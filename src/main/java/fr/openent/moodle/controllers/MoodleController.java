@@ -38,8 +38,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.time.LocalDateTime;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -63,7 +63,7 @@ public class MoodleController extends ControllerHelper {
 
 		this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
 		this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
-		this.httpClientHelper = new HttpClientHelper();
+        this.httpClientHelper = new HttpClientHelper();
 	}
 
     //Permissions
@@ -233,6 +233,12 @@ public class MoodleController extends ControllerHelper {
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
                                     log.info("succes getZimbraEmail : ");
+                        /*JsonObject action = new JsonObject();
+                        action.put("action", "getUserInfos").put("userId", user.getUserId());
+                        moodleEventBus.getParams(action, new Handler<Either<String, JsonObject>>() {
+                            @Override
+                            public void handle(Either<String, JsonObject> event) {
+                                if (event.isRight()) {*/
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                     URI moodleUri = null;
                                     try {
@@ -255,13 +261,14 @@ public class MoodleController extends ControllerHelper {
                                             log.info(event.right().getValue());
                                             String userMail = event.right().getValue().getJsonObject(user.getUserId()).getString("email");
                                             log.info("userMail : " + userMail);
-                                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
                                             final String moodleUrl = moodleUri.toString() +
                                                     "?wstoken=" + config.getString("wsToken") +
                                                     "&wsfunction=" + WS_CREATE_FUNCTION +
                                                     "&parameters[username]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
                                                     "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
                                                     "&parameters[email]=" + URLEncoder.encode(userMail, "UTF-8") +
+                                                    //"&parameters[email]=" + URLEncoder.encode(event.right().getValue().getString("email"), "UTF-8") +
                                                     "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
                                                     "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
                                                     "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +
@@ -296,6 +303,11 @@ public class MoodleController extends ControllerHelper {
                                             log.error("fail to create course by sending the URL to the WS", e);
                                         }
                                     }
+                                /*} else {
+                                    handle(new Either.Left<>("Failed to gets the http params"));
+                                }
+                            }
+                        });*/
                                 } else {
                                     log.error("fail getZimbraEmail : ");
                                     log.error(event.left().getValue());
@@ -369,11 +381,12 @@ public class MoodleController extends ControllerHelper {
                         public void handle(Either<String, JsonArray> sqlCours) {
                             if(sqlCours.isRight()){
                                 final JsonArray sqlCoursArray = sqlCours.right().getValue();
-                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
                                 final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
                                         "?wstoken=" + config.getString("wsToken") +
                                         "&wsfunction=" + WS_GET_USERCOURSES +
                                         //"&parameters[userid]=" + "00d17c30-e693-42f8-a9ba-c2e3f7f62186" +
+                                        //"&parameters[userid]=" + "cf9feb69-c227-4444-bf2b-ad4858f1feac" +
                                         "&parameters[userid]=" + user.getUserId() +
                                         "&moodlewsrestformat=" + JSON;
                                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
@@ -565,7 +578,7 @@ public class MoodleController extends ControllerHelper {
                 if (moodleDeleteUri != null) {
                     JsonObject shareSend = new JsonObject();
                     shareSend = null;
-                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
                     final String moodleDeleteUrl = moodleDeleteUri.toString() +
                             "?wstoken=" + config.getString("wsToken") +
                             "&wsfunction=" + WS_DELETE_FUNCTION +
@@ -683,7 +696,7 @@ public class MoodleController extends ControllerHelper {
                             I18n.acceptLanguage(request), request.params().get("search"), getShareInfosHandler);
                     listeFutures.add(getShareInfosFuture);
 
-                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx,config);
                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                     Buffer wsResponse = new BufferImpl();
                     final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
@@ -1103,7 +1116,10 @@ public class MoodleController extends ControllerHelper {
                         }
                     }
                 }
+                log.info("JSON PARTAGE : " + share.toString());
+                log.info("CALL getZimbraEmail : ");
                 moodleEventBus.getZimbraEmail(zimbraEmail, event -> {
+                    log.info("END getZimbraEmail : ");
                     JsonObject zimbraResult = event.right().getValue();
                     ArrayList zimbraArray = new ArrayList(zimbraResult.getMap().keySet());
                     JsonObject zimbraObject = new JsonObject();
@@ -1133,6 +1149,8 @@ public class MoodleController extends ControllerHelper {
                             }
                         }
                     }
+                    log.info("JSON PARTAGE WITH MAIL : " + share.toString());
+
                     JsonObject shareSend = new JsonObject();
                     shareSend.put("parameters", share)
                             .put("wstoken", config.getString("wsToken"))
@@ -1148,18 +1166,19 @@ public class MoodleController extends ControllerHelper {
                         log.error("Invalid moodle web service sending right share uri",e);
                     }
                     if (moodleUri != null) {
-                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
                         final String moodleUrl = moodleUri.toString();
+                        log.info("CALL WS_CREATE_SHARECOURSE");
                         HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
                             @Override
                             public void handle(Either<String, Buffer> event) {
                                 if (event.isRight()) {
-                                    log.info("Cours partagé");
+                                    log.info("SUCCESS WS_CREATE_SHARECOURSE");
                                     request.response()
                                             .setStatusCode(200)
                                             .end();
                                 } else {
-                                    log.error("Share service didn't work");
+                                    log.error("FAIL WS_CREATE_SHARECOURSE" + event.left().getValue());
                                     unauthorized(request);
                                 }
                             }
@@ -1425,7 +1444,7 @@ public class MoodleController extends ControllerHelper {
                                             log.error("Invalid moodle web service sending demand of duplication uri",e);
                                         }
                                         if (moodleUri != null) {
-                                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+                                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
                                             final String moodleUrl = moodleUri.toString() +
                                                     "?wstoken=" + config.getString("wsToken") +
                                                     "&wsfunction=" + WS_POST_DUPLICATECOURSE +
