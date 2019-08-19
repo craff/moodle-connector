@@ -564,7 +564,7 @@ public class MoodleController extends ControllerHelper {
                 JsonArray coursesIds = courses.getJsonArray("coursesId");
                 String idsDeletes = "";
                 for (int i = 0; i < coursesIds.size(); i++) {
-                    idsDeletes += "&courseids[" + i + "]=" + coursesIds.getValue(i);
+                    idsDeletes += "&parameters[courseid]=" + coursesIds.getValue(i);
                 }
                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 URI moodleDeleteUri = null;
@@ -582,6 +582,7 @@ public class MoodleController extends ControllerHelper {
                     final String moodleDeleteUrl = moodleDeleteUri.toString() +
                             "?wstoken=" + config.getString("wsToken") +
                             "&wsfunction=" + WS_DELETE_FUNCTION +
+                            //"&parameters[categoryid]="+ config.getString("deletionCategory") +
                             idsDeletes +
                             "&moodlewsrestformat=" + JSON;
                     httpClientHelper.webServiceMoodlePost(shareSend, moodleDeleteUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
