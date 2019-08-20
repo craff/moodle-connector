@@ -408,42 +408,42 @@ public class MoodleController extends ControllerHelper {
 
                                                     List<String> sqlCoursId = sqlCoursArray.stream().map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
 
-                                                    for(int i = 0; i < coursArray.size(); i++){
-                                                        coursArray.getJsonObject(i).put("duplication","non");
-                                                        if(sqlCoursId.contains(coursArray.getJsonObject(i).getValue("courseid").toString()))
-                                                            coursArray.getJsonObject(i).put("folderid",Integer.parseInt(sqlCoursArray.getJsonObject(sqlCoursId.indexOf(coursArray.getJsonObject(i).getValue("courseid").toString())).getValue("folder_id").toString()));
-                                                        else{
+                                                    for (int i = 0; i < coursArray.size(); i++) {
+                                                        coursArray.getJsonObject(i).put("duplication", "non");
+                                                        if (sqlCoursId.contains(coursArray.getJsonObject(i).getValue("courseid").toString()))
+                                                            coursArray.getJsonObject(i).put("folderid", Integer.parseInt(sqlCoursArray.getJsonObject(sqlCoursId.indexOf(coursArray.getJsonObject(i).getValue("courseid").toString())).getValue("folder_id").toString()));
+                                                        else {
                                                             coursArray.getJsonObject(i).put("moodleid", coursArray.getJsonObject(i).getValue("courseid"))
-                                                                    .put("userid", user.getUserId()).put("folderid",0);
+                                                                    .put("userid", user.getUserId()).put("folderid", 0);
                                                             String auteur = coursArray.getJsonObject(i).getJsonArray("auteur").getJsonObject(0).getString("entidnumber");
-                                                            if(auteur!= null && auteur.equals(user.getUserId())) {
-                                                                    moodleWebService.createCourse(coursArray.getJsonObject(i), defaultResponseHandler(request));
+                                                            if (auteur != null && auteur.equals(user.getUserId())) {
+                                                                moodleWebService.createCourse(coursArray.getJsonObject(i), defaultResponseHandler(request));
                                                             }
                                                         }
                                                     }
 
                                                     List<String> coursId = coursArray.stream().map(obj -> (((JsonObject) obj).getValue("courseid")).toString()).collect(Collectors.toList());
 
-                                                    moodleWebService.getCourseToDuplicate(user.getUserId(), new Handler<Either<String, JsonArray>> () {
+                                                    moodleWebService.getCourseToDuplicate(user.getUserId(), new Handler<Either<String, JsonArray>>() {
                                                         @Override
                                                         public void handle(Either<String, JsonArray> event) {
                                                             if (event.right().getValue().size() != 0) {
                                                                 JsonArray coursesInDuplication = event.right().getValue();
-                                                                for(int i = 0; i < coursesInDuplication.size(); i++){
+                                                                for (int i = 0; i < coursesInDuplication.size(); i++) {
                                                                     JsonObject courseToAdd = new JsonObject();
                                                                     Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-                                                                    courseToAdd.put("fullname",coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("fullname") + "_" + LocalDateTime.now().getYear() + "-" + LocalDateTime.now().getMonthValue() + "-" + LocalDateTime.now().getDayOfMonth());
+                                                                    courseToAdd.put("fullname", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("fullname") + "_" + LocalDateTime.now().getYear() + "-" + LocalDateTime.now().getMonthValue() + "-" + LocalDateTime.now().getDayOfMonth());
                                                                     courseToAdd.put("summary", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("summary"));
                                                                     courseToAdd.put("auteur", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getJsonArray("auteur"));
                                                                     courseToAdd.put("type", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("type"));
                                                                     courseToAdd.put("course_type", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("course_type"));
                                                                     courseToAdd.put("imageurl", coursArray.getJsonObject(coursId.indexOf(coursesInDuplication.getJsonObject(i).getInteger("id_course").toString())).getString("imageurl"));
-                                                                    courseToAdd.put("date", Long.toString((timestamp.getTime()/1000)));
-                                                                    courseToAdd.put("timemodified", timestamp.getTime()/1000);
-                                                                    courseToAdd.put("duplication",coursesInDuplication.getJsonObject(i).getString("status"));
-                                                                    courseToAdd.put("originalCourseId",coursesInDuplication.getJsonObject(i).getInteger("id_course"));
-                                                                    courseToAdd.put("folderid",coursesInDuplication.getJsonObject(i).getInteger("id_folder"));
-                                                                    courseToAdd.put("courseid",coursesInDuplication.getJsonObject(i).getInteger("id"));
+                                                                    courseToAdd.put("date", Long.toString((timestamp.getTime() / 1000)));
+                                                                    courseToAdd.put("timemodified", timestamp.getTime() / 1000);
+                                                                    courseToAdd.put("duplication", coursesInDuplication.getJsonObject(i).getString("status"));
+                                                                    courseToAdd.put("originalCourseId", coursesInDuplication.getJsonObject(i).getInteger("id_course"));
+                                                                    courseToAdd.put("folderid", coursesInDuplication.getJsonObject(i).getInteger("id_folder"));
+                                                                    courseToAdd.put("courseid", coursesInDuplication.getJsonObject(i).getInteger("id"));
                                                                     coursArray.add(courseToAdd);
                                                                 }
                                                             } else {
@@ -454,32 +454,38 @@ public class MoodleController extends ControllerHelper {
                                                     moodleWebService.getPreferences(user.getUserId(), new Handler<Either<String, JsonArray>>() {
                                                         @Override
                                                         public void handle(Either<String, JsonArray> event) {
-                                                            if (event.isRight()){
+                                                            if (event.isRight()) {
                                                                 JsonArray list = event.right().getValue();
-                                                                if(list.size() != 0) {
+                                                                if (list.size() != 0) {
                                                                     for (int i = 0; i < coursArray.size(); i++) {
                                                                         JsonObject cours = coursArray.getJsonObject(i);
                                                                         for (int j = 0; j < list.size(); j++) {
                                                                             JsonObject PreferencesCours = list.getJsonObject(j);
-                                                                            if(cours.containsKey("courseid")) {
+                                                                            if (cours.containsKey("courseid")) {
                                                                                 if (PreferencesCours.getValue("moodle_id").toString().equals(cours.getValue("courseid").toString())) {
                                                                                     coursArray.getJsonObject(i).put("masked", PreferencesCours.getValue("masked"));
                                                                                     coursArray.getJsonObject(i).put("favorites", PreferencesCours.getValue("favorites"));
                                                                                 }
                                                                             }
                                                                         }
-                                                                        if(!(coursArray.getJsonObject(i).containsKey("masked"))){
+                                                                        if (!(coursArray.getJsonObject(i).containsKey("masked"))) {
                                                                             coursArray.getJsonObject(i).put("masked", false);
                                                                             coursArray.getJsonObject(i).put("favorites", false);
                                                                         }
                                                                     }
-                                                                }else{
+                                                                } else {
                                                                     for (int i = 0; i < coursArray.size(); i++) {
                                                                         coursArray.getJsonObject(i).put("masked", false);
                                                                         coursArray.getJsonObject(i).put("favorites", false);
                                                                     }
                                                                 }
-                                                                Renders.renderJson(request, coursArray);
+
+                                                                JsonObject courses = new JsonObject();
+                                                                courses.put("allCourses", coursArray);
+                                                                courses.put("idAuditeur", moodleConfig.getInteger("idAuditeur"));
+                                                                courses.put("idEditingTeacher", moodleConfig.getInteger("idEditingTeacher"));
+                                                                courses.put("idStudent", moodleConfig.getInteger("idStudent"));
+                                                                Renders.renderJson(request, courses);
                                                             } else {
                                                                 log.error("Get list favorites and masked failed !");
                                                                 renderError(request);
@@ -496,7 +502,7 @@ public class MoodleController extends ControllerHelper {
                                             response.bodyHandler(new Handler<Buffer>() {
                                                 @Override
                                                 public void handle(Buffer event) {
-                                                    log.error("Returning body after GET CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                                                    log.error("Returning body after GET CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
                                                     if (!responseIsSent.getAndSet(true)) {
                                                         httpClient.close();
                                                     }

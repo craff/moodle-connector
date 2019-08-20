@@ -235,8 +235,12 @@ export class Courses {
     async getCoursesbyUser (userId: string) {
         try {
             let courses = await http.get(`/moodle/users/courses`);
-            let allCourses = Mix.castArrayAs(Course, courses.data);
+            let allCourses = Mix.castArrayAs(Course, courses.data.allCourses);
             this.allCourses = allCourses;
+            let idAuditeur = courses.data.idAuditeur + "";
+            let idEditingTeacher = courses.data.idEditingTeacher + "";
+            let idStudent = courses.data.idStudent + "";
+
             _.each(this.allCourses,function(course) {
                 course.id = course.courseid;
                 course._id = course.courseid;
@@ -247,12 +251,12 @@ export class Courses {
                     course.summary = course.summary.replace(/<\/p><p>/g, " ; ").replace(/<p>/g, "").replace(/<\/p>/g, "");
                 }
             });
-            this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.role === "10"; });
+            this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.role === idAuditeur; });
             this.coursesShared = _.filter(this.allCourses, function (cours) {
-                return cours.role === "3" && cours.auteur[0].entidnumber !== userId;
+                return cours.role === idEditingTeacher && cours.auteur[0].entidnumber !== userId;
             });
             this.coursesSharedToFollow = _.filter(this.allCourses, function (cours) {
-                return cours.role === "5" && cours.auteur[0].entidnumber !== userId;
+                return cours.role === idStudent && cours.auteur[0].entidnumber !== userId;
             });
             this.coursesSharedToFollow = this.coursesSharedToFollow.sort(
                 function compare(a, b) {
