@@ -50,10 +50,10 @@ public class HttpClientHelper extends ControllerHelper {
                     .setUsername(System.getProperty("httpclient.proxyUsername"))
                     .setPassword(System.getProperty("httpclient.proxyPassword"));
             options.setProxyOptions(proxyOptions);
-            int maxPoolSize = config.getInteger("http-client-max-pool-size", 0);
-            if(maxPoolSize > 0) {
-                options.setMaxPoolSize(maxPoolSize);
-            }
+        }
+        int maxPoolSize = config.getInteger("http-client-max-pool-size", 0);
+        if(maxPoolSize > 0) {
+            options.setMaxPoolSize(maxPoolSize);
         }
         return vertx.createHttpClient(options);
     }
