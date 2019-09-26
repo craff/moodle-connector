@@ -1,0 +1,1 @@
+export const TIMETOREFRESHDUPLICATION:number = 10 * 1000; //second

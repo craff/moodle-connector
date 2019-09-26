@@ -2,6 +2,7 @@ import {_, model, moment, ng, notify, template} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
+import {TIMETOREFRESHDUPLICATION, STATUS} from "../constantes";
 
 export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', '$rootScope', '$interval', ($scope, $timeout, route, $rootScope, $interval) => {
 
@@ -17,7 +18,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         library: function (params) {
             $scope.initController();
             $scope.initLibraryTab();
-        }
+        },
     });
 
     $scope.switchTab = function (current: string) {
@@ -49,6 +50,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             await $scope.courses.getCoursesbyUser(model.me.userId);
             $scope.displayMessageLoader = false;
         }
+        $scope.updateCourse();
         Utils.safeApply($scope);
     };
 
@@ -202,22 +204,22 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                 folder.printsubfolder = folderSearch.printsubfolder;
             }
         });
-       $scope.printfolders = true;
-       if(folder.printsubfolder) {
-           $scope.currentfolderid = folder.id;
-           $scope.folders.folderIdMoveIn = $scope.currentfolderid;
-       } else {
-           $scope.currentfolderid = folder.parent_id;
-           $scope.folders.folderIdMoveIn = $scope.currentfolderid;
-       }
-       $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
-       if ($scope.courses.searchInput.MyCourse != '') {
-           $scope.courses.searchInput.MyCourse = '';
-       }
-       if ($scope.folders.searchInFolders != $scope.currentfolderid) {
-           $scope.folders.searchInFolders = $scope.currentfolderid;
-       }
-       Utils.safeApply($scope);
+        $scope.printfolders = true;
+        if(folder.printsubfolder) {
+            $scope.currentfolderid = folder.id;
+            $scope.folders.folderIdMoveIn = $scope.currentfolderid;
+        } else {
+            $scope.currentfolderid = folder.parent_id;
+            $scope.folders.folderIdMoveIn = $scope.currentfolderid;
+        }
+        $scope.setprintsubfolderValuebyFolder(folder, folder.printsubfolder);
+        if ($scope.courses.searchInput.MyCourse != '') {
+            $scope.courses.searchInput.MyCourse = '';
+        }
+        if ($scope.folders.searchInFolders != $scope.currentfolderid) {
+            $scope.folders.searchInFolders = $scope.currentfolderid;
+        }
+        Utils.safeApply($scope);
     };
 
     $scope.isPrintSubFolderNumber = function(folderId:number){
@@ -245,7 +247,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.targetMenu = function(){
         $scope.folders.folderIdMoveIn = 0;
         $scope.folders.all.forEach(function (e) {
-             e.printTargetsubfolder=false;
+            e.printTargetsubfolder=false;
         });
     };
 
@@ -272,7 +274,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         });
         $scope.folders.all.forEach(function (e) {
             if(e.id === targetFolder)
-            e.printsubfolder = true;
+                e.printsubfolder = true;
             $scope.parent = e.parent_id;
         });
         while ($scope.parent != 0){
@@ -297,8 +299,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.initAllCouresbyuser = async function(){
-            await $scope.courses.getCoursesAndSharedByFolder();
-            Utils.safeApply($scope);
+        await $scope.courses.getCoursesAndSharedByFolder();
+        Utils.safeApply($scope);
     };
 
     $scope.initFolders = async function () {
@@ -321,11 +323,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         return $scope.folders.getSubFolder(folder.id);
     };
 
-	route({
+    route({
         view: function(params){
-		    template.open('main', 'main');
+            template.open('main', 'main');
             Utils.safeApply($scope);
-		}
+        }
     });
 
     /**
@@ -466,14 +468,14 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
 
     $scope.targetFolderName = function() {
         var nameToReturn;
-            if ($scope.folders.folderIdMoveIn != 0) {
-                $scope.folders.all.forEach(function (e) {
-                    if (e.id == $scope.folders.folderIdMoveIn) {
-                        nameToReturn = e.name;
-                    }
-                });
-            } else
-                nameToReturn = "Mes cours";
+        if ($scope.folders.folderIdMoveIn != 0) {
+            $scope.folders.all.forEach(function (e) {
+                if (e.id == $scope.folders.folderIdMoveIn) {
+                    nameToReturn = e.name;
+                }
+            });
+        } else
+            nameToReturn = "Mes cours";
         return nameToReturn;
     };
 
@@ -511,7 +513,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.openLightbox = false;
         Utils.safeApply($scope);
         $timeout(() =>
-            $scope.initFolders()
+                $scope.initFolders()
             , 1500);
     };
 
@@ -578,8 +580,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.courses.folderid = ($scope.courses.allCourses.filter(course => course.selectConfirm))[0].folderid;
             await $scope.courses.coursesDuplicate();
         }
+        $scope.updateCourse();
         $timeout(() =>
-                $scope.initCoursesbyuser());
+            $scope.initCoursesbyuser());
         $scope.initFolders();
     };
 
@@ -823,18 +826,19 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.toasterShow = !!($scope.folders.all.some(folder => folder.select) || $scope.courses.allCourses.some(course => course.select));
         Utils.safeApply($scope);
         $timeout(() =>
-            $scope.initCoursesbyuser()
+                $scope.initCoursesbyuser()
             , 5000)
     };
 
     /**
      * set timeout in order to update the status of duplicate course
      */
-    $scope.updateCourse = async function () {
+    $scope.updateCourse = async():Promise<void> => {
         let duplicateCourses = await $scope.courses.getDuplicateCourse();
         let needRefresh = false;
-        if(duplicateCourses.length != $scope.courses.coursesByUser.filter(course => course.duplication != "non").length && !$scope.openLightbox)
+        if(duplicateCourses.length != $scope.courses.coursesByUser.filter(course => course.duplication != "non").length && !$scope.openLightbox){
             $scope.initCoursesbyuser();
+        }
         duplicateCourses.forEach(async function (duplicateCourse){
             $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
                 if(duplicateCourse.id == course.courseid){
@@ -845,11 +849,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                 }
             });
         });
-        if(needRefresh && !$scope.openLightbox)
+        const isStartDuplicationCheck:boolean = duplicateCourses.filter(cour=> cour.status === STATUS.WAITING).length !== 0;
+        if(isStartDuplicationCheck){
+            $timeout(():void =>
+                    $scope.updateCourse()
+                , TIMETOREFRESHDUPLICATION);
+        }
+        if(needRefresh && !$scope.openLightbox){
             Utils.safeApply($scope);
+        }
     };
-
-    $interval( function(){ $scope.updateCourse(); }, 5000, $scope.courses != undefined);
 
     $(window).resize(function(){
         if ($(window).width() < 800) {
