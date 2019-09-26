@@ -51,20 +51,20 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 
 public class MoodleController extends ControllerHelper {
 
-	private final MoodleWebService moodleWebService;
-	private final MoodleEventBus moodleEventBus;
-	private final HttpClientHelper httpClientHelper;
+    private final MoodleWebService moodleWebService;
+    private final MoodleEventBus moodleEventBus;
+    private final HttpClientHelper httpClientHelper;
     private final Storage storage;
 
     public MoodleController(final Storage storage, EventBus eb) {
-		super();
+        super();
         this.eb = eb;
         this.storage = storage;
 
-		this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
-		this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
+        this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
+        this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
         this.httpClientHelper = new HttpClientHelper();
-	}
+    }
 
     //Permissions
     private static final String
@@ -76,15 +76,15 @@ public class MoodleController extends ControllerHelper {
             workflow_view = "moodle.view",
             workflow_duplicate = "moodle.duplicate";
 
-	/**
-	 * Displays the home view.
-	 * @param request Client request
-	 */
-	@Get("")
-	@SecuredAction(workflow_view)
-	public void view(HttpServerRequest request) {
-		renderView(request);
-	}
+    /**
+     * Displays the home view.
+     * @param request Client request
+     */
+    @Get("")
+    @SecuredAction(workflow_view)
+    public void view(HttpServerRequest request) {
+        renderView(request);
+    }
 
     @Put("/folders/move")
     @ApiDoc("move a folder")
@@ -207,18 +207,18 @@ public class MoodleController extends ControllerHelper {
     @Post("/course")
     @ApiDoc("create a course")
     @SecuredAction(workflow_create)
-	public void create(final HttpServerRequest request) {
-	    RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
-	        @Override
+    public void create(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
+            @Override
             public void handle(JsonObject course) {
-	            if ("1".equals(course.getString("type"))) {
+                if ("1".equals(course.getString("type"))) {
                     course.put("typeA", "");
                 }
                 if (isNull(course.getString("summary"))) {
-	                course.put("summary", "");
-	            }
+                    course.put("summary", "");
+                }
                 UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-	                @Override
+                    @Override
                     public void handle(final UserInfos user) {
                         Calendar calendar =new GregorianCalendar();
                         String uniqueID = UUID.randomUUID().toString();
@@ -227,18 +227,22 @@ public class MoodleController extends ControllerHelper {
                                 course.getString("fullname").substring(0, 4) + uniqueID);
                         JsonArray zimbraEmail = new JsonArray();
                         zimbraEmail.add(user.getUserId());
-                        log.info("getZimbraEmail : " + zimbraEmail.toString());
+                        //log.info("getZimbraEmail : " + zimbraEmail.toString());
+                        /*
                         moodleEventBus.getZimbraEmail(zimbraEmail, new Handler<Either<String, JsonObject>>() {
+
                             @Override
                             public void handle(Either<String, JsonObject> event) {
                                 if (event.isRight()) {
                                     log.info("succes getZimbraEmail : ");
-                        /*JsonObject action = new JsonObject();
+
+                         */
+                        JsonObject action = new JsonObject();
                         action.put("action", "getUserInfos").put("userId", user.getUserId());
                         moodleEventBus.getParams(action, new Handler<Either<String, JsonObject>>() {
                             @Override
                             public void handle(Either<String, JsonObject> event) {
-                                if (event.isRight()) {*/
+                                if (event.isRight()) {
                                     final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                                     URI moodleUri = null;
                                     try {
@@ -259,7 +263,7 @@ public class MoodleController extends ControllerHelper {
                                             }
 
                                             log.info(event.right().getValue());
-                                            String userMail = event.right().getValue().getJsonObject(user.getUserId()).getString("email");
+                                            String userMail = "moodleNotif@entcgi.fr";
                                             log.info("userMail : " + userMail);
                                             final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
                                             final String moodleUrl = moodleUri.toString() +
@@ -309,7 +313,7 @@ public class MoodleController extends ControllerHelper {
                             }
                         });*/
                                 } else {
-                                    log.error("fail getZimbraEmail : ");
+                                    //log.error("fail getZimbraEmail : ");
                                     log.error(event.left().getValue());
                                     handle(new Either.Left<>("Failed to gets the http params"));
                                 }
@@ -319,7 +323,7 @@ public class MoodleController extends ControllerHelper {
                 });
             }
         });
-	}
+    }
 
     @ApiDoc("public Get pictutre for moodle webside")
     @Get("/files/:id")
@@ -604,13 +608,13 @@ public class MoodleController extends ControllerHelper {
                 }
             }
         });
-	}
+    }
 
-	@Get("/course/:id")
+    @Get("/course/:id")
     @ApiDoc("Redirect to Moodle")
     public void redirectToMoodle (HttpServerRequest request){
-	    String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
-	    redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" +
+        String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
+        redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" +
                 request.getParam("id") + "&notifyeditingon=1");
     }
 
@@ -618,19 +622,19 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("get a choice")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void getChoices (final HttpServerRequest request) {
-	    UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-	        @Override
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
             public void handle(UserInfos user) {
-	            if (user != null) {
-	                String userId = user.getUserId();
-	                moodleWebService.getChoices(userId, arrayResponseHandler(request));
-	            } else {
-	                log.error("User not found in session.");
-	                unauthorized(request);
-	            }
-	        }
-	    });
-	}
+                if (user != null) {
+                    String userId = user.getUserId();
+                    moodleWebService.getChoices(userId, arrayResponseHandler(request));
+                } else {
+                    log.error("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
+    }
 
     @Put("/choices/:view")
     @ApiDoc("set a choice")
@@ -840,7 +844,7 @@ public class MoodleController extends ControllerHelper {
                                     shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"), tabToAdd);
                                 }
 
-                            handler.handle(new Either.Right<String, JsonObject>(shareInfosFuture));
+                                handler.handle(new Either.Right<String, JsonObject>(shareInfosFuture));
                             }
                         } else {
                             badRequest(request, event.cause().getMessage());
@@ -1124,8 +1128,10 @@ public class MoodleController extends ControllerHelper {
                     }
                 }
                 log.info("JSON PARTAGE : " + share.toString());
-                log.info("CALL getZimbraEmail : ");
-                moodleEventBus.getZimbraEmail(zimbraEmail, event -> {
+
+                //log.info("CALL getZimbraEmail : ");
+                //moodleEventBus.getZimbraEmail(zimbraEmail, event -> {
+                /*
                     log.info("END getZimbraEmail : ");
                     JsonObject zimbraResult = event.right().getValue();
                     ArrayList zimbraArray = new ArrayList(zimbraResult.getMap().keySet());
@@ -1143,55 +1149,55 @@ public class MoodleController extends ControllerHelper {
                             user1.put("email", zimbraMap.get(idUser));
                         }
                     }
-
-                    JsonArray groupsUsers = share.getJsonArray("groups");
-                    if(groupsUsers != null) {
-                        for (int i = 0; i < groupsUsers.size(); i++) {
-                            JsonArray usersInGroup = groupsUsers.getJsonObject(i).getJsonArray("users");
-                            if(usersInGroup != null) {
-                                for (int j = 0; j < usersInGroup.size(); j++) {
-                                    JsonObject userInGroupe = usersInGroup.getJsonObject(j);
-                                    userInGroupe.put("email", zimbraMap.get(userInGroupe.getString("id")));
-                                }
+*/
+                JsonArray groupsUsers = share.getJsonArray("groups");
+                if(groupsUsers != null) {
+                    for (int i = 0; i < groupsUsers.size(); i++) {
+                        JsonArray usersInGroup = groupsUsers.getJsonObject(i).getJsonArray("users");
+                        if(usersInGroup != null) {
+                            for (int j = 0; j < usersInGroup.size(); j++) {
+                                JsonObject userInGroupe = usersInGroup.getJsonObject(j);
+                                userInGroupe.put("email", "moodleNotif@entcgi.fr");
                             }
                         }
                     }
-                    log.info("JSON PARTAGE WITH MAIL : " + share.toString());
+                }
+                log.info("JSON PARTAGE WITH MAIL : " + share.toString());
 
-                    JsonObject shareSend = new JsonObject();
-                    shareSend.put("parameters", share)
-                            .put("wstoken", config.getString("wsToken"))
-                            .put("wsfunction", WS_CREATE_SHARECOURSE)
-                            .put("moodlewsrestformat", JSON);
-                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                    URI moodleUri = null;
-                    try {
-                        final String service = (config.getString("address_moodle") + config.getString("ws-path"));
-                        final String urlSeparator = service.endsWith("") ? "" : "/";
-                        moodleUri = new URI(service + urlSeparator);
-                    } catch (URISyntaxException e) {
-                        log.error("Invalid moodle web service sending right share uri",e);
-                    }
-                    if (moodleUri != null) {
-                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
-                        final String moodleUrl = moodleUri.toString();
-                        log.info("CALL WS_CREATE_SHARECOURSE");
-                        HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                            @Override
-                            public void handle(Either<String, Buffer> event) {
-                                if (event.isRight()) {
-                                    log.info("SUCCESS WS_CREATE_SHARECOURSE");
-                                    request.response()
-                                            .setStatusCode(200)
-                                            .end();
-                                } else {
-                                    log.error("FAIL WS_CREATE_SHARECOURSE" + event.left().getValue());
-                                    unauthorized(request);
-                                }
+                JsonObject shareSend = new JsonObject();
+                shareSend.put("parameters", share)
+                        .put("wstoken", config.getString("wsToken"))
+                        .put("wsfunction", WS_CREATE_SHARECOURSE)
+                        .put("moodlewsrestformat", JSON);
+                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                URI moodleUri = null;
+                try {
+                    final String service = (config.getString("address_moodle") + config.getString("ws-path"));
+                    final String urlSeparator = service.endsWith("") ? "" : "/";
+                    moodleUri = new URI(service + urlSeparator);
+                } catch (URISyntaxException e) {
+                    log.error("Invalid moodle web service sending right share uri",e);
+                }
+                if (moodleUri != null) {
+                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
+                    final String moodleUrl = moodleUri.toString();
+                    log.info("CALL WS_CREATE_SHARECOURSE");
+                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
+                        @Override
+                        public void handle(Either<String, Buffer> event) {
+                            if (event.isRight()) {
+                                log.info("SUCCESS WS_CREATE_SHARECOURSE");
+                                request.response()
+                                        .setStatusCode(200)
+                                        .end();
+                            } else {
+                                log.error("FAIL WS_CREATE_SHARECOURSE" + event.left().getValue());
+                                unauthorized(request);
                             }
-                        }, true);
-                    }
-                });
+                        }
+                    }, true);
+                }
+                //});
             }
         });
     }
@@ -1262,11 +1268,11 @@ public class MoodleController extends ControllerHelper {
     @Delete("/courseDuplicate/:id")
     @ApiDoc("delete a duplicateFailed folder")
     public void deleteDuplicateCourse(final HttpServerRequest request) {
-	    UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-	        @Override
+        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
+            @Override
             public void handle(UserInfos user) {
-	            if (user != null) {
-	                final String status = FINISHED;
+                if (user != null) {
+                    final String status = FINISHED;
                     Integer id = Integer.parseInt(request.params().get("id"));
                     moodleWebService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
                         @Override
@@ -1291,12 +1297,12 @@ public class MoodleController extends ControllerHelper {
                             }
                         }
                     });
-	            } else {
-	                log.error("User not found in session.");
-	                unauthorized(request);
-	            }
-	        }
-	    });
+                } else {
+                    log.error("User not found in session.");
+                    unauthorized(request);
+                }
+            }
+        });
     }
 
     @Post("/course/duplicate/response")
