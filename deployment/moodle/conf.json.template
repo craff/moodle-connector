@@ -26,6 +26,7 @@
         "idStudent": ${idStudent},
         "idEditingTeacher": ${idEditingTeacher},
         "idAuditeur": ${idAuditeur},
-        "header": "${header}"
+        "header": "${header}",
+        "deleteCategoryId": ${deleteCategoryId}
       }
     }

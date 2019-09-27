@@ -1,6 +1,6 @@
-import {_, idiom, moment, notify, Rights, Shareable} from "entcore";
+import {_, idiom, moment, notify, Rights, Shareable, } from "entcore";
 import http from "axios";
-import {Mix} from "entcore-toolkit";
+import {Mix} from 'entcore-toolkit";
 import {Folders} from "./Folder";
 
 export class Course implements Shareable{
@@ -192,7 +192,7 @@ export class Courses {
         try {
             await http.delete('/moodle/course', { data: this.toJsonForDelete() } );
         } catch (e) {
-            notify.error("Delete function didn't work");
+            notify.error(idiom.translate("moodle.error.delete.course"));
             throw e;
         }
     }
