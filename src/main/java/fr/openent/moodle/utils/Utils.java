@@ -1,6 +1,7 @@
 package fr.openent.moodle.utils;
 
 import fr.openent.moodle.Moodle;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -36,6 +37,10 @@ public class Utils {
         return role1.equals(Moodle.ROLE_AUDITEUR) ||
                 (role1.equals(Moodle.ROLE_EDITEUR) && role1.equals(Moodle.ROLE_APPRENANT));
 
+    }
+
+    public static void sendErrorRequest(HttpServerRequest request, String textSend){
+        request.response().setStatusCode(400).end(textSend);
     }
 
 }

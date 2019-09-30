@@ -591,15 +591,15 @@ public class MoodleController extends ControllerHelper {
                         if (responseMoodle.isRight()) {
                             moodleWebService.deleteCourse(courses, defaultResponseHandler(request));
                         } else {
-                            badRequest(request);
+                            Utils.sendErrorRequest(request, responseMoodle.left() + config.toString());
                             log.error("Post service failed"  + responseMoodle.left().getValue());
                         }
                     }, true);
                 } else {
-                    badRequest(request);
+                    Utils.sendErrorRequest(request, config.toString());
                 }
             } catch (Exception error){
-                badRequest(request);
+                Utils.sendErrorRequest(request, error + config.toString());
                 log.error("Invalid moodle web service deleting course uri", error);
             }
         });
