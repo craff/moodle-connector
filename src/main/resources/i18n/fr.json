@@ -174,5 +174,5 @@
 	"group.school.Teacher": "Enseignants de l'{0}.",
 	"group.school.Guest": "Invités de l'{0}.",
 
-	"moodle.error.delete.course": "Une erreur est survenue lors de la suppression du cour"
+	"moodle.error.delete.course": "Une erreur est survenue lors de la suppression des cours"
 }

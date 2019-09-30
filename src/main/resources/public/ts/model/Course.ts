@@ -1,6 +1,6 @@
 import {_, idiom, moment, notify, Rights, Shareable, } from "entcore";
 import http from "axios";
-import {Mix} from 'entcore-toolkit";
+import {Mix} from "entcore-toolkit";
 import {Folders} from "./Folder";
 
 export class Course implements Shareable{
