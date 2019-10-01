@@ -299,8 +299,10 @@ export class Courses {
         }
     }
 
-    lastCreation(){
-        return this.coursesByUser.filter(course => course.duplication == 'non').slice(0,5);
+    lastCreation():Course[]{
+        return this.coursesByUser.filter((course:Course):boolean => course.duplication === 'non')
+            .sort((courseOne:any, courseTwo:any):number=> courseTwo.date - courseOne.date)
+            .slice(0, 5);
     }
 
     isTheFirst(courseFirst : Course){
