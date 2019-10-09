@@ -234,7 +234,7 @@ export class Courses {
 
     async getCoursesbyUser (userId: string) {
         try {
-            let courses = await http.get(`/moodle/users/courses`);
+            let courses = await http.get(`/moodle/user/courses`);
             let allCourses = Mix.castArrayAs(Course, courses.data.allCourses);
             this.allCourses = allCourses;
             let idAuditeur = courses.data.idAuditeur + "";
@@ -285,6 +285,7 @@ export class Courses {
 
             this.isSynchronized = true;
         } catch (e) {
+            notify.error(idiom.translate("moodle.error.get.course"));
             this.isSynchronized = false;
             throw e;
         }

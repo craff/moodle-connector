@@ -37,38 +37,31 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         }
     };
 
-    $scope.initDashBoardTab = async function () {
+    $scope.initDashBoardTab = async function ():Promise<void> {
         $scope.currentTab = 'dashboard';
         template.open('main', 'dashboard/dashboard_home');
         await $scope.courses.getChoice();
-        Utils.safeApply($scope);
-        // TODO recupérer de la bdd, selon le choix de l'utilisateur connecté
-
-        if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
-            $scope.displayMessageLoader = true;
-            Utils.safeApply($scope);
-            await $scope.courses.getCoursesbyUser(model.me.userId);
-            $scope.displayMessageLoader = false;
-        }
+        await initViewLoadind();
         $scope.updateCourse();
         Utils.safeApply($scope);
     };
 
-    $scope.initCoursesTab = async function () {
+    $scope.initCoursesTab = async function ():Promise<void> {
         $scope.currentTab = 'courses';
         template.open('main', 'my-courses');
-        Utils.safeApply($scope);
-        // TODO ne charger que si besoin
-        if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
-            $scope.displayMessageLoader = true;
-            Utils.safeApply($scope);
-            await $scope.courses.getCoursesbyUser(model.me.userId);
-            $scope.displayMessageLoader = false;
-        }
-        $scope.folders.searchInFolders = 0;
+        await initViewLoadind();
         $scope.isPrintMenuFolder();
         Utils.safeApply($scope);
     };
+
+    const initViewLoadind = async():Promise<void> => {
+        if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
+            $scope.displayMessageLoader = true;
+            await $scope.courses.getCoursesbyUser(model.me.userId)
+                .then(() => $scope.displayMessageLoader = false)
+                .catch(() => $scope.displayMessageLoader = false);
+        }
+    }
 
     $scope.initLibraryTab = async function () {
         $scope.currentTab = 'library';

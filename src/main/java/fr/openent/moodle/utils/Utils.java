@@ -1,14 +1,19 @@
 package fr.openent.moodle.utils;
 
 import fr.openent.moodle.Moodle;
+import fr.openent.moodle.controllers.SynchController;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+
+import static fr.wseduc.webutils.http.Renders.badRequest;
 
 public class Utils {
+    protected static final Logger log = LoggerFactory.getLogger(SynchController.class);
 
     public static JsonArray removeDuplicateCourses(JsonArray duplicatesCours) {
-
         JsonArray coursesUniq = new JsonArray();
         for (Object course : duplicatesCours)
         {
@@ -40,7 +45,7 @@ public class Utils {
     }
 
     public static void sendErrorRequest(HttpServerRequest request, String textSend){
-        request.response().setStatusCode(400).end(textSend);
+        log.error(textSend);
+        badRequest(request, textSend);
     }
-
 }
