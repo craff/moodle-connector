@@ -417,8 +417,7 @@ public class MoodleController extends ControllerHelper {
                                                                 if (auteur != null && auteur.equals(user.getUserId())) {
                                                                     moodleWebService.createCourse(course, eventResponseCreate ->{
                                                                         if(eventResponseCreate.isLeft()) {
-                                                                            log.error("" +
-                                                                                    "Error when created course in function get course " +
+                                                                            log.error("Error when created course in function get course " +
                                                                                     eventResponseCreate.left().getValue());
                                                                         } else {
                                                                             log.info("" +
@@ -434,59 +433,59 @@ public class MoodleController extends ControllerHelper {
                                                             try {
                                                                 if (eventCoursesDuplication.right().getValue().size() != 0) {
                                                                     JsonArray coursesInDuplication = eventCoursesDuplication.right().getValue();
-                                                                    for (int i = 0; i < coursesInDuplication.size(); i++) {
+                                                                    for (int i = 0 ; i < coursesInDuplication.size() ; i++) {
                                                                         JsonObject courseDuplicate = coursesInDuplication.getJsonObject(i);
-                                                                        int indexCourse = courseId.indexOf(courseDuplicate.getValue("id_course").toString());
-                                                                        JsonObject course = courses.getJsonObject(indexCourse);
-                                                                        courses.add(createCourseForsent(course, courseDuplicate));
+                                                                        int indexCourseDuplication = courseId.indexOf(courseDuplicate.getValue("id_course").toString());
+                                                                        JsonObject course = courses.getJsonObject(indexCourseDuplication);
+                                                                        courses.add(createCourseForSend(course, courseDuplicate));
                                                                     }
                                                                 }
-                                                            } catch (Exception error){
-                                                                Utils.sendErrorRequest(request, "Error in get duplication in get courses by user" +
-                                                                        error.toString());
-                                                            }
-                                                        });
-                                                        moodleWebService.getPreferences(idUser, eventPreference -> {
-                                                            try{
-                                                                if (eventPreference.isRight()) {
-                                                                    JsonArray list = eventPreference.right().getValue();
-                                                                    if (list.size() != 0) {
-                                                                        for (int i = 0; i < courses.size(); i++) {
-                                                                            JsonObject courseAddPreference = courses.getJsonObject(i);
-                                                                            for (int j = 0; j < list.size(); j++) {
-                                                                                JsonObject preferencesCourse = list.getJsonObject(j);
-                                                                                if (courseAddPreference.containsKey("courseid")) {
-                                                                                    if (preferencesCourse.getValue("moodle_id").toString().equals(courseAddPreference.getValue("courseid").toString())) {
-                                                                                        courseAddPreference.put("masked", preferencesCourse.getBoolean("masked"));
-                                                                                        courseAddPreference.put("favorites", preferencesCourse.getBoolean("favorites"));
+                                                                moodleWebService.getPreferences(idUser, eventPreference -> {
+                                                                    try{
+                                                                        if (eventPreference.isRight()) {
+                                                                            JsonArray list = eventPreference.right().getValue();
+                                                                            if (list.size() != 0) {
+                                                                                for (int i = 0; i < courses.size(); i++) {
+                                                                                    JsonObject courseAddPreference = courses.getJsonObject(i);
+                                                                                    for (int j = 0; j < list.size(); j++) {
+                                                                                        JsonObject preferencesCourse = list.getJsonObject(j);
+                                                                                        if (courseAddPreference.containsKey("courseid")) {
+                                                                                            if (preferencesCourse.getValue("moodle_id").toString().equals(courseAddPreference.getValue("courseid").toString())) {
+                                                                                                courseAddPreference.put("masked", preferencesCourse.getBoolean("masked"));
+                                                                                                courseAddPreference.put("favorites", preferencesCourse.getBoolean("favorites"));
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                    if (!(courseAddPreference.containsKey("masked"))) {
+                                                                                        courseAddPreference.put("masked", false);
+                                                                                        courseAddPreference.put("favorites", false);
                                                                                     }
                                                                                 }
+                                                                            } else {
+                                                                                for (int i = 0; i < courses.size(); i++) {
+                                                                                    JsonObject courseWithoutPreference = courses.getJsonObject(i);
+                                                                                    courseWithoutPreference.put("masked", false);
+                                                                                    courseWithoutPreference.put("favorites", false);
+                                                                                }
                                                                             }
-                                                                            if (!(courseAddPreference.containsKey("masked"))) {
-                                                                                courseAddPreference.put("masked", false);
-                                                                                courseAddPreference.put("favorites", false);
-                                                                            }
+                                                                            JsonObject finalResponse = new JsonObject();
+                                                                            finalResponse.put("allCourses", courses);
+                                                                            finalResponse.put("idAuditeur", moodleConfig.getInteger("idAuditeur"));
+                                                                            finalResponse.put("idEditingTeacher", moodleConfig.getInteger("idEditingTeacher"));
+                                                                            finalResponse.put("idStudent", moodleConfig.getInteger("idStudent"));
+                                                                            Renders.renderJson(request, finalResponse);
+                                                                        } else {
+                                                                            Utils.sendErrorRequest(request,
+                                                                                    "Fail to call get courses webservice : " +
+                                                                                            responseMoodle.statusMessage());
                                                                         }
-                                                                    } else {
-                                                                        for (int i = 0; i < courses.size(); i++) {
-                                                                            JsonObject courseWithoutPreference = courses.getJsonObject(i);
-                                                                            courseWithoutPreference.put("masked", false);
-                                                                            courseWithoutPreference.put("favorites", false);
-                                                                        }
+                                                                    } catch (Exception error){
+                                                                        Utils.sendErrorRequest(request, "Error in get preference in get courses by user : " +
+                                                                                error.toString());
                                                                     }
-                                                                    JsonObject finalResponse = new JsonObject();
-                                                                    finalResponse.put("allCourses", courses);
-                                                                    finalResponse.put("idAuditeur", moodleConfig.getInteger("idAuditeur"));
-                                                                    finalResponse.put("idEditingTeacher", moodleConfig.getInteger("idEditingTeacher"));
-                                                                    finalResponse.put("idStudent", moodleConfig.getInteger("idStudent"));
-                                                                    Renders.renderJson(request, finalResponse);
-                                                                } else {
-                                                                    Utils.sendErrorRequest(request,
-                                                                            "Fail to call get courses webservice " +
-                                                                                    responseMoodle.statusMessage());
-                                                                }
+                                                                });
                                                             } catch (Exception error){
-                                                                Utils.sendErrorRequest(request, "Error in get preference in get courses by user" +
+                                                                Utils.sendErrorRequest(request, "Error in get duplication in get courses by user : " +
                                                                         error.toString());
                                                             }
                                                         });
@@ -494,7 +493,7 @@ public class MoodleController extends ControllerHelper {
                                                             httpClient.close();
                                                         }
                                                     } catch (Exception error){
-                                                        Utils.sendErrorRequest(request, "Error in get courses by user" +
+                                                        Utils.sendErrorRequest(request, "Error in get courses by user : " +
                                                                 error.toString());
                                                     }
                                                 }
@@ -510,14 +509,14 @@ public class MoodleController extends ControllerHelper {
                                             }
                                         });
                                         Utils.sendErrorRequest(request,
-                                                "Fail to call get courses webservice" +
+                                                "Fail to call get courses webservice : " +
                                                         responseMoodle.statusMessage());
                                     }
                                 });
                                 httpClientRequest.headers().set("Content-Length", "0");
                                 httpClientRequest.exceptionHandler(eventClientRequest -> {
                                     Utils.sendErrorRequest(request,
-                                            "Typically an unresolved Address, a timeout about connection or response" +
+                                            "Typically an unresolved Address, a timeout about connection or response : " +
                                                     eventClientRequest.getMessage() +
                                                     eventClientRequest);
                                     if (!responseIsSent.getAndSet(true)) {
@@ -526,19 +525,19 @@ public class MoodleController extends ControllerHelper {
                                     }
                                 }).end();
                             } else {
-                                Utils.sendErrorRequest(request, "Get list courses in Ent Base failed " +
+                                Utils.sendErrorRequest(request, "Get list courses in Ent Base failed : " +
                                         eventSqlCourses.left().getValue());
                             }
                         });
                     } else {
-                        unauthorized(request, "User is not authorized to access courses");
+                        unauthorized(request, "User is not authorized to access courses : ");
                     }
                 } catch (Exception error){
-                    Utils.sendErrorRequest(request,"Error in get courses by user after get user " + error);
+                    Utils.sendErrorRequest(request,"Error in get courses by user after get user : " + error);
                 }
             });
         } catch (Exception error){
-            Utils.sendErrorRequest(request,"Error in get courses by user" + error);
+            Utils.sendErrorRequest(request,"Error in get courses by user : " + error);
         }
     }
 
@@ -557,7 +556,7 @@ public class MoodleController extends ControllerHelper {
         }
     }
 
-    private final JsonObject createCourseForsent (JsonObject course, JsonObject courseDuplicate){
+    private final JsonObject createCourseForSend (JsonObject course, JsonObject courseDuplicate){
         try{
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             return new JsonObject()
@@ -579,6 +578,7 @@ public class MoodleController extends ControllerHelper {
                     .put("duplication", courseDuplicate.getString("status"))
                     .put("originalCourseId", courseDuplicate.getInteger("id_course"))
                     .put("folderid", courseDuplicate.getInteger("id_folder"))
+                    .put("role", course.getString("role"))
                     .put("courseid", courseDuplicate.getInteger("id"));
         } catch (Exception error) {
             log.error("Error in createCourseForsent" + error);

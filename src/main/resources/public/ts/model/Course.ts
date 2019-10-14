@@ -2,6 +2,7 @@ import {_, idiom, moment, notify, Rights, Shareable, } from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
 import {Folders} from "./Folder";
+import {STATUS} from "../constantes";
 
 export class Course implements Shareable{
     shared : any;
@@ -10,7 +11,7 @@ export class Course implements Shareable{
 
     courseid : number;
     id : number;
-
+    status: STATUS;
     fullname : string;
     summary : string;
     date : Date;
@@ -197,28 +198,36 @@ export class Courses {
         }
     }
 
-    toJsonForDuplicate(){
-        return {
-            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
-            folderId: this.folderid
+    /*    toJsonForDuplicate(){
+            return {
+                coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
+                folderId: this.folderid
+            }
+        }*/
+
+    private coursesSelectedConfirmed():Array<Course>{
+        return this.allCourses.filter((course:Course):boolean => course.selectConfirm && course.select);
+    }
+
+    public async coursesDuplicate(folderId:number):Promise<void> {
+        try {
+            let coursesId:Array<number>;
+            coursesId = this.coursesSelectedConfirmed().map((course:Course):number => course.id);
+            const idsCoursesAndFolders:Object = { folderId:folderId, coursesId };
+            await http.post('/moodle/course/duplicate', idsCoursesAndFolders);
+        } catch (error) {
+            notify.error(idiom.translate("moodle.error.duplicate.course"));
+            throw error;
         }
     }
 
-    async coursesDuplicate() {
+    public async getDuplicateCourse ():Promise<Course[]>{
         try {
-            await http.post('/moodle/course/duplicate', this.toJsonForDuplicate());
-        } catch (e) {
-            notify.error("Duplicate function didn't work");
-            throw e;
-        }
-    }
-
-    async getDuplicateCourse () {
-        try {
-            let courses = await http.get(`/moodle/duplicateCourses`);
-            return courses.data;
-        } catch (e) {
-            throw e;
+            const { data } = await http.get('/moodle/duplicateCourses');
+            return data
+        } catch (error) {
+            notify.error(idiom.translate("moodle.error.duplicate.course"));
+            throw error;
         }
     }
 

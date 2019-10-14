@@ -2,7 +2,7 @@ import {_, model, moment, ng, notify, template} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
-import {TIMETOREFRESHDUPLICATION, STATUS} from "../constantes";
+import {TIME_TO_REFRESH_DUPLICATION, STATUS} from "../constantes";
 
 export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', '$rootScope', '$interval', ($scope, $timeout, route, $rootScope, $interval) => {
 
@@ -41,7 +41,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.currentTab = 'dashboard';
         template.open('main', 'dashboard/dashboard_home');
         await $scope.courses.getChoice();
-        await initViewLoadind();
+        await initViewLoading();
         $scope.updateCourse();
         Utils.safeApply($scope);
     };
@@ -49,12 +49,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.initCoursesTab = async function ():Promise<void> {
         $scope.currentTab = 'courses';
         template.open('main', 'my-courses');
-        await initViewLoadind();
+        await initViewLoading();
         $scope.isPrintMenuFolder();
         Utils.safeApply($scope);
     };
 
-    const initViewLoadind = async():Promise<void> => {
+    const initViewLoading = async():Promise<void> => {
         if ($scope.courses.isSynchronized === undefined || $scope.courses.isSynchronized === false) {
             $scope.displayMessageLoader = true;
             await $scope.courses.getCoursesbyUser(model.me.userId)
@@ -556,30 +556,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     /**
-     * duplicate elements
-     * */
-    $scope.openPopUpDuplicate = function () {
-        $scope.courses.numberDuplication = undefined;
-        template.open('ligthBoxContainer', 'courses/duplicateLightbox');
-        $scope.courses.allCourses.filter(course => course.select).map(course => course.selectConfirm = true);
-        $scope.confirmDuplicateSend();
-        $scope.openLightbox = true;
-    };
-
-    $scope.duplicateElements = async function () {
-        $scope.disableDuplicateSend = false;
-        $scope.openLightbox = false;
-        if ($scope.courses.allCourses.some(course => course.selectConfirm)) {
-            $scope.courses.folderid = ($scope.courses.allCourses.filter(course => course.selectConfirm))[0].folderid;
-            await $scope.courses.coursesDuplicate();
-        }
-        $scope.updateCourse();
-        $timeout(() =>
-            $scope.initCoursesbyuser());
-        $scope.initFolders();
-    };
-
-    /**
      * move folders & courses
      * */
     $scope.openPopUpMove = function () {
@@ -655,7 +631,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
      * confirm duplicate
      * */
     $scope.confirmDuplicateSend = function () {
-        $scope.disableDuplicateSend = !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
+        return !!($scope.folders.all.some(folder => folder.selectConfirm) || $scope.courses.allCourses.some(course => course.selectConfirm));
     };
 
     /**
@@ -824,32 +800,44 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     /**
+     * duplicate elements
+     * */
+    let isStartDuplicationCheck:Boolean, numberCoursesPending:Number;
+    $scope.openPopUpDuplicate = ():void => {
+        $scope.courses.allCourses = $scope.courses.allCourses.map((course:Course):Course => {
+            course.selectConfirm = course.select;
+            return course
+        });
+        template.open('ligthBoxContainer', 'courses/duplicateLightbox');
+        $scope.openLightbox = true;
+    };
+
+    $scope.duplicateElements = async ():Promise<void> => {
+        $scope.disableDuplicateSend = $scope.openLightbox = $scope.toasterShow = false;
+        if ($scope.courses.allCourses.some((course:Course):boolean => course.selectConfirm)) {
+            await $scope.courses.coursesDuplicate($scope.currentfolderid);
+            if(!isStartDuplicationCheck) await $scope.updateCourse();
+            await $scope.initCoursesbyuser();
+        }
+    };
+    /**
      * set timeout in order to update the status of duplicate course
      */
     $scope.updateCourse = async():Promise<void> => {
-        let duplicateCourses = await $scope.courses.getDuplicateCourse();
-        let needRefresh = false;
-        if(duplicateCourses.length != $scope.courses.coursesByUser.filter(course => course.duplication != "non").length && !$scope.openLightbox){
-            $scope.initCoursesbyuser();
-        }
-        duplicateCourses.forEach(async function (duplicateCourse){
-            $scope.courses.coursesByUser.filter(course => course.duplication != "non").forEach(async function (course) {
-                if(duplicateCourse.id == course.courseid){
-                    if(duplicateCourse.status != course.duplication){
-                        course.duplication = duplicateCourse.status;
-                        needRefresh=true;
-                    }
-                }
-            });
-        });
-        const isStartDuplicationCheck:boolean = duplicateCourses.filter(cour=> cour.status === STATUS.WAITING).length !== 0;
+        const duplicateCourses:Course[] = await $scope.courses.getDuplicateCourse();
+        const coursesChecked:Course[] = duplicateCourses
+            .filter((course:Course):boolean => course.status === STATUS.WAITING || course.status === STATUS.PENDING);
+        isStartDuplicationCheck = coursesChecked.length !== 0;
         if(isStartDuplicationCheck){
+            if(coursesChecked.length !== numberCoursesPending && numberCoursesPending) {
+                await $scope.initCoursesbyuser();
+            }
+            numberCoursesPending = coursesChecked.length;
             $timeout(():void =>
                     $scope.updateCourse()
-                , TIMETOREFRESHDUPLICATION);
-        }
-        if(needRefresh && !$scope.openLightbox){
-            Utils.safeApply($scope);
+                , TIME_TO_REFRESH_DUPLICATION);
+        } else {
+            await $scope.initCoursesbyuser();
         }
     };
 

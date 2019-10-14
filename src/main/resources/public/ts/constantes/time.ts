@@ -1,1 +1,1 @@
-export const TIMETOREFRESHDUPLICATION:number = 10 * 1000; //second
+export const TIME_TO_REFRESH_DUPLICATION:number = 10 * 1000; //second

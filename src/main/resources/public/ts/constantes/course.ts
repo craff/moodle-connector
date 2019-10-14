@@ -1,3 +1,4 @@
 export enum STATUS {
-    WAITING ="en attente",
+    WAITING="en attente",
+    PENDING= "en cours",
 }

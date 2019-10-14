@@ -175,5 +175,6 @@
 	"group.school.Guest": "Invités de l'{0}.",
 
 	"moodle.error.delete.course": "Une erreur est survenue lors de la suppression des cours",
-	"moodle.error.get.course": "Une erreur est survenue lors de la récupération des cours"
+	"moodle.error.get.course": "Une erreur est survenue lors de la récupération des cours",
+	"moodle.error.duplicate.course" : "Une erreur est survenue lors de la duplications des cours"
 }
