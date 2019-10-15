@@ -1,4 +1,4 @@
-import {_, model, moment, ng, notify, template} from "entcore";
+import {_, model, moment, ng, notify, template, idiom as i18n} from "entcore";
 import {Course, Courses} from "../model";
 import {Folder, Folders} from "../model/Folder";
 import {Utils} from "../utils/Utils";
@@ -361,28 +361,22 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * Create a course
      */
-    $scope.createCourse = async function () {
-        // TODO get current folder id the first time we open the create lightbox
+    $scope.createCourse = async ():Promise<void> => {
         $scope.course.folderid = parseInt($scope.folders.folderIdMoveIn);
         if ($scope.course.fullname.length >= 4) {
             $scope.submitWait = true;
-            try {
-                await $scope.course.create();
-                $scope.activityType = $scope.course.typeA;
-                await $scope.courses.getCoursesbyUser(model.me.userId);
-                $scope.openLightbox = false;
-                $scope.showToaster();
-                $scope.currentfolderid = $scope.folders.folderIdMoveIn;
-                $scope.initFolders();
-                $scope.submitWait = false;
-                $scope.folders.folderIdMoveIn = undefined;
-            } catch (e){
-                $scope.submitWait = false;
-                notify.error("La création du cours n'a pas abouti");
-                throw (e)
-            }
+            await $scope.course.create()
+                .then(async ():Promise<void> => {
+                    $scope.activityType = $scope.course.typeA;
+                    $scope.currentfolderid = $scope.folders.folderIdMoveIn;
+                    $scope.folders.folderIdMoveIn = undefined;
+                    $scope.showToaster();
+                    await $scope.courses.getCoursesbyUser(model.me.userId);
+                    $scope.openLightbox = $scope.submitWait = false;
+                })
+                .catch(():boolean=> $scope.submitWait = $scope.openLightbox = false);
         } else {
-            notify.error("Le Titre est trop court");
+            notify.error(i18n.translate("moodle.info.short.title"));
         }
         Utils.safeApply($scope);
     };

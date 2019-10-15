@@ -35,7 +35,7 @@
 	"create": "Créer",
 	"rename": "Renommer",
 	"move": "Déplacer",
-	"waiting": "EN ATTENTE",
+	"waiting": "EN COURS",
 	"share.search.title": "Rechercher des utilisateurs et des groupes",
 	"tuto.title": "Naviguez au sein de vos documents en vue vignettes : ",
 	"tuto.action.select": "Cliquez",
@@ -176,5 +176,8 @@
 
 	"moodle.error.delete.course": "Une erreur est survenue lors de la suppression des cours",
 	"moodle.error.get.course": "Une erreur est survenue lors de la récupération des cours",
-	"moodle.error.duplicate.course" : "Une erreur est survenue lors de la duplications des cours"
+	"moodle.error.duplicate.course": "Une erreur est survenue lors de la duplications des cours",
+	"moodle.error.create.course": "La création du cours n'a pas abouti",
+
+	"moodle.info.short.title": "Le Titre est trop court"
 }

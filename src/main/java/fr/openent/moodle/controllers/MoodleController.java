@@ -208,121 +208,76 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("create a course")
     @SecuredAction(workflow_create)
     public void create(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "course", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject course) {
-                if ("1".equals(course.getString("type"))) {
-                    course.put("typeA", "");
-                }
-                if (isNull(course.getString("summary"))) {
-                    course.put("summary", "");
-                }
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(final UserInfos user) {
-                        Calendar calendar =new GregorianCalendar();
-                        String uniqueID = UUID.randomUUID().toString();
-                        course.put("shortname", ((GregorianCalendar) calendar).toZonedDateTime().toString().substring(0, 7) +
-                                user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
-                                course.getString("fullname").substring(0, 4) + uniqueID);
-                        JsonArray zimbraEmail = new JsonArray();
-                        zimbraEmail.add(user.getUserId());
-                        JsonObject action = new JsonObject();
-                        action.put("action", "getUserInfos").put("userId", user.getUserId());
-                        /*
-                        log.info("getZimbraEmail : " + zimbraEmail.toString());
-
-                        moodleEventBus.getZimbraEmail(zimbraEmail, new Handler<Either<String, JsonObject>>() {
-
-                            @Override
-                            public void handle(Either<String, JsonObject> event) {
-                                if (event.isRight()) {
-                                    log.info("succes getZimbraEmail : ");
-                        moodleEventBus.getParams(action, new Handler<Either<String, JsonObject>>() {
-                            @Override
-                            public void handle(Either<String, JsonObject> event) {
-                        if (event.isRight()) {
-                         */
-                        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                        URI moodleUri = null;
-                        try {
-                            final String service = (config.getString("address_moodle") + config.getString("ws-path"));
-                            final String urlSeparator = service.endsWith("") ? "" : "/";
-                            moodleUri = new URI(service + urlSeparator);
-                        } catch (URISyntaxException e) {
-                            log.error("Invalid moodle web service creating a course uri",e);
-                        }
-                        if (moodleUri != null) {
-                            JsonObject shareSend = new JsonObject();
-                            shareSend = null;
-                            try {
-                                String idImage = course.getString("imageurl");
-                                String urlImage = "";
-                                if (idImage != null) {
-                                    urlImage = "&parameters[imageurl]=" + URLEncoder.encode(getScheme(request), "UTF-8") + "://" + URLEncoder.encode(getHost(request), "UTF-8") + "/moodle/files/" + URLEncoder.encode(idImage, "UTF-8");
-                                }
-//                              log.info(event.right().getValue());
-                                String userMail = "moodleNotif@entcgi.fr";
-                                log.info("userMail : " + userMail);
-                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
-                                final String moodleUrl = moodleUri.toString() +
-                                        "?wstoken=" + config.getString("wsToken") +
-                                        "&wsfunction=" + WS_CREATE_FUNCTION +
-                                        "&parameters[username]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
-                                        "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
-                                        "&parameters[email]=" + URLEncoder.encode(userMail, "UTF-8") +
-                                        //"&parameters[email]=" + URLEncoder.encode(event.right().getValue().getString("email"), "UTF-8") +
-                                        "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
-                                        "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
-                                        "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +
-                                        "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname"), "UTF-8") +
-                                        "&parameters[categoryid]=" + URLEncoder.encode("" + course.getInteger("categoryid"), "UTF-8") +
-                                        "&parameters[summary]=" + URLEncoder.encode(course.getString("summary"), "UTF-8") +
-                                        urlImage +
-                                        "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type"), "UTF-8") +
-                                        "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA"), "UTF-8") +
-                                        "&moodlewsrestformat=" + JSON;
-
-
-                                log.info("CALL WS create course : " + moodleUrl);
-
-                                httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                    @Override
-                                    public void handle(Either<String, Buffer> event) {
-                                        if (event.isRight()) {
-                                            log.info("SUCCESS creating course : ");
-                                            JsonObject object = event.right().getValue().toJsonArray().getJsonObject(0);
-                                            log.info(object);
-                                            course.put("moodleid", object.getValue("courseid"))
-                                                    .put("userid", user.getUserId());
-                                            moodleWebService.createCourse(course, defaultResponseHandler(request));
-                                        } else {
-                                            log.error("FAIL creating course : " + event.left().getValue());
-                                            log.error("fail to call create course webservice" + event.left().getValue());
-                                        }
-                                    }
-                                }, true);
-                            } catch (UnsupportedEncodingException e) {
-                                log.error("fail to create course by sending the URL to the WS", e);
-                            }
-                        }
-
-                                /*} else {
-                                    handle(new Either.Left<>("Failed to gets the http params"));
-                                }
-                            }
-                        });
-/                               } else {
-                                    //log.error("fail getZimbraEmail : ");
-                                    log.error(event.left().getValue());
-                                    handle(new Either.Left<>("Failed to gets the http params"));
-                                }
-                            }
-                        });
-                        */
-                    }
-                });
+        RequestUtils.bodyToJson(request, pathPrefix + "course", course -> {
+            if ("1".equals(course.getString("type"))) {
+                course.put("typeA", "");
             }
+            if (isNull(course.getString("summary"))) {
+                course.put("summary", "");
+            }
+            UserUtils.getUserInfos(eb, request, user -> {
+                URI moodleUri = null;
+                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                try {
+                    Calendar calendar =new GregorianCalendar();
+                    String uniqueID = UUID.randomUUID().toString();
+                    course.put("shortname", ((GregorianCalendar) calendar).toZonedDateTime().toString().substring(0, 7) +
+                            user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
+                            course.getString("fullname").substring(0, 4) + uniqueID);
+                    final String service = (config.getString("address_moodle") + config.getString("ws-path"));
+                    final String urlSeparator = service.endsWith("") ? "" : "/";
+                    moodleUri = new URI(service + urlSeparator);
+                } catch (URISyntaxException error) {
+                    Utils.sendErrorRequest(request,"Invalid moodle web service creating a course uri" + error);
+                }
+                if (moodleUri != null) {
+                    try {
+                        String urlImage = "", idImage = course.getString("imageurl");
+                        if (idImage != null) {
+                            urlImage = "&parameters[imageurl]=" +
+                                    URLEncoder.encode(getScheme(request), "UTF-8") +
+                                    "://" +
+                                    URLEncoder.encode(getHost(request), "UTF-8") +
+                                    "/moodle/files/" +
+                                    URLEncoder.encode(idImage, "UTF-8");
+                        }
+                        //todo remove mail constant and add mail from zimbra, ent ...
+                        String userMail = "moodleNotif@entcgi.fr";
+                        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
+                        final String moodleUrl = moodleUri.toString() +
+                                "?wstoken=" + config.getString("wsToken") +
+                                "&wsfunction=" + WS_CREATE_FUNCTION +
+                                "&parameters[username]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
+                                "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
+                                "&parameters[email]=" + URLEncoder.encode(userMail, "UTF-8") +
+                                "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
+                                "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
+                                "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +
+                                "&parameters[shortname]=" + URLEncoder.encode(course.getString("shortname"), "UTF-8") +
+                                "&parameters[categoryid]=" + URLEncoder.encode("" + course.getInteger("categoryid"), "UTF-8") +
+                                "&parameters[summary]=" + URLEncoder.encode(course.getString("summary"), "UTF-8") +
+                                urlImage +
+                                "&parameters[coursetype]=" + URLEncoder.encode(course.getString("type"), "UTF-8") +
+                                "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA"), "UTF-8") +
+                                "&moodlewsrestformat=" + JSON;
+                        log.info("CALL WS create course : " + moodleUrl);
+                        httpClientHelper.webServiceMoodlePost(null, moodleUrl, httpClient, responseIsSent, responseMoodle -> {
+                            if (responseMoodle.isRight()) {
+                                log.info("SUCCESS creating course : ");
+                                JsonObject courseCreatedInMoodle = responseMoodle.right().getValue().toJsonArray().getJsonObject(0);
+                                log.info(courseCreatedInMoodle);
+                                course.put("moodleid", courseCreatedInMoodle.getValue("courseid"))
+                                        .put("userid", user.getUserId());
+                                moodleWebService.createCourse(course, defaultResponseHandler(request));
+                            } else {
+                                Utils.sendErrorRequest(request,"FAIL creating course : " + responseMoodle.left().getValue());
+                            }
+                        }, true);
+                    } catch (UnsupportedEncodingException error) {
+                        Utils.sendErrorRequest(request,"fail to create course by sending the URL to the WS" + error);
+                    }
+                }
+            });
         });
     }
 

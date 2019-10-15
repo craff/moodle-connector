@@ -75,7 +75,7 @@ export class Course implements Shareable{
         }
     }
 
-    toJSON() {
+    private toJSON() {
         return {
             courseid: this.courseid,
             fullname: this.fullname,
@@ -92,15 +92,16 @@ export class Course implements Shareable{
         }
     }
 
-    async create() {
+    public async create():Promise<void> {
         try {
             const {data} = await http.post('/moodle/course', this.toJSON());
             this.courseid = data.id;
             this.duplication = "non";
-            this.goTo('view');
+            this.goTo();
         } catch (e) {
             this.fullname = undefined;
             this.summary = undefined;
+            notify.error(idiom.translate("moodle.error.create.course"));
             throw e;
         }
     }
@@ -114,9 +115,9 @@ export class Course implements Shareable{
         }
     }
 
-    async goTo(scope: string = 'view') {
+    private async goTo():Promise<void> {
         if(this.duplication == "non")
-            window.open(`/moodle/course/${this.courseid}?scope=${scope}`);
+            window.open(`/moodle/course/${this.courseid}?scope=view`);
     }
 
     async setPreferences(preference : string) {
