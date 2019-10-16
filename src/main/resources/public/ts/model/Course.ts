@@ -171,7 +171,7 @@ export class Courses {
             MyCourse: ""
         };
         this.order = {
-            field: "modificationDate",
+            field: "creationDate",
             desc: false
         };
         this.typeShow = [

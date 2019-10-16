@@ -27,16 +27,16 @@
             <span translate content="creationDate"></span>
             <span class="icons">
                     <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('creationDate')"></i>
-                    <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('creationDate')"></i>
+                    <i class="arrow orderArrow arrow-bottom" ng-if="courses.isOrderedDesc('creationDate')"></i>
             </span>
         </label>
-        <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('modificationDate') || courses.isOrderedDesc('modificationDate')}" ng-click="courses.orderByField('modificationDate')">
+        <!--<label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('modificationDate') || courses.isOrderedDesc('modificationDate')}" ng-click="courses.orderByField('modificationDate')">
             <span translate content="modificationDate"></span>
             <span class="icons">
                     <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('modificationDate')"></i>
                     <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('modificationDate')"></i>
             </span>
-        </label>
+        </label>-->
         <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('name') || courses.isOrderedDesc('name')}" ng-click="courses.orderByField('name')">
             <span translate content="name"></span>
             <span ng-if="courses.isOrderedAsc('name')" class="leftMarginLetter"> A-Z </span>
@@ -46,7 +46,7 @@
             <span translate content="numberEnrolment"></span>
             <span class="icons">
                     <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('numberEnrolment')"></i>
-                    <i class="arrow orderArrow bottom" ng-if="courses.isOrderedDesc('numberEnrolment')"></i>
+                    <i class="arrow orderArrow arrow-bottom" ng-if="courses.isOrderedDesc('numberEnrolment')"></i>
             </span>
         </label>
         <!--<label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('achievment') || courses.isOrderedDesc('achievment')}" ng-click="courses.orderByField('achievment')">

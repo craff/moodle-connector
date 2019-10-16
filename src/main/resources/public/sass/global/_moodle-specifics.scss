@@ -671,6 +671,9 @@ body.moodle {
     z-index: 1;
     position: absolute;
   }
+  .arrow-bottom{
+    transform: rotate(180deg);
+  }
 }
 
 //TEMP FIX
