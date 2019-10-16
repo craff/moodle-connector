@@ -151,7 +151,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.printmenufolder = false;
         $scope.printfolders = false;
         $scope.courses.order = {
-            field: "modificationDate",
+            field: "creationDate",
             desc: false
         };
         $scope.currentfolderid = 0;
