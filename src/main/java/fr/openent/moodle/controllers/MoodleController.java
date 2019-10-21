@@ -777,10 +777,11 @@ public class MoodleController extends ControllerHelper {
                                             JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(groupsEnroledId.indexOf(groupId));
                                             String id = jsonobjctToAdd.getString("idnumber");
                                             jsonobjctToAdd.remove("idnumber");
+                                            jsonobjctToAdd.put("id", id);
                                             //jsonobjctToAdd.put("groupDisplayName", null);
                                             //jsonobjctToAdd.put("structureName",null);
                                             Pattern p = Pattern.compile("^GR_(.*)");
-                                            Matcher m = p.matcher(id);
+                                            Matcher m = p.matcher(jsonobjctToAdd.getString("id"));
                                             while (m.find()) {
                                                 jsonobjctToAdd.put("id", m.group(1));
                                             }
