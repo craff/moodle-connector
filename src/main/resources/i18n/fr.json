@@ -179,5 +179,7 @@
 	"moodle.error.duplicate.course": "Une erreur est survenue lors de la duplications des cours",
 	"moodle.error.create.course": "La création du cours n'a pas abouti",
 
-	"moodle.info.short.title": "Le Titre est trop court"
+	"moodle.info.short.title": "Le Titre est trop court",
+
+    "sharepanel.close.inherited": "Test"
 }

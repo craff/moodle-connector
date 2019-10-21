@@ -42,6 +42,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.*;
@@ -775,9 +777,13 @@ public class MoodleController extends ControllerHelper {
                                             JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(groupsEnroledId.indexOf(groupId));
                                             String id = jsonobjctToAdd.getString("idnumber");
                                             jsonobjctToAdd.remove("idnumber");
-                                            jsonobjctToAdd.put("id", id);
                                             //jsonobjctToAdd.put("groupDisplayName", null);
                                             //jsonobjctToAdd.put("structureName",null);
+                                            Pattern p = Pattern.compile("^GR_(.*)");
+                                            Matcher m = p.matcher(id);
+                                            while (m.find()) {
+                                                jsonobjctToAdd.put("id", m.group(1));
+                                            }
                                             UserUtils.groupDisplayName(jsonobjctToAdd, I18n.acceptLanguage(request));
                                             shareInfosFuture.getJsonObject("groups").getJsonArray("visibles").add(jsonobjctToAdd);
                                         }
