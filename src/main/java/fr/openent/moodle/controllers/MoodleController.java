@@ -244,7 +244,7 @@ public class MoodleController extends ControllerHelper {
                                     URLEncoder.encode(idImage, "UTF-8");
                         }
                         //todo remove mail constant and add mail from zimbra, ent ...
-                        String userMail = "moodleNotif@entcgi.fr";
+                        String userMail = "moodleNotif@lyceeconnecte.fr";
                         final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
                         final String moodleUrl = moodleUri.toString() +
                                 "?wstoken=" + config.getString("wsToken") +
@@ -1151,18 +1151,27 @@ public class MoodleController extends ControllerHelper {
                         }
                     }
 */
+                JsonArray users = share.getJsonArray("users");
+                if(users != null) {
+                    for (int i = 0; i < users.size(); i++) {
+                        JsonObject manualUsers = users.getJsonObject(i);
+                        manualUsers.put("email", "moodleNotif@lyceeconnecte.fr");
+                    }
+                }
+
                 JsonArray groupsUsers = share.getJsonArray("groups");
                 if(groupsUsers != null) {
                     for (int i = 0; i < groupsUsers.size(); i++) {
                         JsonArray usersInGroup = groupsUsers.getJsonObject(i).getJsonArray("users");
                         if(usersInGroup != null) {
                             for (int j = 0; j < usersInGroup.size(); j++) {
-                                JsonObject userInGroupe = usersInGroup.getJsonObject(j);
-                                userInGroupe.put("email", "moodleNotif@entcgi.fr");
+                                JsonObject userInGroup = usersInGroup.getJsonObject(j);
+                                userInGroup.put("email", "moodleNotif@lyceeconnecte.fr");
                             }
                         }
                     }
                 }
+
                 log.info("JSON PARTAGE WITH MAIL : " + share.toString());
 
                 JsonObject shareSend = new JsonObject();
