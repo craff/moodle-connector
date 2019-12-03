@@ -181,5 +181,5 @@
 
 	"moodle.info.short.title": "Le Titre est trop court",
 
-    "sharepanel.close.inherited": "Test"
+    "sharepanel.close.inherited": "Cet utilisateur possède aussi un rôle de gestion sur le cours, vous ne pouvez pas le supprimer. Merci de contacter l'assistance ENT si vous avez besoin de modifier ces rôles."
 }

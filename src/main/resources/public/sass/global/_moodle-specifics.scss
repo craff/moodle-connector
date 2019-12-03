@@ -671,8 +671,13 @@ body.moodle {
     z-index: 1;
     position: absolute;
   }
+
   .arrow-bottom{
     transform: rotate(180deg);
+  }
+
+  div.tipbox.up.relative{
+    position : static;
   }
 }
 

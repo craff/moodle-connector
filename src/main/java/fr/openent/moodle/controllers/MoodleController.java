@@ -760,6 +760,8 @@ public class MoodleController extends ControllerHelper {
                     CompositeFuture.all(listeFutures).setHandler(event -> {
                         if (event.succeeded()) {
                             JsonObject shareInfosFuture = getShareInfosFuture.result();
+                            JsonObject checkedInherited = new JsonObject();
+                            shareInfosFuture.getJsonObject("users").put("checkedInherited", checkedInherited);
                             JsonArray usersEnrolmentsFuture = getUsersEnrolementsFuture.result();
                             if (usersEnrolmentsFuture != null && !usersEnrolmentsFuture.isEmpty() && shareInfosFuture != null && !shareInfosFuture.isEmpty()) {
                                 JsonArray groupEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups");
@@ -832,7 +834,9 @@ public class MoodleController extends ControllerHelper {
                                             profile = "Student";
                                         }
                                         jsonobjctToAdd.put("profile", profile);
-                                        jsonobjctToAdd.remove("role");
+                                        if (jsonobjctToAdd.getInteger("role").equals(config.getInteger("idAuditeur"))) {
+                                            shareInfosFuture.getJsonObject("users").getJsonObject("checkedInherited").put(jsonobjctToAdd.getString("id"), new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER));
+                                        }
                                         shareInfosFuture.getJsonObject("users").getJsonArray("visibles").add(jsonobjctToAdd);
                                     }
                                 }
@@ -842,7 +846,9 @@ public class MoodleController extends ControllerHelper {
                                     if (((JsonObject) userEnroled).getInteger("role").equals(config.getInteger("idStudent"))) {
                                         tabToAdd.remove(2);
                                     }
-                                    shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"), tabToAdd);
+                                    if (!((JsonObject) userEnroled).getInteger("role").equals(config.getInteger("idAuditeur"))) {
+                                        shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"), tabToAdd);
+                                    }
                                 }
 
                                 handler.handle(new Either.Right<String, JsonObject>(shareInfosFuture));
