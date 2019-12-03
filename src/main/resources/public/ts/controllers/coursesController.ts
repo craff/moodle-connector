@@ -42,7 +42,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         template.open('main', 'dashboard/dashboard_home');
         await $scope.courses.getChoice();
         await initViewLoading();
-        $scope.updateCourse();
         Utils.safeApply($scope);
     };
 
