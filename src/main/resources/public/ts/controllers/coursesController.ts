@@ -364,6 +364,9 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.course.folderid = parseInt($scope.folders.folderIdMoveIn);
         if ($scope.course.fullname.length >= 4) {
             $scope.submitWait = true;
+            let reg = new RegExp(".jpg|.jpeg|.gif|.png$");
+            $scope.arraySplitImg = reg.exec($scope.course.infoImg.name);
+            $scope.course.imageurl = $scope.course.imageurl.concat($scope.arraySplitImg[0]);
             await $scope.course.create()
                 .then(async ():Promise<void> => {
                     $scope.activityType = $scope.course.typeA;

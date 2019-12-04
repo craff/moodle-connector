@@ -286,7 +286,8 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("public Get pictutre for moodle webside")
     @Get("/files/:id")
     public void getFile(HttpServerRequest request) {
-        moodleEventBus.getImage(request.getParam("id"), event -> {
+        String idImage = request.getParam("id").substring(0, request.getParam("id").lastIndexOf('.'));
+        moodleEventBus.getImage(idImage, event -> {
             if (event.isRight()) {
                 JsonObject document = event.right().getValue();
                 JsonObject metadata = document.getJsonObject("metadata");
