@@ -106,7 +106,6 @@
 	"achievment": "Taux d'achèvement",
 	"moodle.info.deleteTextConfirmSuccess": "La sélection a bien été supprimée",
 	"moodle.lightBox.delete.title": "Supprimer la sélection",
-	"moodle.lightBox.delete.submit": "supprimer la selection",
 	"moodle.lightBox.delete.content": "Confirmez-vous la suppression de la sélection?",
 
 	"moodle.info.duplicateTextConfirmSuccess": "La sélection a bien été dupliqué",
