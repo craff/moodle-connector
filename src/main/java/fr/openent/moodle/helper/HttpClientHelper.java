@@ -1,13 +1,13 @@
 package fr.openent.moodle.helper;
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.impl.DefaultMoodleWebService;
+import fr.openent.moodle.service.impl.DefaultMoodleService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.*;
-import fr.openent.moodle.service.MoodleWebService;
+import fr.openent.moodle.service.MoodleService;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.ProxyOptions;
@@ -21,11 +21,11 @@ import static fr.openent.moodle.Moodle.moodleConfig;
 
 public class HttpClientHelper extends ControllerHelper {
 
-    private final MoodleWebService moodleWebService;
+    private final MoodleService moodleService;
 
     public HttpClientHelper() {
         super();
-        this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
+        this.moodleService = new DefaultMoodleService(Moodle.moodleSchema, "course");
     }
 
     /**

@@ -95,7 +95,7 @@ export class Course implements Shareable{
     public async create():Promise<void> {
         try {
             const {data} = await http.post('/moodle/course', this.toJSON());
-            this.courseid = data.id;
+            this.courseid = data.moodleid;
             this.duplication = "non";
             this.goTo();
         } catch (e) {
@@ -453,25 +453,27 @@ export class Courses {
 
     getCourseInFolder(coursesToPrint : Course[], currentFolder, searching : string, folders : Folders) {
         let folderToSearch = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
-        if (folderToSearch.id == 0) {
-            return _.filter(coursesToPrint, function (course) {
-                return !!searching ? (course.fullname.toLowerCase().includes(searching.toLowerCase()) ||
-                    course.summary.toLowerCase().includes(searching.toLowerCase())) : course.folderid == 0;
-            });
-        } else {
-            if (searching == '') {
+        if(folderToSearch) {
+            if (folderToSearch.id == 0) {
                 return _.filter(coursesToPrint, function (course) {
-                    return (course.folderid == folderToSearch.id)
+                    return !!searching ? (course.fullname.toLowerCase().includes(searching.toLowerCase()) ||
+                        course.summary.toLowerCase().includes(searching.toLowerCase())) : course.folderid == 0;
                 });
             } else {
-                let subFoldersSearchForCourse = this.courseInFolderSearch(folders, currentFolder);
-                subFoldersSearchForCourse.push(folderToSearch);
-                let searchCourseToReturn = [];
-                for (let j = 0; j < subFoldersSearchForCourse.length; j++) {
-                    searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint =>
-                        coursesToPrint.folderid == subFoldersSearchForCourse[j].id));
+                if (searching == '') {
+                    return _.filter(coursesToPrint, function (course) {
+                        return (course.folderid == folderToSearch.id)
+                    });
+                } else {
+                    let subFoldersSearchForCourse = this.courseInFolderSearch(folders, currentFolder);
+                    subFoldersSearchForCourse.push(folderToSearch);
+                    let searchCourseToReturn = [];
+                    for (let j = 0; j < subFoldersSearchForCourse.length; j++) {
+                        searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint =>
+                            coursesToPrint.folderid == subFoldersSearchForCourse[j].id));
+                    }
+                    return searchCourseToReturn;
                 }
-                return searchCourseToReturn;
             }
         }
     }

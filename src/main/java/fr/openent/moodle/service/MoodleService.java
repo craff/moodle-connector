@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 
-public interface MoodleWebService{
+public interface MoodleService {
 
     /**
      * delete folders
@@ -40,21 +40,49 @@ public interface MoodleWebService{
 
     /**
      * Create a course
-     * @param course course to create
+     *
+     * @param course  course to create
+     * @param userId  user id
      * @param handler function handler returning data
      */
-    void createCourse (JsonObject course, Handler<Either<String, JsonObject>> handler);
+    void createCourse(JsonObject course, String userId, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * move a folder
+     * Check if course(s) is in relation table
+     *
+     * @param courses courses id to check
+     * @param handler function handler returning data
+     */
+    void checkIfCoursesInRelationTable(JsonObject courses, Handler<Either<String, Boolean>> handler);
+
+    /**
+     * Insert course(s) in relation table
+     *
      * @param courses courses to move
      * @param handler function handler returning data
      */
-    void moveCourse(JsonObject courses, Handler<Either<String, JsonObject>> handler);
+    void insertCourseInRelationTable(final JsonObject courses, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * Delete courses
-     * @param course course to delete
+     * Update the folder id for course(s) in relation table
+     *
+     * @param courses courses to move
+     * @param handler function handler returning data
+     */
+    void updateCourseIdInRelationTable(JsonObject courses, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Delete course(s) in relation table
+     *
+     * @param courses courses to delete
+     * @param handler function handler returning data
+     */
+    void deleteCourseInRelationTable(final JsonObject courses, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Delete course(s)
+     *
+     * @param course  course to delete
      * @param handler function handler returning data
      */
     void deleteCourse(JsonObject course, Handler<Either<String, JsonObject>> handler);
@@ -88,13 +116,7 @@ public interface MoodleWebService{
      */
     void countItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler);
 
-    /**
-     * count Item courses In folder
-     * @param id_folder
-     * @param userId
-     * @param defaultResponseHandler
-     */
-    void countCoursesItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler);
+
 
     /**
      * get courses and shared by users
