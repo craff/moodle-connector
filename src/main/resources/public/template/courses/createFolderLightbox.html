@@ -1,5 +1,4 @@
 <!-- popup for create a folder -->
-
     <div class="eight cell horizontal-spacing">
         <h2 class="row twelve">
             <i18n>moodle.folder.information</i18n>
@@ -13,6 +12,6 @@
     <div class="row">
         <div class="right-magnet">
             <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
-            <input type="submit" class="button" i18n-value="create" ng-click="createFolder()" ng-disabled="folder.name == '' || folder.name === undefined"/>
+            <input type="submit" class="button" i18n-value="create" ng-click="createFolder()" ng-disabled="folder.name == '' || folder.name === undefined ||  isCreating"/>
         </div>
     </div>

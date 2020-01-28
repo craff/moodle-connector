@@ -7,7 +7,6 @@ export interface Folder {
     parent_id : number;
     user_id : string;
     name : string;
-    structure_id : string;
     subFolders : Folder[];
     printsubfolder : boolean;
     printTargetsubfolder : boolean;
@@ -29,13 +28,13 @@ export class Folder {
             parentId : this.parent_id,
             userId : this.user_id,
             name : this.name,
-            structureId : this.structure_id,
         }
     }
 
     async create() {
         try {
-            await http.post('/moodle/folder', this.toJson());
+           let {data,status}=  await http.post('/moodle/folder', this.toJson());
+           return  status
         } catch (e) {
             notify.error("Save function didn't work");
             throw e;
@@ -136,23 +135,25 @@ export class Folders {
 
     getFoldersToShow(currentFolder, searching): Folder[] {
         currentFolder = this.listOfSubfolders.filter(folder => folder.id == currentFolder);
-        if (searching !== null && searching !== undefined && searching !== '') {
-            if (currentFolder[0].id == 0 ){
-                return this.all.filter(folder => folder.name.toLowerCase().includes(searching.toLowerCase()));
-            } else {
-                let subFoldersSearch = [];
-                for (let i = 0; i < currentFolder[0].subFolders.length; i++) {
-                    subFoldersSearch.push(currentFolder[0].subFolders[i]);
-                    if (currentFolder[0].subFolders[i].subFolders.length != 0) {
-                        subFoldersSearch.push(...this.getFoldersToShow(currentFolder[0].subFolders[i].id, searching));
+        if (currentFolder && currentFolder[0]) {
+            if (searching !== null && searching !== undefined && searching !== '') {
+                if (currentFolder[0].id == 0) {
+                    return this.all.filter(folder => folder.name.toLowerCase().includes(searching.toLowerCase()));
+                } else {
+                    let subFoldersSearch = [];
+                    for (let i = 0; i < currentFolder[0].subFolders.length; i++) {
+                        subFoldersSearch.push(currentFolder[0].subFolders[i]);
+                        if (currentFolder[0].subFolders[i].subFolders.length != 0) {
+                            subFoldersSearch.push(...this.getFoldersToShow(currentFolder[0].subFolders[i].id, searching));
+                        }
                     }
+                    return subFoldersSearch.filter(folder => folder.name.toLowerCase().includes(searching.toLowerCase()));
                 }
-                return subFoldersSearch.filter(folder => folder.name.toLowerCase().includes(searching.toLowerCase()));
+            } else if (currentFolder[0].id == 0) {
+                return this.getparentFolder();
+            } else {
+                return this.getSubFolder(currentFolder[0].id);
             }
-        } else if (currentFolder[0].id == 0) {
-            return this.getparentFolder();
-        } else {
-            return this.getSubFolder(currentFolder[0].id);
         }
     }
 

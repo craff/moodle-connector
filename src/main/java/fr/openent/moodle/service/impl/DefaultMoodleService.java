@@ -2,7 +2,7 @@ package fr.openent.moodle.service.impl;
 
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.MoodleWebService;
+import fr.openent.moodle.service.MoodleService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -20,27 +20,31 @@ import java.util.List;
 import java.util.Map;
 
 import static fr.openent.moodle.Moodle.*;
-import static java.util.Objects.isNull;
 
-public class DefaultMoodleWebService extends SqlCrudService implements MoodleWebService {
+public class DefaultMoodleService extends SqlCrudService implements MoodleService {
 
-    private final Logger log = LoggerFactory.getLogger(DefaultMoodleWebService.class);
+    private final Logger log = LoggerFactory.getLogger(DefaultMoodleService.class);
 
-    public DefaultMoodleWebService(String schema, String table) {
+    public DefaultMoodleService(String schema, String table) {
         super(schema, table);
     }
 
     @Override
     public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
         JsonArray values = new JsonArray();
+        Object parentId = folder.getValue("parentId");
         values.add(folder.getValue("userId"));
-        values.add(folder.getValue("structureId"));
         values.add(folder.getValue("name"));
-        values.add(folder.getValue("parentId"));
-
-        String createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, structure_id, name, parent_id)" +
-                    " VALUES (?, ?, ?, ?)";
-            sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
+        String createFolder = "";
+        if(!parentId.equals(0)) {
+            values.add(folder.getValue("parentId"));
+            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id,  name, parent_id)" +
+                    " VALUES (?, ?,  ?)";
+        }else {
+            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id,  name)" +
+                    " VALUES (?,  ?)";
+        }
+        sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
@@ -65,35 +69,56 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void moveFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
+    public void moveFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         JsonArray folders = folder.getJsonArray("foldersId");
-        values.add(folder.getValue("parentId"));
+        if (folder.getInteger("parentId") == 0) {
+            values.addNull();
+        } else {
+            values.add(folder.getValue("parentId"));
+        }
 
-        for (int i = 0; i<folders.size(); i++){
+        for (int i = 0; i < folders.size(); i++) {
             values.add(folders.getValue(i));
         }
 
         String moveFolder = "UPDATE " + Moodle.moodleSchema + ".folder SET parent_id = ? WHERE id IN " + Sql.listPrepared(folders.getList());
 
-        sql.prepared(moveFolder,values , SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(moveFolder, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
-    public void createCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
-        String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id, folder_id, user_id)" +
-                " VALUES (?, ?, ?) RETURNING moodle_id as id";
+    public void createCourse(final JsonObject course, String userId, final Handler<Either<String, JsonObject>> handler){
+        String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id,  user_id)" +
+                " VALUES (?,  ?) RETURNING moodle_id as id;";
 
         JsonArray values = new JsonArray();
         values.add(course.getValue("moodleid"));
-
-        Integer folderId = course.getInteger("folderid");
-        if (isNull(folderId)) {
-            values.addNull();
-        } else {
-            values.add(folderId);
-        }
         values.add(course.getString("userid"));
+
+        sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(event -> {
+            if(event.isRight()){
+                if(!course.getValue("folderid").equals(0)){
+                    createRelCourseFolder(course.getValue("moodleid"), course.getValue("folderid"), handler);
+                } else {
+                    handler.handle(new Either.Right<>(course));
+                }
+            }
+            else{
+                log.error("Error when inserting new courses before inserting rel_course_folders elems ");
+            }
+
+        }));
+
+    }
+
+    private void createRelCourseFolder(Object moodleid, Object folderid, Handler<Either<String, JsonObject>> handler) {
+        String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".rel_course_folder(course_id,  folder_id)" +
+                " VALUES (?, ?) RETURNING course_id as id;";
+
+        JsonArray values = new JsonArray();
+        values.add(moodleid);
+        values.add(folderid);
 
         sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(handler));
     }
@@ -125,20 +150,72 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void moveCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler){
+    public void checkIfCoursesInRelationTable(final JsonObject course, final Handler<Either<String, Boolean>> handler) {
         JsonArray values = new JsonArray();
         JsonArray courses = course.getJsonArray("coursesId");
-        values.add(course.getValue("folderId"));
-
-        for (int i = 0; i<courses.size(); i++){
+        for (int i = 0; i < courses.size(); i++) {
             values.add(courses.getValue(i));
         }
 
-        String moveCourse = "UPDATE " + Moodle.moodleSchema + ".course SET folder_id = ? WHERE moodle_id IN " + Sql.listPrepared(courses.getList());
+        String selectCourse = "SELECT COUNT(course_id) " +
+                "FROM " + Moodle.moodleSchema + ".rel_course_folder " +
+                "WHERE course_id IN " + Sql.listPrepared(courses.getList());
 
-        sql.prepared(moveCourse,values , SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(selectCourse, values, res -> {
+            Long count = SqlResult.countResult(res);
+            if (count > 0) handler.handle(new Either.Right<>(count == courses.size()));
+            else handler.handle(new Either.Left<>("Courses present in relation table"));
+        });
     }
 
+    @Override
+    public void insertCourseInRelationTable(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
+        JsonArray values = new JsonArray();
+
+        String insertMoveCourse = "INSERT INTO " + Moodle.moodleSchema + ".rel_course_folder (folder_id, course_id) VALUES ";
+        JsonArray courses = course.getJsonArray("coursesId");
+
+        for (int i = 0; i < courses.size() - 1; i++) {
+            values.add(course.getValue("folderId"));
+            values.add(courses.getValue(i));
+            insertMoveCourse += "(?, ?), ";
+        }
+
+        values.add(course.getValue("folderId"));
+        values.add(courses.getValue(courses.size() - 1));
+        insertMoveCourse += "(?, ?);";
+
+        sql.prepared(insertMoveCourse, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void updateCourseIdInRelationTable(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
+        JsonArray values = new JsonArray();
+        JsonArray courses = course.getJsonArray("coursesId");
+        values.add(course.getValue("folderId"));
+        for (int i = 0; i < courses.size(); i++) {
+            values.add(courses.getValue(i));
+        }
+
+        String updateMoveCourse = "UPDATE " + Moodle.moodleSchema + ".rel_course_folder SET folder_id = ?" +
+                " WHERE course_id IN " + Sql.listPrepared(courses.getList());
+
+        sql.prepared(updateMoveCourse, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void deleteCourseInRelationTable(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
+        JsonArray values = new JsonArray();
+        JsonArray courses = course.getJsonArray("coursesId");
+        for (int i = 0; i < courses.size(); i++) {
+            values.add(courses.getValue(i));
+        }
+
+        String deleteMoveCourse = "DELETE FROM " + Moodle.moodleSchema + ".rel_course_folder" +
+                " WHERE course_id IN " + Sql.listPrepared(courses.getList());
+
+        sql.prepared(deleteMoveCourse, values, SqlResult.validUniqueResultHandler(handler));
+    }
 
     @Override
     public void deleteCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
@@ -157,7 +234,9 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
 
     @Override
     public void getFoldersInEnt(String id_user, Handler<Either<String, JsonArray>> handler) {
-        String query = "SELECT * " +
+        String query = "SELECT id,  " +
+                "CASE WHEN parent_id IS NULL then 0 ELSE parent_id END" +
+                ", user_id, name " +
                 "FROM " + Moodle.moodleSchema + ".folder " +
                 "WHERE user_id = ?;";
         JsonArray values = new JsonArray();
@@ -176,20 +255,12 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
     }
 
     @Override
-    public void countCoursesItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
-        String query = "SELECT  count(*) " +
-                "FROM " + Moodle.moodleSchema + ".course " +
-                "WHERE user_id = ? AND folder_id = ?;";
-        JsonArray values = new JsonArray();
-        values.add(userId).add(id_folder);
-        sql.prepared(query, values, SqlResult.validUniqueResultHandler(defaultResponseHandler));
-    }
-
-    @Override
     public void getCoursesByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler) {
-        String query = "SELECT moodle_id, folder_id  " +
+        String query = "SELECT moodle_id,CASE WHEN folder_id IS NULL THEN 0 else folder_id end " +
                 "FROM " + Moodle.moodleSchema + ".course " +
-                "WHERE user_id = ?;";
+                "LEFT JOIN " + moodleSchema + ".rel_course_folder" +
+                " ON course.moodle_id = rel_course_folder.course_id "+
+                "WHERE course.user_id = ?;";
 
         JsonArray values = new JsonArray();
         values.add(userId);
@@ -312,7 +383,7 @@ public class DefaultMoodleWebService extends SqlCrudService implements MoodleWeb
         String queryNeo4j = "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
                 "MATCH (v:Visible {id : vid})<-[:IN]-(us:User) WHERE not(has(v.deleteDate)) and v:ProfileGroup WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: us.id, email: us.email, lastname: us.lastName, firstname: us.firstName, username: us.id})} as sharedBookMark " +
                 "RETURN sharedBookMark " +
-                    "UNION " +
+                "UNION " +
                 "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
                 "MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) and v:User WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.id})} as sharedBookMark " +
                 "RETURN sharedBookMark";

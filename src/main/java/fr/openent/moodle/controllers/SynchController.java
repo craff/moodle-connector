@@ -1,8 +1,8 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.MoodleWebService;
-import fr.openent.moodle.service.impl.DefaultMoodleWebService;
+import fr.openent.moodle.service.MoodleService;
+import fr.openent.moodle.service.impl.DefaultMoodleService;
 import fr.openent.moodle.service.impl.DefaultSynchService;
 import fr.wseduc.rs.Post;
 import fr.wseduc.webutils.Either;
@@ -30,12 +30,12 @@ import java.util.zip.ZipInputStream;
 public class SynchController extends ControllerHelper {
 
     private final Storage storage;
-    private final MoodleWebService moodleWebService;
+    private final MoodleService moodleService;
     private final DefaultSynchService defaultSynchService;
     protected static final Logger log = LoggerFactory.getLogger(SynchController.class);
 
     public SynchController(Storage storage, EventBus eb, Vertx vertx, JsonObject config) {
-        this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
+        this.moodleService = new DefaultMoodleService(Moodle.moodleSchema, "course");
         this.defaultSynchService = new DefaultSynchService(eb, config, vertx);
         this.storage = storage;
     }

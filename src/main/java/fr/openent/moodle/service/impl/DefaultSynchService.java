@@ -3,11 +3,10 @@ package fr.openent.moodle.service.impl;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.service.MoodleEventBus;
-import fr.openent.moodle.service.MoodleWebService;
+import fr.openent.moodle.service.MoodleService;
 import fr.openent.moodle.utils.SyncCase;
 import fr.openent.moodle.utils.Utils;
 import fr.wseduc.webutils.Either;
-import fr.wseduc.webutils.I18n;
 import io.vertx.core.*;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.buffer.impl.BufferImpl;
@@ -38,7 +37,7 @@ public class DefaultSynchService {
     protected EventBus eb;
     private final Neo4j neo4j = Neo4j.getInstance();
 
-    private final MoodleWebService moodleWebService;
+    private final MoodleService moodleService;
     private final MoodleEventBus moodleEventBus;
 
     private HttpClient httpClient;
@@ -59,7 +58,7 @@ public class DefaultSynchService {
         this.eb = eb;
         this.config = config;
         this.vertx = vertx;
-        this.moodleWebService = new DefaultMoodleWebService(Moodle.moodleSchema, "course");
+        this.moodleService = new DefaultMoodleService(Moodle.moodleSchema, "course");
         this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
         baseWsMoodleUrl = baseWsMoodleUrl = (config.getString("address_moodle")+ config.getString("ws-path"));
     }
@@ -821,8 +820,8 @@ public class DefaultSynchService {
         }).collect(Collectors.toList());
 
         JsonArray groupsIds = new JsonArray(lstGroupIds);
-        moodleWebService.getGroups(groupsIds, getGroupsHandler);
-        moodleWebService.getDistinctSharedBookMarkUsers(groupsIds, true, getSharedBookMarkHandler);
+        moodleService.getGroups(groupsIds, getGroupsHandler);
+        moodleService.getDistinctSharedBookMarkUsers(groupsIds, true, getSharedBookMarkHandler);
     }
 
     private void updateAnDeleteCohorts(Handler<Either<String, JsonObject>> handler) {
