@@ -1,4 +1,6 @@
-<div class="Course" lvl-draggable="[[place == 'coursesMine']]" ng-class="{notDraggable : !(place == 'coursesMine' && course.duplication == 'non')}" ng-click="place == 'coursesShared' && course.goTo()">
+<div class="Course" lvl-draggable="[[place == 'coursesMine']]"
+     ng-class="{notDraggable : !(place == 'coursesMine' && course.duplication == 'non')}"
+     ng-click="place == 'coursesShared'">
     <div id="background" ng-if="place == 'coursesToCome' && view == 'icons'">
         <p id="bg-text">
             <i18n>toCome</i18n>
@@ -17,7 +19,7 @@
                                     courseToDoSmallWidthPicture : place == 'coursesToDo' && course.course_type == 'topics' && view == 'icons' && !first,
                                     coursePictureBackground : place == 'coursesMine' && view == 'icons' && course.course_type == 'topics' ,
                                     courseSharedPicture : place == 'coursesShared' && view == 'icons' && course.course_type == 'topics'}"
-         ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
+         ng-click="place != 'coursesToCome'&& course.goTo()">
         <img ng-src="[[course.imageurl]]" class="image-dashboard"
              ng-class="{ recentPicture : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list') ,
                 toDoPicture : place == 'coursesToDo' && first && view == 'icons',
@@ -39,18 +41,23 @@
                           'shared-margin-left' : place == 'coursesShared' && view == 'icons',
                           'inside-margin' : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list')}">
             <div ng-class="{'specific-mine-shared-width' : place == 'coursesMine' || place == 'coursesShared'}">
-                <label class="text-font notDraggable" ng-if="place == 'coursesToCome' && view == 'icons' && course.startdate != null" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
+                <label class="text-font notDraggable"
+                       ng-if="place == 'coursesToCome' && view == 'icons' && course.startdate != null"
+                       ng-click="place != 'coursesToCome' && course.goTo()">
                     <i18n>toBegin.at</i18n>
                     <span class="date">[[ printDate(course,"begindate") ]]</span></br>
                 </label>
                 <div class="ellipsis">
-                    <span class="text-font" ng-class="{notDraggable : place == 'coursesToCome'}" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">[[course.fullname]]</span>
+                    <span class="text-font" ng-class="{notDraggable : place == 'coursesToCome'}"
+                          ng-click="place != 'coursesToCome' && course.goTo()">[[course.fullname]]</span>
                 </div>
                 <label class="rightDotsMenu" ng-if="place == 'coursesMine' && course.duplication == 'echec'">
                     <i class="close-2x" ng-click="deleteDuplicateFailed(course)"></i>
                 </label>
-                <dots-menu class="rightDotsMenu" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="(place == 'coursesToCome' || place == 'coursesToDo') && view == 'list'">
-                    <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
+                <dots-menu class="rightDotsMenu"
+                           ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }"
+                           ng-if="(place == 'coursesToCome' || place == 'coursesToDo') && view == 'list'">
+                    <opt ng-if="!course.masked" ng-click="course.setPreferences('masked')">
                         <i class="eye-slash">
                         </i>
                         &nbsp;&nbsp;<i18n>course.mask</i18n>
@@ -75,35 +82,43 @@
                         </div>
                     </opt>
                 </dots-menu>
-                <div class="title-dashboard" ng-class="{notDraggable : place == 'coursesToCome'}" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
+                <div class="title-dashboard" ng-class="{notDraggable : place == 'coursesToCome'}"
+                     ng-click="place != 'coursesToCome' && course.goTo()">
                     <span class="summary-list size-font" ng-if="place != 'coursesMine' && place != 'coursesRecent'">[[ printAuthor(course) ]]</span>
-                    <label class="size-font right-magnet title-dashboard" ng-if="place == 'coursesToDo' && course.enddate != '0' && view == 'list'">
+                    <label class="size-font right-magnet title-dashboard"
+                           ng-if="place == 'coursesToDo' && course.enddate != '0' && view == 'list'">
                         <i18n>toDo.before</i18n>
                         <span class="date">[[ printDate(course,"enddate") ]]</span>
                     </label>
-                    <label class="size-font right-magnet title-dashboard" ng-if="place == 'coursesToCome' && course.startdate != null && view == 'list'">
+                    <label class="size-font right-magnet title-dashboard"
+                           ng-if="place == 'coursesToCome' && course.startdate != null && view == 'list'">
                         <i18n>toBegin.at</i18n>
                         <span class="date">[[ printDate(course,"begindate") ]]</span>
                     </label>
                 </div>
-                <div ng-if="(place == 'coursesMine' || place == 'coursesShared' || place == 'coursesToDo') && view == 'icons'" class="ellipsis" ng-click="place != 'coursesShared' && course.goTo()">
-                    <span class="summary-list summary-color size-font" ng-class="{duplicateCourse : course.duplication != 'non'}">[[course.summary]]</span></br>
+                <div ng-if="(place == 'coursesMine' || place == 'coursesShared' || place == 'coursesToDo') && view == 'icons'"
+                     class="ellipsis" ng-click="place != 'coursesShared' && course.goTo()">
+                    <span class="summary-list summary-color size-font"
+                          ng-class="{duplicateCourse : course.duplication != 'non'}">[[course.summary]]</span></br>
                 </div>
             </div>
             <!--
-           <label class="size-font" ng-if="(place == 'coursesMine' && course.duplication != 'echec') || (place == 'coursesShared' && view == 'icons') || place == 'coursesRecent'" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
+           <label class="size-font" ng-if="(place == 'coursesMine' && course.duplication != 'echec') || (place == 'coursesShared' && view == 'icons') || place == 'coursesRecent'" ng-click="place != 'coursesToCome' && course.goTo()">
               <span class="date">[[ printDate(course, "modified" ) ]]</span>
             </label>
             -->
-            <label class="checkbox right-magnet" ng-if="place == 'coursesMine'">
-                <label ng-if="place == 'coursesMine' && course.duplication == 'non' && course.usernumber > 1" class="size-font title-dashboard">
+            <label class="checkbox right-magnet" ng-if="place == 'coursesMine' || place == 'coursesShared'">
+                <label ng-if="course.duplication == 'non' && course.usernumber > 1"
+                       class="size-font title-dashboard">
                     <i class="share"></i>
                     <span>[[ course.usernumber - 1 ]]</span>
                 </label>
                 <span></span>
-                <input type="checkbox" ng-change="checkCourse()" ng-model="course.select" ng-if="course.duplication == 'non'">
-                <label ng-if="place == 'coursesMine' && course.duplication == 'echec'" class="title-dashboard big-folder whiteColor">
-                    <i18n>echec.duplication</i18n>
+                <input type="checkbox" ng-change="check(place, course)" ng-model="course.select"
+                       ng-if="course.duplication == 'non'">
+                <label ng-if="place == 'coursesMine' && course.duplication == 'echec'"
+                       class="title-dashboard big-folder whiteColor">
+                    <i18n>failure.duplication</i18n>
                 </label>
                 <span></span>
             </label>
@@ -119,26 +134,36 @@
                 <div></div>
             </div>
         </div>
-        <div class="left-margin littleMarginTop" ng-if="view =='icons' && (place == 'coursesToDo' || place == 'coursesToCome')">
-            <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != '0'" ng-click="place != 'coursesToCome' && place != 'coursesShared' && course.goTo()">
+        <div class="left-margin littleMarginTop"
+             ng-if="view =='icons' && (place == 'coursesToDo' || place == 'coursesToCome')">
+            <label class="size-font" ng-if="place == 'coursesToDo' && course.enddate != '0'"
+                   ng-click="place != 'coursesToCome' && course.goTo()">
                 <i18n>toDo.before</i18n>
                 <span class="date">[[ printDate(course,"enddate") ]]</span>
             </label>
             <div class="right-magnet zero-desktop">
-                <i class="eye-slash import" class="grey-color" ng-if="!course.masked" ng-click="course.setPreferences('masked')">
+                <i class="eye-slash import" class="grey-color" ng-if="!course.masked"
+                   ng-click="course.setPreferences('masked')">
                 </i>
-                <i class="eye-open import" class="grey-color" ng-if="course.masked" ng-click="course.setPreferences('masked')">
+                <i class="eye-open import" class="grey-color" ng-if="course.masked"
+                   ng-click="course.setPreferences('masked')">
                 </i>
-                <i class="favorite rightTop-margin import" ng-class="{'yellow-color' : course.favorites, 'grey-color': !course.favorites}" ng-click="course.setPreferences('favorites')">
+                <i class="favorite rightTop-margin import"
+                   ng-class="{'yellow-color' : course.favorites, 'grey-color': !course.favorites}"
+                   ng-click="course.setPreferences('favorites')">
                 </i>
             </div>
             <br class="zero-mobile" ng-if="place == 'coursesToDo' && course.enddate == '0'" ng-click="course.goTo()"/>
             <div class="zero-mobile" ng-class="{'row move-up' : place == 'coursesToDo'}">
-                <progress-bar class="progress" ng-class="{activityProgress : course.course_type == 'singleactivity', courseProgress : course.course_type == 'topics'}"
-                              max="100" filled="course.progress.slice(0,course.progress.length-1)" unit="%" ng-if="place == 'coursesToDo'" ng-click="course.goTo()">
+                <progress-bar class="progress"
+                              ng-class="{activityProgress : course.course_type == 'singleactivity', courseProgress : course.course_type == 'topics'}"
+                              max="100" filled="course.progress.slice(0,course.progress.length-1)" unit="%"
+                              ng-if="place == 'coursesToDo'" ng-click="course.goTo()">
                 </progress-bar>
-                <dots-menu class="cell right-magnet top-margin" ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }" ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
-                    <opt  ng-if="!course.masked" ng-click="course.setPreferences('masked')">
+                <dots-menu class="cell right-magnet top-margin"
+                           ng-class="{'bigWidth' : course.favorites, 'middleWidth' : course.masked }"
+                           ng-if="place == 'coursesToCome' || place == 'coursesToDo'">
+                    <opt ng-if="!course.masked" ng-click="course.setPreferences('masked')">
                         <i class="eye-slash">
                         </i>
                         &nbsp;&nbsp;<i18n>course.mask</i18n>

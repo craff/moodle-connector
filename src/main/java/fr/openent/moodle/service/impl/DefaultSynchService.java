@@ -2,8 +2,9 @@ package fr.openent.moodle.service.impl;
 
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
-import fr.openent.moodle.service.MoodleEventBus;
-import fr.openent.moodle.service.MoodleService;
+import fr.openent.moodle.service.moduleNeoRequestService;
+import fr.openent.moodle.service.moduleSQLRequestService;
+import fr.openent.moodle.service.moodleEventBus;
 import fr.openent.moodle.utils.SyncCase;
 import fr.openent.moodle.utils.Utils;
 import fr.wseduc.webutils.Either;
@@ -13,7 +14,6 @@ import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -37,8 +37,10 @@ public class DefaultSynchService {
     protected EventBus eb;
     private final Neo4j neo4j = Neo4j.getInstance();
 
-    private final MoodleService moodleService;
-    private final MoodleEventBus moodleEventBus;
+    private final moduleSQLRequestService moduleSQLRequestService;
+    private final moduleNeoRequestService moduleNeoRequestService;
+
+    private final moodleEventBus moodleEventBus;
 
     private HttpClient httpClient;
 
@@ -58,19 +60,20 @@ public class DefaultSynchService {
         this.eb = eb;
         this.config = config;
         this.vertx = vertx;
-        this.moodleService = new DefaultMoodleService(Moodle.moodleSchema, "course");
+        this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
+        this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
         this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
-        baseWsMoodleUrl = baseWsMoodleUrl = (config.getString("address_moodle")+ config.getString("ws-path"));
+        baseWsMoodleUrl = baseWsMoodleUrl = (config.getString("address_moodle") + config.getString("ws-path"));
     }
 
     public void initSyncUsers() {
-        mapUsersMoodle = new HashMap<String, JsonObject>();
-        mapUsersFound = new HashMap<String, JsonObject>();
+        mapUsersMoodle = new HashMap<>();
+        mapUsersFound = new HashMap<>();
         arrUsersToDelete = new JsonArray();
         arrUsersToEnroll = new JsonArray();
         mapUsersNotFound = new Map[]{new HashMap<String, JsonObject>()};
         compositeFuturEnded = new AtomicInteger(2);
-        httpClient = HttpClientHelper.createHttpClient(vertx,config);
+        httpClient = HttpClientHelper.createHttpClient(vertx, config);
     }
 
 
@@ -110,7 +113,7 @@ public class DefaultSynchService {
     public void syncUsers(Scanner scUsers, Handler<Either<String, JsonObject>> handler) {
         log.info("START syncUsers");
 
-        List<Future> listGetFuture = new ArrayList<Future>();
+        List<Future> listGetFuture = new ArrayList<>();
         initSyncUsers();
         putUsersInMap(scUsers);
 
@@ -118,182 +121,167 @@ public class DefaultSynchService {
 
         // ---------- delete users --------------
 
-        Handler<Either<String, Buffer>> handlerDeleteUsers = new Handler<Either<String, Buffer>>() {
-            @Override
-            public void handle(Either<String, Buffer> event) {
-                if (event.isRight()) {
-                    log.info("END deleting users");
-                    endSyncUsers(handler);
-                } else {
-                    httpClient.close();
-                    handler.handle(new Either.Left<>(event.left().getValue()));
-                    log.error("Error deleting users", event.left());
-                }
+        Handler<Either<String, Buffer>> handlerDeleteUsers = event -> {
+            if (event.isRight()) {
+                log.info("END deleting users");
+                endSyncUsers(handler);
+            } else {
+                httpClient.close();
+                handler.handle(new Either.Left<>(event.left().getValue()));
+                log.error("Error deleting users", event.left());
             }
         };
         // ---------- END delete users --------------
 
         // ---------- enrolls users --------------
-        Handler<Either<String, Buffer>> handlerEnrollUsers = new Handler<Either<String, Buffer>>() {
-            @Override
-            public void handle(Either<String, Buffer> event) {
-                if (event.isRight()) {
-                    log.info("END enrolling user individually");
-                    if (arrUsersToDelete.isEmpty()) {
-                        String message = "Aucune suppression necessaire";
-                        log.info(message);
-                        endSyncUsers(handler);
-                    } else {
-                        // Un fois inscriptions individuelles ok, lancer les suppressions
-                        deleteUsers(arrUsersToDelete, handlerDeleteUsers);
-                    }
+        Handler<Either<String, Buffer>> handlerEnrollUsers = event -> {
+            if (event.isRight()) {
+                log.info("END enrolling user individually");
+                if (arrUsersToDelete.isEmpty()) {
+                    String message = "Aucune suppression necessaire";
+                    log.info(message);
+                    endSyncUsers(handler);
                 } else {
-                    httpClient.close();
-                    handler.handle(new Either.Left<>(event.left().getValue()));
-                    log.error("Error enrolling user individually", event.left());
+                    // Un fois inscriptions individuelles ok, lancer les suppressions
+                    deleteUsers(arrUsersToDelete, handlerDeleteUsers);
                 }
-
+            } else {
+                httpClient.close();
+                handler.handle(new Either.Left<>(event.left().getValue()));
+                log.error("Error enrolling user individually", event.left());
             }
+
         };
         // ---------- END enrolls users --------------
 
         // ---------- getCourses for each user deleted --------------
-        Handler<AsyncResult<CompositeFuture>> handlerGetCourses = new Handler<AsyncResult<CompositeFuture>>() {
-            @Override
-            public void handle(AsyncResult<CompositeFuture> eventFuture) {
+        Handler<AsyncResult<CompositeFuture>> handlerGetCourses = eventFuture -> {
 
-                if (eventFuture.succeeded()) {
-                    log.info("END getting courses");
-                    for (Map.Entry<String, JsonObject> entryUser : mapUsersMoodle.entrySet()) {
-                        JsonObject jsonUser = entryUser.getValue();
-                        log.info(jsonUser.toString());
-                        log.info("-------");
-                    }
-
-                    // Utilisateurs non retrouvés (supp physiquement)
-                    for (Map.Entry<String, JsonObject> entryUser : mapUsersNotFound[0].entrySet()) {
-                        JsonObject jsonUser = entryUser.getValue();
-                        JsonArray jsonArrayCourses = mapUsersMoodle.get(jsonUser.getString("id")).getJsonArray("courses");
-
-                        identifyUserToDeleteAndEnroll(arrUsersToDelete, arrUsersToEnroll, jsonArrayCourses,
-                                jsonUser.getString("id"), SyncCase.SYNC_USER_NOT_FOUND);
-
-                    }
-
-                    // Utilisateurs en instance de suppresion
-                    for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
-                        JsonObject jsonUser = entryUser.getValue();
-                        if(jsonUser.getValue("deleteDate") == null) {
-                            continue;
-                        }
-                        JsonArray jsonArrayCourses = mapUsersMoodle.get(jsonUser.getString("id")).getJsonArray("courses");
-
-                        identifyUserToDeleteAndEnroll(arrUsersToDelete, arrUsersToEnroll, jsonArrayCourses,
-                                jsonUser.getString("id"), SyncCase.SYNC_USER_FOUND);
-                    }
-
-                    if (arrUsersToEnroll.isEmpty()) {
-                        String message = "Aucune inscription individuelle necessaire";
-                        log.info(message);
-                        endSyncUsers(handler);
-                    } else {
-                        enrollUsersIndivudually(arrUsersToEnroll, handlerEnrollUsers);
-                    }
-                } else {
-                    httpClient.close();
-                    handler.handle(new Either.Left<>("Error getting users Future"));
-                    log.error("Error getting users Future", eventFuture.cause());
+            if (eventFuture.succeeded()) {
+                log.info("END getting courses");
+                for (Map.Entry<String, JsonObject> entryUser : mapUsersMoodle.entrySet()) {
+                    JsonObject jsonUser = entryUser.getValue();
+                    log.info(jsonUser.toString());
+                    log.info("-------");
                 }
 
+                // Utilisateurs non retrouvés (supp physiquement)
+                for (Map.Entry<String, JsonObject> entryUser : mapUsersNotFound[0].entrySet()) {
+                    JsonObject jsonUser = entryUser.getValue();
+                    JsonArray jsonArrayCourses = mapUsersMoodle.get(jsonUser.getString("id")).getJsonArray("courses");
+
+                    identifyUserToDeleteAndEnroll(arrUsersToDelete, arrUsersToEnroll, jsonArrayCourses,
+                            jsonUser.getString("id"), SyncCase.SYNC_USER_NOT_FOUND);
+
+                }
+
+                // Utilisateurs en instance de suppresion
+                for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
+                    JsonObject jsonUser = entryUser.getValue();
+                    if (jsonUser.getValue("deleteDate") == null) {
+                        continue;
+                    }
+                    JsonArray jsonArrayCourses = mapUsersMoodle.get(jsonUser.getString("id")).getJsonArray("courses");
+
+                    identifyUserToDeleteAndEnroll(arrUsersToDelete, arrUsersToEnroll, jsonArrayCourses,
+                            jsonUser.getString("id"), SyncCase.SYNC_USER_FOUND);
+                }
+
+                if (arrUsersToEnroll.isEmpty()) {
+                    String message = "Aucune inscription individuelle necessaire";
+                    log.info(message);
+                    endSyncUsers(handler);
+                } else {
+                    enrollUsersIndivudually(arrUsersToEnroll, handlerEnrollUsers);
+                }
+            } else {
+                httpClient.close();
+                handler.handle(new Either.Left<>("Error getting users Future"));
+                log.error("Error getting users Future", eventFuture.cause());
             }
+
         };
         // ---------- END getCourses for each user deleted --------------
 
 
         // ---------- getUsers --------------
-        final Handler<Either<String, JsonArray>> getUsersHandler = new Handler<Either<String, JsonArray>>() {
-            @Override
-            public void handle(Either<String, JsonArray> resultUsers) {
-                try {
-                    if(resultUsers.isLeft()) {
-                        httpClient.close();
-                        handler.handle(new Either.Left<>("Error getting users Future"));
-                        log.error("Error getting users Future", resultUsers.left());
-                    } else {
-                        log.info("End getting users");
-                        JsonArray usersFromNeo = resultUsers.right().getValue();
-                        for (Object userFromNeo: usersFromNeo) {
-                            JsonObject jsonUserFromNeo = (JsonObject)userFromNeo;
-                            mapUsersFound.put(jsonUserFromNeo.getString("id"), jsonUserFromNeo);
-                        }
-                        mapUsersNotFound[0] = new HashMap<String, JsonObject>(mapUsersMoodle);
-                        mapUsersNotFound[0].keySet().removeAll(mapUsersFound.keySet());
-
-
-                        JsonArray idUsersFound = new JsonArray(Arrays.asList(mapUsersFound.keySet().toArray()));
-                        moodleEventBus.getZimbraEmail(idUsersFound, res -> {
-                            if(res.isLeft()) {
-                                handler.handle(new Either.Left<>("Error getting users mail"));
-                                log.error("Error getting users mail", res.left());
-                            } else {
-                                JsonObject jsonUsersMail = res.right().getValue();
-                                Set<String> keysUsers = jsonUsersMail.getMap().keySet();
-                                for (String idUser : keysUsers) {
-                                    JsonObject userNeo = mapUsersFound.get(idUser);
-                                    userNeo.put("email", jsonUsersMail.getJsonObject(idUser).getString("email"));
-                                    mapUsersFound.put(idUser, userNeo);
-                                }
-
-                                JsonArray arrUsersToUpdate = new JsonArray();
-                                for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
-                                    JsonObject jsonUserFromNeo = entryUser.getValue();
-                                    if(jsonUserFromNeo.getValue("deleteDate") != null) {
-                                        Future getCoursesFuture = Future.future();
-                                        listGetFuture.add(getCoursesFuture);
-                                        getCourses(jsonUserFromNeo, getCoursesFuture);
-                                    }
-
-                                    if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
-                                        arrUsersToUpdate.add(jsonUserFromNeo);
-                                    }
-                                }
-
-                                if (arrUsersToUpdate.isEmpty()) {
-                                    String message = "Aucune mise à jour necessaire";
-                                    log.info(message);
-                                    endSyncUsers(handler);
-                                } else {
-                                    updateUsers(arrUsersToUpdate, new Handler<Either<String, Buffer>>() {
-                                        @Override
-                                        public void handle(Either<String, Buffer> event) {
-                                            if (event.isRight()) {
-                                                log.info("END updating users");
-                                                endSyncUsers(handler);
-                                            } else {
-                                                httpClient.close();
-                                                handler.handle(new Either.Left<>(event.left().getValue()));
-                                                log.error("Error updating users", event.left());
-                                            }
-
-                                        }
-                                    });
-                                }
-
-                                if(listGetFuture.isEmpty()) {
-                                    String message = "Aucun utilisateur supprimé avec des cours";
-                                    log.info(message);
-                                    endSyncUsers(handler);
-                                } else {
-                                    CompositeFuture.all(listGetFuture).setHandler(handlerGetCourses);
-                                }
-
-
-                            }
-                        });
+        final Handler<Either<String, JsonArray>> getUsersHandler = resultUsers -> {
+            try {
+                if (resultUsers.isLeft()) {
+                    httpClient.close();
+                    handler.handle(new Either.Left<>("Error getting users Future"));
+                    log.error("Error getting users Future", resultUsers.left());
+                } else {
+                    log.info("End getting users");
+                    JsonArray usersFromNeo = resultUsers.right().getValue();
+                    for (Object userFromNeo : usersFromNeo) {
+                        JsonObject jsonUserFromNeo = (JsonObject) userFromNeo;
+                        mapUsersFound.put(jsonUserFromNeo.getString("id"), jsonUserFromNeo);
                     }
-                }catch (Throwable t) {
-                    log.error("Erreur getUsersHandler : ", t);
+                    mapUsersNotFound[0] = new HashMap<>(mapUsersMoodle);
+                    mapUsersNotFound[0].keySet().removeAll(mapUsersFound.keySet());
+
+
+                    JsonArray idUsersFound = new JsonArray(Arrays.asList(mapUsersFound.keySet().toArray()));
+                    moodleEventBus.getZimbraEmail(idUsersFound, res -> {
+                        if (res.isLeft()) {
+                            handler.handle(new Either.Left<>("Error getting users mail"));
+                            log.error("Error getting users mail", res.left());
+                        } else {
+                            JsonObject jsonUsersMail = res.right().getValue();
+                            Set<String> keysUsers = jsonUsersMail.getMap().keySet();
+                            for (String idUser : keysUsers) {
+                                JsonObject userNeo = mapUsersFound.get(idUser);
+                                userNeo.put("email", jsonUsersMail.getJsonObject(idUser).getString("email"));
+                                mapUsersFound.put(idUser, userNeo);
+                            }
+
+                            JsonArray arrUsersToUpdate = new JsonArray();
+                            for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
+                                JsonObject jsonUserFromNeo = entryUser.getValue();
+                                if (jsonUserFromNeo.getValue("deleteDate") != null) {
+                                    Future getCoursesFuture = Future.future();
+                                    listGetFuture.add(getCoursesFuture);
+                                    getCourses(jsonUserFromNeo, getCoursesFuture);
+                                }
+
+                                if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
+                                    arrUsersToUpdate.add(jsonUserFromNeo);
+                                }
+                            }
+
+                            if (arrUsersToUpdate.isEmpty()) {
+                                String message = "Aucune mise à jour necessaire";
+                                log.info(message);
+                                endSyncUsers(handler);
+                            } else {
+                                updateUsers(arrUsersToUpdate, event -> {
+                                    if (event.isRight()) {
+                                        log.info("END updating users");
+                                        endSyncUsers(handler);
+                                    } else {
+                                        httpClient.close();
+                                        handler.handle(new Either.Left<>(event.left().getValue()));
+                                        log.error("Error updating users", event.left());
+                                    }
+
+                                });
+                            }
+
+                            if (listGetFuture.isEmpty()) {
+                                String message = "Aucun utilisateur supprimé avec des cours";
+                                log.info(message);
+                                endSyncUsers(handler);
+                            } else {
+                                CompositeFuture.all(listGetFuture).setHandler(handlerGetCourses);
+                            }
+
+
+                        }
+                    });
                 }
+            } catch (Throwable t) {
+                log.error("Erreur getUsersHandler : ", t);
             }
         };
         // ---------- END getUsers --------------
@@ -443,43 +431,34 @@ public class DefaultSynchService {
                 "&moodlewsrestformat=" + JSON;
         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         Buffer wsResponse = new BufferImpl();
-        log.info("Start retrieving courses for user "+jsonUser.getString("id"));
-        final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
-            @Override
-            public void handle(HttpClientResponse response) {
-                if (response.statusCode() == 200) {
+        log.info("Start retrieving courses for user " + jsonUser.getString("id"));
+        final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, response -> {
+            if (response.statusCode() == 200) {
 
-                    response.handler(wsResponse::appendBuffer);
-                    response.endHandler(new Handler<Void>() {
-                        @Override
-                        public void handle(Void end) {
-                            JsonArray object = new JsonArray(wsResponse);
-                            JsonArray userCoursesDuplicate = object.getJsonObject(0).getJsonArray("enrolments");
-                            JsonArray userCourses = Utils.removeDuplicateCourses(userCoursesDuplicate);
+                response.handler(wsResponse::appendBuffer);
+                response.endHandler(end -> {
+                    JsonArray object = new JsonArray(wsResponse);
+                    JsonArray userCoursesDuplicate = object.getJsonObject(0).getJsonArray("enrolments");
+                    JsonArray userCourses = Utils.removeDuplicateCourses(userCoursesDuplicate);
 
-                            jsonUser.put("courses", userCourses);
-                            mapUsersMoodle.put(jsonUser.getString("id"), jsonUser);
-                            log.info("End retrieving courses for user "+jsonUser.getString("id"));
-                            getCoursesFuture.complete();
-                        }
-                    });
-                } else {
-                    log.error("Error retrieving courses for user "+jsonUser.getString("id"));
-                    log.error("response.statusCode() = "+response.statusCode());
+                    jsonUser.put("courses", userCourses);
+                    mapUsersMoodle.put(jsonUser.getString("id"), jsonUser);
+                    log.info("End retrieving courses for user " + jsonUser.getString("id"));
                     getCoursesFuture.complete();
-                }
+                });
+            } else {
+                log.error("Error retrieving courses for user " + jsonUser.getString("id"));
+                log.error("response.statusCode() = " + response.statusCode());
+                getCoursesFuture.complete();
             }
         });
 
         httpClientRequest.headers().set("Content-Length", "0");
         //Typically an unresolved Address, a timeout about connection or response
-        httpClientRequest.exceptionHandler(new Handler<Throwable>() {
-            @Override
-            public void handle(Throwable event) {
-                log.error(event.getMessage(), event);
-                if (!responseIsSent.getAndSet(true)) {
-                    //renderError(request);
-                }
+        httpClientRequest.exceptionHandler(event -> {
+            log.error(event.getMessage(), event);
+            if (!responseIsSent.getAndSet(true)) {
+                //renderError(request);
             }
         }).end();
 
@@ -542,11 +521,11 @@ public class DefaultSynchService {
     private JsonArray arrCohortsToUpdate;
 
     public void initSyncGroups() {
-        mapCohortsMoodle = new HashMap<String, JsonObject>();
-        mapCohortsFound = new HashMap<String, JsonObject>();
-        mapCohortsNotFound = new HashMap<String, JsonObject>();
+        mapCohortsMoodle = new HashMap<>();
+        mapCohortsFound = new HashMap<>();
+        mapCohortsNotFound = new HashMap<>();
 
-        mapUsersMoodle = new HashMap<String, JsonObject>();
+        mapUsersMoodle = new HashMap<>();
 
         arrUsersToDelete = new JsonArray();
         arrUsersToEnroll = new JsonArray();
@@ -600,213 +579,198 @@ public class DefaultSynchService {
 
         //---HANDLERS--
         Future getGroupsFuture = Future.future();
-        Handler<Either<String, JsonArray>> getGroupsHandler = new Handler<Either<String, JsonArray>>() {
-            @Override
-            public void handle(Either<String, JsonArray> resultGroups) {
-                try {
-                    if(resultGroups.isLeft()) {
-                        httpClient.close();
-                        handler.handle(new Either.Left<>("Error getting groups"));
-                        log.error("Error getting groups", resultGroups.left());
-                        getGroupsFuture.fail("Error getting groups");
-                    } else {
-                        log.info("End getting groups");
-                        JsonArray groupsFromNeo = resultGroups.right().getValue();
-                        for (Object objGroup : groupsFromNeo) {
-                            JsonObject jsonGroup = ((JsonObject)objGroup);
-
-                            // suppression prefix
-                            String idGroup = jsonGroup.getString("id");
-                            //idGroup.replace("GR_","");
-                            jsonGroup.put("id",idGroup);
-                            mapCohortsFound.put(idGroup, jsonGroup);
-                        }
-                        getGroupsFuture.complete();
-                    }
-                }catch (Throwable t) {
-                    log.error("Erreur getGroupsHandler : ", t);
+        Handler<Either<String, JsonArray>> getGroupsHandler = resultGroups -> {
+            try {
+                if (resultGroups.isLeft()) {
+                    httpClient.close();
+                    handler.handle(new Either.Left<>("Error getting groups"));
+                    log.error("Error getting groups", resultGroups.left());
                     getGroupsFuture.fail("Error getting groups");
+                } else {
+                    log.info("End getting groups");
+                    JsonArray groupsFromNeo = resultGroups.right().getValue();
+                    for (Object objGroup : groupsFromNeo) {
+                        JsonObject jsonGroup = ((JsonObject) objGroup);
+
+                        // suppression prefix
+                        String idGroup = jsonGroup.getString("id");
+                        //idGroup.replace("GR_","");
+                        jsonGroup.put("id", idGroup);
+                        mapCohortsFound.put(idGroup, jsonGroup);
+                    }
+                    getGroupsFuture.complete();
                 }
+            } catch (Throwable t) {
+                log.error("Erreur getGroupsHandler : ", t);
+                getGroupsFuture.fail("Error getting groups");
             }
         };
 
         Future getSharedBookMarkFuture = Future.future();
-        Handler<Either<String, Map<String, JsonObject>>> getSharedBookMarkHandler = new Handler<Either<String, Map<String, JsonObject>>>() {
-            @Override
-            public void handle(Either<String, Map<String, JsonObject>> resultSharedBookMark) {
-                try {
-                    if(resultSharedBookMark.isLeft()) {
-                        httpClient.close();
-                        handler.handle(new Either.Left<>("Error getting sharedBookMarks"));
-                        log.error("Error getting groups", resultSharedBookMark.left());
-                        getSharedBookMarkFuture.fail("Error getting sharedBookMarks");
-                    } else {
-                        log.info("End getting sharedBookMarks");
-                        Map<String, JsonObject> mapShareBookMarks = resultSharedBookMark.right().getValue();
-                        if(mapShareBookMarks != null && !mapShareBookMarks.isEmpty()) {
-                            mapCohortsFound.putAll(mapShareBookMarks);
-                        }
-                        getSharedBookMarkFuture.complete();
+        Handler<Either<String, Map<String, JsonObject>>> getSharedBookMarkHandler = resultSharedBookMark -> {
+            try {
+                if (resultSharedBookMark.isLeft()) {
+                    httpClient.close();
+                    handler.handle(new Either.Left<>("Error getting bookmarks"));
+                    log.error("Error getting groups", resultSharedBookMark.left());
+                    getSharedBookMarkFuture.fail("Error getting bookmarks");
+                } else {
+                    log.info("End getting bookmarks");
+                    Map<String, JsonObject> mapShareBookMarks = resultSharedBookMark.right().getValue();
+                    if (mapShareBookMarks != null && !mapShareBookMarks.isEmpty()) {
+                        mapCohortsFound.putAll(mapShareBookMarks);
                     }
-                }catch (Throwable t) {
-                    log.error("Erreur getSharedBookMarkHandler : ", t);
-                    getSharedBookMarkFuture.fail("Error getting sharedBookMarks");
+                    getSharedBookMarkFuture.complete();
                 }
+            } catch (Throwable t) {
+                log.error("Erreur getSharedBookMarkHandler : ", t);
+                getSharedBookMarkFuture.fail("Error getting bookmarks");
             }
         };
 
-        Handler<AsyncResult<CompositeFuture>> handlerGetAllGroups = new Handler<AsyncResult<CompositeFuture>>() {
-            @Override
-            public void handle(AsyncResult<CompositeFuture> compositeFutureAsyncResult) {
-                if (compositeFutureAsyncResult.failed()) {
-                    httpClient.close();
-                    handler.handle(new Either.Left<>("Error getting all groups Future"));
-                    log.error("Error getting all groups Future", compositeFutureAsyncResult.cause());
-                } else {
+        Handler<AsyncResult<CompositeFuture>> handlerGetAllGroups = compositeFutureAsyncResult -> {
+            if (compositeFutureAsyncResult.failed()) {
+                httpClient.close();
+                handler.handle(new Either.Left<>("Error getting all groups Future"));
+                log.error("Error getting all groups Future", compositeFutureAsyncResult.cause());
+            } else {
 
-                    // groupes / sharebook non retrouvés dans l'ENT
-                    mapCohortsNotFound = new HashMap<String, JsonObject>(mapCohortsMoodle);
-                    mapCohortsNotFound.keySet().removeAll(mapCohortsFound.keySet());
+                // groupes / sharebook non retrouvés dans l'ENT
+                mapCohortsNotFound = new HashMap<String, JsonObject>(mapCohortsMoodle);
+                mapCohortsNotFound.keySet().removeAll(mapCohortsFound.keySet());
 
-                    JsonArray usersIdsToEnrrollIndivually = new JsonArray();
+                JsonArray usersIdsToEnrrollIndivually = new JsonArray();
 
-                    // Cohortes NON retrouvées ->
-                    for (Map.Entry<String, JsonObject> entryCohort : mapCohortsNotFound.entrySet()) {
-                        JsonObject jsonCohort = entryCohort.getValue();
-                        JsonObject jsonMoodleCohort = mapCohortsMoodle.get(jsonCohort.getString("idnumber"));
+                // Cohortes NON retrouvées ->
+                for (Map.Entry<String, JsonObject> entryCohort : mapCohortsNotFound.entrySet()) {
+                    JsonObject jsonCohort = entryCohort.getValue();
+                    JsonObject jsonMoodleCohort = mapCohortsMoodle.get(jsonCohort.getString("idnumber"));
+
+                    JsonArray moodleUsers = jsonMoodleCohort.getJsonArray("users");
+                    if (moodleUsers != null && !moodleUsers.isEmpty()) {
+                        usersIdsToEnrrollIndivually.addAll(moodleUsers);
+                    }
+
+                    JsonObject cohortToDelete = new JsonObject().put("id", jsonCohort.getString("idnumber"));
+                    arrCohortsToDelete.add(cohortToDelete);
+                }
+
+
+                // Cohortes retrouvées ->
+                for (Map.Entry<String, JsonObject> entryCohort : mapCohortsFound.entrySet()) {
+                    JsonObject jsonCohortNeo = entryCohort.getValue();
+                    JsonArray arrUsersNeo = jsonCohortNeo.getJsonArray("users");
+
+                    JsonObject jsonMoodleCohort = mapCohortsMoodle.get(jsonCohortNeo.getString("id"));
+                    JsonArray arrUsersMoodle = jsonMoodleCohort.getJsonArray("users");
+
+                    // si plus aucun membre : suppression de la cohorte
+                    if (arrUsersNeo == null || arrUsersNeo.isEmpty()) {
 
                         JsonArray moodleUsers = jsonMoodleCohort.getJsonArray("users");
-                        if(moodleUsers != null && !moodleUsers.isEmpty()) {
+                        if (moodleUsers != null && !moodleUsers.isEmpty()) {
                             usersIdsToEnrrollIndivually.addAll(moodleUsers);
                         }
 
-                        JsonObject cohortToDelete = new JsonObject().put("id", jsonCohort.getString("idnumber"));
+                        JsonObject cohortToDelete = new JsonObject().put("id", jsonCohortNeo.getString("id"));
                         arrCohortsToDelete.add(cohortToDelete);
-                    }
+                    } else {
 
+                        // identification changements
+                        UserUtils.groupDisplayName(jsonCohortNeo, acceptLanguage);
+                        boolean hasChangeName = !jsonCohortNeo.getString("name").equals(jsonMoodleCohort.getString("name"));
+                        final JsonObject[] jsonCohorteWithUpdate = {null};
+                        if (hasChangeName) {
+                            jsonCohorteWithUpdate[0] = new JsonObject();
+                            jsonCohorteWithUpdate[0].put("id", jsonCohortNeo.getString("id"));
+                            jsonCohorteWithUpdate[0].put("newname", jsonCohortNeo.getString("name"));
+                        }
 
-                    // Cohortes retrouvées ->
-                    for (Map.Entry<String, JsonObject> entryCohort : mapCohortsFound.entrySet()) {
-                        JsonObject jsonCohortNeo = entryCohort.getValue();
-                        JsonArray arrUsersNeo = jsonCohortNeo.getJsonArray("users");
-
-                        JsonObject jsonMoodleCohort = mapCohortsMoodle.get(jsonCohortNeo.getString("id"));
-                        JsonArray arrUsersMoodle = jsonMoodleCohort.getJsonArray("users");
-
-                        // si plus aucun membre : suppression de la cohorte
-                        if (arrUsersNeo == null || arrUsersNeo.isEmpty()) {
-
-                            JsonArray moodleUsers = jsonMoodleCohort.getJsonArray("users");
-                            if(moodleUsers != null && !moodleUsers.isEmpty()) {
-                                usersIdsToEnrrollIndivually.addAll(moodleUsers);
-                            }
-
-                            JsonObject cohortToDelete = new JsonObject().put("id", jsonCohortNeo.getString("id"));
-                            arrCohortsToDelete.add(cohortToDelete);
-                        } else {
-
-                            // identification changements
-                            UserUtils.groupDisplayName(jsonCohortNeo, acceptLanguage);
-                            boolean hasChangeName = !jsonCohortNeo.getString("name").equals(jsonMoodleCohort.getString("name"));
-                            final JsonObject[] jsonCohorteWithUpdate = {null};
-                            if (hasChangeName) {
-                                jsonCohorteWithUpdate[0] = new JsonObject();
-                                jsonCohorteWithUpdate[0].put("id", jsonCohortNeo.getString("id"));
-                                jsonCohorteWithUpdate[0].put("newname", jsonCohortNeo.getString("name"));
-                            }
-
-                            // identification des nouveaux utilisateurs dans la cohorte
-                            for (Object objUserNeo : arrUsersNeo) {
-                                JsonObject jsonUserNeo = ((JsonObject) objUserNeo);
-                                boolean exist = arrUsersMoodle.stream().filter(u -> u.equals(jsonUserNeo.getString("id"))).count() > 0;
-                                if(!exist) {
-                                    moodleEventBus.getZimbraEmail(new JsonArray().add(jsonUserNeo.getString("id")), res -> {
-                                        if (res.isLeft()) {
-                                            log.error("Error getting user mail "+jsonUserNeo.getString("id"), res.left());
-                                        } else {
-                                            if(jsonCohorteWithUpdate[0] == null) {
-                                                jsonCohorteWithUpdate[0] = new JsonObject();
-                                            }
-                                            JsonArray useradded = jsonCohorteWithUpdate[0].getJsonArray("useradded");
-
-                                            if(useradded == null) {
-                                                useradded = new JsonArray();
-                                            }
-
-                                            jsonUserNeo.put("email", res.right().getValue().getJsonObject(jsonUserNeo.getString("id")).getString("email"));
-                                            useradded.add(jsonUserNeo);
-                                            jsonCohorteWithUpdate[0].put("useradded", useradded);
+                        // identification des nouveaux utilisateurs dans la cohorte
+                        for (Object objUserNeo : arrUsersNeo) {
+                            JsonObject jsonUserNeo = ((JsonObject) objUserNeo);
+                            boolean exist = arrUsersMoodle.stream().filter(u -> u.equals(jsonUserNeo.getString("id"))).count() > 0;
+                            if (!exist) {
+                                moodleEventBus.getZimbraEmail(new JsonArray().add(jsonUserNeo.getString("id")), res -> {
+                                    if (res.isLeft()) {
+                                        log.error("Error getting user mail " + jsonUserNeo.getString("id"), res.left());
+                                    } else {
+                                        if (jsonCohorteWithUpdate[0] == null) {
+                                            jsonCohorteWithUpdate[0] = new JsonObject();
                                         }
-                                    });
-                                }
-                            }
+                                        JsonArray useradded = jsonCohorteWithUpdate[0].getJsonArray("useradded");
 
-                            // identification des utilisateurs supprimés de la cohorte
-                            // pour ces utilisateurs on les inscriras individuellement à leurs cours dans la suite
-                            //de l'algo
-                            for (Object objUserMoodle : arrUsersMoodle) {
-                                String idUserMoodle = ((String) objUserMoodle);
-                                boolean exist = arrUsersNeo.stream().filter(u -> ((JsonObject)u).getString("id").equals(idUserMoodle)).count() > 0;
-                                if(!exist) {
-                                    if(jsonCohorteWithUpdate[0] == null) {
-                                        jsonCohorteWithUpdate[0] = new JsonObject();
+                                        if (useradded == null) {
+                                            useradded = new JsonArray();
+                                        }
+
+                                        jsonUserNeo.put("email", res.right().getValue().getJsonObject(jsonUserNeo.getString("id")).getString("email"));
+                                        useradded.add(jsonUserNeo);
+                                        jsonCohorteWithUpdate[0].put("useradded", useradded);
                                     }
-                                    JsonArray userdeleted = jsonCohorteWithUpdate[0].getJsonArray("userdeleted");
-
-                                    if(userdeleted == null) {
-                                        userdeleted = new JsonArray();
-                                    }
-
-                                    JsonObject jsonUserMoodle = new JsonObject();
-                                    jsonUserMoodle.put("id", idUserMoodle);
-                                    userdeleted.add(jsonUserMoodle);
-                                    jsonCohorteWithUpdate[0].put("userdeleted", userdeleted);
-
-                                    usersIdsToEnrrollIndivually.add(jsonUserMoodle.getString("id"));
-                                }
-                            }
-
-                            if(jsonCohorteWithUpdate[0] != null) {
-                                arrCohortsToUpdate.add(jsonCohorteWithUpdate[0]);
+                                });
                             }
                         }
+
+                        // identification des utilisateurs supprimés de la cohorte
+                        // pour ces utilisateurs on les inscriras individuellement à leurs cours dans la suite
+                        //de l'algo
+                        for (Object objUserMoodle : arrUsersMoodle) {
+                            String idUserMoodle = ((String) objUserMoodle);
+                            boolean exist = arrUsersNeo.stream().filter(u -> ((JsonObject) u).getString("id").equals(idUserMoodle)).count() > 0;
+                            if (!exist) {
+                                if (jsonCohorteWithUpdate[0] == null) {
+                                    jsonCohorteWithUpdate[0] = new JsonObject();
+                                }
+                                JsonArray userdeleted = jsonCohorteWithUpdate[0].getJsonArray("userdeleted");
+
+                                if (userdeleted == null) {
+                                    userdeleted = new JsonArray();
+                                }
+
+                                JsonObject jsonUserMoodle = new JsonObject();
+                                jsonUserMoodle.put("id", idUserMoodle);
+                                userdeleted.add(jsonUserMoodle);
+                                jsonCohorteWithUpdate[0].put("userdeleted", userdeleted);
+
+                                usersIdsToEnrrollIndivually.add(jsonUserMoodle.getString("id"));
+                            }
+                        }
+
+                        if (jsonCohorteWithUpdate[0] != null) {
+                            arrCohortsToUpdate.add(jsonCohorteWithUpdate[0]);
+                        }
                     }
-
-                    // Inscription individuel de tous les utilisateurs à leurs cours
-                    // s'ils sont identifiés comme sortant d'une cohorte
-                    getUsersCoursesAndEnroll(usersIdsToEnrrollIndivually, handler);
                 }
+
+                // Inscription individuel de tous les utilisateurs à leurs cours
+                // s'ils sont identifiés comme sortant d'une cohorte
+                getUsersCoursesAndEnroll(usersIdsToEnrrollIndivually, handler);
             }
         };
 
-        handlerEnrollGroups = new Handler<Either<String, Buffer>>() {
-            @Override
-            public void handle(Either<String, Buffer> event) {
-                if (event.isRight()) {
-                    log.info("END enrolling users individually");
-                    updateAnDeleteCohorts(handler);
-                } else {
-                    httpClient.close();
-                    handler.handle(new Either.Left<>(event.left().getValue()));
-                    log.error("Error enrolling users individually", event.left());
-                }
-
+        handlerEnrollGroups = event -> {
+            if (event.isRight()) {
+                log.info("END enrolling users individually");
+                updateAnDeleteCohorts(handler);
+            } else {
+                httpClient.close();
+                handler.handle(new Either.Left<>(event.left().getValue()));
+                log.error("Error enrolling users individually", event.left());
             }
+
         };
 
 
-        handlerUpdateAndDeleteCohorts = new Handler<AsyncResult<CompositeFuture>>() {
-            @Override
-            public void handle(AsyncResult<CompositeFuture> resultUpdateAndDelete) {
-                if(resultUpdateAndDelete.failed()) {
-                    httpClient.close();
-                    handler.handle(new Either.Left<>("Error update/delete cohort Future"));
-                    log.error("Error update/delete cohort Future", resultUpdateAndDelete.cause());
-                } else {
-                    endSyncGroups(handler);
-                }
-
+        handlerUpdateAndDeleteCohorts = resultUpdateAndDelete -> {
+            if (resultUpdateAndDelete.failed()) {
+                httpClient.close();
+                handler.handle(new Either.Left<>("Error update/delete cohort Future"));
+                log.error("Error update/delete cohort Future", resultUpdateAndDelete.cause());
+            } else {
+                endSyncGroups(handler);
             }
+
         };
         //---FIN HANDLERS--
 
@@ -820,8 +784,8 @@ public class DefaultSynchService {
         }).collect(Collectors.toList());
 
         JsonArray groupsIds = new JsonArray(lstGroupIds);
-        moodleService.getGroups(groupsIds, getGroupsHandler);
-        moodleService.getDistinctSharedBookMarkUsers(groupsIds, true, getSharedBookMarkHandler);
+        moduleNeoRequestService.getGroups(groupsIds, getGroupsHandler);
+        moduleSQLRequestService.getDistinctSharedBookMarkUsers(groupsIds, true, getSharedBookMarkHandler);
     }
 
     private void updateAnDeleteCohorts(Handler<Either<String, JsonObject>> handler) {

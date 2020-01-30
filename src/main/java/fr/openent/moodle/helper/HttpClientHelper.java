@@ -1,13 +1,13 @@
 package fr.openent.moodle.helper;
 
-import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.impl.DefaultMoodleService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.*;
-import fr.openent.moodle.service.MoodleService;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.ProxyOptions;
@@ -21,11 +21,9 @@ import static fr.openent.moodle.Moodle.moodleConfig;
 
 public class HttpClientHelper extends ControllerHelper {
 
-    private final MoodleService moodleService;
 
     public HttpClientHelper() {
         super();
-        this.moodleService = new DefaultMoodleService(Moodle.moodleSchema, "course");
     }
 
     /**
@@ -60,7 +58,7 @@ public class HttpClientHelper extends ControllerHelper {
 
     public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, HttpClient httpClient,
                                             AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler, boolean closeHttpClient) {
-        URI url = null;
+        URI url;
         try {
             url = new URI(moodleUrl);
         } catch (URISyntaxException e) {
@@ -68,42 +66,28 @@ public class HttpClientHelper extends ControllerHelper {
             return;
         }
 
-        final HttpClientRequest httpClientRequest = httpClient.postAbs(url.toString(), new Handler<HttpClientResponse>() {
-            @Override
-            public void handle(HttpClientResponse response) {
-                if (response.statusCode() == 200) {
-                    final Buffer buff = Buffer.buffer();
-                    response.handler(new Handler<Buffer>() {
-                        @Override
-                        public void handle(Buffer event) {
-                            buff.appendBuffer(event);
+        final HttpClientRequest httpClientRequest = httpClient.postAbs(url.toString(), response -> {
+            if (response.statusCode() == 200) {
+                final Buffer buff = Buffer.buffer();
+                response.handler(buff::appendBuffer);
+                response.endHandler(end -> {
+                    handler.handle(new Either.Right<>(buff));
+                    if (closeHttpClient) {
+                        if (!responseIsSent.getAndSet(true)) {
+                            httpClient.close();
                         }
-                    });
-                    response.endHandler(new Handler<Void>() {
-                        @Override
-                        public void handle(Void end) {
-                            handler.handle(new Either.Right<>(buff));
-                            if(closeHttpClient) {
-                                if (!responseIsSent.getAndSet(true)) {
-                                    httpClient.close();
-                                }
-                            }
+                    }
+                });
+            } else {
+                log.error("fail to post webservice" + response.statusMessage());
+                response.bodyHandler(event -> {
+                    log.error("Returning body after POST CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                    if (closeHttpClient) {
+                        if (!responseIsSent.getAndSet(true)) {
+                            httpClient.close();
                         }
-                    });
-                } else {
-                    log.error("fail to post webservice" + response.statusMessage());
-                    response.bodyHandler(new Handler<Buffer>() {
-                        @Override
-                        public void handle(Buffer event) {
-                            log.error("Returning body after POST CALL : " +  moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                            if(closeHttpClient) {
-                                if (!responseIsSent.getAndSet(true)) {
-                                    httpClient.close();
-                                }
-                            }
-                        }
-                    });
-                }
+                    }
+                });
             }
         });
 
@@ -111,10 +95,10 @@ public class HttpClientHelper extends ControllerHelper {
             httpClientRequest.setChunked(true);
 
             Object parameters = shareSend.getMap().get("parameters");
-            String encodedParameters = "";
-            if(parameters instanceof JsonObject) {
+            String encodedParameters;
+            if (parameters instanceof JsonObject) {
                 encodedParameters = ((JsonObject) parameters).encode();
-            } else if(parameters instanceof JsonArray) {
+            } else if (parameters instanceof JsonArray) {
                 encodedParameters = ((JsonArray) parameters).encode();
             } else {
                 log.error("unknow parameters format");
@@ -151,24 +135,18 @@ public class HttpClientHelper extends ControllerHelper {
             public void handle(HttpClientResponse response) {
                 if (response.statusCode() == 200) {
                     response.handler(wsResponse::appendBuffer);
-                    response.endHandler(new Handler<Void>() {
-                        @Override
-                        public void handle(Void end) {
-                            handler.handle(new Either.Right<String, Buffer>(wsResponse));
-                            if (!responseIsSent.getAndSet(true)) {
-                                httpClient.close();
-                            }
+                    response.endHandler(end -> {
+                        handler.handle(new Either.Right<>(wsResponse));
+                        if (!responseIsSent.getAndSet(true)) {
+                            httpClient.close();
                         }
                     });
                 } else {
                     log.error("fail to call create course webservice" + response.statusMessage());
-                    response.bodyHandler(new Handler<Buffer>() {
-                        @Override
-                        public void handle(Buffer event) {
-                            log.error("Returning body after PT CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                            if (!responseIsSent.getAndSet(true)) {
-                                httpClient.close();
-                            }
+                    response.bodyHandler(event -> {
+                        log.error("Returning body after PT CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                        if (!responseIsSent.getAndSet(true)) {
+                            httpClient.close();
                         }
                     });
                     handle(response);

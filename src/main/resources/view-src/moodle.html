@@ -33,7 +33,7 @@
                             </header>
                             <header class="horizontal-spacing " data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
                                 <span>
-                                    <i18n>moodle.dashboard.coures</i18n>
+                                    <i18n>moodle.dashboard.courses</i18n>
                                 </span>
                             </header>
                             <!--<header class="horizontal-spacing" data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
@@ -52,7 +52,7 @@
                     </header>
                     <header class="horizontal-spacing row ellipsis" data-ng-click="switchTab('courses')" data-ng-class="{ selected: currentTab === 'courses' }">
                         <span>
-                            <i18n>moodle.dashboard.coures</i18n>
+                            <i18n>moodle.dashboard.courses</i18n>
                         </span>
                     </header>
                     <!--<header class="horizontal-spacing row" data-ng-click="switchTab('library')" data-ng-class="{ selected: currentTab === 'library' }">
@@ -64,7 +64,7 @@
             </div>
 
             <lightbox class="row autoHeight" show="openLightbox === true"  on-close="closePopUp()">
-                <container template="ligthBoxContainer"></container>
+                <container template="lightboxContainer"></container>
             </lightbox>
 
             <!--info pour confirmer la surppression d'un dossier-->
@@ -88,7 +88,7 @@
                     </li>
                     <li class="fab-buttons__item">
                         <a ng-click="openPopUpFolder()" class="fab-buttons__link" data-tooltip="Dossier">
-                            <i class="icon-material foldericon"></i>
+                            <i class="icon-material folderIcon"></i>
                         </a>
                     </li>
                 </ul>

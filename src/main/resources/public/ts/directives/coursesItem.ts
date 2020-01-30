@@ -1,32 +1,29 @@
 /**
  * Created by jolloiss on 21/02/2019.
  */
-import {ng, appPrefix} from 'entcore';
+import {appPrefix, ng} from 'entcore';
 
-export let coursesItem = ng.directive("coursesItem", function(){
+export let coursesItem = ng.directive("coursesItem", function () {
 
     return {
-        restrict : 'E',
-        scope : {
-            place : '=',
-            course : '=',
+        restrict: 'E',
+        scope: {
+            place: '=',
+            course: '=',
             check: '=',
-            dateFunction : '=',
-            authorFunction : '=',
-            refreshFunction : '=',
-            view : '=',
-            first : '='
+            dateFunction: '=',
+            authorFunction: '=',
+            refreshFunction: '=',
+            view: '=',
+            first: '='
         },
-        templateUrl : `/${appPrefix}/public/template/directives/coursesItem.html`,
-        controller : ['$scope', '$element', function($scope, $element) {
-            $scope.checkCourse = () => {
-                $scope.check();
+        templateUrl: `/${appPrefix}/public/template/directives/coursesItem.html`,
+        controller: ['$scope', '$element', function ($scope, $element) {
+            $scope.printDate = (item, number) => {
+                return $scope.dateFunction(item, number);
             };
-            $scope.printDate = (item,number) => {
-                return $scope.dateFunction(item,number);
-            };
-            $scope.printAuthor = (item,number) => {
-                return $scope.authorFunction(item,number);
+            $scope.printAuthor = (item, number) => {
+                return $scope.authorFunction(item, number);
             };
             $scope.deleteDuplicateFailed = (item) => {
                 item.deleteDuplication();

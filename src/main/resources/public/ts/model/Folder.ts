@@ -3,24 +3,24 @@ import {Mix} from 'entcore-toolkit';
 import {notify} from "entcore";
 
 export interface Folder {
-    id : number;
-    parent_id : number;
-    user_id : string;
-    name : string;
-    subFolders : Folder[];
-    printsubfolder : boolean;
-    printTargetsubfolder : boolean;
-    select : boolean;
-    selectConfirm : boolean;
+    id: number;
+    parent_id: number;
+    user_id: string;
+    name: string;
+    subfolder: Folder[];
+    printSubfolder: boolean;
+    printTargetSubfolder: boolean;
+    select: boolean;
+    selectConfirm: boolean;
 }
 
 export class Folder {
     constructor() {
-        this.printsubfolder = false;
+        this.printSubfolder = false;
         this.select = false;
         this.parent_id = 0;
         this.selectConfirm = false;
-        this.printTargetsubfolder = false;
+        this.printTargetSubfolder = false;
     }
 
     toJson() {
@@ -33,8 +33,8 @@ export class Folder {
 
     async create() {
         try {
-           let {data,status}=  await http.post('/moodle/folder', this.toJson());
-           return  status
+            let {data, status} = await http.post('/moodle/folder', this.toJson());
+            return status
         } catch (e) {
             notify.error("Save function didn't work");
             throw e;
@@ -58,21 +58,21 @@ export class Folder {
 }
 
 export class Folders {
-    folderIdMoveIn : number;
-    myCourses : Folder;
-    all : Folder[];
-    search : Folder[];
-    isSynchronized : Boolean;
-    selectedFolders : number[];
-    listSelectedFolders : Folder[];
-    listOfSubfolders : Folder[];
-    searchInFolders : Folder[];
+    folderIdMoveIn: number;
+    myCourses: Folder;
+    all: Folder[];
+    search: Folder[];
+    isSynchronized: Boolean;
+    selectedFolders: number[];
+    listSelectedFolders: Folder[];
+    listOfSubfolder: Folder[];
+    searchInFolders: Folder[];
 
     constructor() {
         this.all = [];
         this.selectedFolders = [];
         this.listSelectedFolders = [];
-        this.listOfSubfolders = [];
+        this.listOfSubfolder = [];
         this.folderIdMoveIn = undefined;
         this.isSynchronized = false;
         this.myCourses = new Folder();
@@ -119,78 +119,79 @@ export class Folders {
         }
     }
 
-    getSubFolder(folderId : number): Folder[] {
-        if(this.all){
+    getSubfolder(folderId: number): Folder[] {
+        if (this.all) {
             return this.all.filter(folder => folder.parent_id == folderId && folder.id != folderId);
         }
         return [];
     }
 
-    getparentFolder(): Folder[] {
-        if(this.all){
+    getParentFolder(): Folder[] {
+        if (this.all) {
             return this.all.filter(folder => folder.parent_id === 0);
         }
         return [];
     }
 
     getFoldersToShow(currentFolder, searching): Folder[] {
-        currentFolder = this.listOfSubfolders.filter(folder => folder.id == currentFolder);
+        currentFolder = this.listOfSubfolder.filter(folder => folder.id == currentFolder);
         if (currentFolder && currentFolder[0]) {
             if (searching !== null && searching !== undefined && searching !== '') {
                 if (currentFolder[0].id == 0) {
                     return this.all.filter(folder => folder.name.toLowerCase().includes(searching.toLowerCase()));
                 } else {
-                    let subFoldersSearch = [];
-                    for (let i = 0; i < currentFolder[0].subFolders.length; i++) {
-                        subFoldersSearch.push(currentFolder[0].subFolders[i]);
-                        if (currentFolder[0].subFolders[i].subFolders.length != 0) {
-                            subFoldersSearch.push(...this.getFoldersToShow(currentFolder[0].subFolders[i].id, searching));
+                    let subfolderSearch = [];
+                    for (let i = 0; i < currentFolder[0].subfolder.length; i++) {
+                        subfolderSearch.push(currentFolder[0].subfolder[i]);
+                        if (currentFolder[0].subfolder[i].subfolder.length != 0) {
+                            subfolderSearch.push(...this.getFoldersToShow(currentFolder[0].subfolder[i].id, searching));
                         }
                     }
-                    return subFoldersSearch.filter(folder => folder.name.toLowerCase().includes(searching.toLowerCase()));
+                    return subfolderSearch.filter(folder => folder.name.toLowerCase().includes(searching.toLowerCase()));
                 }
             } else if (currentFolder[0].id == 0) {
-                return this.getparentFolder();
+                return this.getParentFolder();
             } else {
-                return this.getSubFolder(currentFolder[0].id);
+                return this.getSubfolder(currentFolder[0].id);
             }
         }
     }
 
+
     getAllFoldersModel(): Folder[] {
-        if(this.all){
+        if (this.all) {
             return this.all;
         }
         return [];
     }
 
-    getAllsubfolders() {
+    getAllSubfolder() {
         if (this.all) {
-            this.listOfSubfolders.length = 0;
-            this.listOfSubfolders.push(this.myCourses);
-            this.getparentFolder().forEach(folder => {
+            this.listOfSubfolder.length = 0;
+            this.listOfSubfolder.push(this.myCourses);
+            this.getParentFolder().forEach(folder => {
                 if (!folder.select) {
-                    this.listOfSubfolders.push(folder);
-                    folder.subFolders = this.getSubFolder(folder.id);
-                    this.insertSubFolders(folder);
+                    this.listOfSubfolder.push(folder);
+                    folder.subfolder = this.getSubfolder(folder.id);
+                    this.insertSubfolder(folder);
                 }
             });
         }
     }
 
-    insertSubFolders(folder:Folder) {
-        if (folder.subFolders && folder.subFolders.length) {
-            this.getSubFolder(folder.id).forEach(subFolder => {
-                if(!(subFolder.select)) {
-                    this.listOfSubfolders.push(subFolder);
-                    subFolder.subFolders = this.getSubFolder(subFolder.id);
-                    this.insertSubFolders(subFolder);
+    insertSubfolder(folder: Folder) {
+        if (folder.subfolder && folder.subfolder.length) {
+            this.getSubfolder(folder.id).forEach(subfolder => {
+                if (!(subfolder.select)) {
+                    this.listOfSubfolder.push(subfolder);
+                    subfolder.subfolder = this.getSubfolder(subfolder.id);
+                    this.insertSubfolder(subfolder);
                 }
             });
         }
     }
 
-    async moveToFolder(targetId : number) {
+    async moveToFolder(targetId: number) {
         try {
             await http.put(`/moodle/folders/move`, this.toJsonForMove(targetId));
         } catch (e) {

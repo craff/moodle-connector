@@ -7,14 +7,15 @@ import io.vertx.core.json.JsonObject;
 
 import java.util.Map;
 
-public interface MoodleService {
+public interface moduleSQLRequestService {
 
     /**
      * delete folders
-     * @param folder folder to delete
+     *
+     * @param folder  folder to delete
      * @param handler function handler returning data
      */
-    void deleteFolders (JsonObject folder, Handler<Either<String, JsonObject>> handler);
+    void deleteFolders(JsonObject folder, Handler<Either<String, JsonObject>> handler);
 
 
     /**
@@ -42,10 +43,9 @@ public interface MoodleService {
      * Create a course
      *
      * @param course  course to create
-     * @param userId  user id
      * @param handler function handler returning data
      */
-    void createCourse(JsonObject course, String userId, Handler<Either<String, JsonObject>> handler);
+    void createCourse(JsonObject course, Handler<Either<String, JsonObject>> handler);
 
     /**
      * Check if course(s) is in relation table
@@ -80,7 +80,7 @@ public interface MoodleService {
     void deleteCourseInRelationTable(final JsonObject courses, final Handler<Either<String, JsonObject>> handler);
 
     /**
-     * Delete course(s)
+     * Delete courses
      *
      * @param course  course to delete
      * @param handler function handler returning data
@@ -89,7 +89,8 @@ public interface MoodleService {
 
     /**
      * get course preferences of user
-     * @param id_user
+     *
+     * @param id_user user id
      * @param handler function handler returning data
      */
     void getPreferences(String id_user, Handler<Either<String, JsonArray>> handler);
@@ -103,73 +104,57 @@ public interface MoodleService {
 
     /**
      * get list folders by user
-     * @param id_user
-     * @param handler
+     * @param id_user user id
+     * @param handler function handler returning data
      */
     void getFoldersInEnt(String id_user,Handler<Either<String, JsonArray>> handler);
 
     /**
      * count Item folders In folder
-     * @param id_folder
-     * @param userId
-     * @param defaultResponseHandler
+     *
+     * @param id_folder              id folder
+     * @param userId                 user id
+     * @param defaultResponseHandler function handler returning data
      */
-    void countItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler);
-
-
+    void countItemInFolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler);
 
     /**
      * get courses and shared by users
-     * @param userId
-     * @param eitherHandler
+     * @param userId user id
+     * @param eitherHandler function handler returning data
      */
     void getCoursesByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler);
 
     /**
      * get choice of user in a specific view
-     * @param userId
-     * @param eitherHandler
+     * @param userId user id
+     * @param eitherHandler function handler returning data
      */
     void getChoices(String userId, Handler<Either<String, JsonArray>> eitherHandler);
 
     /**
      * set choice of user in a specific view in the DataBase
+     *
      * @param courses where the choice is stock
-     * @param view
-     * @param handler
+     * @param view    view choose by the user
+     * @param handler function handler returning data
      */
     void setChoice(JsonObject courses, String view, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * get users
-     * @param usersIds
-     * @param handler
+     * @param bookmarksIds ids bookmarks
+     * @param addPrefix    boolean
+     * @param handler      function handler returning data
      */
-    void getUsers(JsonArray usersIds, Handler<Either<String, JsonArray>> handler);
-
-    /**
-     * get groups
-     * @param groupsIds
-     * @param handler
-     */
-    void getGroups(JsonArray groupsIds, Handler<Either<String, JsonArray>> handler);
-
-    /**
-     * get sharedbookmark
-     * @param bookmarksIds
-     * @param handler
-     */
-    void getSharedBookMark(JsonArray bookmarksIds, Handler<Either<String, JsonArray>> handler);
-
-
     void getDistinctSharedBookMarkUsers(JsonArray bookmarksIds, boolean addPrefix, Handler<Either<String, Map<String, JsonObject>>> handler);
 
     /**
      * insert duplication table
+     *
      * @param courseToDuplicate course to duplicate
-     * @param handler function handler returning data
+     * @param handler           function handler returning data
      */
-    void insertDuplicateTable (JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler);
+    void insertDuplicateTable(JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler);
 
     /**
      * get courseid to duplicate
@@ -180,7 +165,7 @@ public interface MoodleService {
 
     /**
      * get course of the user to duplicate
-     * @param userId
+     * @param userId user id
      * @param handler function handler returning data
      */
     void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> handler);

@@ -2,7 +2,7 @@ import {Behaviours, model} from "entcore";
 
 console.log('moodle behaviours loaded');
 
-var moodleBehaviours = {
+const moodleBehaviours = {
 	resources: {
 		read: {
 			right: "fr-openent-moodle-controllers-MoodleController|read"
@@ -35,7 +35,7 @@ Behaviours.register('moodle', {
 			resource.myRights = {};
 		}
 
-		for (var behaviour in moodleBehaviours.resources) {
+		for (const behaviour in moodleBehaviours.resources) {
 			if (model.me.hasRight(rightsContainer, moodleBehaviours.resources[behaviour]) || model.me.userId === resource.owner.userId || model.me.userId === rightsContainer.owner.userId) {
 				if (resource.myRights[behaviour] !== undefined) {
 					resource.myRights[behaviour] = resource.myRights[behaviour] && moodleBehaviours.resources[behaviour];
@@ -53,9 +53,10 @@ Behaviours.register('moodle', {
 	 * <code>@SecuredAction(value = "xxxx.read", type = ActionType.RESOURCE)</code>
 	 * without the prefix <code>xxx</code>.
 	 */
-	resourceRights : function() {
-		return [ 'contrib', 'manager' ];
+	resourceRights: function () {
+		return ['contrib', 'manager'];
 	},
 
-	loadResources: function (callback) { }
+	loadResources: function () {
+	}
 });

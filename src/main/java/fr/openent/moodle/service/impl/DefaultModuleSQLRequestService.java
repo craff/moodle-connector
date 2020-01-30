@@ -2,15 +2,14 @@ package fr.openent.moodle.service.impl;
 
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.MoodleService;
+import fr.openent.moodle.service.moduleNeoRequestService;
+import fr.openent.moodle.service.moduleSQLRequestService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
-import org.entcore.common.neo4j.Neo4j;
-import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
@@ -21,31 +20,36 @@ import java.util.Map;
 
 import static fr.openent.moodle.Moodle.*;
 
-public class DefaultMoodleService extends SqlCrudService implements MoodleService {
+public class DefaultModuleSQLRequestService extends SqlCrudService implements moduleSQLRequestService {
 
-    private final Logger log = LoggerFactory.getLogger(DefaultMoodleService.class);
+    private final moduleNeoRequestService moduleNeoRequestService;
 
-    public DefaultMoodleService(String schema, String table) {
+    private final Logger log = LoggerFactory.getLogger(DefaultModuleSQLRequestService.class);
+
+    public DefaultModuleSQLRequestService(String schema, String table) {
         super(schema, table);
+
+        this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
     }
 
     @Override
-    public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
+    public void createFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         Object parentId = folder.getValue("parentId");
         values.add(folder.getValue("userId"));
         values.add(folder.getValue("name"));
         String createFolder = "";
-        if(!parentId.equals(0)) {
+        if (!parentId.equals(0)) {
             values.add(folder.getValue("parentId"));
-            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id,  name, parent_id)" +
-                    " VALUES (?, ?,  ?)";
-        }else {
-            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id,  name)" +
-                    " VALUES (?,  ?)";
+            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, name, parent_id)" +
+                    " VALUES (?, ?, ?)";
+        } else {
+            createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, name)" +
+                    " VALUES (?, ?)";
         }
-        sql.prepared(createFolder,values , SqlResult.validUniqueResultHandler(handler));
+        sql.prepared(createFolder, values, SqlResult.validUniqueResultHandler(handler));
     }
+
 
     @Override
     public void renameFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
@@ -88,7 +92,7 @@ public class DefaultMoodleService extends SqlCrudService implements MoodleServic
     }
 
     @Override
-    public void createCourse(final JsonObject course, String userId, final Handler<Either<String, JsonObject>> handler){
+    public void createCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
         String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id,  user_id)" +
                 " VALUES (?,  ?) RETURNING moodle_id as id;";
 
@@ -96,18 +100,21 @@ public class DefaultMoodleService extends SqlCrudService implements MoodleServic
         values.add(course.getValue("moodleid"));
         values.add(course.getString("userid"));
 
-        sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(event -> {
-            if(event.isRight()){
-                if(!course.getValue("folderid").equals(0)){
-                    createRelCourseFolder(course.getValue("moodleid"), course.getValue("folderid"), handler);
-                } else {
-                    handler.handle(new Either.Right<>(course));
-                }
-            }
-            else{
-                log.error("Error when inserting new courses before inserting rel_course_folders elems ");
-            }
+        sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
+            @Override
+            public void handle(Either<String, JsonObject> event) {
+                if (event.isRight()) {
+                    if (!course.getValue("folderid").equals(0)) {
+                        createRelCourseFolder(course.getValue("moodleid"), course.getValue("folderid"), handler);
+                    } else {
+                        handler.handle(new Either.Right<>(course));
+                    }
 
+                } else {
+                    log.error("Error when inserting new courses before inserting rel_course_folders elems ");
+                }
+
+            }
         }));
 
     }
@@ -123,13 +130,12 @@ public class DefaultMoodleService extends SqlCrudService implements MoodleServic
         sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(handler));
     }
 
-
     @Override
-    public void getPreferences( String id_user, final Handler<Either<String, JsonArray>> handler) {
-        String getCoursespreferences = "SELECT moodle_id, masked, favorites FROM " + Moodle.moodleSchema + ".preferences" + " WHERE user_id = ?;";
+    public void getPreferences(String id_user, final Handler<Either<String, JsonArray>> handler) {
+        String getCoursesPreferences = "SELECT moodle_id, masked, favorites FROM " + Moodle.moodleSchema + ".preferences" + " WHERE user_id = ?;";
         JsonArray value = new JsonArray();
         value.add(id_user);
-        sql.prepared(getCoursespreferences, value, SqlResult.validResultHandler(handler));
+        sql.prepared(getCoursesPreferences, value, SqlResult.validResultHandler(handler));
     }
 
     @Override
@@ -239,13 +245,14 @@ public class DefaultMoodleService extends SqlCrudService implements MoodleServic
                 ", user_id, name " +
                 "FROM " + Moodle.moodleSchema + ".folder " +
                 "WHERE user_id = ?;";
+
         JsonArray values = new JsonArray();
         values.add(id_user);
         sql.prepared(query, values, SqlResult.validResultHandler(handler));
     }
 
     @Override
-    public void countItemInfolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
+    public void countItemInFolder(long id_folder, String userId, Handler<Either<String, JsonObject>> defaultResponseHandler) {
         String query = "SELECT  count(*) " +
                 "FROM " + Moodle.moodleSchema + ".folder " +
                 "WHERE user_id = ? AND parent_id = ?;";
@@ -259,7 +266,7 @@ public class DefaultMoodleService extends SqlCrudService implements MoodleServic
         String query = "SELECT moodle_id,CASE WHEN folder_id IS NULL THEN 0 else folder_id end " +
                 "FROM " + Moodle.moodleSchema + ".course " +
                 "LEFT JOIN " + moodleSchema + ".rel_course_folder" +
-                " ON course.moodle_id = rel_course_folder.course_id "+
+                " ON course.moodle_id = rel_course_folder.course_id " +
                 "WHERE course.user_id = ?;";
 
         JsonArray values = new JsonArray();
@@ -296,99 +303,40 @@ public class DefaultMoodleService extends SqlCrudService implements MoodleServic
     }
 
     @Override
-    public void getUsers(final JsonArray usersIds, Handler<Either<String, JsonArray>> handler) {
-        JsonObject params = new JsonObject()
-                .put("usersIds", usersIds);
-
-        String queryUsersNeo4j =
-                "MATCH (u:User) WHERE  u.id IN {usersIds} " +
-                        "RETURN u.id AS id, u.id as username, u.email AS email, u.firstName AS firstname, u.lastName AS lastname";
-
-        Neo4j.getInstance().execute(queryUsersNeo4j, params, Neo4jResult.validResultHandler(handler));
-    }
-
-    @Override
-    public void getGroups(final JsonArray groupsIds, Handler<Either<String, JsonArray>> handler) {
-        JsonObject params = new JsonObject()
-                .put("groupsIds", groupsIds);
-
-
-        String queryGroupsNeo4j =
-                "MATCH(g:Group)-[:IN]-(ug:User) WHERE g.id  IN {groupsIds} " +
-                        "WITH g, collect({id: ug.id, username: ug.id, email: ug.email, firstname: ug.firstName, lastname: ug.lastName}) AS users " +
-                        "return \"GR_\"+g.id AS id, g.name AS name, users";
-
-        Neo4j.getInstance().execute(queryGroupsNeo4j, params, Neo4jResult.validResultHandler(handler));
-    }
-
-    @Override
-    public void getSharedBookMark(final JsonArray bookmarksIds, Handler<Either<String, JsonArray>> handler) {
-        JsonObject params = new JsonObject()
-                .put("bookmarksIds", bookmarksIds);
-
-        String queryNeo4j = "WITH {bookmarksIds} AS shareBookmarkIds " +
-                "UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) " +
-                "UNWIND TAIL(sb[shareBookmarkId]) as vid MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) " +
-                "WITH {group: {id: \"SB\" + shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, " +
-                "email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.id})}}as sharedBookMark "+
-                "RETURN COLLECT(sharedBookMark) as sharedBookMarks;";
-
-        Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
-    }
-
-    @Override
     public void getDistinctSharedBookMarkUsers(final JsonArray bookmarksIds, boolean addPrefix, Handler<Either<String, Map<String, JsonObject>>> handler) {
-        getSharedBookMarkUsers(bookmarksIds, new Handler<Either<String, JsonArray>>() {
-            @Override
-            public void handle(Either<String, JsonArray> resultSharedBookMark) {
-                if(resultSharedBookMark.isLeft()) {
-                    log.error("Error getting getSharedBookMarkUsers", resultSharedBookMark.left());
-                    handler.handle(new Either.Left<>("Error getting getSharedBookMarkUsers"));
-                } else {
-                    JsonArray results = resultSharedBookMark.right().getValue();
-                    Map<String, JsonObject> uniqResults = new HashMap<String, JsonObject>();
-                    if(results != null && !results.isEmpty()) {
-                        for(Object objShareBook : results) {
-                            JsonObject jsonShareBook = ((JsonObject)objShareBook).getJsonObject("sharedBookMark");
-                            String idShareBook = jsonShareBook.getString("id");
-                            if(addPrefix) {
-                                idShareBook = "SB" + idShareBook;
-                                jsonShareBook.put("id", idShareBook);
-                            }
-
-                            JsonObject shareBookToMerge = uniqResults.get(idShareBook);
-                            if(shareBookToMerge != null) {
-                                List<JsonObject> users = jsonShareBook.getJsonArray("users").getList();
-                                List<JsonObject> usersToMerge = shareBookToMerge.getJsonArray("users").getList();
-
-                                // fusion des listes sans doublon
-                                users.removeAll(usersToMerge);
-                                users.addAll(usersToMerge);
-                                jsonShareBook.put("users", new JsonArray(users));
-                            }
-
-                            uniqResults.put(idShareBook, jsonShareBook);
+        moduleNeoRequestService.getSharedBookMarkUsers(bookmarksIds, resultSharedBookMark -> {
+            if (resultSharedBookMark.isLeft()) {
+                log.error("Error getting getSharedBookMarkUsers", resultSharedBookMark.left());
+                handler.handle(new Either.Left<>("Error getting getSharedBookMarkUsers"));
+            } else {
+                JsonArray results = resultSharedBookMark.right().getValue();
+                Map<String, JsonObject> uniqResults = new HashMap<>();
+                if (results != null && !results.isEmpty()) {
+                    for (Object objShareBook : results) {
+                        JsonObject jsonShareBook = ((JsonObject) objShareBook).getJsonObject("sharedBookMark");
+                        String idShareBook = jsonShareBook.getString("id");
+                        if (addPrefix) {
+                            idShareBook = "SB" + idShareBook;
+                            jsonShareBook.put("id", idShareBook);
                         }
+
+                        JsonObject shareBookToMerge = uniqResults.get(idShareBook);
+                        if (shareBookToMerge != null) {
+                            List<JsonObject> users = jsonShareBook.getJsonArray("users").getList();
+                            List<JsonObject> usersToMerge = shareBookToMerge.getJsonArray("users").getList();
+
+                            // fusion des listes sans doublon
+                            users.removeAll(usersToMerge);
+                            users.addAll(usersToMerge);
+                            jsonShareBook.put("users", new JsonArray(users));
+                        }
+
+                        uniqResults.put(idShareBook, jsonShareBook);
                     }
-                    handler.handle(new Either.Right<String, Map<String, JsonObject>>(uniqResults));
                 }
+                handler.handle(new Either.Right<>(uniqResults));
             }
         });
-    }
-
-    private void getSharedBookMarkUsers(final JsonArray bookmarksIds, Handler<Either<String, JsonArray>> handler) {
-        JsonObject params = new JsonObject()
-                .put("bookmarksIds", bookmarksIds);
-
-        String queryNeo4j = "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
-                "MATCH (v:Visible {id : vid})<-[:IN]-(us:User) WHERE not(has(v.deleteDate)) and v:ProfileGroup WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: us.id, email: us.email, lastname: us.lastName, firstname: us.firstName, username: us.id})} as sharedBookMark " +
-                "RETURN sharedBookMark " +
-                "UNION " +
-                "WITH {bookmarksIds} AS shareBookmarkIds UNWIND shareBookmarkIds AS shareBookmarkId MATCH (u:User)-[:HAS_SB]->(sb:ShareBookmark) UNWIND TAIL(sb[shareBookmarkId]) as vid " +
-                "MATCH (v:Visible {id : vid}) WHERE not(has(v.deleteDate)) and v:User WITH {id: shareBookmarkId, name: HEAD(sb[shareBookmarkId]), users: COLLECT(DISTINCT{id: v.id, email: v.email, lastname: v.lastName, firstname: v.firstName, username: v.id})} as sharedBookMark " +
-                "RETURN sharedBookMark";
-
-        Neo4j.getInstance().execute(queryNeo4j, params, Neo4jResult.validResultHandler(handler));
     }
 
     @Override

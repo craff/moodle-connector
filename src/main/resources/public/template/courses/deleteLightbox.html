@@ -10,14 +10,16 @@
         </p>
         <ul class="list-element-delete">
             <li class="ellipsis" ng-repeat="folderList in getAllFolders()" ng-if="folderList.select">
-                <label class="checkbox" >
-                    <input id="folders" type="checkbox" ng-change="confirmDeleteSend()" checked class="checkbox"  ng-model="folderList.selectConfirm"/>
+                <label class="checkbox">
+                    <input id="folders" type="checkbox" ng-change="confirmDeleteSend()" checked class="checkbox"
+                           ng-model="folderList.selectConfirm"/>
                     <span>[[folderList.name]]</span>
                 </label>
             </li>
             <li class="ellipsis" ng-repeat="courseList in courses.allCourses" ng-if="courseList.select">
-                <label class="checkbox" >
-                    <input id="courses" type="checkbox" ng-change="confirmDeleteSend()" checked  ng-model="courseList.selectConfirm" class="checkbox "/>
+                <label class="checkbox">
+                    <input id="courses" type="checkbox" ng-change="confirmDeleteSend()" checked
+                           ng-model="courseList.selectConfirm" class="checkbox "/>
                     <span>[[courseList.fullname]]</span>
                 </label>
             </li>

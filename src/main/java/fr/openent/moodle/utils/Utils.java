@@ -13,16 +13,15 @@ import static fr.wseduc.webutils.http.Renders.badRequest;
 public class Utils {
     protected static final Logger log = LoggerFactory.getLogger(SynchController.class);
 
-    public static JsonArray removeDuplicateCourses(JsonArray duplicatesCours) {
+    public static JsonArray removeDuplicateCourses(JsonArray duplicatesCourse) {
         JsonArray coursesUniq = new JsonArray();
-        for (Object course : duplicatesCours)
-        {
+        for (Object course : duplicatesCourse) {
             boolean findDuplicates = false;
             for (int i = 0; i < coursesUniq.size(); i++) {
                 if (((JsonObject) course).getValue("courseid").toString().equals(coursesUniq.getJsonObject(i).getValue("courseid").toString())) {
                     findDuplicates = true;
 
-                    if(isStrongerRole(Integer.parseInt(((JsonObject) course).getValue("role").toString()),
+                    if (isStrongerRole(Integer.parseInt(((JsonObject) course).getValue("role").toString()),
                             Integer.parseInt(coursesUniq.getJsonObject(i).getValue("role").toString()))) {
                         coursesUniq.remove(i);
                         coursesUniq.add(course);

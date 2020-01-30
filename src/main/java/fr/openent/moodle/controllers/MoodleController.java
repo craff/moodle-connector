@@ -1,12 +1,16 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.filters.CanShareResoourceFilter;
+import fr.openent.moodle.filters.canShareResourceFilter;
 import fr.openent.moodle.helper.HttpClientHelper;
-import fr.openent.moodle.service.MoodleEventBus;
-import fr.openent.moodle.service.MoodleService;
+import fr.openent.moodle.service.getShareProcessingService;
+import fr.openent.moodle.service.impl.DefaultGetShareProcessingService;
+import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
-import fr.openent.moodle.service.impl.DefaultMoodleService;
+import fr.openent.moodle.service.impl.DefaultPostShareProcessingService;
+import fr.openent.moodle.service.moduleSQLRequestService;
+import fr.openent.moodle.service.moodleEventBus;
+import fr.openent.moodle.service.postShareProcessingService;
 import fr.openent.moodle.utils.Utils;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -42,31 +46,33 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.*;
+import static fr.openent.moodle.helper.HttpClientHelper.webServiceMoodlePost;
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static java.util.Objects.isNull;
 import static org.entcore.common.http.response.DefaultResponseHandler.defaultResponseHandler;
 
 public class MoodleController extends ControllerHelper {
 
-    private final MoodleService moodleService;
-    private final MoodleEventBus moodleEventBus;
-    private final HttpClientHelper httpClientHelper;
+    private final moduleSQLRequestService moduleSQLRequestService;
+    private final moodleEventBus moodleEventBus;
     private final Storage storage;
+    private final getShareProcessingService getShareProcessingService;
+    private final postShareProcessingService postShareProcessingService;
 
     public MoodleController(final Storage storage, EventBus eb) {
         super();
         this.eb = eb;
         this.storage = storage;
 
-        this.moodleService = new DefaultMoodleService(Moodle.moodleSchema, "course");
+        this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         this.moodleEventBus = new DefaultMoodleEventBus(Moodle.moodleSchema, "course", eb);
-        this.httpClientHelper = new HttpClientHelper();
+        this.getShareProcessingService = new DefaultGetShareProcessingService();
+        this.postShareProcessingService = new DefaultPostShareProcessingService();
     }
+
 
     //Permissions
     private static final String
@@ -80,6 +86,7 @@ public class MoodleController extends ControllerHelper {
 
     /**
      * Displays the home view.
+     *
      * @param request Client request
      */
     @Get("")
@@ -90,98 +97,67 @@ public class MoodleController extends ControllerHelper {
 
     @Put("/folders/move")
     @ApiDoc("move a folder")
-    //@SecuredAction("moodle.modify")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void moveFolder(final HttpServerRequest request){
-        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject folders) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        if (user != null) {
-                            moodleService.moveFolder(folders, defaultResponseHandler(request));
-                        } else {
-                            log.error("User not found in session.");
-                            unauthorized(request);
-                        }
+    public void moveFolder(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", folders ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    if (user != null) {
+                        moduleSQLRequestService.moveFolder(folders, defaultResponseHandler(request));
+                    } else {
+                        log.error("User not found in session.");
+                        unauthorized(request);
                     }
-                });
-            }
-        });
+                }));
     }
 
     @Delete("/folder")
     @ApiDoc("delete a folder")
     public void deleteFolder(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject folder) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        if (user != null) {
-                            moodleService.deleteFolders(folder, defaultResponseHandler(request));
-                        } else {
-                            log.error("User not found in session.");
-                            unauthorized(request);
-                        }
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", folder ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    if (user != null) {
+                        moduleSQLRequestService.deleteFolders(folder, defaultResponseHandler(request));
+                    } else {
+                        log.error("User not found in session.");
+                        unauthorized(request);
                     }
-                });
-            }
-        });
+                }));
     }
 
     @Post("/folder")
     @ApiDoc("create a folder")
     public void createFolder(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject folder) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user){
-                        if (user != null) {
-                            folder.put("userId", user.getUserId());
-                            folder.put("structureId", user.getStructures().get(0));
-                            moodleService.createFolder(folder, defaultResponseHandler(request));
-                        } else {
-                            log.error("User not found in session.");
-                            unauthorized(request);
-                        }
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", folder ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    if (user != null) {
+                        folder.put("userId", user.getUserId());
+                        folder.put("structureId", user.getStructures().get(0));
+                        moduleSQLRequestService.createFolder(folder, defaultResponseHandler(request));
+                    } else {
+                        log.error("User not found in session.");
+                        unauthorized(request);
                     }
-                });
-            }
-        });
+                }));
     }
 
     @Put("/folder/rename")
     @ApiDoc("rename a folder")
     public void renameFolder(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "folder", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject folder) {
-                moodleService.renameFolder(folder, defaultResponseHandler(request));
-            }
-        });
+        RequestUtils.bodyToJson(request, pathPrefix + "folder", folder ->
+                moduleSQLRequestService.renameFolder(folder, defaultResponseHandler(request)));
     }
 
     @Get("/folder/countsFolders/:id")
-    @ApiDoc("Get cours in database by folder id")
-    //@SecuredAction("moodle.list")
+    @ApiDoc("Get course in database by folder id")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getCountsItemInFolder(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    long id_folder =Long.parseLong(request.params().get("id"));
-                    moodleService.countItemInfolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
-                }
-                else {
-                    log.error("User not found in session.");
-                    unauthorized(request);
-                }
+    public void getCountsItemInFolder(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            if (user != null) {
+                long id_folder = Long.parseLong(request.params().get("id"));
+                moduleSQLRequestService.countItemInFolder(id_folder, user.getUserId(), DefaultResponseHandler.defaultResponseHandler(request));
+            } else {
+                log.error("User not found in session.");
+                unauthorized(request);
             }
         });
     }
@@ -201,9 +177,9 @@ public class MoodleController extends ControllerHelper {
                 URI moodleUri = null;
                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 try {
-                    Calendar calendar =new GregorianCalendar();
+                    GregorianCalendar calendar = new GregorianCalendar();
                     String uniqueID = UUID.randomUUID().toString();
-                    course.put("shortname", ((GregorianCalendar) calendar).toZonedDateTime().toString().substring(0, 7) +
+                    course.put("shortname", calendar.toZonedDateTime().toString().substring(0, 7) +
                             user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
                             course.getString("fullname").substring(0, 4) + uniqueID);
                     final String service = (config.getString("address_moodle") + config.getString("ws-path"));
@@ -243,16 +219,16 @@ public class MoodleController extends ControllerHelper {
                                 "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA"), "UTF-8") +
                                 "&moodlewsrestformat=" + JSON;
                         log.info("CALL WS create course : " + moodleUrl);
-                        httpClientHelper.webServiceMoodlePost(null, moodleUrl, httpClient, responseIsSent, responseMoodle -> {
+                        webServiceMoodlePost(null, moodleUrl, httpClient, responseIsSent, responseMoodle -> {
                             if (responseMoodle.isRight()) {
                                 log.info("SUCCESS creating course : ");
                                 JsonObject courseCreatedInMoodle = responseMoodle.right().getValue().toJsonArray().getJsonObject(0);
                                 log.info(courseCreatedInMoodle);
                                 course.put("moodleid", courseCreatedInMoodle.getValue("courseid"))
                                         .put("userid", user.getUserId());
-                                moodleService.createCourse(course,user.getUserId(), defaultResponseHandler(request));
+                                moduleSQLRequestService.createCourse(course, defaultResponseHandler(request));
                             } else {
-                                Utils.sendErrorRequest(request,"FAIL creating course : " + responseMoodle.left().getValue());
+                                Utils.sendErrorRequest(request, "FAIL creating course : " + responseMoodle.left().getValue());
                             }
                         }, true);
                     } catch (UnsupportedEncodingException error) {
@@ -263,7 +239,7 @@ public class MoodleController extends ControllerHelper {
         });
     }
 
-    @ApiDoc("public Get pictutre for moodle webside")
+    @ApiDoc("public Get picture for moodle website")
     @Get("/files/:id")
     public void getFile(HttpServerRequest request) {
         String idImage = request.getParam("id").substring(0, request.getParam("id").lastIndexOf('.'));
@@ -286,7 +262,7 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("get info image workspace")
     @Get("/info/image/:id")
     public void getInfoImg(final HttpServerRequest request) {
-        try{
+        try {
             moodleEventBus.getImage(request.getParam("id"), DefaultResponseHandler.defaultResponseHandler(request));
         } catch (Exception e) {
             log.error("Gail to get image workspace", e);
@@ -296,17 +272,13 @@ public class MoodleController extends ControllerHelper {
     @Get("/folders")
     @ApiDoc("Get folder in database")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void listFoldersAndShared(final HttpServerRequest request){
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(final UserInfos user) {
-                if (user != null) {
-                    moodleService.getFoldersInEnt(user.getUserId(), arrayResponseHandler(request));
-                }
-                else {
-                    log.error("User not found in session.");
-                    unauthorized(request);
-                }
+    public void listFoldersAndShared(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            if (user != null) {
+                moduleSQLRequestService.getFoldersInEnt(user.getUserId(), arrayResponseHandler(request));
+            } else {
+                log.error("User not found in session.");
+                unauthorized(request);
             }
         });
     }
@@ -314,189 +286,173 @@ public class MoodleController extends ControllerHelper {
     @Get("/user/courses")
     @ApiDoc("Get courses by user in moodle and sql")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getCoursesByUser(final HttpServerRequest request){
-        try{
+    public void getCoursesByUser(final HttpServerRequest request) {
+        try {
             UserUtils.getUserInfos(eb, request, user -> {
-                try{
-                    if(user != null){
+                try {
+                    if (user != null) {
                         String idUser = user.getUserId();
-                        moodleService.getCoursesByUserInEnt(idUser, eventSqlCourses -> {
-                            handlerGetCourseByUserId(request, user, idUser, eventSqlCourses);
+                        moduleSQLRequestService.getCoursesByUserInEnt(idUser, eventSqlCourses -> {
+                            if (eventSqlCourses.isRight()) {
+                                final JsonArray sqlCourses = eventSqlCourses.right().getValue();
+                                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
+                                final String moodleUrl = createUrlMoodleGetCourses(idUser);
+                                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                                Buffer wsResponse = new BufferImpl();
+                                log.info("CALL WS_GET_USERCOURSES : " + moodleUrl);
+                                final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, responseMoodle -> {
+                                    if (responseMoodle.statusCode() == 200) {
+                                        log.info("SUCCESS WS_GET_USERCOURSES");
+                                        responseMoodle.handler(wsResponse::appendBuffer);
+                                        responseMoodle.endHandler(end -> {
+                                            try {
+                                                JsonArray object = new JsonArray(wsResponse);
+                                                JsonArray coursesDirtyFromMoodle = object.getJsonObject(0).getJsonArray("enrolments");
+                                                JsonArray courses = Utils.removeDuplicateCourses(coursesDirtyFromMoodle);
+                                                List<String> sqlCourseId = sqlCourses.stream().map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
+
+                                                for (int i = 0; i < courses.size(); i++) {
+                                                    JsonObject course = courses.getJsonObject(i);
+                                                    course.put("duplication", "non");
+
+                                                    if (sqlCourseId.contains(course.getValue("courseid").toString())) {
+                                                        int courseIndex = sqlCourseId.indexOf(course.getValue("courseid").toString());
+                                                        String idFolder = sqlCourses.getJsonObject(courseIndex).getValue("folder_id").toString();
+                                                        course.put("folderid", Integer.parseInt(idFolder));
+                                                    } else {
+                                                        course.put("moodleid", course.getValue("courseid"))
+                                                                .put("userid", idUser).put("folderid", 0);
+                                                        String auteur = course.getJsonArray("auteur").getJsonObject(0).getString("entidnumber");
+                                                        if (auteur != null && auteur.equals(user.getUserId())) {
+                                                            moduleSQLRequestService.createCourse(course, eventResponseCreate -> {
+                                                                if (eventResponseCreate.isLeft()) {
+                                                                    log.error("Error when created course in function get course " +
+                                                                            eventResponseCreate.left().getValue());
+                                                                } else {
+                                                                    log.info("" +
+                                                                            "Course created " +
+                                                                            eventResponseCreate.right().getValue());
+                                                                }
+                                                            });
+                                                        }
+                                                    }
+                                                }
+                                                List<String> courseId = courses.stream().map(obj -> (((JsonObject) obj).getValue("courseid")).toString()).collect(Collectors.toList());
+                                                moduleSQLRequestService.getCourseToDuplicate(idUser, eventCoursesDuplication -> {
+                                                    try {
+                                                        if (eventCoursesDuplication.right().getValue().size() != 0) {
+                                                            JsonArray coursesInDuplication = eventCoursesDuplication.right().getValue();
+                                                            for (int i = 0; i < coursesInDuplication.size(); i++) {
+                                                                JsonObject courseDuplicate = coursesInDuplication.getJsonObject(i);
+                                                                int indexCourseDuplication = courseId.indexOf(courseDuplicate.getValue("id_course").toString());
+                                                                JsonObject course = courses.getJsonObject(indexCourseDuplication);
+                                                                courses.add(createCourseForSend(course, courseDuplicate));
+                                                            }
+                                                        }
+                                                        moduleSQLRequestService.getPreferences(idUser, eventPreference -> {
+                                                            try {
+                                                                if (eventPreference.isRight()) {
+                                                                    JsonArray list = eventPreference.right().getValue();
+                                                                    if (list.size() != 0) {
+                                                                        for (int i = 0; i < courses.size(); i++) {
+                                                                            JsonObject courseAddPreference = courses.getJsonObject(i);
+                                                                            for (int j = 0; j < list.size(); j++) {
+                                                                                JsonObject preferencesCourse = list.getJsonObject(j);
+                                                                                if (courseAddPreference.containsKey("courseid")) {
+                                                                                    if (preferencesCourse.getValue("moodle_id").toString().equals(courseAddPreference.getValue("courseid").toString())) {
+                                                                                        courseAddPreference.put("masked", preferencesCourse.getBoolean("masked"));
+                                                                                        courseAddPreference.put("favorites", preferencesCourse.getBoolean("favorites"));
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            if (!(courseAddPreference.containsKey("masked"))) {
+                                                                                courseAddPreference.put("masked", false);
+                                                                                courseAddPreference.put("favorites", false);
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        for (int i = 0; i < courses.size(); i++) {
+                                                                            JsonObject courseWithoutPreference = courses.getJsonObject(i);
+                                                                            courseWithoutPreference.put("masked", false);
+                                                                            courseWithoutPreference.put("favorites", false);
+                                                                        }
+                                                                    }
+                                                                    JsonObject finalResponse = new JsonObject();
+                                                                    finalResponse.put("allCourses", courses);
+                                                                    finalResponse.put("idAuditeur", moodleConfig.getInteger("idAuditeur"));
+                                                                            finalResponse.put("idEditingTeacher", moodleConfig.getInteger("idEditingTeacher"));
+                                                                            finalResponse.put("idStudent", moodleConfig.getInteger("idStudent"));
+                                                                            Renders.renderJson(request, finalResponse);
+                                                                        } else {
+                                                                            Utils.sendErrorRequest(request,
+                                                                                    "Fail to call get courses webservice : " +
+                                                                                            responseMoodle.statusMessage());
+                                                                        }
+                                                            } catch (Exception error) {
+                                                                Utils.sendErrorRequest(request, "Error in get preference in get courses by user : " +
+                                                                        error.toString());
+                                                            }
+                                                        });
+                                                    } catch (Exception error) {
+                                                        Utils.sendErrorRequest(request, "Error in get duplication in get courses by user : " +
+                                                                error.toString());
+                                                    }
+                                                });
+                                                if (!responseIsSent.getAndSet(true)) {
+                                                    httpClient.close();
+                                                }
+                                            } catch (Exception error) {
+                                                Utils.sendErrorRequest(request, "Error in get courses by user : " +
+                                                        error.toString());
+                                            }
+                                                }
+                                        );
+                                    } else {
+                                        responseMoodle.bodyHandler(eventResponse -> {
+                                            log.error("Returning body after GET CALL : " +
+                                                    moodleUrl +
+                                                    ", Returning body : " +
+                                                    eventResponse.toString("UTF-8"));
+                                            if (!responseIsSent.getAndSet(true)) {
+                                                httpClient.close();
+                                            }
+                                        });
+                                        Utils.sendErrorRequest(request,
+                                                "Fail to call get courses webservice : " +
+                                                        responseMoodle.statusMessage());
+                                    }
+                                });
+                                httpClientRequest.headers().set("Content-Length", "0");
+                                httpClientRequest.exceptionHandler(eventClientRequest -> {
+                                    Utils.sendErrorRequest(request,
+                                            "Typically an unresolved Address, a timeout about connection or response : " +
+                                                    eventClientRequest.getMessage() +
+                                                    eventClientRequest);
+                                    if (!responseIsSent.getAndSet(true)) {
+                                        renderError(request);
+                                        httpClient.close();
+                                    }
+                                }).end();
+                            } else {
+                                Utils.sendErrorRequest(request, "Get list courses in Ent Base failed : " +
+                                        eventSqlCourses.left().getValue());
+                            }
                         });
                     } else {
                         unauthorized(request, "User is not authorized to access courses : ");
                     }
-                } catch (Exception error){
-                    Utils.sendErrorRequest(request,"Error in get courses by user after get user : " + error);
+                } catch (Exception error) {
+                    Utils.sendErrorRequest(request, "Error in get courses by user after get user : " + error);
                 }
             });
-        } catch (Exception error){
-            Utils.sendErrorRequest(request,"Error in get courses by user 4: " + error);
+        } catch (Exception error) {
+            Utils.sendErrorRequest(request, "Error in get courses by user : " + error);
         }
     }
 
-    private void handlerGetCourseByUserId(HttpServerRequest request, UserInfos user, String idUser, Either<String, JsonArray> eventSqlCourses) {
-        if(eventSqlCourses.isRight()){
-            final JsonArray sqlCourses = eventSqlCourses.right().getValue();
-            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
-            final String moodleUrl = createUrlMoodleGetCourses(idUser);
-            final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-            Buffer wsResponse = new BufferImpl();
-            log.info("CALL WS_GET_USERCOURSES : "+ moodleUrl);
-            final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, responseMoodle -> {
-                if (responseMoodle.statusCode() == 200) {
-                    log.info("SUCCESS WS_GET_USERCOURSES");
-                    responseMoodle.handler(wsResponse::appendBuffer);
-                    responseMoodle.endHandler(end -> {
-                                handlerEndHandler(request, user, idUser, sqlCourses, httpClient, responseIsSent, wsResponse, responseMoodle);
-                            }
-                    );
-                } else {
-                    responseMoodle.bodyHandler(eventResponse -> {
-                        log.error("Returning body after GET CALL : " +
-                                moodleUrl +
-                                ", Returning body : " +
-                                eventResponse.toString("UTF-8"));
-                        if (!responseIsSent.getAndSet(true)) {
-                            httpClient.close();
-                        }
-                    });
-                    Utils.sendErrorRequest(request,
-                            "Fail to call get courses webservice : " +
-                                    responseMoodle.statusMessage());
-                }
-            });
-            httpClientRequest.headers().set("Content-Length", "0");
-            httpClientRequest.exceptionHandler(eventClientRequest -> {
-                Utils.sendErrorRequest(request,
-                        "Typically an unresolved Address, a timeout about connection or response : " +
-                                eventClientRequest.getMessage() +
-                                eventClientRequest);
-                if (!responseIsSent.getAndSet(true)) {
-                    renderError(request);
-                    httpClient.close();
-                }
-            }).end();
-        } else {
-            Utils.sendErrorRequest(request, "Get list courses in Ent Base failed : " +
-                    eventSqlCourses.left().getValue());
-        }
-    }
-
-    private void handlerEndHandler(HttpServerRequest request, UserInfos user, String idUser, JsonArray sqlCourses, HttpClient httpClient, AtomicBoolean responseIsSent, Buffer wsResponse, HttpClientResponse responseMoodle) {
-        try{
-            JsonArray object = new JsonArray(wsResponse);
-            JsonArray coursesDirtyFromMoodle = object.getJsonObject(0).getJsonArray("enrolments");
-            JsonArray courses = Utils.removeDuplicateCourses(coursesDirtyFromMoodle);
-            List<String> sqlCourseId = sqlCourses.stream().map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
-
-            for (int i = 0; i < courses.size(); i++) {
-                JsonObject course = courses.getJsonObject(i);
-                course.put("duplication", "non");
-                if (sqlCourseId.contains(course.getValue("courseid").toString())){
-                    int courseIndex = sqlCourseId.indexOf(course.getValue("courseid").toString());
-                    String idFolder = sqlCourses.getJsonObject(courseIndex).getValue("folder_id").toString();
-                    course.put("folderid", Integer.parseInt(idFolder));
-                }
-                else {
-                    String auteur = course.getJsonArray("auteur").getJsonObject(0).getString("entidnumber");
-                    if (auteur != null && auteur.equals(user.getUserId())) {
-                        course.put("moodleid", course.getValue("courseid"))
-                                .put("userid", idUser).put("folderid", 0);
-                        moodleService.createCourse(course, user.getUserId(), eventResponseCreate ->{
-                            if(eventResponseCreate.isLeft()) {
-                                log.error("Error when created course in function get course " +
-                                        eventResponseCreate.left().getValue());
-                            } else {
-                                log.info("" +
-                                        "Course created " +
-                                        eventResponseCreate.right().getValue());
-                            }
-                        });
-                    }
-                }
-            }
-            List<String> courseId = courses.stream().map(obj -> (((JsonObject) obj).getValue("courseid")).toString()).collect(Collectors.toList());
-            moodleService.getCourseToDuplicate(idUser, eventCoursesDuplication -> {
-                getCourseToDuplicateHandler(request, idUser, responseMoodle, courses, courseId, eventCoursesDuplication);
-            });
-            if (!responseIsSent.getAndSet(true)) {
-                httpClient.close();
-            }
-        } catch (Exception error){
-            Utils.sendErrorRequest(request, "Error in get courses by user in handlerEndHandler: " +
-                    error.toString());
-        }
-    }
-
-    private void getCourseToDuplicateHandler(HttpServerRequest request, String idUser, HttpClientResponse responseMoodle, JsonArray courses, List<String> courseId, Either<String, JsonArray> eventCoursesDuplication) {
+    private final String createUrlMoodleGetCourses(String idUser) {
         try {
-            if (eventCoursesDuplication.right().getValue().size() != 0) {
-                JsonArray coursesInDuplication = eventCoursesDuplication.right().getValue();
-                for (int i = 0 ; i < coursesInDuplication.size() ; i++) {
-                    JsonObject courseDuplicate = coursesInDuplication.getJsonObject(i);
-                    int indexCourseDuplication = courseId.indexOf(courseDuplicate.getValue("id_course").toString());
-                    JsonObject course = courses.getJsonObject(indexCourseDuplication);
-                    courses.add(createCourseForSend(course, courseDuplicate));
-                }
-            }
-            moodleService.getPreferences(idUser, eventPreference -> {
-                getPreferenceHandler(request, responseMoodle, courses, eventPreference);
-            });
-        } catch (Exception error){
-            Utils.sendErrorRequest(request, "Error in get duplication in get courses by user in handlerEndHandler : " +
-                    error.toString());
-        }
-    }
-
-    private void getPreferenceHandler(HttpServerRequest request, HttpClientResponse responseMoodle, JsonArray courses, Either<String, JsonArray> eventPreference) {
-        try{
-            if (eventPreference.isRight()) {
-                JsonArray list = eventPreference.right().getValue();
-                if (list.size() != 0) {
-                    for (int i = 0; i < courses.size(); i++) {
-                        JsonObject courseAddPreference = courses.getJsonObject(i);
-                        for (int j = 0; j < list.size(); j++) {
-                            JsonObject preferencesCourse = list.getJsonObject(j);
-                            if (courseAddPreference.containsKey("courseid")) {
-                                if (preferencesCourse.getValue("moodle_id").toString().equals(courseAddPreference.getValue("courseid").toString())) {
-                                    courseAddPreference.put("masked", preferencesCourse.getBoolean("masked"));
-                                    courseAddPreference.put("favorites", preferencesCourse.getBoolean("favorites"));
-                                }
-                            }
-                        }
-                        if (!(courseAddPreference.containsKey("masked"))) {
-                            courseAddPreference.put("masked", false);
-                            courseAddPreference.put("favorites", false);
-                        }
-                    }
-                } else {
-                    for (int i = 0; i < courses.size(); i++) {
-                        JsonObject courseWithoutPreference = courses.getJsonObject(i);
-                        courseWithoutPreference.put("masked", false);
-                        courseWithoutPreference.put("favorites", false);
-                    }
-                }
-                JsonObject finalResponse = new JsonObject();
-                finalResponse.put("allCourses", courses);
-                finalResponse.put("idAuditeur", moodleConfig.getInteger("idAuditeur"));
-                finalResponse.put("idEditingTeacher", moodleConfig.getInteger("idEditingTeacher"));
-                finalResponse.put("idStudent", moodleConfig.getInteger("idStudent"));
-                Renders.renderJson(request, finalResponse);
-            } else {
-                Utils.sendErrorRequest(request,
-                        "Fail to call get courses webservice : " +
-                                responseMoodle.statusMessage());
-            }
-        } catch (Exception error){
-            Utils.sendErrorRequest(request, "Error in get preference in get courses by user in getPreferenceHandler : " +
-                    error.toString());
-        }
-    }
-
-    private final String createUrlMoodleGetCourses(String idUser){
-        try{
-            return  "" +
+            return "" +
                     (config.getString("address_moodle") +
                             config.getString("ws-path")) +
                     "?wstoken=" + config.getString("wsToken") +
@@ -509,8 +465,8 @@ public class MoodleController extends ControllerHelper {
         }
     }
 
-    private final JsonObject createCourseForSend (JsonObject course, JsonObject courseDuplicate){
-        try{
+    private final JsonObject createCourseForSend(JsonObject course, JsonObject courseDuplicate) {
+        try {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             return new JsonObject()
                     .put("fullname", "" +
@@ -541,21 +497,20 @@ public class MoodleController extends ControllerHelper {
 
     @Put("/courses/move")
     @ApiDoc("move a course")
-    //@SecuredAction("moodle.modify")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void moveCourse(final HttpServerRequest request){
+    public void moveCourse(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "courses", courses ->
                 UserUtils.getUserInfos(eb, request, user -> {
                     if (user != null) {
-                        moodleService.checkIfCoursesInRelationTable(courses, checkEvent -> {
+                        moduleSQLRequestService.checkIfCoursesInRelationTable(courses, checkEvent -> {
                             if (checkEvent.isRight()) {
                                 if (courses.getValue("folderId").equals(0)) {
-                                    moodleService.deleteCourseInRelationTable(courses, defaultResponseHandler(request));
+                                    moduleSQLRequestService.deleteCourseInRelationTable(courses, defaultResponseHandler(request));
                                 } else {
-                                    moodleService.updateCourseIdInRelationTable(courses, defaultResponseHandler(request));
+                                    moduleSQLRequestService.updateCourseIdInRelationTable(courses, defaultResponseHandler(request));
                                 }
                             } else {
-                                moodleService.insertCourseInRelationTable(courses, defaultResponseHandler(request));
+                                moduleSQLRequestService.insertCourseInRelationTable(courses, defaultResponseHandler(request));
                             }
                         });
                     } else {
@@ -565,16 +520,17 @@ public class MoodleController extends ControllerHelper {
                 }));
     }
 
+
     @Delete("/course")
     @ApiDoc("Delete a course")
     @SecuredAction(workflow_delete)
-    public void delete (final HttpServerRequest request) {
+    public void delete(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "courses", courses -> {
             try {
                 JsonArray coursesIds = courses.getJsonArray("coursesId");
                 String idsDeletes = "";
                 for (int i = 0; i < coursesIds.size(); i++) {
-                    idsDeletes += "&parameters[course]["+i+"][courseid]=" + coursesIds.getValue(i);
+                    idsDeletes += "&parameters[course][" + i + "][courseid]=" + coursesIds.getValue(i);
                 }
                 final String service = (config.getString("address_moodle") + config.getString("ws-path"));
                 final String urlSeparator = service.endsWith("") ? "" : "/";
@@ -584,22 +540,22 @@ public class MoodleController extends ControllerHelper {
                     final String moodleDeleteUrl = moodleDeleteUri.toString() +
                             "?wstoken=" + config.getString("wsToken") +
                             "&wsfunction=" + WS_DELETE_FUNCTION +
-                            "&parameters[categoryid]="+ config.getInteger("deleteCategoryId").toString() +
+                            "&parameters[categoryid]=" + config.getInteger("deleteCategoryId").toString() +
                             idsDeletes +
                             "&moodlewsrestformat=" + JSON;
-                    httpClientHelper.webServiceMoodlePost(null, moodleDeleteUrl, httpClient, new AtomicBoolean(false), responseMoodle -> {
+                    webServiceMoodlePost(null, moodleDeleteUrl, httpClient, new AtomicBoolean(false), responseMoodle -> {
                         if (responseMoodle.isRight()) {
-                            moodleService.deleteCourse(courses, defaultResponseHandler(request));
+                            moduleSQLRequestService.deleteCourse(courses, defaultResponseHandler(request));
                         } else {
                             Utils.sendErrorRequest(request, "Response to moodle error");
-                            log.error("Post service failed"  + responseMoodle.left().getValue());
+                            log.error("Post service failed" + responseMoodle.left().getValue());
                         }
                     }, true);
                 } else {
-                    Utils.sendErrorRequest(request,"Url and category config is incorrect");
+                    Utils.sendErrorRequest(request, "Url and category config is incorrect");
                 }
-            } catch (Exception error){
-                Utils.sendErrorRequest(request, "Error when create call moodle" );
+            } catch (Exception error) {
+                Utils.sendErrorRequest(request, "Error when create call moodle");
                 log.error("Invalid moodle web service deleting course uri", error);
             }
         });
@@ -607,7 +563,7 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/course/:id")
     @ApiDoc("Redirect to Moodle")
-    public void redirectToMoodle (HttpServerRequest request){
+    public void redirectToMoodle(HttpServerRequest request) {
         String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
         redirect(request, config.getString("address_moodle"), "/course/" + scope + ".php?id=" +
                 request.getParam("id") + "&notifyeditingon=1");
@@ -616,17 +572,14 @@ public class MoodleController extends ControllerHelper {
     @Get("/choices")
     @ApiDoc("get a choice")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void getChoices (final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-                if (user != null) {
-                    String userId = user.getUserId();
-                    moodleService.getChoices(userId, arrayResponseHandler(request));
-                } else {
-                    log.error("User not found in session.");
-                    unauthorized(request);
-                }
+    public void getChoices(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            if (user != null) {
+                String userId = user.getUserId();
+                moduleSQLRequestService.getChoices(userId, arrayResponseHandler(request));
+            } else {
+                log.error("User not found in session.");
+                unauthorized(request);
             }
         });
     }
@@ -634,240 +587,174 @@ public class MoodleController extends ControllerHelper {
     @Put("/choices/:view")
     @ApiDoc("set a choice")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void setChoice (final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "courses", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject courses) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        if (user != null) {
-                            courses.put("userId", user.getUserId());
-                            String view = request.getParam("view");
-                            moodleService.setChoice(courses, view, defaultResponseHandler(request));
-                        } else {
-                            log.error("User not found in session.");
-                            unauthorized(request);
-                        }
+    public void setChoice(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "courses", courses ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    if (user != null) {
+                        courses.put("userId", user.getUserId());
+                        String view = request.getParam("view");
+                        moduleSQLRequestService.setChoice(courses, view, defaultResponseHandler(request));
+                    } else {
+                        log.error("User not found in session.");
+                        unauthorized(request);
                     }
-                });
-            }
-        });
+                }));
     }
 
     @Put("/course/preferences")
     @ApiDoc("set preferences")
     @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
     public void setPreferences(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "coursePreferences", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject coursePreferences) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        if (user != null) {
-                            coursePreferences.put("userId", user.getUserId());
-                            moodleService.setPreferences(coursePreferences, defaultResponseHandler(request));
-                        } else {
-                            log.error("User not found in session.");
-                            unauthorized(request);
-                        }
+        RequestUtils.bodyToJson(request, pathPrefix + "coursePreferences", coursePreferences ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    if (user != null) {
+                        coursePreferences.put("userId", user.getUserId());
+                        moduleSQLRequestService.setPreferences(coursePreferences, defaultResponseHandler(request));
+                    } else {
+                        log.error("User not found in session.");
+                        unauthorized(request);
                     }
-                });
-            }
-        });
+                })
+        );
     }
 
     @Get("/share/json/:id")
     @ApiDoc("Lists rights for a given course.")
-    @ResourceFilter(CanShareResoourceFilter.class)
+    @ResourceFilter(canShareResourceFilter.class)
     @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
     public void share(final HttpServerRequest request) {
         final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-                if (user != null) {
-                    List<Future> listeFutures = new ArrayList<Future>();
+        UserUtils.getUserInfos(eb, request, user -> {
+            if (user != null) {
+                Future<JsonObject> getShareJsonInfosFuture = Future.future();
+                Future<JsonArray> getUsersEnrolmentsFuture = Future.future();
 
-                    Future<JsonObject> getShareInfosFuture = Future.future();
-                    Handler<Either<String, JsonObject>> getShareInfosHandler = finalUsers -> {
-                        if (finalUsers.isRight()) {
-                            getShareInfosFuture.complete(finalUsers.right().getValue());
-                        } else {
-                            getShareInfosFuture.fail( "Share infos not found");
-                        }
-                    };
-                    shareService.shareInfos(user.getUserId(), request.getParam("id"),
-                            I18n.acceptLanguage(request), request.params().get("search"), getShareInfosHandler);
-                    listeFutures.add(getShareInfosFuture);
+                getShareJsonInfos(request, user, getShareJsonInfosFuture);
+                getUsersEnrolmentsFromMoodle(request, getUsersEnrolmentsFuture);
 
-                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx,config);
-                    final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                    Buffer wsResponse = new BufferImpl();
-                    final String moodleUrl = (config.getString("address_moodle")+ config.getString("ws-path")) +
-                            "?wstoken=" + config.getString("wsToken") +
-                            "&wsfunction=" + WS_GET_SHARECOURSE +
-                            "&parameters[courseid]=" + request.getParam("id") +
-                            "&moodlewsrestformat=" + JSON;
-
-                    Future<JsonArray> getUsersEnrolementsFuture = Future.future();
-                    Handler<HttpClientResponse> getUsersEnrolementsHandler = response -> {
-                        if (response.statusCode() == 200) {
-                            response.handler(wsResponse::appendBuffer);
-                            response.endHandler(new Handler<Void>() {
-                                @Override
-                                public void handle(Void end) {
-                                    JsonArray finalGroups = new JsonArray(wsResponse);
-                                    getUsersEnrolementsFuture.complete(finalGroups);
-                                    if (!responseIsSent.getAndSet(true)) {
-                                        httpClient.close();
-                                    }
-                                }
-                            });
-                        } else {
-                            log.error("fail to call get share course right webservice" + response.statusMessage());
-                            response.bodyHandler(new Handler<Buffer>() {
-                                @Override
-                                public void handle(Buffer event) {
-                                    log.error("Returning body after GET CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                                    getUsersEnrolementsFuture.fail(response.statusMessage());
-                                    if (!responseIsSent.getAndSet(true)) {
-                                        httpClient.close();
-                                    }
-                                }
-                            });
-                        }
-                    };
-
-                    final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, getUsersEnrolementsHandler);
-                    listeFutures.add(getUsersEnrolementsFuture);
-                    httpClientRequest.headers().set("Content-Length", "0");
-                    //Typically an unresolved Address, a timeout about connection or response
-                    httpClientRequest.exceptionHandler(new Handler<Throwable>() {
-                        @Override
-                        public void handle(Throwable event) {
-                            log.error(event.getMessage(), event);
-                            getUsersEnrolementsFuture.fail( event.getMessage());
-                            if (!responseIsSent.getAndSet(true)) {
-                                renderError(request);
-                                httpClient.close();
-                            }
-                        }
-                    }).end();
-
-                    CompositeFuture.all(listeFutures).setHandler(event -> {
-                        if (event.succeeded()) {
-                            JsonObject shareInfosFuture = getShareInfosFuture.result();
-                            JsonObject checkedInherited = new JsonObject();
-                            shareInfosFuture.getJsonObject("users").put("checkedInherited", checkedInherited);
-                            JsonArray usersEnrolmentsFuture = getUsersEnrolementsFuture.result();
-                            if (usersEnrolmentsFuture != null && !usersEnrolmentsFuture.isEmpty() && shareInfosFuture != null && !shareInfosFuture.isEmpty()) {
-                                JsonArray groupEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups");
-                                JsonArray shareInfosGroups = shareInfosFuture.getJsonObject("groups").getJsonArray("visibles");
-                                JsonArray usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
-                                JsonArray shareInfosUsers = shareInfosFuture.getJsonObject("users").getJsonArray("visibles");
-                                List<String> usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
-                                List<String> usersshareInfosId = shareInfosUsers.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
-                                if(groupEnroled.size() > 0){
-                                    List<String> groupsEnroledId = groupEnroled.stream().map(obj -> ((JsonObject)obj).getString("idnumber") ).collect(Collectors.toList());
-                                    List<String> groupsshareInfosId = shareInfosGroups.stream().map(obj -> ((JsonObject)obj).getString("id") ).collect(Collectors.toList());
-                                    for (String groupId: groupsEnroledId) {
-                                        //groupIds.add(groupId.substring(3));
-                                        if(!(groupsshareInfosId.contains(groupId))){
-                                            JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("groups").getJsonObject(groupsEnroledId.indexOf(groupId));
-                                            String id = jsonobjctToAdd.getString("idnumber");
-                                            jsonobjctToAdd.remove("idnumber");
-                                            jsonobjctToAdd.put("id", id);
-                                            //jsonobjctToAdd.put("groupDisplayName", null);
-                                            //jsonobjctToAdd.put("structureName",null);
-                                            Pattern p = Pattern.compile("^GR_(.*)");
-                                            Matcher m = p.matcher(jsonobjctToAdd.getString("id"));
-                                            while (m.find()) {
-                                                jsonobjctToAdd.put("id", m.group(1));
-                                            }
-                                            UserUtils.groupDisplayName(jsonobjctToAdd, I18n.acceptLanguage(request));
-                                            shareInfosFuture.getJsonObject("groups").getJsonArray("visibles").add(jsonobjctToAdd);
-                                        }
-                                    }
-
-                                    for (Object group : groupEnroled) {
-                                        JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
-                                        if(((JsonObject)group).getInteger("role").equals(config.getInteger("idStudent"))){
-                                            tabToAdd.remove(2);
-                                        }
-                                        shareInfosFuture.getJsonObject("groups").getJsonObject("checked").put(((JsonObject) group).getString("id"),tabToAdd);
-                                    }
-
-                                    for(Object userEnroled : usersEnroled.copy()) {
-                                        if (!(isNull(((JsonObject) userEnroled).getValue("idnumber")))) {
-                                            usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(usersEnroledId.indexOf(((JsonObject) userEnroled).getString("id")));
-                                            usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
-                                            usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
-
-                                        }
-                                    }
-                                }
-
-                                if (shareInfosFuture.getJsonArray("actions").size() == 3)
-                                    shareInfosFuture.getJsonArray("actions").remove(1);
-                                while (usersEnroledId.contains(user.getUserId())) {
-                                    usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").remove(usersEnroledId.indexOf(user.getUserId()));
-                                    usersEnroled = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
-                                    usersEnroledId = usersEnroled.stream().map(obj -> ((JsonObject) obj).getString("id")).collect(Collectors.toList());
-                                }
-
-                                for (String userId : usersEnroledId) {
-                                    if (!(usersshareInfosId.contains(userId))) {
-                                        JsonObject jsonobjctToAdd = usersEnrolmentsFuture.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users").getJsonObject(usersEnroledId.indexOf(userId)).copy();
-                                        String prenom = jsonobjctToAdd.getString("firstname");
-                                        String nom = jsonobjctToAdd.getString("lastname");
-                                        jsonobjctToAdd.remove("firstname");
-                                        jsonobjctToAdd.remove("lastname");
-                                        jsonobjctToAdd.put("firstName", prenom.charAt(0) + prenom.substring(1).toLowerCase());
-                                        jsonobjctToAdd.put("lastName", nom);
-                                        jsonobjctToAdd.put("login", prenom.toLowerCase() + "." + nom.toLowerCase());
-                                        jsonobjctToAdd.put("username", nom + " " + prenom.charAt(0) + prenom.substring(1).toLowerCase());
-                                        String profile = "Relative";
-                                        if (jsonobjctToAdd.getInteger("role").equals(config.getInteger("idStudent"))) {
-                                            profile = "Student";
-                                        }
-                                        jsonobjctToAdd.put("profile", profile);
-                                        if (jsonobjctToAdd.getInteger("role").equals(config.getInteger("idAuditeur"))) {
-                                            shareInfosFuture.getJsonObject("users").getJsonObject("checkedInherited").put(jsonobjctToAdd.getString("id"), new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER));
-                                        }
-                                        shareInfosFuture.getJsonObject("users").getJsonArray("visibles").add(jsonobjctToAdd);
-                                    }
-                                }
-
-                                for (Object userEnroled : usersEnroled) {
-                                    JsonArray tabToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
-                                    if (((JsonObject) userEnroled).getInteger("role").equals(config.getInteger("idStudent"))) {
-                                        tabToAdd.remove(2);
-                                    }
-                                    if (!((JsonObject) userEnroled).getInteger("role").equals(config.getInteger("idAuditeur"))) {
-                                        shareInfosFuture.getJsonObject("users").getJsonObject("checked").put(((JsonObject) userEnroled).getString("id"), tabToAdd);
-                                    }
-                                }
-
-                                handler.handle(new Either.Right<String, JsonObject>(shareInfosFuture));
-                            }
-                        } else {
-                            badRequest(request, event.cause().getMessage());
-                            //renderError(request);
-                        }
-                    });
-                } else {
-                    log.error("User or group not found.");
-                    unauthorized(request);
-                }
+                CompositeFuture.all(getShareJsonInfosFuture, getUsersEnrolmentsFuture).setHandler(event -> {
+                    if (event.succeeded()) {
+                        generateShareJson(request, handler, user, getShareJsonInfosFuture.result(), getUsersEnrolmentsFuture.result());
+                    } else {
+                        badRequest(request, event.cause().getMessage());
+                    }
+                });
+            } else {
+                log.error("User or group not found.");
+                unauthorized(request);
             }
         });
     }
 
+    /**
+     * Get the shareJson model with a future
+     *
+     * @param request Http request
+     * @param user    User infos
+     * @param future  Future to get the shareJson model
+     */
+    private void getShareJsonInfos(HttpServerRequest request, UserInfos user, Future<JsonObject> future) {
+        shareService.shareInfos(user.getUserId(), request.getParam("id"), I18n.acceptLanguage(request), request.params().get("search"), event -> {
+            if (event.isRight()) {
+                future.complete(event.right().getValue());
+            } else {
+                future.fail("Share infos not found");
+            }
+        });
+    }
+
+    /**
+     * Get the Moodle users with the Web-Service from Moodle
+     *
+     * @param request Http request
+     * @param future  Future to get the Moodle users
+     */
+    private void getUsersEnrolmentsFromMoodle(HttpServerRequest request, Future<JsonArray> future) {
+        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
+        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+        Buffer wsResponse = new BufferImpl();
+        final String moodleUrl = (config.getString("address_moodle") + config.getString("ws-path")) +
+                "?wstoken=" + config.getString("wsToken") +
+                "&wsfunction=" + WS_GET_SHARECOURSE +
+                "&parameters[courseid]=" + request.getParam("id") +
+                "&moodlewsrestformat=" + JSON;
+        Handler<HttpClientResponse> getUsersEnrolmentsHandler = response -> {
+            if (response.statusCode() == 200) {
+                response.handler(wsResponse::appendBuffer);
+                response.endHandler(end -> {
+                    JsonArray finalGroups = new JsonArray(wsResponse);
+                    future.complete(finalGroups);
+                    if (!responseIsSent.getAndSet(true)) {
+                        httpClient.close();
+                    }
+                });
+            } else {
+                log.error("fail to call get share course right webservice" + response.statusMessage());
+                response.bodyHandler(event -> {
+                    log.error("Returning body after GET CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                    future.fail(response.statusMessage());
+                    if (!responseIsSent.getAndSet(true)) {
+                        httpClient.close();
+                    }
+                });
+            }
+        };
+
+        final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, getUsersEnrolmentsHandler);
+        httpClientRequest.headers().set("Content-Length", "0");
+        //Typically an unresolved Address, a timeout about connection or response
+        httpClientRequest.exceptionHandler(event -> {
+            log.error(event.getMessage(), event);
+            future.fail(event.getMessage());
+            if (!responseIsSent.getAndSet(true)) {
+                renderError(request);
+                httpClient.close();
+            }
+        }).end();
+    }
+
+    /**
+     * Creation and implementation of shareJson model
+     *
+     * @param request             Http request
+     * @param handler             function handler returning data
+     * @param user                UserInfos
+     * @param shareJsonInfosFinal JsonObject to fill
+     * @param usersEnrolments     JsonArray with Moodle users
+     */
+    private void generateShareJson(HttpServerRequest request, Handler<Either<String, JsonObject>> handler, UserInfos user, JsonObject shareJsonInfosFinal, JsonArray usersEnrolments) {
+        JsonObject checkedInherited = new JsonObject();
+        shareJsonInfosFinal.getJsonObject("users").put("checkedInherited", checkedInherited);
+        JsonObject userEnrolmentsArray = usersEnrolments.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0);
+        JsonArray rightToAdd = new JsonArray().add(MOODLE_READ).add(MOODLE_CONTRIB).add(MOODLE_MANAGER);
+
+        if (!usersEnrolments.isEmpty() && !shareJsonInfosFinal.isEmpty()) {
+            getShareProcessingService.shareTreatmentForGroups(userEnrolmentsArray, shareJsonInfosFinal, request, rightToAdd, groupsTreatmentEvent -> {
+                if (groupsTreatmentEvent.isRight()) {
+                    log.info("Groups treatment OK");
+                } else {
+                    log.error("Groups treatment KO");
+                }
+            });
+
+            getShareProcessingService.shareTreatmentForUsers(userEnrolmentsArray, shareJsonInfosFinal, user, rightToAdd, usersTreatmentEvent -> {
+                if (usersTreatmentEvent.isRight()) {
+                    log.info("Users treatment OK");
+                } else {
+                    log.error("Users treatment KO");
+                }
+            });
+
+            handler.handle(new Either.Right<>(shareJsonInfosFinal));
+        } else {
+            log.error("User future or share infos future is empty");
+            unauthorized(request);
+        }
+    }
+
     @Put("/contrib")
     @ApiDoc("Adds rights for a given course.")
-    @ResourceFilter(CanShareResoourceFilter.class)
+    @ResourceFilter(canShareResourceFilter.class)
     @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
     public void contrib(final HttpServerRequest request) {
 
@@ -875,407 +762,277 @@ public class MoodleController extends ControllerHelper {
 
     @Put("/share/resource/:id")
     @ApiDoc("Adds rights for a given course.")
-    @ResourceFilter(CanShareResoourceFilter.class)
+    @ResourceFilter(canShareResourceFilter.class)
     @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
     public void shareSubmit(final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "share", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject shareCourse) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        if (user != null) {
-                            for (Object idGroup : shareCourse.copy().getJsonObject("groups").getMap().keySet().toArray() ) {
-                                if(idGroup.toString().substring(0,3).equals("GR_")){
-                                    shareCourse.getJsonObject("groups").put(idGroup.toString().substring(3),shareCourse.getJsonObject("groups").getValue(idGroup.toString()));
-                                    shareCourse.getJsonObject("groups").remove(idGroup.toString());
-                                }
-                                if(idGroup.toString().substring(0,3).equals("SB_")){
-                                    shareCourse.getJsonObject("bookmarks").put(idGroup.toString().substring(2),shareCourse.getJsonObject("groups").getValue(idGroup.toString()));
-                                    shareCourse.getJsonObject("groups").remove(idGroup.toString());
-                                }
-                            }
-                            List<Future> listeFutures = new ArrayList<>();
-                            JsonObject IdFront = new JsonObject();
-                            JsonObject keyShare = new JsonObject();
-                            JsonObject share = new JsonObject();
-
-                            Map<String, Object> idUsers = shareCourse.getJsonObject("users").getMap();
-                            Map<String, Object> idGroups = shareCourse.getJsonObject("groups").getMap();
-                            Map<String, Object> idBookmarks = shareCourse.getJsonObject("bookmarks").getMap();
-
-                            JsonArray usersIds = new JsonArray(new ArrayList(idUsers.keySet()));
-                            JsonArray groupsIds = new JsonArray(new ArrayList(idGroups.keySet()));
-                            JsonArray bookmarksIds = new JsonArray(new ArrayList(idBookmarks.keySet()));
-
-                            if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() > 1) {
-                                for (Map.Entry<String, Object> mapShareUsers : idUsers.entrySet()) {
-                                    IdFront.put(mapShareUsers.getKey(), mapShareUsers.getValue());
-                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 2) {
-                                        keyShare.put(mapShareUsers.getKey(), config.getInteger("idEditingTeacher"));
-                                    }
-                                    if (IdFront.getJsonArray(mapShareUsers.getKey()).size() == 1) {
-                                        keyShare.put(mapShareUsers.getKey(), config.getInteger("idStudent"));
-                                        Map<String, Object> mapInfo = keyShare.getMap();
-                                    }
-                                }
-                            } else if (!shareCourse.getJsonObject("users").isEmpty() && shareCourse.getJsonObject("users").size() == 1) {
-                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(usersIds.getString(0), config.getInteger("idEditingTeacher"));
-                                }
-                                if (shareCourse.getJsonObject("users").getJsonArray(usersIds.getValue(0).toString()).size() == 1) {
-                                    keyShare.put(usersIds.getString(0), config.getInteger("idStudent"));
-                                }
-                            }
-                            if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() > 1) {
-                                for (Map.Entry<String, Object> mapShareGroups : idGroups.entrySet()) {
-                                    IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
-                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
-                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idEditingTeacher"));
-                                    }
-                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 1) {
-                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idStudent"));
-                                    }
-                                }
-                            } else if (!shareCourse.getJsonObject("groups").isEmpty() && shareCourse.getJsonObject("groups").size() == 1) {
-                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(groupsIds.getString(0), config.getInteger("idEditingTeacher"));
-                                }
-                                if (shareCourse.getJsonObject("groups").getJsonArray(groupsIds.getValue(0).toString()).size() == 1) {
-                                    keyShare.put(groupsIds.getString(0), config.getInteger("idStudent"));
-                                }
-                            }
-                            if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() > 1) {
-                                for (Map.Entry<String, Object> mapShareGroups : idBookmarks.entrySet()) {
-                                    IdFront.put(mapShareGroups.getKey(), mapShareGroups.getValue());
-                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 2) {
-                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idEditingTeacher"));
-                                    }
-                                    if (IdFront.getJsonArray(mapShareGroups.getKey()).size() == 1) {
-                                        keyShare.put(mapShareGroups.getKey(), config.getInteger("idStudent"));
-                                    }
-                                }
-                            } else if (!shareCourse.getJsonObject("bookmarks").isEmpty() && shareCourse.getJsonObject("bookmarks").size() == 1) {
-                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 2) {
-                                    keyShare.put(bookmarksIds.getString(0), config.getInteger("idEditingTeacher"));
-                                }
-                                if (shareCourse.getJsonObject("bookmarks").getJsonArray(bookmarksIds.getValue(0).toString()).size() == 1) {
-                                    keyShare.put(bookmarksIds.getString(0), config.getInteger("idStudent"));
-                                }
-                            }
-                            final Map<String, Object> mapInfo = keyShare.getMap();
-                            mapInfo.put(user.getUserId(), config.getInteger("idEditingTeacher"));
-                            share.put("courseid", request.params().entries().get(0).getValue());
-
-                            Future<JsonArray> getUsersFuture = Future.future();
-                            Handler<Either<String, JsonArray>> getUsersHandler = finalUsers -> {
-                                if (finalUsers.isRight()) {
-                                    getUsersFuture.complete(finalUsers.right().getValue());
-                                } else {
-                                    getUsersFuture.fail( "Users not found");
-                                }
-                            };
-
-                            usersIds.add(user.getUserId());
-                            if (!usersIds.isEmpty()) {
-                                moodleService.getUsers(usersIds, getUsersHandler);
-                                listeFutures.add(getUsersFuture);
-                            }
-
-                            Future<JsonArray> getGroupsFuture = Future.future();
-                            Handler<Either<String, JsonArray>> getGroupsHandler = finalGroups -> {
-                                if (finalGroups.isRight()) {
-                                    getGroupsFuture.complete(finalGroups.right().getValue());
-                                } else {
-                                    getGroupsFuture.fail( "Groups not found");
-                                }
-                            };
-                            if (!groupsIds.isEmpty()) {
-                                moodleService.getGroups(groupsIds, getGroupsHandler);
-                                listeFutures.add(getGroupsFuture);
-                            }
-
-                            Future<JsonArray> getShareGroupsFuture = Future.future();
-                            Handler<Either<String, JsonArray>> getShareGroupsHandler = finalShareGroups -> {
-                                if (finalShareGroups.isRight()) {
-                                    getShareGroupsFuture.complete(finalShareGroups.right().getValue());
-                                } else {
-                                    getShareGroupsFuture.fail("Share groups problem");
-                                }
-                            };
-                            if (!bookmarksIds.isEmpty()) {
-                                listeFutures.add(getShareGroupsFuture);
-                                moodleService.getSharedBookMark(bookmarksIds, getShareGroupsHandler);
-                            }
-
-                            CompositeFuture.all(listeFutures).setHandler(event -> {
-                                if (event.succeeded()) {
-                                    JsonArray usersFuture = getUsersFuture.result();
-                                    JsonArray groupsFuture = getGroupsFuture.result();
-                                    JsonArray shareGroups = getShareGroupsFuture.result();
-                                    if (usersFuture != null && !usersFuture.isEmpty()) {
-                                        share.put("users", usersFuture);
-                                        for (Object userObj : usersFuture) {
-                                            JsonObject userJson = ((JsonObject) userObj);
-                                            if (userJson.getString("id").equals(user.getUserId())) {
-                                                userJson.put("role", config.getInteger("idAuditeur"));
-                                            } else {
-                                                userJson.put("role", mapInfo.get(userJson.getString("id")));
-                                            }
-                                        }
-                                    }
-                                    if (groupsFuture != null && !groupsFuture.isEmpty()) {
-                                        share.put("groups", groupsFuture);
-                                        for (Object groupObj : groupsFuture) {
-                                            JsonObject groupJson = ((JsonObject) groupObj);
-                                            groupJson.put("role", mapInfo.get(groupJson.getString("id").substring(3)));
-                                            UserUtils.groupDisplayName(groupJson, I18n.acceptLanguage(request));
-                                        }
-                                    }
-                                    List<Future> listeUsersFutures = new ArrayList<>();
-                                    List<Integer> listeRankGroup = new ArrayList<>();
-                                    int i = 0;
-                                    if (shareGroups != null && !shareGroups.isEmpty()) {
-                                        for (Object shareGroup : shareGroups.getJsonObject(0).getJsonArray("sharedBookMarks")) {
-                                            JsonArray shareJson = ((JsonObject) shareGroup).getJsonObject("group").getJsonArray("users");
-                                            JsonArray groupsId = new JsonArray();
-                                            for(Object userOrGroup : shareJson){
-                                                JsonObject userJson = ((JsonObject) userOrGroup);
-                                                if(isNull(userJson.getValue("email")))
-                                                    groupsId.add(userJson.getValue("id"));
-                                            }
-                                            if(groupsId.size() > 0){
-                                                Future<JsonArray> getUsersGroupsFuture = Future.future();
-                                                Handler<Either<String, JsonArray>> getUsersGroupsHandler = finalUsersGroups -> {
-                                                    if (finalUsersGroups.isRight()) {
-                                                        getUsersGroupsFuture.complete(finalUsersGroups.right().getValue());
-                                                    } else {
-                                                        getUsersGroupsFuture.fail("Share groups problem");
-                                                    }
-                                                };
-                                                listeUsersFutures.add(getUsersGroupsFuture);
-                                                listeRankGroup.add(i);
-                                                moodleService.getGroups(groupsId, getUsersGroupsHandler);
-                                            }
-                                            ((JsonObject) shareGroup).getJsonObject("group").put("role", mapInfo.get(((JsonObject) shareGroup).getJsonObject("group").getString("id").substring(2)));
-                                            if (share.containsKey("groups"))
-                                                share.getJsonArray("groups").add(((JsonObject) shareGroup).getJsonObject("group"));
-                                            else {
-                                                JsonArray jsonArrayToAdd = new JsonArray();
-                                                jsonArrayToAdd.add(((JsonObject) shareGroup).getJsonObject("group"));
-                                                share.put("groups", jsonArrayToAdd);
-                                            }
-                                            i++;
-                                        }
-                                    }
-                                    if(listeUsersFutures.size() > 0) {
-                                        CompositeFuture.all(listeUsersFutures).setHandler(finished -> {
-                                            if (finished.succeeded()) {
-                                                JsonArray usersBookMarkGroups = new JsonArray();
-                                                for (int j = 0; j < listeUsersFutures.size(); j++) {
-                                                    usersBookMarkGroups = (JsonArray) listeUsersFutures.get(j).result();
-                                                    for (Object group : usersBookMarkGroups) {
-                                                        share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).getJsonArray("users").addAll(((JsonObject) group).getJsonArray("users"));
-                                                        JsonArray duplicatesUsers = share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).getJsonArray("users").copy();
-                                                        share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).remove("users");
-                                                        JsonArray usersArray = new JsonArray();
-                                                        for (Object userToShare : duplicatesUsers) {
-                                                            boolean findDuplicate = false;
-                                                            for(int k = 0; k < usersArray.size(); k++){
-                                                                if (((JsonObject)userToShare).getValue("id").toString().equals(usersArray.getJsonObject(k).getValue("id").toString()))
-                                                                    findDuplicate = true;
-                                                            }
-                                                            if(!findDuplicate){
-                                                                if(!isNull(((JsonObject)userToShare).getValue("firstname")))
-                                                                    usersArray.add(userToShare);
-                                                            }
-                                                        }
-                                                        share.getJsonArray("groups").getJsonObject(listeRankGroup.get(j)).put("users",usersArray);
-                                                    }
-                                                }
-                                                sendRightShare(share, request);
-                                            } else {
-                                                badRequest(request, event.cause().getMessage());
-                                            }
-                                        });
-                                    } else {
-                                        sendRightShare(share, request);
-                                    }
-
-                                } else {
-                                    badRequest(request, event.cause().getMessage());
-                                }
-                            });
-                        } else {
-                            log.error("User not found.");
-                            unauthorized(request);
+        RequestUtils.bodyToJson(request, pathPrefix + "share", shareCourseObject -> {
+            JsonObject shareObjectToFill = new JsonObject();
+            shareObjectToFill.put("courseid", request.params().entries().get(0).getValue());
+            UserUtils.getUserInfos(eb, request, user -> {
+                if (user != null) {
+                    for (Object idGroup : shareCourseObject.copy().getJsonObject("groups").getMap().keySet().toArray()) {
+                        if (idGroup.toString().substring(0, 3).equals("GR_")) {
+                            shareCourseObject.getJsonObject("groups").put(idGroup.toString().substring(3), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
+                            shareCourseObject.getJsonObject("groups").remove(idGroup.toString());
+                        }
+                        if (idGroup.toString().substring(0, 3).equals("SB_")) {
+                            shareCourseObject.getJsonObject("bookmarks").put(idGroup.toString().substring(2), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
+                            shareCourseObject.getJsonObject("groups").remove(idGroup.toString());
                         }
                     }
-                });
-            }
+
+                    Map<String, Object> idUsers = shareCourseObject.getJsonObject("users").getMap();
+                    Map<String, Object> idGroups = shareCourseObject.getJsonObject("groups").getMap();
+                    Map<String, Object> idBookmarks = shareCourseObject.getJsonObject("bookmarks").getMap();
+
+                    JsonObject IdFront = new JsonObject();
+                    JsonObject keyShare = new JsonObject();
+
+                    JsonArray usersIds = new JsonArray(new ArrayList<>(idUsers.keySet()));
+                    postShareProcessingService.getResultUsers(shareCourseObject, usersIds, idUsers, IdFront, keyShare, event -> {
+                        if (event.isRight()) {
+                            log.info("Users treatment for Post OK");
+                        } else {
+                            log.info("Users treatment for Post KO");
+                        }
+                    });
+
+                    JsonArray groupsIds = new JsonArray(new ArrayList<>(idGroups.keySet()));
+                    postShareProcessingService.getResultGroups(shareCourseObject, groupsIds, idGroups, IdFront, keyShare, event -> {
+                        if (event.isRight()) {
+                            log.info("Groups treatment for Post OK");
+                        } else {
+                            log.info("Groups treatment for Post KO");
+                        }
+                    });
+
+                    JsonArray bookmarksIds = new JsonArray(new ArrayList<>(idBookmarks.keySet()));
+                    postShareProcessingService.getResultBookmarks(shareCourseObject, bookmarksIds, idBookmarks, IdFront, keyShare, event -> {
+                        if (event.isRight()) {
+                            log.info("Bookmarks treatment for Post OK");
+                        } else {
+                            log.info("Bookmarks treatment for Post KO");
+                        }
+                    });
+
+                    Future<JsonArray> getUsersFuture = Future.future();
+                    Future<JsonArray> getUsersInGroupsFuture = Future.future();
+                    Future<JsonArray> getBookmarksFuture = Future.future();
+
+                    usersIds.add(user.getUserId());
+                    postShareProcessingService.getUsersFuture(usersIds, getUsersFuture);
+                    postShareProcessingService.getUsersInGroupsFuture(groupsIds, getUsersInGroupsFuture);
+                    postShareProcessingService.getUsersInBookmarksFuture(bookmarksIds, getBookmarksFuture);
+
+                    Future<JsonArray> getTheAuditeurIdFuture = Future.future();
+                    getUsersEnrolmentsFromMoodle(request, getTheAuditeurIdFuture);
+
+                    final Map<String, Object> mapInfo = keyShare.getMap();
+                    mapInfo.put(user.getUserId(), config.getInteger("idEditingTeacher"));
+
+                    CompositeFuture.all(getUsersFuture, getUsersInGroupsFuture, getBookmarksFuture, getTheAuditeurIdFuture).setHandler(event -> {
+                        if (event.succeeded()) {
+                            JsonArray usersFutureResult = getUsersFuture.result();
+                            JsonArray groupsFutureResult = getUsersInGroupsFuture.result();
+                            JsonArray bookmarksFutureResult = getBookmarksFuture.result();
+                            JsonArray getTheAuditeurIdFutureResult = getTheAuditeurIdFuture.result().getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+
+                            JsonObject auditeur = new JsonObject();
+                            for (int i = 0; auditeur.size() == 0; i++) {
+                                if (getTheAuditeurIdFutureResult.getJsonObject(i).getInteger("role") == 10) {
+                                    auditeur = getTheAuditeurIdFutureResult.getJsonObject(i);
+                                }
+                            }
+                            if (usersFutureResult != null && !usersFutureResult.isEmpty()) {
+                                shareObjectToFill.put("users", usersFutureResult);
+                                for (Object userObject : usersFutureResult) {
+                                    JsonObject userJson = ((JsonObject) userObject);
+                                    if (userJson.getString("id").equals(user.getUserId()) && userJson.getString("id").equals(auditeur.getString("id"))) {
+                                        userJson.put("role", config.getInteger("idAuditeur"));
+                                    } else {
+                                        userJson.put("role", mapInfo.get(userJson.getString("id")));
+                                    }
+                                }
+                            }
+                            if (groupsFutureResult != null && !groupsFutureResult.isEmpty()) {
+                                shareObjectToFill.put("groups", groupsFutureResult);
+                                for (Object groupObject : groupsFutureResult) {
+                                    JsonObject groupJson = ((JsonObject) groupObject);
+                                    groupJson.put("role", mapInfo.get(groupJson.getString("id").substring(3)));
+                                    UserUtils.groupDisplayName(groupJson, I18n.acceptLanguage(request));
+                                }
+                            }
+                            ArrayList<Future> listUsersFutures = new ArrayList<>();
+                            List<Integer> listRankGroup = new ArrayList<>();
+                            int i = 0;
+                            if (bookmarksFutureResult != null && !bookmarksFutureResult.isEmpty()) {
+                                postShareProcessingService.getUsersInBookmarksFutureLoop(shareObjectToFill, mapInfo, bookmarksFutureResult, listUsersFutures, listRankGroup, i);
+                            }
+                            if (listUsersFutures.size() > 0) {
+                                CompositeFuture.all(listUsersFutures).setHandler(finished -> {
+                                    if (finished.succeeded()) {
+                                        postShareProcessingService.processUsersInBookmarksFutureResult(shareObjectToFill, listUsersFutures, listRankGroup);
+                                        sendRightShare(shareObjectToFill, request);
+                                    } else {
+                                        badRequest(request, event.cause().getMessage());
+                                    }
+                                });
+                            } else {
+                                sendRightShare(shareObjectToFill, request);
+                            }
+                        } else {
+                            badRequest(request, event.cause().getMessage());
+                        }
+                    });
+                } else {
+                    log.error("User not found.");
+                    unauthorized(request);
+                }
+            });
         });
     }
 
-    private void sendRightShare(JsonObject share, HttpServerRequest request){;
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-                JsonArray zimbraEmail = new JsonArray();
-                if (share.getJsonArray("users") != null) {
-                    for (int i = 0; i < share.getJsonArray("users").size(); i++) {
-                        zimbraEmail.add(share.getJsonArray("users").getJsonObject(i).getString("id"));
+    private void sendRightShare(JsonObject shareObjectToFill, HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            JsonArray zimbraEmail = new JsonArray();
+            if (shareObjectToFill.getJsonArray("users") != null) {
+                for (int i = 0; i < shareObjectToFill.getJsonArray("users").size(); i++) {
+                    zimbraEmail.add(shareObjectToFill.getJsonArray("users").getJsonObject(i).getString("id"));
+                }
+            }
+            if (shareObjectToFill.getJsonArray("groups") != null) {
+                for (int i = 0; i < shareObjectToFill.getJsonArray("groups").size(); i++) {
+                    for (int j = 0; j < shareObjectToFill.getJsonArray("groups").getJsonObject(i).getJsonArray("users").size(); j++) {
+                        zimbraEmail.add(shareObjectToFill.getJsonArray("groups").getJsonObject(i).getJsonArray("users").getJsonObject(j).getString("id"));
                     }
                 }
-                if (share.getJsonArray("groups") != null) {
-                    for (int i = 0; i < share.getJsonArray("groups").size(); i++) {
-                        for (int j = 0; j < share.getJsonArray("groups").getJsonObject(i).getJsonArray("users").size(); j++) {
-                            zimbraEmail.add(share.getJsonArray("groups").getJsonObject(i).getJsonArray("users").getJsonObject(j).getString("id"));
-                        }
-                    }
-                }
-                log.info("JSON PARTAGE : " + share.toString());
+            }
+            log.info("JSON PARTAGE : " + shareObjectToFill.toString());
 
-                //log.info("CALL getZimbraEmail : ");
-                //moodleEventBus.getZimbraEmail(zimbraEmail, event -> {
-                /*
-                    log.info("END getZimbraEmail : ");
-                    JsonObject zimbraResult = event.right().getValue();
-                    ArrayList zimbraArray = new ArrayList(zimbraResult.getMap().keySet());
-                    JsonObject zimbraObject = new JsonObject();
-                    for (int i = 0; i < zimbraArray.size(); i++) {
-                        zimbraObject.put(zimbraArray.get(i).toString(), zimbraResult.getJsonObject(zimbraArray.get(i)
-                                .toString()).getString("email"));
-                    }
-                    Map<String, Object> zimbraMap = (zimbraObject.getMap());
-                    JsonArray users = share.getJsonArray("users");
-                    if(users != null) {
-                        for(int i = 0; i < users.size(); i++) {
-                            JsonObject user1 = users.getJsonObject(i);
-                            String idUser = user1.getString("id");
-                            user1.put("email", zimbraMap.get(idUser));
-                        }
-                    }
-*/
+            /*log.info("CALL getZimbraEmail : ");
+                moodleEventBus.getZimbraEmail(zimbraEmail, event -> {
+
+                log.info("END getZimbraEmail : ");
+                JsonObject zimbraResult = event.right().getValue();
+                ArrayList zimbraArray = new ArrayList(zimbraResult.getMap().keySet());
+                JsonObject zimbraObject = new JsonObject();
+                for (int i = 0; i < zimbraArray.size(); i++) {
+                    zimbraObject.put(zimbraArray.get(i).toString(), zimbraResult.getJsonObject(zimbraArray.get(i)
+                            .toString()).getString("email"));
+                }
+                Map<String, Object> zimbraMap = (zimbraObject.getMap());
                 JsonArray users = share.getJsonArray("users");
                 if(users != null) {
-                    for (int i = 0; i < users.size(); i++) {
-                        JsonObject manualUsers = users.getJsonObject(i);
-                        manualUsers.put("email", "moodleNotif@lyceeconnecte.fr");
+                    for(int i = 0; i < users.size(); i++) {
+                        JsonObject user1 = users.getJsonObject(i);
+                        String idUser = user1.getString("id");
+                        user1.put("email", zimbraMap.get(idUser));
                     }
                 }
-
-                JsonArray groupsUsers = share.getJsonArray("groups");
-                if(groupsUsers != null) {
-                    for (int i = 0; i < groupsUsers.size(); i++) {
-                        JsonArray usersInGroup = groupsUsers.getJsonObject(i).getJsonArray("users");
-                        if(usersInGroup != null) {
-                            for (int j = 0; j < usersInGroup.size(); j++) {
-                                JsonObject userInGroup = usersInGroup.getJsonObject(j);
-                                userInGroup.put("email", "moodleNotif@lyceeconnecte.fr");
-                            }
-                        }
-                    }
+            */
+            JsonArray users = shareObjectToFill.getJsonArray("users");
+            if (users != null) {
+                for (int i = 0; i < users.size(); i++) {
+                    JsonObject manualUsers = users.getJsonObject(i);
+                    manualUsers.put("email", "moodleNotif@lyceeconnecte.fr");
                 }
-
-                log.info("JSON PARTAGE WITH MAIL : " + share.toString());
-
-                JsonObject shareSend = new JsonObject();
-                shareSend.put("parameters", share)
-                        .put("wstoken", config.getString("wsToken"))
-                        .put("wsfunction", WS_CREATE_SHARECOURSE)
-                        .put("moodlewsrestformat", JSON);
-                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                URI moodleUri = null;
-                try {
-                    final String service = (config.getString("address_moodle") + config.getString("ws-path"));
-                    final String urlSeparator = service.endsWith("") ? "" : "/";
-                    moodleUri = new URI(service + urlSeparator);
-                } catch (URISyntaxException e) {
-                    log.error("Invalid moodle web service sending right share uri",e);
-                }
-                if (moodleUri != null) {
-                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
-                    final String moodleUrl = moodleUri.toString();
-                    log.info("CALL WS_CREATE_SHARECOURSE");
-                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                        @Override
-                        public void handle(Either<String, Buffer> event) {
-                            if (event.isRight()) {
-                                log.info("SUCCESS WS_CREATE_SHARECOURSE");
-                                request.response()
-                                        .setStatusCode(200)
-                                        .end();
-                            } else {
-                                log.error("FAIL WS_CREATE_SHARECOURSE" + event.left().getValue());
-                                unauthorized(request);
-                            }
-                        }
-                    }, true);
-                }
-                //});
             }
+
+            JsonArray groupsUsers = shareObjectToFill.getJsonArray("groups");
+            if (groupsUsers != null) {
+                for (int i = 0; i < groupsUsers.size(); i++) {
+                    JsonArray usersInGroup = groupsUsers.getJsonObject(i).getJsonArray("users");
+                    if (usersInGroup != null) {
+                        for (int j = 0; j < usersInGroup.size(); j++) {
+                            JsonObject userInGroup = usersInGroup.getJsonObject(j);
+                            userInGroup.put("email", "moodleNotif@lyceeconnecte.fr");
+                        }
+                    }
+                }
+            }
+
+            log.info("JSON PARTAGE WITH MAIL : " + shareObjectToFill.toString());
+
+            JsonObject shareSend = new JsonObject();
+            shareSend.put("parameters", shareObjectToFill)
+                    .put("wstoken", config.getString("wsToken"))
+                    .put("wsfunction", WS_CREATE_SHARECOURSE)
+                    .put("moodlewsrestformat", JSON);
+            final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+            URI moodleUri = null;
+            try {
+                final String service = (config.getString("address_moodle") + config.getString("ws-path"));
+                final String urlSeparator = service.endsWith("") ? "" : "/";
+                moodleUri = new URI(service + urlSeparator);
+            } catch (URISyntaxException e) {
+                log.error("Invalid moodle web service sending right share uri", e);
+            }
+            if (moodleUri != null) {
+                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
+                final String moodleUrl = moodleUri.toString();
+                log.info("CALL WS_CREATE_SHARECOURSE");
+                webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, event -> {
+                    if (event.isRight()) {
+                        log.info("SUCCESS WS_CREATE_SHARECOURSE");
+                        request.response()
+                                .setStatusCode(200)
+                                .end();
+                    } else {
+                        log.error("FAIL WS_CREATE_SHARECOURSE" + event.left().getValue());
+                        unauthorized(request);
+                    }
+                }, true);
+            }
+            //});
         });
     }
 
     @Post("/course/duplicate")
     @ApiDoc("Duplicate courses")
     @SecuredAction(workflow_duplicate)
-    public void duplicate (final HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "duplicate", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject duplicateCourse) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        JsonArray courseId = duplicateCourse.getJsonArray("coursesId");
-                        JsonObject courseToDuplicate = new JsonObject();
-                        courseToDuplicate.put("folderid", duplicateCourse.getInteger("folderId"));
-                        courseToDuplicate.put("status", WAITING);
-                        courseToDuplicate.put("userId", user.getUserId());
-                        for (int i = 0; i < courseId.size(); i++) {
-                            courseToDuplicate.put("courseid", courseId.getValue(i));
-                            moodleService.insertDuplicateTable(courseToDuplicate, new Handler<Either<String, JsonObject>>() {
-                                @Override
-                                public void handle(Either<String, JsonObject> event) {
-                                    if (event.isRight()) {
-                                        request.response()
-                                                .setStatusCode(200)
-                                                .end();
-                                    } else {
-                                        handle(new Either.Left<>("Failed to insert in database"));
-                                    }
+    public void duplicate(final HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "duplicate", duplicateCourse ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    JsonArray courseId = duplicateCourse.getJsonArray("coursesId");
+                    JsonObject courseToDuplicate = new JsonObject();
+                    courseToDuplicate.put("folderid", duplicateCourse.getInteger("folderId"));
+                    courseToDuplicate.put("status", WAITING);
+                    courseToDuplicate.put("userId", user.getUserId());
+                    for (int i = 0; i < courseId.size(); i++) {
+                        courseToDuplicate.put("courseid", courseId.getValue(i));
+                        moduleSQLRequestService.insertDuplicateTable(courseToDuplicate, new Handler<Either<String, JsonObject>>() {
+                            @Override
+                            public void handle(Either<String, JsonObject> event) {
+                                if (event.isRight()) {
+                                    request.response()
+                                            .setStatusCode(200)
+                                            .end();
+                                } else {
+                                    handle(new Either.Left<>("Failed to insert in database"));
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
-                });
-            }
-        });
+                }));
     }
 
     @Get("/duplicateCourses")
     @ApiDoc("Get duplicate courses")
     @SecuredAction(workflow_duplicate)
-    public void getDuplicateCourses (final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-                if (user != null) {
-                    moodleService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
-                        @Override
-                        public void handle(Either<String, JsonObject> event) {
-                            if (event.isRight()) {
-                                moodleService.getCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
-                            } else {
-                                log.error("Problem to delete finished duplicate courses !");
-                                renderError(request);
-                            }
-                        }
-                    });
-                } else {
-                    log.error("User not found in session.");
-                    unauthorized(request);
-                }
+    public void getDuplicateCourses(final HttpServerRequest request) {
+        UserUtils.getUserInfos(eb, request, user -> {
+            if (user != null) {
+                moduleSQLRequestService.deleteFinishedCoursesDuplicate(event -> {
+                    if (event.isRight()) {
+                        moduleSQLRequestService.getCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
+                    } else {
+                        log.error("Problem to delete finished duplicate courses !");
+                        renderError(request);
+                    }
+                });
+            } else {
+                log.error("User not found in session.");
+                unauthorized(request);
             }
         });
     }
@@ -1283,241 +1040,184 @@ public class MoodleController extends ControllerHelper {
     @Delete("/courseDuplicate/:id")
     @ApiDoc("delete a duplicateFailed folder")
     public void deleteDuplicateCourse(final HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-            @Override
-            public void handle(UserInfos user) {
-                if (user != null) {
-                    final String status = FINISHED;
-                    Integer id = Integer.parseInt(request.params().get("id"));
-                    moodleService.updateStatusCourseToDuplicate(status, id, 1, new Handler<Either<String, JsonObject>>() {
-                        @Override
-                        public void handle(Either<String, JsonObject> event) {
-                            if (event.isRight()) {
-                                moodleService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
-                                    @Override
-                                    public void handle(Either<String, JsonObject> event) {
-                                        if (event.isRight()) {
-                                            request.response()
-                                                    .setStatusCode(200)
-                                                    .end();
-                                        } else {
-                                            log.error("Problem to delete finished duplicate courses !");
-                                            renderError(request);
-                                        }
-                                    }
-                                });
+        UserUtils.getUserInfos(eb, request, user -> {
+            if (user != null) {
+                final String status = FINISHED;
+                Integer id = Integer.parseInt(request.params().get("id"));
+                moduleSQLRequestService.updateStatusCourseToDuplicate(status, id, 1, event -> {
+                    if (event.isRight()) {
+                        moduleSQLRequestService.deleteFinishedCoursesDuplicate(event1 -> {
+                            if (event1.isRight()) {
+                                request.response()
+                                        .setStatusCode(200)
+                                        .end();
                             } else {
-                                log.error("Update Duplicate course database didn't work!");
+                                log.error("Problem to delete finished duplicate courses !");
                                 renderError(request);
                             }
-                        }
-                    });
-                } else {
-                    log.error("User not found in session.");
-                    unauthorized(request);
-                }
+                        });
+                    } else {
+                        log.error("Update Duplicate course database didn't work!");
+                        renderError(request);
+                    }
+                });
+            } else {
+                log.error("User not found in session.");
+                unauthorized(request);
             }
         });
     }
 
     @Post("/course/duplicate/response")
     @ApiDoc("Duplicate courses")
-    public void getMoodleResponse (HttpServerRequest request) {
-        RequestUtils.bodyToJson(request, pathPrefix + "duplicateResponse", new Handler<JsonObject>() {
-            @Override
-            public void handle(JsonObject duplicateResponse) {
-                UserUtils.getUserInfos(eb, request, new Handler<UserInfos>() {
-                    @Override
-                    public void handle(UserInfos user) {
-                        switch(duplicateResponse.getString("status")) {
-                            case "pending":
-                                moodleService.updateStatusCourseToDuplicate(PENDING,
-                                        Integer.parseInt(duplicateResponse.getString("ident")), 1, new Handler<Either<String, JsonObject>>() {
-                                            @Override
-                                            public void handle(Either<String, JsonObject> event) {
-                                                if (event.isRight()) {
-                                                    request.response()
-                                                            .setStatusCode(200)
-                                                            .end();
-                                                } else {
-                                                    log.error("Cannot update the status of the course in duplication table");
-                                                    unauthorized(request);
-                                                }
-                                            }
-                                        });
-                                break;
-                            case "finished":
-                                moodleService.updateStatusCourseToDuplicate(FINISHED,
-                                        Integer.parseInt(duplicateResponse.getString("ident")), 1, new Handler<Either<String, JsonObject>>() {
-                                            @Override
-                                            public void handle(Either<String, JsonObject> event) {
-                                                if (event.isRight()) {
-                                                    moodleService.getCourseIdToDuplicate(FINISHED, new Handler<Either<String, JsonArray>>() {
-                                                        @Override
-                                                        public void handle(Either<String, JsonArray> event) {
-                                                            JsonObject createCourseDuplicate = new JsonObject();
-                                                            createCourseDuplicate.put("userid", event.right().getValue().getJsonObject(0).getString("id_users"));
-                                                            createCourseDuplicate.put("folderid", event.right().getValue().getJsonObject(0).getInteger("id_folder"));
-                                                            createCourseDuplicate.put("moodleid", Integer.parseInt(duplicateResponse.getString("courseid")));
-                                                            moodleService.createCourse(createCourseDuplicate, user.getUserId(), new Handler<Either<String, JsonObject>>() {
-                                                                @Override
-                                                                public void handle(Either<String, JsonObject> event) {
-                                                                    if (event.isRight()) {
-                                                                        moodleService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
-                                                                            @Override
-                                                                            public void handle(Either<String, JsonObject> event) {
-                                                                                if (event.isRight()) {
-                                                                                    request.response()
-                                                                                            .setStatusCode(200)
-                                                                                            .end();
-                                                                                } else {
-                                                                                    log.error("Problem to delete finished duplicate courses !");
-                                                                                    unauthorized(request);
-                                                                                }
-                                                                            }
-                                                                        });
-                                                                    } else {
-                                                                        log.error("Problem to insert in course database !");
-                                                                        unauthorized(request);
-                                                                    }
-                                                                }
-                                                            });
-                                                        }
-                                                    });
-                                                }
-                                            }
-                                        });
-                                break;
-                            case "busy":
-                                log.debug("A duplication is already in progress");
-                                break;
-                            case "error":
-                                moodleService.getCourseToDuplicate(duplicateResponse.getString("userid"),
-                                        new Handler<Either<String, JsonArray>>() {
-                                            @Override
-                                            public void handle(Either<String, JsonArray> event) {
-                                                if (event.isRight()) {
-                                                    if (event.right().getValue().getInteger(6) == 3) {
-                                                        moodleService.deleteFinishedCoursesDuplicate(new Handler<Either<String, JsonObject>>() {
-                                                            @Override
-                                                            public void handle(Either<String, JsonObject> event) {
-                                                                if (event.isRight()) {
-                                                                    request.response()
-                                                                            .setStatusCode(200)
-                                                                            .end();
-                                                                } else {
-                                                                    log.error("Problem to delete the duplicate course in database !");
-                                                                    unauthorized(request);
-                                                                }
-                                                            }
-                                                        });
-                                                    } else if (event.right().getValue().getInteger(6) < 3) {
-                                                        log.error("Duplication web-service failed !");
-                                                        final String status = WAITING;
-                                                        Integer id = duplicateResponse.getInteger("id");
-                                                        Integer nbrTentatives =  duplicateResponse.getInteger("numberOfTentatives");
-                                                        moodleService.updateStatusCourseToDuplicate(status, id, nbrTentatives, new Handler<Either<String, JsonObject>>() {
-                                                            @Override
-                                                            public void handle(Either<String, JsonObject> event) {
-                                                                if (event.isRight()) {
-                                                                    log.error("Duplication web-service failed");
-                                                                    unauthorized(request);
-                                                                } else {
-                                                                    log.error("Failed to access database");
-                                                                    unauthorized(request);
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                }
-                                            }
-                                        });
-                                break;
-                            default:
-                                log.error("Failed to read the Moodle response");
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    public void synchronisationDuplication (final Handler<Either<String, JsonObject>> eitherHandler){
-        String status = PENDING;
-        moodleService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonArray>>() {
-            @Override
-            public void handle(Either<String, JsonArray> event) {
-                if (event.isRight()) {
-                    if(event.right().getValue().size() < config.getInteger("numberOfMaxPendingDuplication")) {
-                        String status = WAITING;
-                        moodleService.getCourseIdToDuplicate(status, new Handler<Either<String, JsonArray>>() {
-                            @Override
-                            public void handle(Either<String, JsonArray> event) {
-                                if (event.isRight()) {
-                                    if (event.right().getValue().size() != 0) {
-                                        JsonObject courseDuplicate = event.right().getValue().getJsonObject(0);
-                                        JsonObject courseToDuplicate = new JsonObject();
-                                        courseToDuplicate.put("courseid", courseDuplicate.getInteger("id_course"));
-                                        courseToDuplicate.put("userid", courseDuplicate.getString("id_users"));
-                                        courseToDuplicate.put("folderid", courseDuplicate.getInteger("id_folder"));
-                                        courseToDuplicate.put("id", courseDuplicate.getInteger("id"));
-                                        courseToDuplicate.put("numberOfTentatives", courseDuplicate.getInteger("nombre_tentatives"));
-                                        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-                                        URI moodleUri = null;
-                                        try {
-                                            final String service = config.getString("address_moodle") + config.getString("ws-path");
-                                            final String urlSeparator = service.endsWith("") ? "" : "/";
-                                            moodleUri = new URI(service + urlSeparator);
-                                        } catch (URISyntaxException e) {
-                                            log.error("Invalid moodle web service sending demand of duplication uri",e);
+    public void getMoodleResponse(HttpServerRequest request) {
+        RequestUtils.bodyToJson(request, pathPrefix + "duplicateResponse", duplicateResponse ->
+                UserUtils.getUserInfos(eb, request, user -> {
+                    switch (duplicateResponse.getString("status")) {
+                        case "pending":
+                            moduleSQLRequestService.updateStatusCourseToDuplicate(PENDING,
+                                    Integer.parseInt(duplicateResponse.getString("ident")), 1, event -> {
+                                        if (event.isRight()) {
+                                            request.response()
+                                                    .setStatusCode(200)
+                                                    .end();
+                                        } else {
+                                            log.error("Cannot update the status of the course in duplication table");
+                                            unauthorized(request);
                                         }
-                                        if (moodleUri != null) {
-                                            final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
-                                            final String moodleUrl = moodleUri.toString() +
-                                                    "?wstoken=" + config.getString("wsToken") +
-                                                    "&wsfunction=" + WS_POST_DUPLICATECOURSE +
-                                                    "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
-                                                    "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
-                                                    "&parameters[course][0][ident]=" + courseDuplicate.getInteger("id") +
-                                                    "&moodlewsrestformat=" + JSON;
-
-                                            JsonObject shareSend = new JsonObject();
-                                            shareSend = null;
-                                            httpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, httpClient, responseIsSent, new Handler<Either<String, Buffer>>() {
-                                                @Override
-                                                public void handle(Either<String, Buffer> event) {
-                                                    if (event.isRight()) {
-                                                        eitherHandler.handle(new Either.Right<>(event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
+                                    });
+                            break;
+                        case "finished":
+                            moduleSQLRequestService.updateStatusCourseToDuplicate(FINISHED,
+                                    Integer.parseInt(duplicateResponse.getString("ident")), 1, event -> {
+                                        if (event.isRight()) {
+                                            moduleSQLRequestService.getCourseIdToDuplicate(FINISHED, event1 -> {
+                                                JsonObject createCourseDuplicate = new JsonObject();
+                                                createCourseDuplicate.put("userid", event1.right().getValue().getJsonObject(0).getString("id_users"));
+                                                createCourseDuplicate.put("folderid", event1.right().getValue().getJsonObject(0).getInteger("id_folder"));
+                                                createCourseDuplicate.put("moodleid", Integer.parseInt(duplicateResponse.getString("courseid")));
+                                                moduleSQLRequestService.createCourse(createCourseDuplicate, event11 -> {
+                                                    if (event11.isRight()) {
+                                                        moduleSQLRequestService.deleteFinishedCoursesDuplicate(event111 -> {
+                                                            if (event111.isRight()) {
+                                                                request.response()
+                                                                        .setStatusCode(200)
+                                                                        .end();
+                                                            } else {
+                                                                log.error("Problem to delete finished duplicate courses !");
+                                                                unauthorized(request);
+                                                            }
+                                                        });
                                                     } else {
-                                                        log.error("Failed to contact Moodle");
-                                                        eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
+                                                        log.error("Problem to insert in course database !");
+                                                        unauthorized(request);
                                                     }
-                                                }
-                                            }, true);
+                                                });
+                                            });
                                         }
-                                    } else {
-                                        log.debug("There are no course to duplicate in the duplication table !");
-                                        eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
+                                    });
+                            break;
+                        case "busy":
+                            log.debug("A duplication is already in progress");
+                            break;
+                        case "error":
+                            moduleSQLRequestService.getCourseToDuplicate(duplicateResponse.getString("userid"), event -> {
+                                if (event.isRight()) {
+                                    if (event.right().getValue().getInteger(6) == 3) {
+                                        moduleSQLRequestService.deleteFinishedCoursesDuplicate(event12 -> {
+                                            if (event12.isRight()) {
+                                                request.response()
+                                                        .setStatusCode(200)
+                                                        .end();
+                                            } else {
+                                                log.error("Problem to delete the duplicate course in database !");
+                                                unauthorized(request);
+                                            }
+                                        });
+                                    } else if (event.right().getValue().getInteger(6) < 3) {
+                                        log.error("Duplication web-service failed !");
+                                        final String status = WAITING;
+                                        Integer id = duplicateResponse.getInteger("id");
+                                        Integer nbrTentatives = duplicateResponse.getInteger("numberOfTentatives");
+                                        moduleSQLRequestService.updateStatusCourseToDuplicate(status, id, nbrTentatives, event13 -> {
+                                            if (event13.isRight()) {
+                                                log.error("Duplication web-service failed");
+                                            } else {
+                                                log.error("Failed to access database");
+                                            }
+                                            unauthorized(request);
+                                        });
                                     }
-                                } else {
-                                    log.error("The access to duplicate database failed !");
-                                    eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
                                 }
-                            }
-                        });
-                    } else {
-                        log.error("The quota of duplication in same time is reached, you have to wait !");
-                        eitherHandler.handle(new Either.Left<>("The quota of duplication in same time is reached, you have to wait"));
+                            });
+                            break;
+                        default:
+                            log.error("Failed to read the Moodle response");
                     }
-                } else {
-                    log.error("The access to duplicate database failed !");
-                    eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
-                }
-            }
-        });
+                }));
     }
 
-    public LocalDateTime getDateString(String date){
-        return LocalDateTime.parse(date.substring(0, 10) + "T" + date.substring(11));
+    public void synchronisationDuplication(final Handler<Either<String, JsonObject>> eitherHandler) {
+        String status = PENDING;
+        moduleSQLRequestService.getCourseIdToDuplicate(status, event -> {
+            if (event.isRight()) {
+                if (event.right().getValue().size() < config.getInteger("numberOfMaxPendingDuplication")) {
+                    String status1 = WAITING;
+                    moduleSQLRequestService.getCourseIdToDuplicate(status1, event1 -> {
+                        if (event1.isRight()) {
+                            if (event1.right().getValue().size() != 0) {
+                                JsonObject courseDuplicate = event1.right().getValue().getJsonObject(0);
+                                JsonObject courseToDuplicate = new JsonObject();
+                                courseToDuplicate.put("courseid", courseDuplicate.getInteger("id_course"));
+                                courseToDuplicate.put("userid", courseDuplicate.getString("id_users"));
+                                courseToDuplicate.put("folderid", courseDuplicate.getInteger("id_folder"));
+                                courseToDuplicate.put("id", courseDuplicate.getInteger("id"));
+                                courseToDuplicate.put("numberOfTentatives", courseDuplicate.getInteger("nombre_tentatives"));
+                                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+                                URI moodleUri = null;
+                                try {
+                                    final String service = config.getString("address_moodle") + config.getString("ws-path");
+                                    final String urlSeparator = service.endsWith("") ? "" : "/";
+                                    moodleUri = new URI(service + urlSeparator);
+                                } catch (URISyntaxException e) {
+                                    log.error("Invalid moodle web service sending demand of duplication uri", e);
+                                }
+                                if (moodleUri != null) {
+                                    final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, config);
+                                    final String moodleUrl = moodleUri.toString() +
+                                            "?wstoken=" + config.getString("wsToken") +
+                                            "&wsfunction=" + WS_POST_DUPLICATECOURSE +
+                                            "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
+                                            "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
+                                            "&parameters[course][0][ident]=" + courseDuplicate.getInteger("id") +
+                                            "&moodlewsrestformat=" + JSON;
+
+                                    webServiceMoodlePost(null, moodleUrl, httpClient, responseIsSent, event11 -> {
+                                        if (event11.isRight()) {
+                                            eitherHandler.handle(new Either.Right<>(event11.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
+                                        } else {
+                                            log.error("Failed to contact Moodle");
+                                            eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
+                                        }
+                                    }, true);
+                                }
+                            } else {
+                                log.debug("There are no course to duplicate in the duplication table !");
+                                eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
+                            }
+                        } else {
+                            log.error("The access to duplicate database failed !");
+                            eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
+                        }
+                    });
+                } else {
+                    log.error("The quota of duplication in same time is reached, you have to wait !");
+                    eitherHandler.handle(new Either.Left<>("The quota of duplication in same time is reached, you have to wait"));
+                }
+            } else {
+                log.error("The access to duplicate database failed !");
+                eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
+            }
+        });
     }
 }

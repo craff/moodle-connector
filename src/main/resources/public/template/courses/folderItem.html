@@ -1,41 +1,46 @@
 <div class="vertical-spacing left-border-menu noWrapSideNav-mobile">
-    <div ng-click="isPrintMenuFolder()" ng-class="{colorActivity:printmenufolder, colorCourse : !printmenufolder}" class="eleven" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
+    <div ng-click="isPrintMenuFolder()" ng-class="{colorActivity:printMenuFolder, colorCourse : !printMenuFolder}"
+         class="eleven" lvl-drop-target on-drop="dropped(dragEl, dropEl)">
         <label ng-show="false">0</label>
-        <i class="sort-desc" ng-if="printmenufolder"></i>
-        <i class="icon-play" ng-if="!printmenufolder"></i>
+        <i class="sort-desc" ng-if="printMenuFolder"></i>
+        <i class="icon-play" ng-if="!printMenuFolder"></i>
         <i18n>moodle.courses</i18n>
         <br/>
     </div>
-    <div ng-repeat="folder in getFolderParent()" ng-if="printfolders">
-        <span ng-init="folder.subFolders=getSubFolder(folder);" class="left-padding row" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
-              ng-click="isPrintSubFolder(folder)" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
+    <div ng-repeat="folder in getFolderParent()" ng-if="printFolders">
+        <span ng-init="folder.subfolder=getSubfolder(folder);" class="left-padding row"
+              ng-class="{colorActivity:folder.printSubfolder, colorCourse : !folder.printSubfolder}"
+              ng-click="isPrintSubfolder(folder)" lvl-drop-target on-drop="dropped(dragEl, dropEl)">
             <label ng-show="false">[[folder.id]]</label>
-            <i class="icon-play" ng-if="!folder.printsubfolder"></i>
-            <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
+            <i class="icon-play" ng-if="!folder.printSubfolder"></i>
+            <i class="sort-desc" ng-if="folder.printSubfolder"></i>  [[folder.name]]
         </span>
-        <div ng-if="folder.subFolders && folder.subFolders.length && folder.printsubfolder" class="left-padding"
+        <div ng-if="folder.subfolder && folder.subfolder.length && folder.printSubfolder" class="left-padding"
              ng-include="'tree_item_renderer.html'"></div>
     </div>
-    <div ng-click="isPrintMenuCoursesShared()" ng-class="{colorActivity:printmenucourseShared, colorCourse : !printmenucourseShared}">
-        <i class="icon-play" ng-if="!printmenucourseShared"></i>
-        <i class="sort-desc" ng-if="printmenucourseShared"></i>
-         <i18n>moodle.courses.shared</i18n>
+    <div ng-click="isPrintMenuCoursesShared()"
+         ng-class="{colorActivity:printMenuCourseShared, colorCourse : !printMenuCourseShared}">
+        <i class="icon-play" ng-if="!printMenuCourseShared"></i>
+        <i class="sort-desc" ng-if="printMenuCourseShared"></i>
+        <i18n>moodle.courses.shared</i18n>
         <br/>
     </div>
 </div>
 <div class="vertical-spacing zero-mobile">
-    <input ng-disabled="!printfolders" type="button" ng-click="openPopUpFolder()" i18n-value="moodle.folder.new" class="colorButton responsive-button">
+    <input ng-disabled="!printFolders" type="button" ng-click="openPopUpFolder()" i18n-value="moodle.folder.new"
+           class="colorButton responsive-button">
 </div>
 
 <script type="text/ng-template"  id="tree_item_renderer.html">
-    <div ng-repeat="folder in folder.subFolders">
-        <span ng-init="folder.subFolders = getSubFolder(folder);" class="left-padding row" ng-class="{colorActivity:folder.printsubfolder, colorCourse : !folder.printsubfolder}"
-              ng-click="isPrintSubFolder(folder)" lvl-drop-target  on-drop="dropped(dragEl, dropEl)">
+    <div ng-repeat="folder in folder.subfolder">
+        <span ng-init="folder.subfolder = getSubfolder(folder);" class="left-padding row"
+              ng-class="{colorActivity:folder.printSubfolder, colorCourse : !folder.printSubfolder}"
+              ng-click="isPrintSubfolder(folder)" lvl-drop-target on-drop="dropped(dragEl, dropEl)">
             <label ng-show="false">[[folder.id]]</label>
-            <i class="icon-play" ng-if="!folder.printsubfolder"></i>
-            <i class="sort-desc" ng-if="folder.printsubfolder"></i>  [[folder.name]]
+            <i class="icon-play" ng-if="!folder.printSubfolder"></i>
+            <i class="sort-desc" ng-if="folder.printSubfolder"></i>  [[folder.name]]
         </span>
-        <div ng-if="folder.subFolders && folder.subFolders.length && folder.printsubfolder"
+        <div ng-if="folder.subfolder && folder.subfolder.length && folder.printSubfolder"
              ng-include="'tree_item_renderer.html'" class="left-padding"></div>
     </div>
 </script>

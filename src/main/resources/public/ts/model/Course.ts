@@ -1,4 +1,4 @@
-import {_, idiom, moment, notify, Rights, Shareable, } from "entcore";
+import {_, idiom, moment, notify, Rights, Shareable} from "entcore";
 import http from "axios";
 import {Mix} from "entcore-toolkit";
 import {Folders} from "./Folder";
@@ -242,7 +242,7 @@ export class Courses {
         }
     }
 
-    async getCoursesbyUser (userId: string) {
+    async getCoursesByUser(userId: string) {
         try {
             let courses = await http.get(`/moodle/user/courses`);
             let allCourses = Mix.castArrayAs(Course, courses.data.allCourses);
@@ -251,11 +251,14 @@ export class Courses {
             let idEditingTeacher = courses.data.idEditingTeacher + "";
             let idStudent = courses.data.idStudent + "";
 
-            _.each(this.allCourses,function(course) {
+            _.each(this.allCourses, function (course) {
                 course.id = course.courseid;
                 course._id = course.courseid;
-                course.owner = {userId: course.auteur[0].entidnumber, displayName:course.auteur[0].firstname + " " + course.auteur[0].lastname};
-                if(course.summary == null) {
+                course.owner = {
+                    userId: course.auteur[0].entidnumber,
+                    displayName: course.auteur[0].firstname + " " + course.auteur[0].lastname
+                };
+                if (course.summary == null) {
                     course.summary = "";
                 } else {
                     course.summary = course.summary.replace(/<\/p><p>/g, " ; ").replace(/<p>/g, "").replace(/<\/p>/g, "");
@@ -297,15 +300,6 @@ export class Courses {
         } catch (e) {
             notify.error(idiom.translate("moodle.error.get.course"));
             this.isSynchronized = false;
-            throw e;
-        }
-    }
-
-    async getCoursesAndSharedByFolder () {
-        try {
-            let courses = await http.get(`/moodle/users/coursesAndShared`);
-            this.coursesShared = Mix.castArrayAs(Course, courses.data);
-        } catch (e) {
             throw e;
         }
     }
@@ -391,23 +385,23 @@ export class Courses {
                             return 1;
                 } else if(this.order.field == "numberEnrolment") {
                     if (a.usernumber < b.usernumber)
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.usernumber > b.usernumber)
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(this.order.field == "achievment") {
-                    if (a.progress.slice(0,a.progress.length-1) < b.progress.slice(0,b.progress.length-1))
-                        if(this.order.desc)
+                } else if (this.order.field == "achievement") {
+                    if (a.progress.slice(0, a.progress.length - 1) < b.progress.slice(0, b.progress.length - 1))
+                        if (this.order.desc)
                             return 1;
                         else
                             return -1;
-                    if (a.progress.slice(0,a.progress.length-1) > b.progress.slice(0,b.progress.length-1))
-                        if(this.order.desc)
+                    if (a.progress.slice(0, a.progress.length - 1) > b.progress.slice(0, b.progress.length - 1))
+                        if (this.order.desc)
                             return -1;
                         else
                             return 1;
@@ -440,20 +434,20 @@ export class Courses {
     };
 
     courseInFolderSearch (folders : Folders, currentFolder) {
-        let folderToSearch = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
-        let subFoldersSearchForCourse = [];
-        for (let i = 0; i < folderToSearch.subFolders.length; i++) {
-            subFoldersSearchForCourse.push(folderToSearch.subFolders[i]);
-            if (folderToSearch.subFolders[i].subFolders.length != 0) {
-                subFoldersSearchForCourse.push(...this.courseInFolderSearch(folders, folderToSearch.subFolders[i].id));
+        let folderToSearch = folders.listOfSubfolder.find(folder => folder.id == currentFolder);
+        let subfolderSearchForCourse = [];
+        for (let i = 0; i < folderToSearch.subfolder.length; i++) {
+            subfolderSearchForCourse.push(folderToSearch.subfolder[i]);
+            if (folderToSearch.subfolder[i].subfolder.length != 0) {
+                subfolderSearchForCourse.push(...this.courseInFolderSearch(folders, folderToSearch.subfolder[i].id));
             }
         }
-        return subFoldersSearchForCourse;
+        return subfolderSearchForCourse;
     }
 
-    getCourseInFolder(coursesToPrint : Course[], currentFolder, searching : string, folders : Folders) {
-        let folderToSearch = folders.listOfSubfolders.find(folder => folder.id == currentFolder);
-        if(folderToSearch) {
+    getCourseInFolder(coursesToPrint: Course[], currentFolder, searching: string, folders: Folders) {
+        let folderToSearch = folders.listOfSubfolder.find(folder => folder.id == currentFolder);
+        if (folderToSearch) {
             if (folderToSearch.id == 0) {
                 return _.filter(coursesToPrint, function (course) {
                     return !!searching ? (course.fullname.toLowerCase().includes(searching.toLowerCase()) ||
@@ -465,12 +459,12 @@ export class Courses {
                         return (course.folderid == folderToSearch.id)
                     });
                 } else {
-                    let subFoldersSearchForCourse = this.courseInFolderSearch(folders, currentFolder);
-                    subFoldersSearchForCourse.push(folderToSearch);
+                    let subfolderSearchForCourse = this.courseInFolderSearch(folders, currentFolder);
+                    subfolderSearchForCourse.push(folderToSearch);
                     let searchCourseToReturn = [];
-                    for (let j = 0; j < subFoldersSearchForCourse.length; j++) {
+                    for (let j = 0; j < subfolderSearchForCourse.length; j++) {
                         searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint =>
-                            coursesToPrint.folderid == subFoldersSearchForCourse[j].id));
+                            coursesToPrint.folderid == subfolderSearchForCourse[j].id));
                     }
                     return searchCourseToReturn;
                 }
@@ -478,8 +472,9 @@ export class Courses {
         }
     }
 
-    getAllCoursesModel(): Course[]  {
-        if(this.allCourses){
+
+    getAllCoursesModel(): Course[] {
+        if (this.allCourses) {
             return this.allCourses;
         }
         return [];
@@ -488,20 +483,18 @@ export class Courses {
     async getChoice() {
         try {
             const {data} = await http.get('/moodle/choices');
-            if(data.length != 0) {
+            if (data.length != 0) {
                 this.lastcreation = data[0].lastcreation;
                 this.todo = data[0].todo;
                 this.tocome = data[0].tocome;
-                this.coursestodosort = this.typeShow.filter(type => type.id == data[0].coursestodosort );
-                this.coursestocomesort = this.typeShow.filter(type => type.id == data[0].coursestocomesort );
-            }
-            else
-            {
+                this.coursestodosort = this.typeShow.filter(type => type.id == data[0].coursestodosort);
+                this.coursestocomesort = this.typeShow.filter(type => type.id == data[0].coursestocomesort);
+            } else {
                 this.lastcreation = true;
                 this.todo = true;
                 this.tocome = true;
-                this.coursestodosort = this.typeShow.filter(type => type.id == "doing" );
-                this.coursestocomesort = this.typeShow.filter(type => type.id == "all" );
+                this.coursestodosort = this.typeShow.filter(type => type.id == "doing");
+                this.coursestocomesort = this.typeShow.filter(type => type.id == "all");
             }
         } catch (e) {
             notify.error("Get Choice function didn't work");

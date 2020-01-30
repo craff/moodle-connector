@@ -9,7 +9,7 @@ import org.entcore.common.user.UserInfos;
 /**
  * Created by lugana on 01/03/2019.
  */
-public class CanShareResoourceFilter implements ResourcesProvider {
+public class canShareResourceFilter implements ResourcesProvider {
     @Override
     public void authorize(HttpServerRequest request, Binding binding, UserInfos userInfos, Handler<Boolean> handler) {
         final String subjectId = request.params().get("id");
