@@ -20,6 +20,7 @@ import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.http.Renders;
 import fr.wseduc.webutils.http.response.DefaultResponseHandler;
 import fr.wseduc.webutils.request.RequestUtils;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -838,10 +839,15 @@ public class MoodleController extends ControllerHelper {
                             JsonArray getTheAuditeurIdFutureResult = getTheAuditeurIdFuture.result().getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
 
                             JsonObject auditeur = new JsonObject();
-                            for (int i = 0; auditeur.size() == 0; i++) {
-                                if (getTheAuditeurIdFutureResult.getJsonObject(i).getInteger("role") == 10) {
+                            for (int i = 0; i < getTheAuditeurIdFutureResult.size(); i++) {
+                                if (getTheAuditeurIdFutureResult.getJsonObject(i).getInteger("role") == moodleConfig.getValue("idAuditeur")) {
                                     auditeur = getTheAuditeurIdFutureResult.getJsonObject(i);
+                                    break;
                                 }
+                            }
+                            if (auditeur.size() == 0) {
+                                badRequest(request, "No auditor role found for course : " + shareObjectToFill.getValue("courseid"));
+                                return;
                             }
                             if (usersFutureResult != null && !usersFutureResult.isEmpty()) {
                                 shareObjectToFill.put("users", usersFutureResult);
@@ -872,13 +878,13 @@ public class MoodleController extends ControllerHelper {
                                 CompositeFuture.all(listUsersFutures).setHandler(finished -> {
                                     if (finished.succeeded()) {
                                         postShareProcessingService.processUsersInBookmarksFutureResult(shareObjectToFill, listUsersFutures, listRankGroup);
-                                        sendRightShare(shareObjectToFill, request);
+                                        MoodleController.this.sendRightShare(shareObjectToFill, request);
                                     } else {
                                         badRequest(request, event.cause().getMessage());
                                     }
                                 });
                             } else {
-                                sendRightShare(shareObjectToFill, request);
+                                MoodleController.this.sendRightShare(shareObjectToFill, request);
                             }
                         } else {
                             badRequest(request, event.cause().getMessage());
