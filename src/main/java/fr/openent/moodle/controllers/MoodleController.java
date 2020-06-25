@@ -180,9 +180,14 @@ public class MoodleController extends ControllerHelper {
                 try {
                     GregorianCalendar calendar = new GregorianCalendar();
                     String uniqueID = UUID.randomUUID().toString();
-                    course.put("shortname", calendar.toZonedDateTime().toString().substring(0, 7) +
-                            user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
-                            course.getString("fullname").substring(0, 4) + uniqueID);
+                    if (user.getLastName().length() < 3)
+                        course.put("shortname", calendar.toZonedDateTime().toString().substring(0, 7) +
+                                user.getFirstName().substring(0, 1) + user.getLastName() +
+                                course.getString("fullname").substring(0, 4) + uniqueID);
+                    else
+                        course.put("shortname", calendar.toZonedDateTime().toString().substring(0, 7) +
+                                user.getFirstName().substring(0, 1) + user.getLastName().substring(0, 3) +
+                                course.getString("fullname").substring(0, 4) + uniqueID);
                     final String service = (config.getString("address_moodle") + config.getString("ws-path"));
                     final String urlSeparator = service.endsWith("") ? "" : "/";
                     moodleUri = new URI(service + urlSeparator);
