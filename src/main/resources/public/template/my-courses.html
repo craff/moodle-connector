@@ -2,9 +2,10 @@
     <div class="twelve twelve-mobile">
         <div class="row-mobile stickyParent">
             <div class="cell three twelve-mobile horizontal-spacing rightPaddingMenu sticky">
-                <p>
+                <div>
                     <i ng-click="openNavMyCourses()" class="dropbtn zero-desktop"></i>
                     <i18n class="zero-mobile">moodle.folders</i18n>
+                    <br/><br/>
                     <div class="search-pagination">
                         <div class="eleven twelve-mobile cell infoBackground infoBackgroundTopMargin style-bord-with-over-effect searchBar">
                             <i class="one search searchIcon" ></i>
@@ -22,9 +23,8 @@
                                 class="eleven twelve-mobile cell ellipsis infoBackground infoBackgroundTopMargin style-bord-with-over-effect selectSearchBar noBorder"
                                 ng-change="selectSearchFolder()">
                         </select>
-                        <div></div>
                     </div>
-                </p>
+                </div>
                 <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
                 </div>
                 <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">

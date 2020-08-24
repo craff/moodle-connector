@@ -67,10 +67,6 @@
                 <container template="lightboxContainer"></container>
             </lightbox>
 
-            <!--info pour confirmer la surppression d'un dossier-->
-            <div ng-show="successDelete" class="info">
-                <i18n>moodle.info.deleteTextConfirmSuccess</i18n>
-            </div>
             <container template="main"></container>
             <container template="toaster"></container>
             <div ng-click="openPopUp()" ng-if="!toasterShow && currentTab != 'courses'" class="fab zero-desktop" workflow="moodle.createCourse">

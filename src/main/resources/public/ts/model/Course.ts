@@ -4,52 +4,46 @@ import {Mix} from "entcore-toolkit";
 import {Folders} from "./Folder";
 import {STATUS} from "../constantes";
 
-export class Course implements Shareable{
-    shared : any;
-    owner : {userId: string; displayName: string};
-    myRights : Rights<Course>;
+export class Course implements Shareable {
+    shared: any;
+    owner: { userId: string; displayName: string };
+    myRights: Rights<Course>;
 
-    courseid : number;
-    id : number;
+    courseid: number;
+    id: number;
     status: STATUS;
-    fullname : string;
-    summary : string;
-    date : Date;
-    auteur : Author;
-    role : string;
-    startdate : Date;
-    enddate : Date;
-    timemodified : number;
-    enrolmentdate : number;
-    categoryid : number;
-    folderid : number;
-    imageurl : string;
-    type : string;
-    typeA : string;
-    progress : string;
-    select : boolean;
-    selectConfirm : boolean;
-    masked : boolean;
-    favorites : boolean;
-    infoImg : {
-        name : string;
-        type : string;
-        compatibleMoodle : boolean;
+    fullname: string;
+    summary: string;
+    date: Date;
+    auteur: Author;
+    role: string;
+    startdate: Date;
+    enddate: Date;
+    timemodified: number;
+    enrolmentdate: number;
+    categoryid: number;
+    folderId: number;
+    imageurl: string;
+    type: string;
+    typeA: string;
+    progress: string;
+    select: boolean;
+    selectConfirm: boolean;
+    masked: boolean;
+    favorites: boolean;
+    infoImg: {
+        name: string;
+        type: string;
+        compatibleMoodle: boolean;
     };
-    duplication : string;
-    usernumber : number;
+    duplication: string;
+    usernumber: number;
 
-    constructor(){
+    constructor() {
         this.type = "1";
         this.select = false;
         this.selectConfirm = false;
         this.myRights = new Rights<Course>(this);
-    }
-
-    toJson() {
-        return {
-            role: "edit"
-        }
     }
 
     toJsonPreferences() {
@@ -86,18 +80,18 @@ export class Course implements Shareable{
             imageurl: this.imageurl ? this.imageurl.split("/").slice(-1)[0] : null,
             type: this.type,
             typeA: this.typeA,
-            folderid: this.folderid,
+            folderId: this.folderId,
             id: this.courseid,
             nameImgUrl: this.infoImg ? this.infoImg.name.toLocaleLowerCase() : null,
         }
     }
 
-    public async create():Promise<void> {
+    async create(): Promise<void> {
         try {
             const {data} = await http.post('/moodle/course', this.toJSON());
             this.courseid = data.moodleid;
             this.duplication = "non";
-            this.goTo();
+            await this.goTo();
         } catch (e) {
             this.fullname = undefined;
             this.summary = undefined;
@@ -107,24 +101,24 @@ export class Course implements Shareable{
     }
 
     async deleteDuplication() {
-        try{
+        try {
             await http.delete(`/moodle/courseDuplicate/${this.courseid}`);
-        }catch(e){
+        } catch (e) {
             notify.error("delete failed duplicate course didn't work");
             throw e;
         }
     }
 
-    private async goTo():Promise<void> {
-        if(this.duplication == "non")
+    private async goTo(): Promise<void> {
+        if (this.duplication == "non")
             window.open(`/moodle/course/${this.courseid}?scope=view`);
     }
 
-    async setPreferences(preference : string) {
+    async setPreferences(preference: string) {
 
-        if(preference == "masked") {
+        if (preference == "masked") {
             this.masked = !this.masked;
-        }else if(preference == "favorites") {
+        } else if (preference == "favorites") {
             this.favorites = !this.favorites;
         }
         try {
@@ -137,28 +131,32 @@ export class Course implements Shareable{
 }
 
 export class Courses {
-    allbyfolder : Course[];
-    coursesShared : Course[];
-    coursesSharedToFollow : Course[];
-    coursesByUser : Course[];
-    isSynchronized : Boolean;
-    allCourses : Course[];
-    lastcreation : boolean;
-    todo : boolean;
-    tocome : boolean;
-    coursestodosort : any;
-    coursestocomesort : any;
-    coursesToDo : Course[];
-    coursesToCome : Course[];
-    coursesMyCourse : Course[];
-    showCourses : Course[];
-    folderid : number;
-    searchInput : any;
-    order : any;
-    typeShow : any;
+    publicBankCategoryId: number;
+    deleteCategoryId: number;
+    allByFolder: Course[];
+    coursesShared: Course[];
+    coursesPublished: Course[];
+    coursesSharedToFollow: Course[];
+    coursesByUser: Course[];
+    isSynchronized: Boolean;
+    allCourses: Course[];
+    lastCreation: boolean;
+    toDo: boolean;
+    toCome: boolean;
+    coursestodosort: any;
+    coursestocomesort: any;
+    coursesToDo: Course[];
+    coursesToCome: Course[];
+    coursesMyCourse: Course[];
+    showCourses: Course[];
+    folderId: number;
+    categoryType: String;
+    searchInput: any;
+    order: any;
+    typeShow: any;
 
     constructor() {
-        this.allbyfolder = [];
+        this.allByFolder = [];
         this.allCourses = [];
         this.coursesShared = [];
         this.coursesSharedToFollow = [];
@@ -184,37 +182,31 @@ export class Courses {
         this.getChoice();
     }
 
-    toJsonForDelete(){
+    toJsonForDelete() {
         return {
-            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid )
+            coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid),
+            categoryType: this.categoryType
         }
     }
 
     async coursesDelete() {
         try {
-            await http.delete('/moodle/course', { data: this.toJsonForDelete() } );
+            await http.delete('/moodle/course', {data: this.toJsonForDelete()});
         } catch (e) {
             notify.error(idiom.translate("moodle.error.delete.course"));
             throw e;
         }
     }
 
-    /*    toJsonForDuplicate(){
-            return {
-                coursesId: this.allCourses.filter(course => course.selectConfirm).map(course => course.courseid ),
-                folderId: this.folderid
-            }
-        }*/
-
-    private coursesSelectedConfirmed():Array<Course>{
-        return this.allCourses.filter((course:Course):boolean => course.selectConfirm && course.select);
+    private coursesSelectedConfirmed(): Array<Course> {
+        return this.allCourses.filter((course: Course): boolean => course.selectConfirm && course.select);
     }
 
-    public async coursesDuplicate(folderId:number):Promise<void> {
+    public async coursesDuplicate(folderId: number): Promise<void> {
         try {
-            let coursesId:Array<number>;
-            coursesId = this.coursesSelectedConfirmed().map((course:Course):number => course.id);
-            const idsCoursesAndFolders:Object = { folderId:folderId, coursesId };
+            let coursesId: Array<number>;
+            coursesId = this.coursesSelectedConfirmed().map((course: Course): number => course.id);
+            const idsCoursesAndFolders: Object = {folderId: folderId, coursesId};
             await http.post('/moodle/course/duplicate', idsCoursesAndFolders);
         } catch (error) {
             notify.error(idiom.translate("moodle.error.duplicate.course"));
@@ -222,9 +214,9 @@ export class Courses {
         }
     }
 
-    public async getDuplicateCourse ():Promise<Course[]>{
+    public async getDuplicateCourse(): Promise<Course[]> {
         try {
-            const { data } = await http.get('/moodle/duplicateCourses');
+            const {data} = await http.get('/moodle/duplicateCourses');
             return data
         } catch (error) {
             notify.error(idiom.translate("moodle.error.duplicate.course"));
@@ -234,22 +226,23 @@ export class Courses {
 
     toJSON() {
         return {
-            lastcreation : this.lastcreation,
-            todo : this.todo,
-            tocome : this.tocome,
-            coursestodosort : this.coursestodosort[0].id,
-            coursestocomesort : this.coursestocomesort[0].id
+            lastCreation: this.lastCreation,
+            toDo: this.toDo,
+            toCome: this.toCome,
+            coursestodosort: this.coursestodosort[0].id,
+            coursestocomesort: this.coursestocomesort[0].id
         }
     }
 
     async getCoursesByUser(userId: string) {
         try {
             let courses = await http.get(`/moodle/user/courses`);
-            let allCourses = Mix.castArrayAs(Course, courses.data.allCourses);
-            this.allCourses = allCourses;
+            this.allCourses = Mix.castArrayAs(Course, courses.data.allCourses);
             let idAuditeur = courses.data.idAuditeur + "";
             let idEditingTeacher = courses.data.idEditingTeacher + "";
             let idStudent = courses.data.idStudent + "";
+            this.publicBankCategoryId = courses.data.publicBankCategoryId;
+            this.deleteCategoryId = courses.data.deleteCategoryId;
 
             _.each(this.allCourses, function (course) {
                 course.id = course.courseid;
@@ -260,16 +253,16 @@ export class Courses {
                 };
                 if (course.summary == null) {
                     course.summary = "";
-                } else {
-                    course.summary = course.summary.replace(/<\/p><p>/g, " ; ").replace(/<p>/g, "").replace(/<\/p>/g, "");
                 }
             });
-            this.coursesByUser = _.filter(this.allCourses, function(cours) { return cours.role === idAuditeur; });
-            this.coursesShared = _.filter(this.allCourses, function (cours) {
-                return cours.role === idEditingTeacher && cours.auteur[0].entidnumber !== userId;
+            this.coursesByUser = _.filter(this.allCourses, function (course) {
+                return course.role === idAuditeur;
             });
-            this.coursesSharedToFollow = _.filter(this.allCourses, function (cours) {
-                return cours.role === idStudent && cours.auteur[0].entidnumber !== userId;
+            this.coursesShared = _.filter(this.allCourses, function (course) {
+                return course.role === idEditingTeacher && course.auteur[0].entidnumber !== userId;
+            });
+            this.coursesSharedToFollow = _.filter(this.allCourses, function (course) {
+                return course.role === idStudent && course.auteur[0].entidnumber !== userId;
             });
             this.coursesSharedToFollow = this.coursesSharedToFollow.sort(
                 function compare(a, b) {
@@ -304,86 +297,93 @@ export class Courses {
         }
     }
 
-    lastCreation():Course[]{
-        return this.coursesByUser.filter((course:Course):boolean => course.duplication === 'non')
-            .sort((courseOne:any, courseTwo:any):number=> courseTwo.date - courseOne.date)
+    getLastCreation(): Course[] {
+        return this.coursesByUser.filter((course: Course): boolean => course.duplication === 'non' &&
+            course.categoryid != this.publicBankCategoryId)
+            .sort((courseOne: any, courseTwo: any): number => courseTwo.date - courseOne.date)
             .slice(0, 5);
     }
 
-    isTheFirst(courseFirst : Course){
-        if(this.coursesToShow("coursesToDo").indexOf(courseFirst) == 0 || $(window).width() < 800)
-            return true;
-        else
-            return false;
+    isTheFirst(courseFirst: Course) {
+        return this.coursesToShow("coursesToDo").indexOf(courseFirst) == 0 || $(window).width() < 800;
     }
 
-    coursesToShow(place : string){
-        if(place == "coursesToDo"){
-            if(this.coursesToDo) {
+    coursesToShow(place: string) {
+        let id;
+        if (place == "coursesToDo") {
+            if (this.coursesToDo) {
                 this.showCourses = this.coursesToDo.filter(course => this.searchCoursesToDo(course));
-                var id = this.coursestodosort[0].id;
+                id = this.coursestodosort[0].id;
             }
-        }else if (place == "coursesToCome"){
-            if(this.coursesToCome) {
+        } else if (place == "coursesToCome") {
+            if (this.coursesToCome) {
                 this.showCourses = this.coursesToCome.filter(course => this.searchCoursesToCome(course));
-                var id = this.coursestocomesort[0].id;
+                id = this.coursestocomesort[0].id;
             }
-        }else if (place == "coursesMyCourse"){
-            if(this.coursesMyCourse) {
+        } else if (place == "coursesMyCourse") {
+            if (this.coursesMyCourse) {
                 this.showCourses = this.coursesByUser.filter(course => this.searchMyCourses(course));
             }
         }
-        if (id =="all")
+        if (id == "all")
             this.showCourses = _.filter(this.showCourses);
         else if (id == "doing")
-            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress != "100%" && !(cours.masked)) });
+            this.showCourses = _.filter(this.showCourses, function (course) {
+                return (course.progress != "100%" && !(course.masked))
+            });
         else if (id == "favorites")
-            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.favorites); });
+            this.showCourses = _.filter(this.showCourses, function (course) {
+                return (course.favorites);
+            });
         else if (id == "finished")
-            this.showCourses = _.filter(this.showCourses, function(cours) { return (cours.progress == "100%" && !(cours.masked)); });
+            this.showCourses = _.filter(this.showCourses, function (course) {
+                return (course.progress == "100%" && !(course.masked));
+            });
         else if (id == "masked")
-            this.showCourses = _.filter(this.showCourses, function(cours) { return cours.masked; });
+            this.showCourses = _.filter(this.showCourses, function (course) {
+                return course.masked;
+            });
 
         return this.showCourses;
     }
 
-    orderCourses(coursesToOrder : Course[]) {
+    orderCourses(coursesToOrder: Course[]) {
         return coursesToOrder.sort(
             (a, b) => {
-                if(this.order.field == "creationDate") {
+                if (this.order.field == "creationDate") {
                     if (a.date > b.date)
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.date < b.date)
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(this.order.field == "modificationDate") {
+                } else if (this.order.field == "modificationDate") {
                     if (a.timemodified > b.timemodified)
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.timemodified < b.timemodified)
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(this.order.field == "name") {
+                } else if (this.order.field == "name") {
                     if (a.fullname.toLowerCase() < b.fullname.toLowerCase())
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return 1;
                         else
                             return -1;
                     if (a.fullname.toLowerCase() > b.fullname.toLowerCase())
-                        if(this.order.desc)
+                        if (this.order.desc)
                             return -1;
                         else
                             return 1;
-                } else if(this.order.field == "numberEnrolment") {
+                } else if (this.order.field == "numberEnrolment") {
                     if (a.usernumber < b.usernumber)
                         if (this.order.desc)
                             return 1;
@@ -410,7 +410,7 @@ export class Courses {
         );
     }
 
-    /**
+    /*
      * search with teacher name
      */
     searchCoursesToDo = (item: Course) => {
@@ -433,7 +433,7 @@ export class Courses {
             idiom.removeAccents(this.searchInput.toCome).toLowerCase()) !== -1;
     };
 
-    courseInFolderSearch (folders : Folders, currentFolder) {
+    courseInFolderSearch(folders: Folders, currentFolder) {
         let folderToSearch = folders.listOfSubfolder.find(folder => folder.id == currentFolder);
         let subfolderSearchForCourse = [];
         for (let i = 0; i < folderToSearch.subfolder.length; i++) {
@@ -451,12 +451,12 @@ export class Courses {
             if (folderToSearch.id == 0) {
                 return _.filter(coursesToPrint, function (course) {
                     return !!searching ? (course.fullname.toLowerCase().includes(searching.toLowerCase()) ||
-                        course.summary.toLowerCase().includes(searching.toLowerCase())) : course.folderid == 0;
+                        course.summary.toLowerCase().includes(searching.toLowerCase())) : course.folderId == 0;
                 });
             } else {
                 if (searching == '') {
                     return _.filter(coursesToPrint, function (course) {
-                        return (course.folderid == folderToSearch.id)
+                        return (course.folderId == folderToSearch.id)
                     });
                 } else {
                     let subfolderSearchForCourse = this.courseInFolderSearch(folders, currentFolder);
@@ -464,7 +464,7 @@ export class Courses {
                     let searchCourseToReturn = [];
                     for (let j = 0; j < subfolderSearchForCourse.length; j++) {
                         searchCourseToReturn.push(...coursesToPrint.filter(coursesToPrint =>
-                            coursesToPrint.folderid == subfolderSearchForCourse[j].id));
+                            coursesToPrint.folderId == subfolderSearchForCourse[j].id));
                     }
                     return searchCourseToReturn;
                 }
@@ -484,15 +484,15 @@ export class Courses {
         try {
             const {data} = await http.get('/moodle/choices');
             if (data.length != 0) {
-                this.lastcreation = data[0].lastcreation;
-                this.todo = data[0].todo;
-                this.tocome = data[0].tocome;
+                this.lastCreation = data[0].lastCreation;
+                this.toDo = data[0].toDo;
+                this.toCome = data[0].toCome;
                 this.coursestodosort = this.typeShow.filter(type => type.id == data[0].coursestodosort);
                 this.coursestocomesort = this.typeShow.filter(type => type.id == data[0].coursestocomesort);
             } else {
-                this.lastcreation = true;
-                this.todo = true;
-                this.tocome = true;
+                this.lastCreation = true;
+                this.toDo = true;
+                this.toCome = true;
                 this.coursestodosort = this.typeShow.filter(type => type.id == "doing");
                 this.coursestocomesort = this.typeShow.filter(type => type.id == "all");
             }
@@ -501,32 +501,32 @@ export class Courses {
         }
     }
 
-    async setChoice(view:number){
-        if (view == 1){
+    async setChoice(view: number) {
+        if (view == 1) {
             try {
-                await http.put(`/moodle/choices/lastcreation`, this.toJSON());
+                await http.put(`/moodle/choices/lastCreation`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice lastCreation function didn't work");
             }
-        }else if (view == 2){
+        } else if (view == 2) {
             try {
-                await http.put(`/moodle/choices/todo`, this.toJSON());
+                await http.put(`/moodle/choices/toDo`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice toDo function didn't work");
             }
-        }else if (view == 3){
+        } else if (view == 3) {
             try {
-                await http.put(`/moodle/choices/tocome`, this.toJSON());
+                await http.put(`/moodle/choices/toCome`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice toCome function didn't work");
             }
-        }else if (view == 4){
+        } else if (view == 4) {
             try {
                 await http.put(`/moodle/choices/coursestodosort`, this.toJSON());
             } catch (e) {
                 notify.error("Set Choice coursesToDo sorting function didn't work");
             }
-        }else if (view == 5){
+        } else if (view == 5) {
             try {
                 await http.put(`/moodle/choices/coursestocomesort`, this.toJSON());
             } catch (e) {
@@ -535,50 +535,50 @@ export class Courses {
         }
     }
 
-    toJsonForMove(targetId : number){
+    toJsonForMove(targetId: number) {
         return {
             folderId: targetId,
-            coursesId: this.allCourses.filter(course => course.select).map(course => course.courseid )
+            coursesId: this.allCourses.filter(course => course.select).map(course => course.courseid)
         }
     }
 
-    async moveToFolder(targetId : number) {
+    async moveToFolder(targetId: number) {
         try {
-            this.allCourses.filter(course => course.select).map(course => course.folderid = targetId);
+            this.allCourses.filter(course => course.select).map(course => course.folderId = targetId);
             await http.put(`/moodle/courses/move`, this.toJsonForMove(targetId));
         } catch (e) {
             throw e;
         }
     }
 
-    orderByField (fieldName) {
+    orderByField(fieldName) {
         if (fieldName === this.order.field) {
             this.order.desc = !this.order.desc;
-        }
-        else {
+        } else {
             this.order.desc = false;
             this.order.field = fieldName;
         }
     };
 
-    isOrderedAsc (field) {
+    isOrderedAsc(field) {
         return this.order.field === field && !this.order.desc;
     }
-    isOrderedDesc (field) {
+
+    isOrderedDesc(field) {
         return this.order.field === field && this.order.desc;
     }
 }
 
-export class Author{
-    entidnumber : string;
-    firstname : string;
-    lastname : string;
+export class Author {
+    entidnumber: string;
+    firstname: string;
+    lastname: string;
 
     toJson() {
         return {
-            entidnumber : this.entidnumber,
-            firstname : this.firstname,
-            lastname : this.lastname,
+            entidnumber: this.entidnumber,
+            firstname: this.firstname,
+            lastname: this.lastname,
         }
     }
 }

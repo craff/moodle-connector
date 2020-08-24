@@ -1,20 +1,15 @@
 {
+	"variables": [],
 	"info": {
 		"name": "CGIENT dev",
-		"_postman_id": "c0515ea2-2958-6017-2c52-ace67f8670fd",
+		"_postman_id": "094a3fc8-fac2-5634-b67e-26a762e4b69e",
 		"description": "CGIENT dev",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
 	},
 	"item": [
 		{
 			"name": "local_entcgi_services_createcourse",
 			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_createcourse&parameters[username]=vanguard&parameters[idnumber]=van678999&parameters[email]=gopovan@giroscop.com&parameters[firstname]=soarele&parameters[lastname]=meu&parameters[fullname]=moderation&parameters[shortname]=bnc moderator&parameters[categoryid]=1&parameters[courseidnumber]=55vang&parameters[summary]=test new course vanguard&parameters[imageurl]=https://medias.liberation.fr/photo/552903--.jpg&parameters[coursetype]=1&parameters[activity]&moodlewsrestformat=json",
 					"protocol": "https",
@@ -104,7 +99,14 @@
 							"key": "moodlewsrestformat",
 							"value": "json"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "create teacher/course"
 			},
@@ -113,9 +115,6 @@
 		{
 			"name": "local_entcgi_services_usercourses",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_usercourses&parameters[userid]=7dc5d281-f5f6-48dc-aad4-786c56a8a0f0&parameters[categoryid]=2&moodlewsrestformat=json",
 					"protocol": "https",
@@ -155,7 +154,14 @@
 							"value": "json",
 							"equals": true
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "usercourses"
 			},
@@ -164,12 +170,6 @@
 		{
 			"name": "core_course_delete_courses",
 			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=core_course_delete_courses&courseids[0]=29&courseids[1]=50&moodlewsrestformat=json",
 					"protocol": "https",
@@ -204,7 +204,14 @@
 							"key": "moodlewsrestformat",
 							"value": "json"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "create users with core web-service for multiple custom fields case"
 			},
@@ -213,12 +220,6 @@
 		{
 			"name": "local_entcgi_services_sharecourseinpool",
 			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_sharecourseinpool&parameters[idnumber]=somethingelse&parameters[course][0][originalcourseid]=6&parameters[course][0][topic]=management&parameters[course][0][courselevel]=upper level&parameters[course][1][originalcourseid]=7&parameters[course][1][topic]=topic2&parameters[course][1][courselevel]=middle management&moodlewsrestformat=json",
 					"protocol": "https",
@@ -275,7 +276,14 @@
 							"key": "moodlewsrestformat",
 							"value": "json"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "create teacher/course"
 			},
@@ -284,12 +292,6 @@
 		{
 			"name": "local_entcgi_services_listpoolcourses",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_listpoolcourses&moodlewsrestformat=json",
 					"protocol": "https",
@@ -316,7 +318,14 @@
 							"key": "moodlewsrestformat",
 							"value": "json"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "usercourses"
 			},
@@ -325,12 +334,6 @@
 		{
 			"name": "local_entcgi_services_copycourseinpool",
 			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_copycourseinpool&parameters[idnumber]=biz1234&parameters[course][0][poolcourseid]=8&parameters[course][1][poolcourseid]=10&moodlewsrestformat=json",
 					"protocol": "https",
@@ -371,7 +374,14 @@
 							"key": "moodlewsrestformat",
 							"value": "json"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "create teacher/course"
 			},
@@ -380,6 +390,7 @@
 		{
 			"name": "local_entcgi_services_shareenrolment",
 			"request": {
+				"url": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
 				"method": "POST",
 				"header": [
 					{
@@ -412,20 +423,6 @@
 						}
 					]
 				},
-				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
-					"protocol": "https",
-					"host": [
-						"moodle-dev",
-						"preprod-ent",
-						"fr"
-					],
-					"path": [
-						"webservice",
-						"rest",
-						"server.php"
-					]
-				},
 				"description": "enrol as teacher or student + groups"
 			},
 			"response": []
@@ -433,12 +430,6 @@
 		{
 			"name": "local_entcgi_services_getcourseenrolment",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_getcourseenrolment&parameters[courseid]=457&moodlewsrestformat=json",
 					"protocol": "https",
@@ -469,7 +460,14 @@
 							"key": "moodlewsrestformat",
 							"value": "json"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "usercourses"
 			},
@@ -478,6 +476,7 @@
 		{
 			"name": "local_entcgi_services_createuser",
 			"request": {
+				"url": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
 				"method": "POST",
 				"header": [
 					{
@@ -510,20 +509,6 @@
 						}
 					]
 				},
-				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
-					"protocol": "https",
-					"host": [
-						"moodle-dev",
-						"preprod-ent",
-						"fr"
-					],
-					"path": [
-						"webservice",
-						"rest",
-						"server.php"
-					]
-				},
 				"description": "enrol as teacher or student + groups"
 			},
 			"response": []
@@ -531,14 +516,8 @@
 		{
 			"name": "local_entcgi_services_duplicatecourse",
 			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_duplicatecourse&parameters[idnumber]=7a0eff20-1dc3-4cf4-9174-ece177e6b7f5&parameters[course][0][moodlecourseid]=614&parameters[course][0][ident]=9&moodlewsrestformat=json",
+					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_duplicatecourse&parameters[idnumber]=7a0eff20-1dc3-4cf4-9174-ece177e6b7f5&parameters[course][0][moodlecourseid]=614&parameters[course][0][ident]=9&moodlewsrestformat=json&parameters[auditeurid]&parameters[course][0][categoryid]=0",
 					"protocol": "https",
 					"host": [
 						"moodle-dev",
@@ -553,31 +532,60 @@
 					"query": [
 						{
 							"key": "wstoken",
-							"value": "ce7f30ccedfaaa24485629872671200a"
+							"value": "ce7f30ccedfaaa24485629872671200a",
+							"equals": true,
+							"description": ""
 						},
 						{
 							"key": "wsfunction",
-							"value": "local_entcgi_services_duplicatecourse"
+							"value": "local_entcgi_services_duplicatecourse",
+							"equals": true,
+							"description": ""
 						},
 						{
 							"key": "parameters[idnumber]",
 							"value": "7a0eff20-1dc3-4cf4-9174-ece177e6b7f5",
+							"equals": true,
 							"description": "moodle user idnumber"
 						},
 						{
 							"key": "parameters[course][0][moodlecourseid]",
 							"value": "614",
+							"equals": true,
 							"description": "moodle course id"
 						},
 						{
 							"key": "parameters[course][0][ident]",
-							"value": "9"
+							"value": "9",
+							"equals": true,
+							"description": ""
 						},
 						{
 							"key": "moodlewsrestformat",
-							"value": "json"
+							"value": "json",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "parameters[auditeurid]",
+							"value": "",
+							"equals": false,
+							"description": "auditeur user idnumber - optional"
+						},
+						{
+							"key": "parameters[course][0][categoryid]",
+							"value": "0",
+							"equals": true,
+							"description": "moodle category id - optional"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "create teacher/course"
 			},
@@ -586,9 +594,6 @@
 		{
 			"name": "local_entcgi_services_getcoursesize",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_getcoursesize&parameters[courseid]=790&moodlewsrestformat=json",
 					"protocol": "https",
@@ -623,7 +628,14 @@
 							"value": "json",
 							"equals": true
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "usercourses"
 			},
@@ -632,12 +644,6 @@
 		{
 			"name": "local_entcgi_services_userslist",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_userslist&moodlewsrestformat=json",
 					"protocol": "https",
@@ -664,7 +670,14 @@
 							"key": "moodlewsrestformat",
 							"value": "json"
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "usercourses"
 			},
@@ -673,9 +686,6 @@
 		{
 			"name": "local_entcgi_services_getcoursescategory",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
 				"url": {
 					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_getcoursescategory&parameters[categoryid]=2&moodlewsrestformat=json",
 					"protocol": "https",
@@ -710,7 +720,14 @@
 							"value": "json",
 							"equals": true
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "courses in the deleted category"
 			},
@@ -719,11 +736,8 @@
 		{
 			"name": "local_entcgi_services_movecourse",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {},
 				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_movecourse&parameters[categoryid]=3&parameters[course][0][courseid]=1203&moodlewsrestformat=json",
+					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_movecourse&parameters[categoryid]=2&parameters[courseid]=85&moodlewsrestformat=json",
 					"protocol": "https",
 					"host": [
 						"moodle-dev",
@@ -748,12 +762,12 @@
 						},
 						{
 							"key": "parameters[categoryid]",
-							"value": "3",
+							"value": "2",
 							"equals": true
 						},
 						{
-							"key": "parameters[course][0][courseid]",
-							"value": "1203",
+							"key": "parameters[courseid]",
+							"value": "85",
 							"equals": true
 						},
 						{
@@ -761,7 +775,14 @@
 							"value": "json",
 							"equals": true
 						}
-					]
+					],
+					"variable": []
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
 				},
 				"description": "move course inside delete category and mark it as hidden"
 			},
@@ -770,6 +791,7 @@
 		{
 			"name": "local_entcgi_services_deletecohortes",
 			"request": {
+				"url": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
 				"method": "POST",
 				"header": [
 					{
@@ -802,20 +824,6 @@
 						}
 					]
 				},
-				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
-					"protocol": "https",
-					"host": [
-						"moodle-dev",
-						"preprod-ent",
-						"fr"
-					],
-					"path": [
-						"webservice",
-						"rest",
-						"server.php"
-					]
-				},
 				"description": "enrol as teacher or student + groups"
 			},
 			"response": []
@@ -823,6 +831,7 @@
 		{
 			"name": "local_entcgi_services_createuser",
 			"request": {
+				"url": "http://172.31.100.5/cgi/webservice/rest/server.php",
 				"method": "POST",
 				"header": [
 					{
@@ -855,22 +864,6 @@
 						}
 					]
 				},
-				"url": {
-					"raw": "http://172.31.100.5/cgi/webservice/rest/server.php",
-					"protocol": "http",
-					"host": [
-						"172",
-						"31",
-						"100",
-						"5"
-					],
-					"path": [
-						"cgi",
-						"webservice",
-						"rest",
-						"server.php"
-					]
-				},
 				"description": "enrol as teacher or student + groups"
 			},
 			"response": []
@@ -878,6 +871,7 @@
 		{
 			"name": "local_entcgi_services_enrolluserscourses",
 			"request": {
+				"url": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
 				"method": "POST",
 				"header": [
 					{
@@ -910,20 +904,6 @@
 						}
 					]
 				},
-				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
-					"protocol": "https",
-					"host": [
-						"moodle-dev",
-						"preprod-ent",
-						"fr"
-					],
-					"path": [
-						"webservice",
-						"rest",
-						"server.php"
-					]
-				},
 				"description": "enrol as teacher or student + groups"
 			},
 			"response": []
@@ -931,6 +911,7 @@
 		{
 			"name": "local_entcgi_services_updatecohort",
 			"request": {
+				"url": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
 				"method": "POST",
 				"header": [
 					{
@@ -963,20 +944,6 @@
 						}
 					]
 				},
-				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
-					"protocol": "https",
-					"host": [
-						"moodle-dev",
-						"preprod-ent",
-						"fr"
-					],
-					"path": [
-						"webservice",
-						"rest",
-						"server.php"
-					]
-				},
 				"description": "enrol as teacher or student + groups"
 			},
 			"response": []
@@ -984,6 +951,7 @@
 		{
 			"name": "local_entcgi_services_deleteuser",
 			"request": {
+				"url": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
 				"method": "POST",
 				"header": [
 					{
@@ -996,7 +964,7 @@
 					"urlencoded": [
 						{
 							"key": "parameters",
-							"value": "[{\n\t\t\"remove\": \"hard\",\n\t\t\"id\": \"balan\"\n\t},\n\t{\n\t\t\"remove\": \"suspend\",\n\t\t\"id\": \"mircea678\"\n\t},\n\t{\n\t\t\"remove\": \"soft\",\n\t\t\"id\": \"bobo12345\"\n\t}\n]",
+							"value": "[{\n    \"remove\": true,\n    \"id\": \"meniu2345\"\n  },\n {\n        \"remove\": false,\n        \"id\": \"bobo12345\"\n  }]",
 							"type": "text"
 						},
 						{
@@ -1016,8 +984,15 @@
 						}
 					]
 				},
+				"description": "delete and soft delete users"
+			},
+			"response": []
+		},
+		{
+			"name": "local_entcgi_services_assigncategoryrole copy",
+			"request": {
 				"url": {
-					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php",
+					"raw": "https://moodle-dev.preprod-ent.fr/webservice/rest/server.php?wstoken=ce7f30ccedfaaa24485629872671200a&wsfunction=local_entcgi_services_assigncategoryrole&parameters[entuserid]=56777&parameters[moodleroleid]=1&parameters[moodlecategoryid]=1&moodlewsrestformat=json",
 					"protocol": "https",
 					"host": [
 						"moodle-dev",
@@ -1028,9 +1003,54 @@
 						"webservice",
 						"rest",
 						"server.php"
-					]
+					],
+					"query": [
+						{
+							"key": "wstoken",
+							"value": "ce7f30ccedfaaa24485629872671200a",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "wsfunction",
+							"value": "local_entcgi_services_assigncategoryrole",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "parameters[entuserid]",
+							"value": "56777",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "parameters[moodleroleid]",
+							"value": "1",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "parameters[moodlecategoryid]",
+							"value": "1",
+							"equals": true,
+							"description": ""
+						},
+						{
+							"key": "moodlewsrestformat",
+							"value": "json",
+							"equals": true,
+							"description": ""
+						}
+					],
+					"variable": []
 				},
-				"description": "delete and soft delete users"
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"description": "move course inside delete category and mark it as hidden"
 			},
 			"response": []
 		}

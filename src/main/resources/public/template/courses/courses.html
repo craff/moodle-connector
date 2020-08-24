@@ -6,9 +6,11 @@
         <div class="lds-dual-ring row center-courses"></div>
     </div>
 </div>
-<div ng-if="printMenuFolder && showCourse(course.course_type)"
+
+<!--Affiche onglet "Mes cours"-->
+<div ng-if="principal_folder == utils.PRINCIPAL_FOLDER_TYPE.my_courses && showCourse(course.course_type) && is_in_category(course)"
      class="cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin"
-     ng-class="{duplicateCourse: course.duplication != 'non', greyfilter: course.duplication !='non', duplicationFailed: course.duplication == 'echec',
+     ng-class="{duplicateCourse: course.duplication != 'non', greyFilter: course.duplication !='non', duplicationFailed: course.duplication == 'echec',
      'minimal-mine-recent-width infoBackgroundTopMargin': viewModeMyCourses == 'icons', 'all-width': viewModeMyCourses == 'list'}"
      ng-repeat="course in courses.getCourseInFolder(courses.orderCourses(courses.coursesToShow('coursesMyCourse')), currentFolderId, courses.searchInput.MyCourse, folders)">
     <courses-item course="course" place="coursesMine" check="showToaster" date-function="printRightFormatDate"
@@ -16,10 +18,24 @@
                   view="viewModeMyCourses"></courses-item>
 </div>
 
-<div ng-if="printMenuCourseShared && showCourse(course.course_type)"
+<!--Affiche onglet "Cours partagés avec moi"-->
+<div ng-if="principal_folder == utils.PRINCIPAL_FOLDER_TYPE.shared && showCourse(course.course_type)"
      class="cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin"
      ng-class="{'minimal-mine-recent-width infoBackgroundTopMargin': viewModeMyCourses == 'icons', 'all-width': viewModeMyCourses == 'list'}"
      ng-repeat="course in courses.orderCourses(courses.coursesShared)">
     <courses-item course="course" place="coursesShared" check="showToaster" date-function="printRightFormatDate"
                   author-function="printRightFormatAuthor" view="viewModeMyCourses"></courses-item>
 </div>
+
+<!--Affiche onglet "Cours publiés"-->
+<div ng-if="principal_folder == utils.PRINCIPAL_FOLDER_TYPE.published && showCourse(course.course_type) && is_in_category(course)"
+     class="cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin"
+     ng-class="{'minimal-mine-recent-width infoBackgroundTopMargin': viewModeMyCourses == 'icons', 'all-width': viewModeMyCourses == 'list'}"
+     ng-repeat="course in courses.getCourseInFolder(courses.orderCourses(courses.coursesToShow('coursesMyCourse')), currentFolderId, courses.searchInput.MyCourse, folders)">
+    <courses-item course="course" place="coursesMine" check="showToaster" date-function="printRightFormatDate"
+                  author-function="printRightFormatAuthor" view="viewModeMyCourses"></courses-item>
+</div>
+
+<!--
+    coursesMine à remplacer par coursesPublished, faire la refacto dans coursesItem.html
+-->

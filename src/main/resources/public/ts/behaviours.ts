@@ -17,7 +17,8 @@ const moodleBehaviours = {
 	workflow: {
 		createCourse: 'fr.openent.moodle.controllers.MoodleController|create',
 		delete: 'fr.openent.moodle.controllers.MoodleController|delete',
-		view: 'fr.openent.moodle.controllers.MoodleController|view'
+		view: 'fr.openent.moodle.controllers.MoodleController|view',
+		publish: 'fr.openent.moodle.controllers.MoodleController|publish'
 	}
 };
 

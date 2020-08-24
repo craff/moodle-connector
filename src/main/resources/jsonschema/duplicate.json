@@ -11,6 +11,33 @@
 		},
 		"numberOfDuplication": {
 			"type": "number"
+		},
+		"disciplines": {
+			"type": "array"
+		},
+		"levels": {
+			"type": "array"
+		},
+		"role": {
+			"type": "string"
+		},
+		"publication": {
+			"type" : "string"
+		},
+		"authors": {
+			"type": "array"
+		},
+		"description": {
+			"type": "string"
+		},
+		"title": {
+			"type": "string"
+		},
+		"urlImage": {
+			"type": "string"
+		},
+		"plain_text": {
+			"type": "array"
 		}
 	}
 }

@@ -74,7 +74,8 @@ public class DefaultPostShareProcessingService extends ControllerHelper implemen
         }
     }
 
-    public void getUsersFuture(JsonArray usersIds, Future<JsonArray> getUsersFuture) {
+    public void getUsersFuture(JsonArray usersIds, Future<JsonArray>
+            getUsersFuture) {
         moduleNeoRequestService.getUsers(usersIds, eventUsers -> {
             if (eventUsers.isRight()) {
                 getUsersFuture.complete(eventUsers.right().getValue());

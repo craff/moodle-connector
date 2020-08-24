@@ -13,13 +13,13 @@
 			"type" : "number"
 		},
 		"date": {
-			"type" : ["string","null"]
+			"type" : ["string", "null"]
 		},
 		"role": {
 			"type" : "string"
 		},
 		"imageurl": {
-			"type" : ["string","null"]
+			"type" : ["string", "null"]
 		},
 		"type": {
 			"type" : "string"
@@ -27,11 +27,10 @@
 		"typeA": {
 			"type" : "string"
 		},
-
 		"activityType": {
 			"type" : "string"
 		},
-		"folderid": {
+		"folderId": {
 			"type" : ["number", "null"]
 		},
 		"nameImgUrl": {
@@ -48,7 +47,10 @@
         },
         "users": {
           "type" : ["number", "null"]
-        }
+        },
+		"BP": {
+			"type" : "boolean"
+		}
 	},
 	"required": [
 		"fullname"

@@ -1,0 +1,67 @@
+    <div class="twelve cell horizontal-spacing">
+        <h2 class="row twelve">
+            <i18n>moodle.lightBox.publish.title</i18n>
+        </h2>
+        <p>
+            <i18n>moodle.lightBox.publish.content</i18n> [[courseToPublish.fullname]]
+        </p>
+    </div>
+    <br>
+    <div class=" ">
+        <div class="row">
+            <multi-combo title="[[lang.translate('levels')]]" class="ten cell" combo-model="levels.all" search-on="label" order-by="label" filtered-model="courseToPublish.levels"></multi-combo>
+            <div class="twelve cell select-blocks">
+                <div ng-repeat="level in courseToPublish.levels"
+                     ng-click="removeLevelFromCourse(level)"
+                     class="labels-in-ligne">
+                    <div > [[ level.label]] </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <multi-combo title="[[lang.translate('disciplines')]]" class="ten cell" combo-model="disciplines.all" search-on="label"  order-by="label" filtered-model="courseToPublish.disciplines"></multi-combo>
+            <div class="twelve cell select-blocks">
+                <div ng-repeat="discipline in courseToPublish.disciplines"
+                     ng-click="removeDisciplineFromCourse(discipline)"
+                     class="labels-in-ligne">
+                    <div> [[ discipline.label]] </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <label >
+                <i18n>keyword</i18n>
+            </label>
+            <input class="row" type="text" ng-model="courseToPublish._plain_text" ng-keyup="addKeyWord($event)"  i18n-placeholder="moodle.key.words.separation" >
+            <div class=" twelve cell select-blocks">
+                <div ng-repeat="word in courseToPublish.plain_text"
+                     ng-click="removeWordFromCourse(word)"
+                     class="labels-in-ligne">
+                    <div > [[word]] </div>
+                </div>
+            </div>
+        </div>
+        <div class="horizontal-spacing row seven vertical-spacing specific-border-lightbox">
+            <p>
+                <i18n>moodle.lightBox.publish.information</i18n>
+            </p>
+        </div>
+        <div>
+            <label class="checkbox" >
+                <input type="checkbox" checked ng-model="courseToPublish.acceptationLicence" class="checkbox"/>
+                &nbsp;&nbsp;
+                <span>
+                    <i18n>
+                        moodle.lightBox.publish.condition.acceptation
+                    </i18n>
+                </span>
+            </label>
+        </div>
+    </div>
+    <div class="row">
+        <div class="right-magnet">
+            <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
+            <input type="submit" class="button" i18n-value="validate"
+                   ng-disabled="courseToPublish.acceptationLicence === undefined" ng-click="publishCourse()"/>
+        </div>
+    </div>

@@ -26,7 +26,11 @@
         "idStudent": ${idStudent},
         "idEditingTeacher": ${idEditingTeacher},
         "idAuditeur": ${idAuditeur},
+        "idGuest": ${idGuest},
         "header": "${header}",
-        "deleteCategoryId": ${deleteCategoryId}
+        "deleteCategoryId": ${deleteCategoryId},
+        "publicBankCategoryId": ${publicBankCategoryId},
+        "mainCategoryId": ${mainCategoryId},
+        "userMail" : "${userMail}"
       }
     }

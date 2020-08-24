@@ -3,13 +3,13 @@
 	"type": "object",
 	"additionalProperties": false,
 	"properties": {
-		"lastcreation": {
+		"lastCreation": {
 			"type" : ["boolean"]
 		},
-		"todo": {
+		"toDo": {
 			"type" : ["boolean"]
 		},
-		"tocome": {
+		"toCome": {
 			"type" : ["boolean"]
 		},
 		"coursestodosort": {
@@ -23,6 +23,9 @@
 		},
 		"folderId": {
 			"type" : "number"
+		},
+		"categoryType": {
+			"type" : "boolean"
 		}
 	}
 }

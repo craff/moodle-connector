@@ -1,23 +1,29 @@
 <section class="toggle-buttons" ng-if="toasterShow">
     <div class="toggle">
         <div class="row">
-            <button class="cell" ng-show="showShareButton()" ng-click="openShareLightBox()"
+            <button ng-click="openSharePopUp()" class="cell" ng-show="nbCoursesSelect === 1 && nbFoldersSelect === 0 && categoryBoolean == true"
                     workflow="moodle.createCourse">
                 <i18n>moodle.toaster.registration</i18n>
             </button>
-            <button  ng-click="" class="cell" ng-disabled="true">
-                <i18n>moodle.toaster.publish</i18n>
+            <button ng-click="openPublishLightBox()" class="cell" ng-show="ableToPublish() && nbFoldersSelect === 0 && categoryBoolean == true"
+                    ng-if="nbFoldersSelect === 0" workflow="moodle.publish">
+                <i18n>moodle.publish</i18n>
             </button>
-            <button ng-show="nbFoldersSelect === 1 && nbCoursesSelect === 0" ng-click="openPopUpFolderRename()"
-                    class="cell">
+            <button ng-click="openPopUpFolderRename()" ng-show="nbFoldersSelect === 1 && nbCoursesSelect === 0 && categoryBoolean == true"
+                    class="cell" workflow="moodle.createCourse">
                 <i18n>moodle.toaster.rename</i18n>
             </button>
-            <button ng-click="openPopUpDuplicate()" class="cell" ng-show="nbFoldersSelect === 0"
+            <button ng-click="openPopUpDuplicate()" class="cell" ng-show="nbFoldersSelect === 0 && categoryBoolean == true"
                     workflow="moodle.createCourse" ng-if="sharedCourse == false">
                 <i18n>moodle.toaster.duplicate</i18n>
             </button>
-            <button ng-click="openPopUpMove()" class="cell" ng-if="sharedCourse == false">
+            <button ng-click="openPopUpMove()" class="cell" ng-show="categoryBoolean == true" ng-if="sharedCourse == false"
+                    workflow="moodle.createCourse">
                 <i18n>moodle.toaster.move</i18n>
+            </button>
+            <button ng-click="openPopUpMetadataChange()" class="cell" ng-if="sharedCourse == false && nbCoursesSelect === 1 && categoryBoolean == false"
+                    ng-show="nbFoldersSelect === 0" workflow="moodle.publish">
+                <i18n>modify</i18n>
             </button>
             <button ng-click="openPopUpDelete()" class="cell" workflow="moodle.createCourse"
                     ng-if="sharedCourse == false">

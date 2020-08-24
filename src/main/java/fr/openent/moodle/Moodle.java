@@ -1,6 +1,7 @@
 package fr.openent.moodle;
 
 import fr.openent.moodle.controllers.MoodleController;
+import fr.openent.moodle.controllers.PublishedCourseController;
 import fr.openent.moodle.controllers.SynchController;
 import fr.openent.moodle.cron.synchDuplicationMoodle;
 import io.vertx.core.eventbus.EventBus;
@@ -47,9 +48,14 @@ public class Moodle extends BaseServer {
 	public static String FINISHED = "finis";
 	public static String ERROR = "echec";
 
+	public static String MEDIACENTRE_CREATE = "fr.openent.mediacentre.source.Moodle|create";
+	public static String MEDIACENTRE_DELETE = "fr.openent.mediacentre.source.Moodle|delete";
+	public static String MEDIACENTRE_UPDATE = "fr.openent.mediacentre.source.Moodle|update";
+
+
 	public static String moodleSchema;
     public static JsonObject moodleConfig;
-    @Override
+	@Override
 	public void start() throws Exception {
 		super.start();
 
@@ -69,6 +75,7 @@ public class Moodle extends BaseServer {
 		courseConf.setShareTable("course_shares");
 
 		MoodleController moodleController = new MoodleController(storage, eb);
+        PublishedCourseController publishedCourseController = new PublishedCourseController(storage);
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
 		SynchController synchController = new SynchController(storage, eb, vertx, config);
@@ -84,5 +91,6 @@ public class Moodle extends BaseServer {
 
 		addController(moodleController);
 		addController(synchController);
+		addController(publishedCourseController);
 	}
 }

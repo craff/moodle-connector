@@ -1,11 +1,11 @@
 <div class="coursesBackground-dashboard">
     <div class="row">
         <span class="left-magnet title-dashboard">
-            <i18n>moodle.todo.courses</i18n>
+            <i18n>moodle.to.do.courses</i18n>
         </span>
-        <switch ng-model="courses.todo" ng-click="courses.setChoice(2)"></switch>
+        <switch ng-model="courses.toDo" ng-click="courses.setChoice(2)"></switch>
     </div>
-    <div ng-if="courses.todo">
+    <div ng-if="courses.toDo">
         <div class="row list-dashboard">
             <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestodosort[0]"
                     ng-options="option.name for option in courses.typeShow track by option.id"
@@ -93,11 +93,11 @@
     <br/>
     <div class="row">
         <span class="left-magnet title-dashboard">
-            <i18n>moodle.tocome.courses</i18n>
+            <i18n>moodle.to.come.courses</i18n>
         </span>
-        <switch ng-model="courses.tocome" ng-click="courses.setChoice(3)"></switch>
+        <switch ng-model="courses.toCome" ng-click="courses.setChoice(3)"></switch>
     </div>
-    <div ng-if="courses.tocome">
+    <div ng-if="courses.toCome">
         <div class="row  list-dashboard">
             <select class="cell left-magnet special-selected zero-mobile" ng-model="courses.coursestocomesort[0]"
                     ng-options="option.name for option in courses.typeShow.slice(0, 1).concat(courses.typeShow.slice(2, 3)).concat(courses.typeShow.slice(4, 5)) track by option.id"
@@ -181,9 +181,9 @@
             <span class="left-magnet title-dashboard">
                 <i18n>moodle.create.courses.recent</i18n>
             </span>
-            <switch ng-model="courses.lastcreation" ng-click="courses.setChoice(1)"></switch>
+            <switch ng-model="courses.lastCreation" ng-click="courses.setChoice(1)"></switch>
         </div>
-        <div ng-if="courses.lastcreation" class="row center-courses">
+        <div ng-if="courses.lastCreation" class="row center-courses">
             <div ng-show="displayMessageLoader">
                 <div>
                     <div class="row">
@@ -192,7 +192,7 @@
                     <div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.lastCreation()" class="all-width cell twelve-mobile style-bord-with-over-effect infoBackground bottom-margin">
+            <div ng-repeat="course in courses.getLastCreation()" class="all-width cell twelve-mobile style-bord-with-over-effect infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
             </div>
         </div>

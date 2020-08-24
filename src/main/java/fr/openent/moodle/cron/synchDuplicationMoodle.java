@@ -18,14 +18,11 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
     @Override
     public void handle(Long event) {
         log.debug("Moodle cron started");
-        moodleController.synchronisationDuplication(new Handler<Either<String, JsonObject>>() {
-            @Override
-            public void handle(Either<String, JsonObject> event) {
-                if(event.isRight())
-                    log.debug("Cron launch successful");
-                else
-                    log.debug("Cron synchonisation not full");
-            }
+        moodleController.synchronisationDuplication(event1 -> {
+            if(event1.isRight())
+                log.debug("Cron launch successful");
+            else
+                log.debug("Cron synchonisation not full");
         });
     }
 }

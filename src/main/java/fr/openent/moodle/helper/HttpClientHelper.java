@@ -7,7 +7,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.ProxyOptions;
@@ -30,10 +29,10 @@ public class HttpClientHelper extends ControllerHelper {
      * Create default HttpClient
      * @return new HttpClient
      */
-    public static HttpClient createHttpClient(Vertx vertx, JsonObject config) {
+    public static HttpClient createHttpClient(Vertx vertx) {
         boolean setSsl = true;
         try {
-            setSsl = "https".equals(new URI(config.getString("address_moodle")).getScheme());
+            setSsl = "https".equals(new URI(moodleConfig.getString("address_moodle")).getScheme());
         } catch (URISyntaxException e) {
             log.error("Invalid moodle uri",e);
         }
@@ -49,15 +48,18 @@ public class HttpClientHelper extends ControllerHelper {
                     .setPassword(System.getProperty("httpclient.proxyPassword"));
             options.setProxyOptions(proxyOptions);
         }
-        int maxPoolSize = config.getInteger("http-client-max-pool-size", 0);
+        int maxPoolSize = moodleConfig.getInteger("http-client-max-pool-size", 0);
         if(maxPoolSize > 0) {
             options.setMaxPoolSize(maxPoolSize);
         }
         return vertx.createHttpClient(options);
     }
 
-    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, HttpClient httpClient,
-                                            AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler, boolean closeHttpClient) {
+    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, Vertx vertx, Handler<Either<String, Buffer>> handler) {
+
+        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+
         URI url;
         try {
             url = new URI(moodleUrl);
@@ -72,20 +74,16 @@ public class HttpClientHelper extends ControllerHelper {
                 response.handler(buff::appendBuffer);
                 response.endHandler(end -> {
                     handler.handle(new Either.Right<>(buff));
-                    if (closeHttpClient) {
-                        if (!responseIsSent.getAndSet(true)) {
-                            httpClient.close();
-                        }
+                    if (!responseIsSent.getAndSet(true)) {
+                        httpClient.close();
                     }
                 });
             } else {
-                log.error("fail to post webservice" + response.statusMessage());
+                log.error("Fail to post webservice" + response.statusMessage());
                 response.bodyHandler(event -> {
                     log.error("Returning body after POST CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                    if (closeHttpClient) {
-                        if (!responseIsSent.getAndSet(true)) {
-                            httpClient.close();
-                        }
+                    if (!responseIsSent.getAndSet(true)) {
+                        httpClient.close();
                     }
                 });
             }
@@ -101,8 +99,8 @@ public class HttpClientHelper extends ControllerHelper {
             } else if (parameters instanceof JsonArray) {
                 encodedParameters = ((JsonArray) parameters).encode();
             } else {
-                log.error("unknow parameters format");
-                handler.handle(new Either.Left<>("unknow parameters format"));
+                log.error("unknown parameters format");
+                handler.handle(new Either.Left<>("unknown parameters format"));
                 return;
             }
 
@@ -125,45 +123,5 @@ public class HttpClientHelper extends ControllerHelper {
                 }
             }
         }).setFollowRedirects(true).end();
-    }
-
-    //TODO Finir le helper de WS Get
-    public void webServiceMoodleGet (String moodleUrl, Buffer wsResponse, HttpClient httpClient, AtomicBoolean responseIsSent, Handler<Either<String, Buffer>> handler) {
-
-        final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, new Handler<HttpClientResponse>() {
-            @Override
-            public void handle(HttpClientResponse response) {
-                if (response.statusCode() == 200) {
-                    response.handler(wsResponse::appendBuffer);
-                    response.endHandler(end -> {
-                        handler.handle(new Either.Right<>(wsResponse));
-                        if (!responseIsSent.getAndSet(true)) {
-                            httpClient.close();
-                        }
-                    });
-                } else {
-                    log.error("fail to call create course webservice" + response.statusMessage());
-                    response.bodyHandler(event -> {
-                        log.error("Returning body after PT CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
-                        if (!responseIsSent.getAndSet(true)) {
-                            httpClient.close();
-                        }
-                    });
-                    handle(response);
-                }
-            }
-        });
-        httpClientRequest.headers().set("Content-Length", "0");
-        //Typically an unresolved Address, a timeout about connection or response
-        httpClientRequest.exceptionHandler(new Handler<Throwable>() {
-            @Override
-            public void handle(Throwable event) {
-                log.error(event.getMessage(), event);
-                if (!responseIsSent.getAndSet(true)) {
-                    handle(event);
-                    httpClient.close();
-                }
-            }
-        }).end();
     }
 }

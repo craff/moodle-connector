@@ -18,7 +18,7 @@ export let coursesItem = ng.directive("coursesItem", function () {
             first: '='
         },
         templateUrl: `/${appPrefix}/public/template/directives/coursesItem.html`,
-        controller: ['$scope', '$element', function ($scope, $element) {
+        controller: ['$scope', function ($scope) {
             $scope.printDate = (item, number) => {
                 return $scope.dateFunction(item, number);
             };

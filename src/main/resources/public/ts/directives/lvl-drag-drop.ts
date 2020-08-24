@@ -65,8 +65,6 @@ export const lvlDropTarget = ng.directive('lvlDropTarget', ['$rootScope', 'uuidD
                     e.stopPropagation(); // Necessary. Allows us to drop.
                 }
                 var data = e.originalEvent.dataTransfer.getData("text");
-                var dest = document.getElementById(id);
-                var src = document.getElementById(data);
 
                 scope.onDrop({dragEl: data, dropEl: id});
             });

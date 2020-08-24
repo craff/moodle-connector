@@ -174,14 +174,64 @@ public interface moduleSQLRequestService {
      * get courseid to duplicate
      * @param status state of the course to duplicate
      * @param id sql id of the course to duplicate
-     * @param numberOfTentatives in order to increment the number of duplication when the processus failed
+     * @param attemptsNumber in order to increment the number of duplication when the processus failed
      * @param handler function handler returning data
      */
-    void updateStatusCourseToDuplicate (String status, Integer id, Integer numberOfTentatives, Handler<Either<String, JsonObject>> handler);
+    void updateStatusCourseToDuplicate (String status, Integer id, Integer attemptsNumber, Handler<Either<String, JsonObject>> handler);
 
     /**
      * Delete finished duplication
      * @param handler function handler returning data
      */
     void deleteFinishedCoursesDuplicate (Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Insert published course metadata
+     * @param courseToPublish publish course to insert
+     * @param handler function handler returning data
+     */
+    void insertPublishedCourseMetadata (JsonObject courseToPublish, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Update publication table with the new course id
+     * @param createCourseDuplicate JsonObject with the course id to put in publication table
+     * @param handler function handler returning data
+     */
+    void updatePublishedCourseId (JsonObject createCourseDuplicate, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Update metadata publication table with the new course id
+     * @param course_id Integer of the course id to change
+     * @param newMetadata JsonObject with the new metadata label
+     * @param handler function handler returning data
+     */
+    void updatePublicCourseMetadata(Integer course_id, JsonObject newMetadata, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Update course publication table with the new course id
+     * @param newCourse JsonObject with the new course infos
+     * @param handler function handler returning data
+     */
+    void updatePublicCourse( JsonObject newCourse, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Delete published course
+     * @param idsToDelete JsonArray with course id to delete
+     * @param handler function handler returning data
+     */
+    void deletePublicCourse(JsonArray idsToDelete, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Get duplication id to update publication table
+     * @param publicationId JsonArray publication foreign key in duplication table
+     * @param handler function handler returning data
+     */
+    void getDuplicationId(JsonArray publicationId, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Delete published course
+     * @param id JsonArray with the id of the course to get data from
+     * @param handler function handler returning data
+     */
+    void getPublicCourseData(JsonArray id, Handler<Either<String, JsonObject>> handler);
 }

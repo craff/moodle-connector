@@ -2,6 +2,7 @@ package fr.openent.moodle.service;
 
 import io.vertx.core.Handler;
 import fr.wseduc.webutils.Either;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
@@ -37,4 +38,36 @@ public interface moodleEventBus {
      */
 
     void getZimbraEmail(final JsonArray zimbraEmail, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Update resources in Mediacentre
+     * @param updateCourse JsonArray with the id to publish
+     * @param handler function handler returning data
+     */
+
+    void updateInMediacentre(JsonObject updateCourse, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Create resources in Mediacentre
+     * @param id JsonArray with the id to publish
+     * @param handler function handler returning data
+     */
+
+    void publishInMediacentre(JsonArray id, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Delete resources in Mediacentre
+     * @param deleteEvent Resource JsonObject with the id to delete
+     * @param handler function handler returning data
+     */
+
+    void deleteResourceInMediacentre(JsonObject deleteEvent, final Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * Modify metadata resources in Mediacentre
+     * @param updateMetadata Resource JsonObject with the id to modify
+     * @param handler function handler returning data
+     */
+
+    void updateResourceInMediacentre(JsonObject updateMetadata, final Handler<Either<String, JsonObject>> handler);
 }

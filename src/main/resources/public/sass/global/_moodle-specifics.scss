@@ -172,7 +172,7 @@ body.moodle {
     background: #555;
   }
 
-  .greyfilter{
+  .greyFilter{
     filter: grayscale(100%);
   }
 
@@ -679,6 +679,12 @@ body.moodle {
   div.tipbox.up.relative{
     position : static;
   }
+  div.labels-in-ligne{
+    div::after {
+      top: 4px !important;
+    }
+  }
+
 }
 
 //TEMP FIX

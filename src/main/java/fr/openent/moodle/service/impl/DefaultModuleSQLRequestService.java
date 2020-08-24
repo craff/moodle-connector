@@ -6,6 +6,7 @@ import fr.openent.moodle.service.moduleNeoRequestService;
 import fr.openent.moodle.service.moduleSQLRequestService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -14,6 +15,8 @@ import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.sql.Sql;
 import org.entcore.common.sql.SqlResult;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +41,7 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
         Object parentId = folder.getValue("parentId");
         values.add(folder.getValue("userId"));
         values.add(folder.getValue("name"));
-        String createFolder = "";
+        String createFolder;
         if (!parentId.equals(0)) {
             values.add(folder.getValue("parentId"));
             createFolder = "INSERT INTO " + Moodle.moodleSchema + ".folder(user_id, name, parent_id)" +
@@ -93,39 +96,36 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
 
     @Override
     public void createCourse(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
-        String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id,  user_id)" +
-                " VALUES (?,  ?) RETURNING moodle_id as id;";
+        String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".course(moodle_id, user_id)" +
+                " VALUES (?, ?) RETURNING moodle_id as id;";
 
         JsonArray values = new JsonArray();
         values.add(course.getValue("moodleid"));
         values.add(course.getString("userid"));
 
-        sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(new Handler<Either<String, JsonObject>>() {
-            @Override
-            public void handle(Either<String, JsonObject> event) {
-                if (event.isRight()) {
-                    if (!course.getValue("folderid").equals(0)) {
-                        createRelCourseFolder(course.getValue("moodleid"), course.getValue("folderid"), handler);
-                    } else {
-                        handler.handle(new Either.Right<>(course));
-                    }
-
+        sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(event -> {
+            if (event.isRight()) {
+                if (!course.getValue("folderId").equals(0)) {
+                    createRelCourseFolder(course.getValue("moodleid"), course.getValue("folderId"), handler);
                 } else {
-                    log.error("Error when inserting new courses before inserting rel_course_folders elems ");
+                    handler.handle(new Either.Right<>(course));
                 }
 
+            } else {
+                log.error("Error when inserting new courses before inserting rel_course_folders elements ");
             }
+
         }));
 
     }
 
-    private void createRelCourseFolder(Object moodleid, Object folderid, Handler<Either<String, JsonObject>> handler) {
-        String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".rel_course_folder(course_id,  folder_id)" +
+    private void createRelCourseFolder(Object moodleid, Object folderId, Handler<Either<String, JsonObject>> handler) {
+        String createCourse = "INSERT INTO " + Moodle.moodleSchema + ".rel_course_folder(course_id, folder_id)" +
                 " VALUES (?, ?) RETURNING course_id as id;";
 
         JsonArray values = new JsonArray();
         values.add(moodleid);
-        values.add(folderid);
+        values.add(folderId);
 
         sql.prepared(createCourse, values, SqlResult.validUniqueResultHandler(handler));
     }
@@ -143,7 +143,7 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
         String query = "INSERT INTO " + Moodle.moodleSchema + ".preferences (moodle_id, user_id, masked, favorites)" +
                 " VALUES (?, ?, ?, ?) ON CONFLICT (moodle_id, user_id) DO UPDATE SET masked =" + course.getBoolean("masked") +
                 ", favorites =" + course.getBoolean("favorites") + " ; " +
-                "DELETE FROM " + Moodle.moodleSchema + ".preferences WHERE masked=false AND favorites=false;";
+                "DELETE FROM " + Moodle.moodleSchema + ".preferences WHERE masked = false AND favorites = false;";
 
         JsonArray values = new JsonArray();
         values.add(course.getInteger("courseid"));
@@ -231,8 +231,7 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
         for (int i = 0; i < courses.size(); i++) {
             values.add(courses.getValue(i));
         }
-        String deleteCourse = "" +
-                "DELETE FROM " + Moodle.moodleSchema + ".course " +
+        String deleteCourse = "DELETE FROM " + Moodle.moodleSchema + ".course " +
                 "WHERE moodle_id IN " + Sql.listPrepared(courses.getList());
 
         sql.prepared(deleteCourse, values, SqlResult.validUniqueResultHandler(handler));
@@ -264,12 +263,18 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     @Override
     public void getCoursesByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler) {
         String query = "SELECT moodle_id,CASE WHEN folder_id IS NULL THEN 0 else folder_id end " +
+                ", null as discipline_label, null as level_label, null as key_word, null as fullname, null as imageurl, " +
+                "null as summary, null as author, null as author_id, null as user_id, null as username, null as license " +
                 "FROM " + Moodle.moodleSchema + ".course " +
-                "LEFT JOIN " + moodleSchema + ".rel_course_folder" +
-                " ON course.moodle_id = rel_course_folder.course_id " +
-                "WHERE course.user_id = ?;";
+                "LEFT JOIN " + moodleSchema + ".rel_course_folder " +
+                "ON course.moodle_id = rel_course_folder.course_id " +
+                "WHERE course.user_id = ? AND NOT EXISTS (SELECT course_id FROM " + Moodle.moodleSchema + ".publication WHERE course_id = moodle_id) " +
+                "UNION SELECT course_id as moodle_id, 0 as folder_id, discipline_label, level_label, key_words, fullname, " +
+                "imageurl, summary, author, author_id, user_id, username, license " +
+                "FROM " + Moodle.moodleSchema + ".publication WHERE publication.user_id = ? AND course_id is not null;";
 
         JsonArray values = new JsonArray();
+        values.add(userId);
         values.add(userId);
         sql.prepared(query, values, SqlResult.validResultHandler(eitherHandler));
     }
@@ -289,13 +294,14 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     public void setChoice(final JsonObject courses, String view, Handler<Either<String, JsonObject>> handler) {
         String query = "INSERT INTO " + Moodle.moodleSchema + ".choices (user_id, lastcreation, todo, tocome, coursestodosort, coursestocomesort)" +
                 " VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (user_id) DO UPDATE SET " + view + "='" + courses.getValue(view) + "'; " +
-                "DELETE FROM " + Moodle.moodleSchema + ".choices WHERE lastcreation=true AND todo=true AND tocome=true AND coursestodosort='doing' AND coursestocomesort='all';";
+                "DELETE FROM " + Moodle.moodleSchema + ".choices WHERE lastcreation = true AND todo = true AND tocome = true " +
+                "AND coursestodosort = 'doing' AND coursestocomesort = 'all';";
 
         JsonArray values = new JsonArray();
         values.add(courses.getString("userId"));
-        values.add(courses.getBoolean("lastcreation"));
-        values.add(courses.getBoolean("todo"));
-        values.add(courses.getBoolean("tocome"));
+        values.add(courses.getBoolean("lastCreation"));
+        values.add(courses.getBoolean("toDo"));
+        values.add(courses.getBoolean("toCome"));
         values.add(courses.getString("coursestodosort"));
         values.add(courses.getString("coursestocomesort"));
 
@@ -341,21 +347,35 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
 
     @Override
     public void insertDuplicateTable (JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler) {
-        String query = "INSERT INTO " + Moodle.moodleSchema + ".duplication (id_course, id_folder, id_users, status)" +
-                " VALUES (?, ?, ?, ?);";
-
         JsonArray values = new JsonArray();
-        values.add(courseToDuplicate.getInteger("courseid"));
-        values.add(courseToDuplicate.getInteger("folderid"));
-        values.add(courseToDuplicate.getString("userId"));
-        values.add(courseToDuplicate.getString("status"));
+        String query = "INSERT INTO " + Moodle.moodleSchema + ".duplication (id_course, id_folder, id_users, status, category_id";
+
+        if (courseToDuplicate.getInteger("publishFK") != null) {
+            query += ", auditeur, publishFK) VALUES (?, ?, ?, ?, ?, ?, ?);";
+            values.add(courseToDuplicate.getInteger("courseid"))
+                    .add(courseToDuplicate.getInteger("folderId"))
+                    .add(courseToDuplicate.getString("userId"))
+                    .add(courseToDuplicate.getString("status"))
+                    .add(courseToDuplicate.getInteger("category_id"))
+                    .add(courseToDuplicate.getString("auditeur_id"))
+                    .add(courseToDuplicate.getInteger("publishFK"));
+
+        } else {
+            query += ") VALUES (?, ?, ?, ?, ?);";
+            values.add(courseToDuplicate.getInteger("courseid"))
+                    .add(courseToDuplicate.getInteger("folderId"))
+                    .add(courseToDuplicate.getString("userId"))
+                    .add(courseToDuplicate.getString("status"))
+                    .add(courseToDuplicate.getInteger("category_id"));
+        }
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
     public void getCourseIdToDuplicate (String status, Handler<Either<String, JsonArray>> handler){
-        String query = "SELECT id, id_course, id_users, id_folder, nombre_tentatives FROM " + Moodle.moodleSchema + ".duplication WHERE status = ?";
+        String query = "SELECT id, id_course, id_users, id_folder, nombre_tentatives, category_id, auditeur FROM " + Moodle.moodleSchema +
+                ".duplication WHERE status = ?";
 
         if(status.equals(WAITING))
             query+= " LIMIT 1";
@@ -379,15 +399,15 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     }
 
     @Override
-    public void updateStatusCourseToDuplicate (String status, Integer id, Integer numberOfTentatives, Handler<Either<String, JsonObject>> handler){
+    public void updateStatusCourseToDuplicate (String status, Integer id, Integer attemptsNumber, Handler<Either<String, JsonObject>> handler){
         JsonArray values = new JsonArray();
         String query = "UPDATE " + Moodle.moodleSchema + ".duplication SET ";
         if(status.equals(WAITING)){
-            if(numberOfTentatives.equals(moodleConfig.getInteger("numberOfMaxDuplicationTentatives")))
+            if(attemptsNumber.equals(moodleConfig.getInteger("numberOfMaxDuplicationTentatives")))
                 status=ERROR;
             query += "nombre_tentatives = ?, ";
 
-            values.add(numberOfTentatives + 1);
+            values.add(attemptsNumber + 1);
         }
 
         query += "status = ? WHERE id = ?";
@@ -395,16 +415,126 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
         values.add(status);
         values.add(id);
 
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void deleteFinishedCoursesDuplicate (Handler<Either<String, JsonObject>> handler){
+        String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status = '" + FINISHED + "' ;"+
+                "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status != '" + WAITING + "' AND status != '" + ERROR + "' AND now()-date > interval '"+
+                moodleConfig.getString("timeDuplicationBeforeDelete")+"';";
+
+        sql.raw(query, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void insertPublishedCourseMetadata (JsonObject courseToPublish, Handler<Either<String, JsonObject>> handler){
+        JsonArray values = new JsonArray();
+
+        SimpleDateFormat formater;
+        Date now = new Date();
+        formater = new SimpleDateFormat("_yyyy-MM-dd");
+        courseToPublish.put("title", courseToPublish.getString("title") + formater.format(now));
+
+        JsonArray levelArray = new JsonArray();
+        for (int i = 0; i < courseToPublish.getJsonArray("levels").size(); i++) {
+            levelArray.add((courseToPublish.getJsonArray("levels").getJsonObject(i).getString("label")));
+        }
+
+        JsonArray disciplineArray = new JsonArray();
+        for (int i = 0; i < courseToPublish.getJsonArray("disciplines").size(); i++) {
+            disciplineArray.add((courseToPublish.getJsonArray("disciplines").getJsonObject(i).getString("label")));
+        }
+
+        JsonArray plainTextArray = courseToPublish.getJsonArray("plain_text");
+
+        String test = "";
+        if (disciplineArray.isEmpty())
+            disciplineArray.add(test);
+        if (levelArray.isEmpty())
+            levelArray.add(test);
+        if (plainTextArray.isEmpty())
+            plainTextArray.add(test);
+
+        String query = "INSERT INTO " + Moodle.moodleSchema + ".publication (discipline_label, level_label, key_words, " +
+                "fullname, imageurl, summary, author, author_id, user_id, username, license) " +
+                "VALUES (" + Sql.arrayPrepared(disciplineArray) + " ," + Sql.arrayPrepared(levelArray) +
+                ", " + Sql.arrayPrepared(plainTextArray) + ", ?, ?, ?, ?, ?, ?, ?, ?) RETURNING publication.id AS id;";
+
+        values.addAll(disciplineArray)
+                .addAll(levelArray)
+                .addAll(plainTextArray)
+                .add(courseToPublish.getString("title"))
+                .add(courseToPublish.getString("urlImage"))
+                .add(courseToPublish.getString("description"))
+                .add(courseToPublish.getString("author"))
+                .add(courseToPublish.getString("author_id"))
+                .add(courseToPublish.getString("userid"))
+                .add(courseToPublish.getString("username"))
+                .add(true);
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
-    public void deleteFinishedCoursesDuplicate ( Handler<Either<String, JsonObject>> handler){
-        String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status = '"+FINISHED+"' ;"+
-                "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status != '"+WAITING+"' AND status != '"+ERROR+"' AND now()-date > interval '"+
-                moodleConfig.getString("timeDuplicationBeforeDelete")+"' ;";
+    public void updatePublishedCourseId (JsonObject createCourseDuplicate, Handler<Either<String, JsonObject>> handler) {
+        String query = "UPDATE " + Moodle.moodleSchema + ".publication SET course_id = ? WHERE id = ?";
 
-        sql.raw(query, SqlResult.validUniqueResultHandler(handler));
+        JsonArray values = new JsonArray();
+        values.add(createCourseDuplicate.getInteger("moodleid"));
+        values.add(createCourseDuplicate.getInteger("duplicationFK"));
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void updatePublicCourseMetadata(Integer course_id, JsonObject newMetadata, Handler<Either<String, JsonObject>> handler) {
+        String query = "UPDATE " + Moodle.moodleSchema + ".publication SET discipline_label = ?, level_label = ? " +
+                "WHERE course_id = ?";
+
+        JsonArray values = new JsonArray();
+        values.add(newMetadata.getJsonArray("discipline_label"));
+        values.add(newMetadata.getJsonArray("level_label"));
+        values.add(course_id);
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void updatePublicCourse(JsonObject newCourse, Handler<Either<String, JsonObject>> handler) {
+        String query = "UPDATE " + Moodle.moodleSchema + ".publication SET fullname = ?, imageurl = ?, summary = ? " +
+                "WHERE course_id = ?";
+
+        JsonArray values = new JsonArray();
+        values.add(newCourse.getString("fullname"));
+        values.add(newCourse.getString("imageurl"));
+        values.add(newCourse.getString("summary"));
+        values.add(newCourse.getInteger("courseid"));
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void deletePublicCourse(JsonArray idsToDelete, Handler<Either<String, JsonObject>> handler) {
+        String deleteCourse = "DELETE FROM " + Moodle.moodleSchema + ".publication " +
+                "WHERE course_id IN " + Sql.listPrepared(idsToDelete.getList());
+
+        sql.prepared(deleteCourse, idsToDelete, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void getDuplicationId(JsonArray publicationId, Handler<Either<String, JsonObject>> handler) {
+        String getId = "SELECT publishfk FROM " + Moodle.moodleSchema + ".duplication " +
+        "WHERE id = ?";
+
+        sql.prepared(getId, publicationId, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void getPublicCourseData(JsonArray id, final Handler<Either<String, JsonObject>> handler) {
+        String selectCourse = "SELECT * FROM " + Moodle.moodleSchema + ".publication " +
+                "WHERE course_id = ?";
+
+        sql.prepared(selectCourse, id, SqlResult.validUniqueResultHandler(handler));
     }
 }
