@@ -76,6 +76,12 @@
               'all-width cell' : viewModeToDo == 'list'}">
                 <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course)"></courses-item>
             </div>
+            <div class="twelve courses-empty vertical-spacing" ng-if="courses.coursesToShow('coursesToDo').length == 0 && !displayMessageLoader">
+                <img src="moodle/public/img/moodle_inscriptions.svg"/>
+                <div class="horizontal-margin-four">
+                    <i18n>moodle.empty.ToDo.courses</i18n>
+                </div>
+            </div>
         </div>
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
@@ -161,6 +167,12 @@
                  ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell infoBackgroundTopMargin' : viewModeToCome == 'icons'}">
                 <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
             </div>
+            <div class="twelve courses-empty vertical-spacing" ng-if="courses.coursesToShow('coursesToCome').length == 0 && !displayMessageLoader">
+                <img src="moodle/public/img/moodle_coursavenir.svg"/>
+                <div class="horizontal-margin-four">
+                    <i18n>moodle.empty.toCome.courses</i18n>
+                </div>
+            </div>
         </div>
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
@@ -194,6 +206,12 @@
             </div>
             <div ng-repeat="course in courses.getLastCreation()" class="all-width cell twelve-mobile style-bord-with-over-effect infoBackground bottom-margin">
                 <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
+            </div>
+            <div class="twelve courses-empty vertical-spacing" ng-if="courses.getLastCreation().length == 0 && !displayMessageLoader">
+                <img src="moodle/public/img/moodle_creation.svg"/>
+                <div class="horizontal-margin-four">
+                    <i18n>moodle.empty.create.courses</i18n>
+                </div>
             </div>
         </div>
     </div>

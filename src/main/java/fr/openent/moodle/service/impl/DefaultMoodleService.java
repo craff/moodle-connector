@@ -80,14 +80,6 @@ public class DefaultMoodleService implements moodleService {
             JsonObject shareObjectToFill = new JsonObject();
             shareObjectToFill.put("courseid", courseId);
             shareObjectToFill.put("users", getUsersEvent.right().getValue());
-            for (Object userObject : getUsersEvent.right().getValue()) {
-                JsonObject userJson = ((JsonObject) userObject);
-                if (userJson.getString("id").equals(usersId.getString(0))) {
-                    userJson.put("role", moodleConfig.getInteger("idAuditeur"));
-                } else {
-                    userJson.put("role", moodleConfig.getInteger("idGuest"));
-                }
-            }
 
             JsonObject shareSend = new JsonObject();
 
@@ -99,8 +91,7 @@ public class DefaultMoodleService implements moodleService {
             URI moodleUri = null;
             try {
                 final String service = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
-                final String urlSeparator = service.endsWith("") ? "" : "/";
-                moodleUri = new URI(service + urlSeparator);
+                moodleUri = new URI(service);
             } catch (URISyntaxException e) {
                 log.error("Invalid moodle web service sending right share uri", e);
             }
