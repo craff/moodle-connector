@@ -78,7 +78,7 @@ public class Moodle extends BaseServer {
         PublishedCourseController publishedCourseController = new PublishedCourseController(storage);
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
-		SynchController synchController = new SynchController(storage, eb, vertx, config);
+		SynchController synchController = new SynchController(eb, vertx);
 
 
 		try {

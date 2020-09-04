@@ -482,19 +482,22 @@ export class Courses {
 
     async getChoice() {
         try {
-            const {data} = await http.get('/moodle/choices');
-            if (data.length != 0) {
-                this.lastCreation = data[0].lastCreation;
-                this.toDo = data[0].toDo;
-                this.toCome = data[0].toCome;
-                this.coursestodosort = this.typeShow.filter(type => type.id == data[0].coursestodosort);
-                this.coursestocomesort = this.typeShow.filter(type => type.id == data[0].coursestocomesort);
-            } else {
-                this.lastCreation = true;
-                this.toDo = true;
-                this.toCome = true;
-                this.coursestodosort = this.typeShow.filter(type => type.id == "doing");
-                this.coursestocomesort = this.typeShow.filter(type => type.id == "all");
+            if(this.lastCreation == undefined || this.toDo == undefined || this.toCome == undefined ||
+                this.coursestodosort == undefined || this.coursestocomesort == undefined) {
+                const {data} = await http.get('/moodle/choices');
+                if (data.length != 0) {
+                    this.lastCreation = data[0].lastcreation;
+                    this.toDo = data[0].todo;
+                    this.toCome = data[0].tocome;
+                    this.coursestodosort = this.typeShow.filter(type => type.id == data[0].coursestodosort);
+                    this.coursestocomesort = this.typeShow.filter(type => type.id == data[0].coursestocomesort);
+                } else {
+                    this.lastCreation = true;
+                    this.toDo = true;
+                    this.toCome = true;
+                    this.coursestodosort = this.typeShow.filter(type => type.id == "doing");
+                    this.coursestocomesort = this.typeShow.filter(type => type.id == "all");
+                }
             }
         } catch (e) {
             notify.error("Get Choice function didn't work");

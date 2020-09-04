@@ -3,7 +3,7 @@
         <span class="left-magnet title-dashboard">
             <i18n>moodle.to.do.courses</i18n>
         </span>
-        <switch ng-model="courses.toDo" ng-click="courses.setChoice(2)"></switch>
+        <switch ng-model="courses.toDo" ng-change="courses.setChoice(2)"></switch>
     </div>
     <div ng-if="courses.toDo">
         <div class="row list-dashboard">
@@ -101,7 +101,7 @@
         <span class="left-magnet title-dashboard">
             <i18n>moodle.to.come.courses</i18n>
         </span>
-        <switch ng-model="courses.toCome" ng-click="courses.setChoice(3)"></switch>
+        <switch ng-model="courses.toCome" ng-change="courses.setChoice(3)"></switch>
     </div>
     <div ng-if="courses.toCome">
         <div class="row  list-dashboard">
@@ -193,7 +193,7 @@
             <span class="left-magnet title-dashboard">
                 <i18n>moodle.create.courses.recent</i18n>
             </span>
-            <switch ng-model="courses.lastCreation" ng-click="courses.setChoice(1)"></switch>
+            <switch ng-model="courses.lastCreation" ng-change="courses.setChoice(1)"></switch>
         </div>
         <div ng-if="courses.lastCreation" class="row center-courses">
             <div ng-show="displayMessageLoader">

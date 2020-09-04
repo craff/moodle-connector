@@ -32,7 +32,6 @@ import static fr.openent.moodle.Moodle.*;
 public class DefaultSynchService {
 
     protected static final Logger log = LoggerFactory.getLogger(DefaultSynchService.class);
-    private JsonObject config;
     private final Vertx vertx;
     protected EventBus eb;
     private final Neo4j neo4j = Neo4j.getInstance();
@@ -44,7 +43,7 @@ public class DefaultSynchService {
 
     private HttpClient httpClient;
 
-    private String baseWsMoodleUrl;
+    private final String baseWsMoodleUrl;
 
     private Map<String, JsonObject> mapUsersMoodle;
     private Map<String, JsonObject> mapUsersFound;
@@ -56,17 +55,16 @@ public class DefaultSynchService {
 
     public String acceptLanguage = "fr";
 
-    public DefaultSynchService(EventBus eb, JsonObject config, Vertx vertx) {
+    public DefaultSynchService(EventBus eb, Vertx vertx) {
         this.eb = eb;
-        this.config = config;
         this.vertx = vertx;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
         this.moodleEventBus = new DefaultMoodleEventBus(eb);
-        baseWsMoodleUrl = baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
+        baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
     }
 
-    public void initSyncUsers() {
+    private void initSyncUsers() {
         mapUsersMoodle = new HashMap<>();
         mapUsersFound = new HashMap<>();
         arrUsersToDelete = new JsonArray();
@@ -77,7 +75,7 @@ public class DefaultSynchService {
     }
 
 
-    public void putUsersInMap(Scanner scUsers) {
+    private void putUsersInMap(Scanner scUsers) {
         while (scUsers.hasNextLine()) {
             String userLine = scUsers.nextLine();
             log.info(userLine);
@@ -93,7 +91,6 @@ public class DefaultSynchService {
                 mapUsersMoodle.put(values[2], jsonUser);
             } catch (Throwable t) {
                 log.warn("Error reading user : " + userLine);
-                continue;
             }
 
         }
@@ -325,7 +322,7 @@ public class DefaultSynchService {
 
 
             if(syncCase.equals(SyncCase.SYNC_USER_FOUND)) {
-                if (jsonArrayCourses != null && !jsonArrayCourses.isEmpty()) {
+                if (!jsonArrayCourses.isEmpty()) {
                     for (Object cours : jsonArrayCourses) {
                         JsonObject jsonCours = ((JsonObject) cours);
 
@@ -347,7 +344,7 @@ public class DefaultSynchService {
                 }
             } else if(syncCase.equals(SyncCase.SYNC_USER_NOT_FOUND)) {
 
-                if (jsonArrayCourses != null && !jsonArrayCourses.isEmpty()) {
+                if (!jsonArrayCourses.isEmpty()) {
                     for (Object cours : jsonArrayCourses) {
                         JsonObject jsonCours = ((JsonObject) cours);
 
@@ -376,7 +373,7 @@ public class DefaultSynchService {
                 }
 
             } else if(syncCase.equals(SyncCase.SYNC_GROUP)) {
-                if (jsonArrayCourses != null && !jsonArrayCourses.isEmpty()) {
+                if (!jsonArrayCourses.isEmpty()) {
                     for (Object cours : jsonArrayCourses) {
                         JsonObject jsonCours = ((JsonObject) cours);
                         // Inscription en tant qu'apprenant individuel au cours :
@@ -455,9 +452,7 @@ public class DefaultSynchService {
         //Typically an unresolved Address, a timeout about connection or response
         httpClientRequest.exceptionHandler(event -> {
             log.error(event.getMessage(), event);
-            if (!responseIsSent.getAndSet(true)) {
-                //renderError(request);
-            }
+            responseIsSent.getAndSet(true);//renderError(request);
         }).end();
 
     }
@@ -470,19 +465,17 @@ public class DefaultSynchService {
     }
 
 
-    public void getUsers(Object[] idUsers, Handler<Either<String, JsonArray>> handler){
+    private void getUsers(Object[] idUsers, Handler<Either<String, JsonArray>> handler){
 
-        StringBuilder query = new StringBuilder();
-
-        String RETURNING = " RETURN  u.id as id, u.firstName as firstName, u.lastName as lastName, u.deleteDate as deleteDate ORDER BY lastName, firstName ";
-
-        query.append(" MATCH (u:User) WHERE u.id IN {idUsers} ")
-                .append(RETURNING);
+        String RETURNING = " RETURN  u.id as id, u.firstName as firstName, u.lastName as lastName, " +
+                "u.deleteDate as deleteDate ORDER BY lastName, firstName ";
 
         JsonObject params = new JsonObject();
         params.put("idUsers", new fr.wseduc.webutils.collections.JsonArray(Arrays.asList(idUsers)));
 
-        neo4j.execute(query.toString(),params, Neo4jResult.validResultHandler(handler));
+        String query = " MATCH (u:User) WHERE u.id IN {idUsers} " +
+                RETURNING;
+        neo4j.execute(query,params, Neo4jResult.validResultHandler(handler));
 
     }
 
@@ -495,7 +488,6 @@ public class DefaultSynchService {
                 .put("wstoken", moodleConfig.getString("wsToken"))
                 .put("wsfunction", WS_POST_UPDATE_COHORTS)
                 .put("moodlewsrestformat", JSON);
-        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerCohort);
     }
 
@@ -506,7 +498,6 @@ public class DefaultSynchService {
                 .put("wstoken", moodleConfig.getString("wsToken"))
                 .put("wsfunction", WS_POST_DELETE_COHORTS)
                 .put("moodlewsrestformat", JSON);
-        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerCohort);
     }
 
@@ -518,7 +509,7 @@ public class DefaultSynchService {
     private JsonArray arrCohortsToDelete;
     private JsonArray arrCohortsToUpdate;
 
-    public void initSyncGroups() {
+    private void initSyncGroups() {
         mapCohortsMoodle = new HashMap<>();
         mapCohortsFound = new HashMap<>();
         mapCohortsNotFound = new HashMap<>();
@@ -536,7 +527,7 @@ public class DefaultSynchService {
     }
 
 
-    public void putCohortsInMap(JsonArray jsonArrayCohorts) {
+    private void putCohortsInMap(JsonArray jsonArrayCohorts) {
         for (Object objChorts : jsonArrayCohorts) {
             JsonObject jsonCohort = ((JsonObject)objChorts);
             log.info(jsonCohort);
@@ -552,7 +543,6 @@ public class DefaultSynchService {
                 mapCohortsMoodle.put(idCohort, jsonCohort);
             } catch (Throwable t) {
                 log.warn("Error reading cohort : " + jsonCohort, t);
-                continue;
             }
 
         }
@@ -687,7 +677,7 @@ public class DefaultSynchService {
                         // identification des nouveaux utilisateurs dans la cohorte
                         for (Object objUserNeo : arrUsersNeo) {
                             JsonObject jsonUserNeo = ((JsonObject) objUserNeo);
-                            boolean exist = arrUsersMoodle.stream().filter(u -> u.equals(jsonUserNeo.getString("id"))).count() > 0;
+                            boolean exist = arrUsersMoodle.stream().anyMatch(u -> u.equals(jsonUserNeo.getString("id")));
                             if (!exist) {
                                 moodleEventBus.getZimbraEmail(new JsonArray().add(jsonUserNeo.getString("id")), res -> {
                                     if (res.isLeft()) {
@@ -715,7 +705,7 @@ public class DefaultSynchService {
                         //de l'algo
                         for (Object objUserMoodle : arrUsersMoodle) {
                             String idUserMoodle = ((String) objUserMoodle);
-                            boolean exist = arrUsersNeo.stream().filter(u -> ((JsonObject) u).getString("id").equals(idUserMoodle)).count() > 0;
+                            boolean exist = arrUsersNeo.stream().anyMatch(u -> ((JsonObject) u).getString("id").equals(idUserMoodle));
                             if (!exist) {
                                 if (jsonCohorteWithUpdate[0] == null) {
                                     jsonCohorteWithUpdate[0] = new JsonObject();
@@ -777,9 +767,8 @@ public class DefaultSynchService {
 
 
         List lstGroupIds = Arrays.asList(mapCohortsMoodle.keySet().toArray());
-        lstGroupIds = (List) lstGroupIds.stream().map(o -> {
-            return ((String) o).replace("SB", "").replace("GR_", "");
-        }).collect(Collectors.toList());
+        lstGroupIds = (List) lstGroupIds.stream().map(
+                o -> ((String) o).replace("SB", "").replace("GR_", "")).collect(Collectors.toList());
 
         JsonArray groupsIds = new JsonArray(lstGroupIds);
         moduleNeoRequestService.getGroups(groupsIds, getGroupsHandler);
@@ -848,7 +837,7 @@ public class DefaultSynchService {
         } else {
 
             // Recupération des cours de tous ces utilisateurs
-            List<Future> listGetFuture = new ArrayList<Future>();
+            List<Future> listGetFuture = new ArrayList<>();
             for (Object idUser: usersIdsToEnrrollIndivually) {
                 Future getCoursesFuture = Future.future();
                 listGetFuture.add(getCoursesFuture);

@@ -299,11 +299,11 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
 
         JsonArray values = new JsonArray();
         values.add(courses.getString("userId"));
-        values.add(courses.getBoolean("lastCreation"));
-        values.add(courses.getBoolean("toDo"));
-        values.add(courses.getBoolean("toCome"));
-        values.add(courses.getString("coursestodosort"));
-        values.add(courses.getString("coursestocomesort"));
+        values.add(courses.getBoolean("lastCreation",true));
+        values.add(courses.getBoolean("toDo",true));
+        values.add(courses.getBoolean("toCome",true));
+        values.add(courses.getString("coursestodosort","all"));
+        values.add(courses.getString("coursestocomesort","doing"));
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
