@@ -112,7 +112,8 @@ public class MoodleController extends ControllerHelper {
             workflow_rename = "moodle.rename",
             workflow_duplicate = "moodle.duplicate",
             workflow_publish = "moodle.publish",
-            workflow_accessPublicCourse = "moodle.accessPublicCourse";
+            workflow_accessPublicCourse = "moodle.accessPublicCourse",
+            workflow_view = "moodle.view";
 
     /**
      * Displays the home view.
@@ -120,7 +121,7 @@ public class MoodleController extends ControllerHelper {
      * @param request Client request
      */
     @Get("")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @SecuredAction(workflow_view)
     public void view(HttpServerRequest request) {
         renderView(request);
         eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
