@@ -103,7 +103,7 @@ public class MoodleController extends ControllerHelper {
             resource_contrib = "moodle.contrib",
             resource_manager = "moodle.manager",
 
-            workflow_createCourse = "moodle.createCourse",
+    workflow_createCourse = "moodle.createCourse",
             workflow_deleteCourse = "moodle.deleteCourse",
             workflow_moveCourse = "moodle.moveCourse",
             workflow_createFolder = "moodle.createFolder",
@@ -389,6 +389,9 @@ public class MoodleController extends ControllerHelper {
                             String idFolder = SQLCourse.getValue("folder_id").toString();
                             course.put("folderId", Integer.parseInt(idFolder));
                             if(!isNull(SQLCourse.getString("fullname"))){
+                                course.put("levels", SQLCourse.getJsonArray("levels"));
+                                course.put("disciplines", SQLCourse.getJsonArray("disciplines"));
+                                course.put("plain_text", SQLCourse.getJsonArray("plain_text"));
                                 if(!SQLCourse.getString("fullname").equals(course.getString("fullname")) ||
                                         !SQLCourse.getString("imageurl").equals(course.getString("imageurl")) ||
                                         !SQLCourse.getString("summary").equals(course.getString("summary")) ){
@@ -1457,10 +1460,16 @@ public class MoodleController extends ControllerHelper {
                 newMetadata.put("level_label", new JsonArray().add(updateMetadata.getJsonArray("levels").getJsonObject(0).getString("label")));
             else
                 newMetadata.put("level_label", new JsonArray());
+
             if (updateMetadata.getJsonArray("disciplines").size() != 0)
                 newMetadata.put("discipline_label", new JsonArray().add(updateMetadata.getJsonArray("disciplines").getJsonObject(0).getString("label")));
             else
                 newMetadata.put("discipline_label", new JsonArray());
+
+            if (updateMetadata.getJsonArray("plain_text").size() != 0)
+                newMetadata.put("key_words", new JsonArray().add(updateMetadata.getJsonArray("plain_text")));
+            else
+                newMetadata.put("key_words", new JsonArray());
             callMediacentreEventBusToUpdateMetadata(updateMetadata, ebEvent -> {
                 if (ebEvent.isRight()) {
                     moduleSQLRequestService.updatePublicCourseMetadata(course_id, newMetadata, event -> {

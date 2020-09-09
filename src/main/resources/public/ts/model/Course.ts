@@ -38,6 +38,9 @@ export class Course implements Shareable {
     };
     duplication: string;
     usernumber: number;
+    disciplines : Array<string>;
+    levels : Array<string>;
+    plain_text: Array<string> = [];
 
     constructor() {
         this.type = "1";

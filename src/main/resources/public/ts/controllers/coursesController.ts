@@ -815,7 +815,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     /**
      * duplicate elements
      */
-    let isStartDuplicationCheck: Boolean, numberCoursesPending: Number;
+    let isStartDuplicationCheck: boolean, numberCoursesPending: number;
     $scope.openPopUpDuplicate = (): void => {
         $scope.courses.allCourses = $scope.courses.allCourses.map((course: Course): Course => {
             course.selectConfirm = course.select;
@@ -846,6 +846,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             if (coursesChecked.length !== numberCoursesPending && numberCoursesPending)
                 await $scope.initCoursesByUser();
             numberCoursesPending = coursesChecked.length;
+            await $scope.initCoursesByUser();
             $timeout((): void =>
                     $scope.updateCourse()
                 , TIME_TO_REFRESH_DUPLICATION);
@@ -948,8 +949,11 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.toasterShow = false;
         await $scope.courseToPublish.publish()
             .then(async (): Promise<void> => {
-                notify.success('moodle.info.publishTextConfirmSuccess');
                 await $scope.initFolders();
+                if (!isStartDuplicationCheck)
+                    await $scope.updateCourse();
+                await $scope.initCoursesByUser();
+                notify.success('moodle.info.publishTextConfirmSuccess');
             });
     };
 

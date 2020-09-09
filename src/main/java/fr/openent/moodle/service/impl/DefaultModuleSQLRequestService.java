@@ -263,13 +263,13 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     @Override
     public void getCoursesByUserInEnt(String userId, Handler<Either<String, JsonArray>> eitherHandler) {
         String query = "SELECT moodle_id,CASE WHEN folder_id IS NULL THEN 0 else folder_id end " +
-                ", null as discipline_label, null as level_label, null as key_word, null as fullname, null as imageurl, " +
+                ", null as disciplines, null as levels, null as plain_text, null as fullname, null as imageurl, " +
                 "null as summary, null as author, null as author_id, null as user_id, null as username, null as license " +
                 "FROM " + Moodle.moodleSchema + ".course " +
                 "LEFT JOIN " + moodleSchema + ".rel_course_folder " +
                 "ON course.moodle_id = rel_course_folder.course_id " +
                 "WHERE course.user_id = ? AND NOT EXISTS (SELECT course_id FROM " + Moodle.moodleSchema + ".publication WHERE course_id = moodle_id) " +
-                "UNION SELECT course_id as moodle_id, 0 as folder_id, discipline_label, level_label, key_words, fullname, " +
+                "UNION SELECT course_id as moodle_id, 0 as folder_id, discipline_label as disciplines, level_label as levels, key_words as plain_text, fullname, " +
                 "imageurl, summary, author, author_id, user_id, username, license " +
                 "FROM " + Moodle.moodleSchema + ".publication WHERE publication.user_id = ? AND course_id is not null;";
 
