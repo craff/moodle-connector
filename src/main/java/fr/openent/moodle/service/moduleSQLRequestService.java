@@ -168,7 +168,14 @@ public interface moduleSQLRequestService {
      * @param userId user id
      * @param handler function handler returning data
      */
-    void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> handler);
+    void getUserCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * get a course to duplicate
+     * @param ident sql id of the course to duplicate
+     * @param handler function handler returning data
+     */
+    void getCourseToDuplicate (Integer ident, final Handler<Either<String, JsonObject>> handler);
 
     /**
      * get courseid to duplicate

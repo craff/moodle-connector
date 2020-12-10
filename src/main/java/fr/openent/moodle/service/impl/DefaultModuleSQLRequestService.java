@@ -389,13 +389,23 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     }
 
     @Override
-    public void getCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> handler){
+    public void getUserCourseToDuplicate (String userId, final Handler<Either<String, JsonArray>> handler){
         String query = "SELECT * FROM " + Moodle.moodleSchema + ".duplication WHERE id_users = ? ;";
 
         JsonArray values = new JsonArray();
         values.add(userId);
 
         sql.prepared(query, values, SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void getCourseToDuplicate (Integer ident, final Handler<Either<String, JsonObject>> handler){
+        String query = "SELECT * FROM " + Moodle.moodleSchema + ".duplication WHERE id = ? ;";
+
+        JsonArray values = new JsonArray();
+        values.add(ident);
+
+        sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
@@ -420,9 +430,9 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
 
     @Override
     public void deleteFinishedCoursesDuplicate (Handler<Either<String, JsonObject>> handler){
-        String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status = '" + FINISHED + "' ;"+
-                "DELETE FROM " + Moodle.moodleSchema + ".duplication WHERE status != '" + WAITING + "' AND status != '" + ERROR + "' AND now()-date > interval '"+
-                moodleConfig.getString("timeDuplicationBeforeDelete")+"';";
+        String query = "DELETE FROM " + Moodle.moodleSchema + ".duplication " +
+                "WHERE status = '" + FINISHED + "' "+
+                "OR (status != '" + ERROR + "' AND now()-date > interval '" + moodleConfig.getString("timeDuplicationBeforeDelete") + "');";
 
         sql.raw(query, SqlResult.validUniqueResultHandler(handler));
     }

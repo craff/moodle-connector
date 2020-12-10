@@ -846,7 +846,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             if (coursesChecked.length !== numberCoursesPending && numberCoursesPending)
                 await $scope.initCoursesByUser();
             numberCoursesPending = coursesChecked.length;
-            await $scope.initCoursesByUser();
             $timeout((): void =>
                     $scope.updateCourse()
                 , TIME_TO_REFRESH_DUPLICATION);
@@ -952,7 +951,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                 await $scope.initFolders();
                 if (!isStartDuplicationCheck)
                     await $scope.updateCourse();
-                await $scope.initCoursesByUser();
                 notify.success('moodle.info.publishTextConfirmSuccess');
             });
     };

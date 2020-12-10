@@ -201,20 +201,21 @@ public class DefaultMoodleEventBus extends ControllerHelper implements moodleEve
     public void updateResourceInMediacentre (JsonObject updateMetadata, final Handler<Either<String, JsonObject>> handler) {
         JsonObject query = new JsonObject();
 
-        if (updateMetadata.getJsonArray("levels").size() != 0)
-            query.put("doc", new JsonObject().put("levels", new JsonArray().add(updateMetadata.getJsonArray("levels").getJsonObject(0).getString("label"))));
-        else
-            query.put("doc", new JsonObject().put("levels", new JsonArray()));
+        JsonArray levelArray = new JsonArray();
+        for (int i = 0; i < updateMetadata.getJsonArray("levels").size(); i++) {
+            levelArray.add((updateMetadata.getJsonArray("levels").getJsonObject(i).getString("label")));
+        }
+        query.put("doc", new JsonObject().put("levels", levelArray));
 
-        if (updateMetadata.getJsonArray("disciplines").size() != 0)
-            query.getJsonObject("doc").put("disciplines", new JsonArray().add(updateMetadata.getJsonArray("disciplines").getJsonObject(0).getString("label")));
-        else
-            query.getJsonObject("doc").put("disciplines", new JsonArray());
 
-        if (updateMetadata.getJsonArray("plain_text").size() != 0)
-            query.getJsonObject("doc").put("plain_text", updateMetadata.getJsonArray("plain_text"));
-        else
-            query.getJsonObject("doc").put("plain_text", new JsonArray());
+        JsonArray disciplineArray = new JsonArray();
+        for (int i = 0; i < updateMetadata.getJsonArray("disciplines").size(); i++) {
+            disciplineArray.add((updateMetadata.getJsonArray("disciplines").getJsonObject(i).getString("label")));
+        }
+        query.getJsonObject("doc").put("disciplines", disciplineArray);
+
+        JsonArray plainTextArray = updateMetadata.getJsonArray("plain_text");
+        query.getJsonObject("doc").put("plain_text", plainTextArray);
 
         JsonObject resources = new JsonObject();
         resources.put("query", query)

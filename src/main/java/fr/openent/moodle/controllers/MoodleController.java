@@ -428,7 +428,7 @@ public class MoodleController extends ControllerHelper {
                     }
                     List<String> courseId = courses.stream().map(obj ->
                             (((JsonObject) obj).getValue("courseid")).toString()).collect(Collectors.toList());
-                    moduleSQLRequestService.getCourseToDuplicate(idUser,
+                    moduleSQLRequestService.getUserCourseToDuplicate(idUser,
                             getDuplicateCoursesHandler(request, idUser, responseMoodle, courses, courseId));
                     if (!responseIsSent.getAndSet(true))
                         httpClient.close();
@@ -455,8 +455,13 @@ public class MoodleController extends ControllerHelper {
                 for (int i = 0; i < coursesInDuplication.size(); i++) {
                     JsonObject courseDuplicate = coursesInDuplication.getJsonObject(i);
                     int indexCourseDuplication = courseId.indexOf(courseDuplicate.getValue("id_course").toString());
-                    JsonObject course = courses.getJsonObject(indexCourseDuplication);
-                    courses.add(createCourseForSend(course, courseDuplicate));
+                    if (indexCourseDuplication >= 0) {
+                        JsonObject course = courses.getJsonObject(indexCourseDuplication);
+                        courses.add(createCourseForSend(course, courseDuplicate));
+                    }
+                    else {
+                        log.error("Fail to find course to duplicate : " + courseDuplicate.toString());
+                    }
                 }
             }
             moduleSQLRequestService.getPreferences(idUser, getCoursePreferencesHandler(request, responseMoodle, courses));
@@ -1212,7 +1217,7 @@ public class MoodleController extends ControllerHelper {
             if (user != null) {
                 moduleSQLRequestService.deleteFinishedCoursesDuplicate(event -> {
                     if (event.isRight()) {
-                        moduleSQLRequestService.getCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
+                        moduleSQLRequestService.getUserCourseToDuplicate(user.getUserId(), arrayResponseHandler(request));
                     } else {
                         log.error("Problem to delete finished duplicate courses !");
                         renderError(request);
@@ -1337,115 +1342,116 @@ public class MoodleController extends ControllerHelper {
                             log.info("A duplication is already in progress");
                             break;
                         case "error":
-                            moduleSQLRequestService.getCourseToDuplicate(duplicateResponse.getString("userid"), duplicateEvent -> {
+                            moduleSQLRequestService.getCourseToDuplicate(Integer.parseInt(duplicateResponse.getString("ident")), duplicateEvent -> {
                                 if (duplicateEvent.isRight()) {
-                                    if (duplicateEvent.right().getValue().getInteger(6) == 3) {
-                                        moduleSQLRequestService.deleteFinishedCoursesDuplicate(deleteEvent -> {
-                                            if (deleteEvent.isRight()) {
-                                                request.response()
-                                                        .setStatusCode(200)
-                                                        .end();
-                                            } else {
-                                                log.error("Problem to delete the duplicate course in database !");
-                                                unauthorized(request);
-                                            }
-                                        });
-                                    } else if (duplicateEvent.right().getValue().getInteger(6) < 3) {
-                                        log.error("Duplication web-service failed !");
-                                        final String status = WAITING;
-                                        Integer id = duplicateResponse.getInteger("id");
-                                        Integer nbrTentatives = duplicateResponse.getInteger("attemptsNumber");
-                                        moduleSQLRequestService.updateStatusCourseToDuplicate(status, id, nbrTentatives, updateEvent -> {
-                                            if (updateEvent.isRight()) {
-                                                log.error("Duplication web-service failed");
-                                            } else {
-                                                log.error("Failed to access database");
-                                            }
+                                    Integer nbAttempts = duplicateEvent.right().getValue().getInteger("nombre_tentatives");
+                                    final String status = WAITING;
+                                    Integer id = duplicateResponse.getInteger("ident");
+                                    moduleSQLRequestService.updateStatusCourseToDuplicate(status, id, nbAttempts, updateEvent -> {
+                                        if (updateEvent.isRight()) {
+                                            request.response()
+                                                    .setStatusCode(200)
+                                                    .end();
+                                            log.error("Duplication web-service failed");
+                                        } else {
+                                            log.error("Failed to update database updateStatusCourseToDuplicate");
                                             unauthorized(request);
-                                        });
-                                    }
+                                        }
+                                    });
+                                } else {
+                                    log.error("Failed to access database getCourseToDuplicate");
+                                    unauthorized(request);
                                 }
                             });
                             break;
                         default:
                             log.error("Failed to read the Moodle response");
+                            unauthorized(request);
                     }
-                }));
+                })
+        );
     }
 
     public void synchronisationDuplication(final Handler<Either<String, JsonObject>> eitherHandler) {
         String status = PENDING;
-        moduleSQLRequestService.getCourseIdToDuplicate(status, event -> {
-            if (event.isRight()) {
-                if (event.right().getValue().size() < moodleConfig.getInteger("numberOfMaxPendingDuplication")) {
-                    String status1 = WAITING;
-                    moduleSQLRequestService.getCourseIdToDuplicate(status1, getCourseEvent -> {
-                        if (getCourseEvent.isRight()) {
-                            if (getCourseEvent.right().getValue().size() != 0) {
-                                JsonObject courseDuplicate = getCourseEvent.right().getValue().getJsonObject(0);
-                                JsonObject courseToDuplicate = new JsonObject();
-                                courseToDuplicate.put("courseid", courseDuplicate.getInteger("id_course"))
-                                        .put("userid", courseDuplicate.getString("id_users"))
-                                        .put("folderId", courseDuplicate.getInteger("id_folder"))
-                                        .put("id", courseDuplicate.getInteger("id"))
-                                        .put("attemptsNumber", courseDuplicate.getInteger("nombre_tentatives"))
-                                        .put("category_id", courseDuplicate.getInteger("category_id"))
-                                        .put("auditeur_id", courseDuplicate.getString("auditeur"));
+        moduleSQLRequestService.deleteFinishedCoursesDuplicate(deleteEvent -> {
+            if (deleteEvent.isRight()) {
+                moduleSQLRequestService.getCourseIdToDuplicate(status, event -> {
+                    if (event.isRight()) {
+                        if (event.right().getValue().size() < moodleConfig.getInteger("numberOfMaxPendingDuplication")) {
+                            String status1 = WAITING;
+                            moduleSQLRequestService.getCourseIdToDuplicate(status1, getCourseEvent -> {
+                                if (getCourseEvent.isRight()) {
+                                    if (getCourseEvent.right().getValue().size() != 0) {
+                                        JsonObject courseDuplicate = getCourseEvent.right().getValue().getJsonObject(0);
+                                        JsonObject courseToDuplicate = new JsonObject();
+                                        courseToDuplicate.put("courseid", courseDuplicate.getInteger("id_course"))
+                                                .put("userid", courseDuplicate.getString("id_users"))
+                                                .put("folderId", courseDuplicate.getInteger("id_folder"))
+                                                .put("id", courseDuplicate.getInteger("id"))
+                                                .put("attemptsNumber", courseDuplicate.getInteger("nombre_tentatives"))
+                                                .put("category_id", courseDuplicate.getInteger("category_id"))
+                                                .put("auditeur_id", courseDuplicate.getString("auditeur"));
 
-                                URI moodleUri = null;
-                                try {
-                                    final String service = moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path");
-                                    moodleUri = new URI(service);
-                                } catch (URISyntaxException e) {
-                                    log.error("Invalid moodle web service sending demand of duplication uri", e);
-                                }
-                                if (moodleUri != null) {
-                                    String moodleUrl;
-                                    if (courseToDuplicate.getInteger("category_id").equals(moodleConfig.getInteger("publicBankCategoryId"))) {
-                                        moodleUrl = moodleUri.toString() +
-                                                "?wstoken=" + moodleConfig.getString("wsToken") +
-                                                "&wsfunction=" + WS_POST_DUPLICATECOURSE +
-                                                "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
-                                                "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
-                                                "&parameters[course][0][ident]=" + courseToDuplicate.getInteger("id") +
-                                                "&moodlewsrestformat=" + JSON +
-                                                "&parameters[auditeurid]=" + courseToDuplicate.getString("auditeur_id") +
-                                                "&parameters[course][0][categoryid]=" + courseToDuplicate.getInteger("category_id");
-                                    } else {
-                                        moodleUrl = moodleUri.toString() +
-                                                "?wstoken=" + moodleConfig.getString("wsToken") +
-                                                "&wsfunction=" + WS_POST_DUPLICATECOURSE +
-                                                "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
-                                                "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
-                                                "&parameters[course][0][ident]=" + courseToDuplicate.getInteger("id") +
-                                                "&moodlewsrestformat=" + JSON +
-                                                "&parameters[auditeurid]=" + "" +
-                                                "&parameters[course][0][categoryid]=" + courseToDuplicate.getInteger("category_id");
-                                    }
-                                    HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, postEvent -> {
-                                        if (postEvent.isRight()) {
-                                            log.info("Duplication success");
-                                            eitherHandler.handle(new Either.Right<>(postEvent.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
-                                        } else {
-                                            log.error("Failed to contact Moodle");
-                                            eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
+                                        URI moodleUri = null;
+                                        try {
+                                            final String service = moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path");
+                                            moodleUri = new URI(service);
+                                        } catch (URISyntaxException e) {
+                                            log.error("Invalid moodle web service sending demand of duplication uri", e);
                                         }
-                                    });
+                                        if (moodleUri != null) {
+                                            String moodleUrl;
+                                            if (courseToDuplicate.getInteger("category_id").equals(moodleConfig.getInteger("publicBankCategoryId"))) {
+                                                moodleUrl = moodleUri.toString() +
+                                                        "?wstoken=" + moodleConfig.getString("wsToken") +
+                                                        "&wsfunction=" + WS_POST_DUPLICATECOURSE +
+                                                        "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
+                                                        "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
+                                                        "&parameters[course][0][ident]=" + courseToDuplicate.getInteger("id") +
+                                                        "&moodlewsrestformat=" + JSON +
+                                                        "&parameters[auditeurid]=" + courseToDuplicate.getString("auditeur_id") +
+                                                        "&parameters[course][0][categoryid]=" + courseToDuplicate.getInteger("category_id");
+                                            } else {
+                                                moodleUrl = moodleUri.toString() +
+                                                        "?wstoken=" + moodleConfig.getString("wsToken") +
+                                                        "&wsfunction=" + WS_POST_DUPLICATECOURSE +
+                                                        "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
+                                                        "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
+                                                        "&parameters[course][0][ident]=" + courseToDuplicate.getInteger("id") +
+                                                        "&moodlewsrestformat=" + JSON +
+                                                        "&parameters[auditeurid]=" + "" +
+                                                        "&parameters[course][0][categoryid]=" + courseToDuplicate.getInteger("category_id");
+                                            }
+                                            HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, postEvent -> {
+                                                if (postEvent.isRight()) {
+                                                    log.info("Duplication request sent to Moodle");
+                                                    eitherHandler.handle(new Either.Right<>(postEvent.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
+                                                } else {
+                                                    log.error("Failed to contact Moodle");
+                                                    eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
+                                                }
+                                            });
+                                        }
+                                    } else {
+                                        eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
+                                    }
+                                } else {
+                                    log.error("The access to duplicate database failed !");
+                                    eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
                                 }
-                            } else {
-                                eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));
-                            }
+                            });
                         } else {
-                            log.error("The access to duplicate database failed !");
-                            eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
+                            eitherHandler.handle(new Either.Left<>("The quota of duplication in same time is reached, you have to wait"));
                         }
-                    });
-                } else {
-                    eitherHandler.handle(new Either.Left<>("The quota of duplication in same time is reached, you have to wait"));
-                }
+                    } else {
+                        log.error("The access to duplicate database failed !");
+                        eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
+                    }
+                });
             } else {
-                log.error("The access to duplicate database failed !");
-                eitherHandler.handle(new Either.Left<>("The access to duplicate database failed"));
+                log.error("Problem to delete finished duplicate courses !");
+                eitherHandler.handle(new Either.Left<>("Problem to delete finished duplicate courses"));
             }
         });
     }
@@ -1456,20 +1462,22 @@ public class MoodleController extends ControllerHelper {
         RequestUtils.bodyToJson(request, updateMetadata -> {
             Integer course_id = updateMetadata.getJsonArray("coursesId").getInteger(0);
             JsonObject newMetadata = new JsonObject();
-            if (updateMetadata.getJsonArray("levels").size() != 0)
-                newMetadata.put("level_label", new JsonArray().add(updateMetadata.getJsonArray("levels").getJsonObject(0).getString("label")));
-            else
-                newMetadata.put("level_label", new JsonArray());
 
-            if (updateMetadata.getJsonArray("disciplines").size() != 0)
-                newMetadata.put("discipline_label", new JsonArray().add(updateMetadata.getJsonArray("disciplines").getJsonObject(0).getString("label")));
-            else
-                newMetadata.put("discipline_label", new JsonArray());
+            JsonArray levelArray = new JsonArray();
+            for (int i = 0; i < updateMetadata.getJsonArray("levels").size(); i++) {
+                levelArray.add((updateMetadata.getJsonArray("levels").getJsonObject(i).getString("label")));
+            }
+            newMetadata.put("level_label", levelArray);
 
-            if (updateMetadata.getJsonArray("plain_text").size() != 0)
-                newMetadata.put("key_words", new JsonArray().add(updateMetadata.getJsonArray("plain_text")));
-            else
-                newMetadata.put("key_words", new JsonArray());
+            JsonArray disciplineArray = new JsonArray();
+            for (int i = 0; i < updateMetadata.getJsonArray("disciplines").size(); i++) {
+                disciplineArray.add((updateMetadata.getJsonArray("disciplines").getJsonObject(i).getString("label")));
+            }
+            newMetadata.put("discipline_label", disciplineArray);
+
+            JsonArray plainTextArray = updateMetadata.getJsonArray("plain_text");
+            newMetadata.put("key_words", plainTextArray);
+
             callMediacentreEventBusToUpdateMetadata(updateMetadata, ebEvent -> {
                 if (ebEvent.isRight()) {
                     moduleSQLRequestService.updatePublicCourseMetadata(course_id, newMetadata, event -> {
