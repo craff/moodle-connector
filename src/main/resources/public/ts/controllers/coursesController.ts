@@ -5,7 +5,8 @@ import {Utils} from "../utils/Utils";
 import {TIME_TO_REFRESH_DUPLICATION, STATUS} from "../constantes";
 import {Configuration} from "../model/Configuration";
 
-export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', 'route', ($scope, $timeout, route) => {
+export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', '$templateCache', 'route',
+    ($scope, $timeout, $templateCache, route) => {
 
     route({
         dashboard: async function () {
@@ -828,6 +829,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.duplicateElements = async (): Promise<void> => {
         $scope.disableDuplicateSend = $scope.openLightbox = $scope.toasterShow = false;
         if ($scope.courses.allCourses.some((course: Course): boolean => course.selectConfirm)) {
+            $templateCache.removeAll();
             await $scope.courses.coursesDuplicate($scope.currentFolderId);
             if (!isStartDuplicationCheck)
                 await $scope.updateCourse();
