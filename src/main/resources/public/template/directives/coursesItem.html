@@ -45,7 +45,8 @@
                        ng-if="place == 'coursesToCome' && view == 'icons' && course.startdate != null"
                        ng-click="place != 'coursesToCome' && course.goTo()">
                     <i18n>toBegin.at</i18n>
-                    <span class="date">[[ printDate(course,"begindate") ]]</span></br>
+                    <span class="date">[[ printDate(course,"begindate") ]]</span>
+                    </br>
                 </label>
                 <div class="ellipsis">
                     <span class="text-font" ng-class="{notDraggable : place == 'coursesToCome'}"
@@ -99,7 +100,10 @@
                 <div ng-if="(place == 'coursesMine' || place == 'coursesShared' || place == 'coursesToDo') && view == 'icons'"
                      class="ellipsis" ng-click="place != 'coursesShared' && course.goTo()">
                     <span class="summary-list summary-color size-font"
-                          ng-class="{duplicateCourse : course.duplication != 'non'}">[[course.summary]]</span></br>
+                          ng-class="{duplicateCourse : course.duplication != 'non'}">
+                        [[course.summary]]
+                    </span>
+                    </br>
                 </div>
             </div>
             <!--
@@ -142,10 +146,10 @@
                 <span class="date">[[ printDate(course,"enddate") ]]</span>
             </label>
             <div class="right-magnet zero-desktop">
-                <i class="eye-slash import" class="grey-color" ng-if="!course.masked"
+                <i class="eye-slash import grey-color" ng-if="!course.masked"
                    ng-click="course.setPreferences('masked')">
                 </i>
-                <i class="eye-open import" class="grey-color" ng-if="course.masked"
+                <i class="eye-open import grey-color" ng-if="course.masked"
                    ng-click="course.setPreferences('masked')">
                 </i>
                 <i class="favorite rightTop-margin import"

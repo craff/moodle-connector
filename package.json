@@ -1,5 +1,5 @@
 {
-  "name": "Moodle",
+  "name": "moodle",
   "version": "0.1.0",
   "description": "ENT Core application to create Moodles",
   "main": "gulpfile.js",
@@ -17,7 +17,7 @@
   },
   "homepage": "",
   "dependencies": {
-    "entcore": "3.12.0-myapps.19",
+    "entcore": "3.12.0-dev.29",
     "@types/core-js": "0.9.42",
     "awesome-typescript-loader": "3.2.1",
     "axios": "0.16.2",

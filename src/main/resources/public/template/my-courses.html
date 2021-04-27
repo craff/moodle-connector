@@ -7,7 +7,8 @@
                     <i18n class="zero-mobile">moodle.folders</i18n>
                     <br/><br/>
                     <div class="search-pagination">
-                        <div class="eleven twelve-mobile cell infoBackground infoBackgroundTopMargin style-bord-with-over-effect searchBar">
+                        <div class="eleven twelve-mobile cell infoBackground infoBackgroundTopMargin
+                        style-bord-with-over-effect searchBar">
                             <i class="one search searchIcon" ></i>
                             <input class="eight noBorder"
                                    type="text"
@@ -20,20 +21,19 @@
                         <br/><br/>
                         <select ng-model="folders.searchInFolders"
                                 ng-options="folder.id as folder.name for folder in folders.listOfSubfolder"
-                                class="eleven twelve-mobile cell ellipsis infoBackground infoBackgroundTopMargin style-bord-with-over-effect selectSearchBar noBorder"
+                                class="eleven twelve-mobile cell ellipsis infoBackground infoBackgroundTopMargin
+                                style-bord-with-over-effect selectSearchBar noBorder"
                                 ng-change="selectSearchFolder()">
                         </select>
                     </div>
                 </div>
-                <div class="horizontal-spacing zero-mobile" static-include="/moodle/public/template/courses/folderItem.html">
-                </div>
+                <div class="horizontal-spacing zero-mobile" ng-include="'/moodle/public/template/courses/folderItem.html'"></div>
                 <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">
                     <div class="vertical-spacing row">
                         <i18n class="text-font titleSideNav">moodle.folders</i18n>
                         <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
                     </div>
-                    <div class="horizontal-spacing upNav" static-include="/moodle/public/template/courses/folderItem.html">
-                    </div>
+                    <div class="horizontal-spacing upNav" ng-include="'/moodle/public/template/courses/folderItem.html'"></div>
                 </div>
             </div>
             <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp coursesBackground" >
@@ -52,11 +52,11 @@
                     </label>
                     <br/>
                 </p>
-                <p class="row zero-mobile" static-include="/moodle/public/template/courses/filters.html"></p>
-                <div class="row coursesBottomPadding" static-include="/moodle/public/template/courses/folders.html"
+                <p class="row zero-mobile" ng-include="'/moodle/public/template/courses/filters.html'"></p>
+                <div class="row coursesBottomPadding" ng-include="'/moodle/public/template/courses/folders.html'"
                      ng-if="printFolders"></div>
                 <div class="row coursesBottomPadding"
-                     static-include="/moodle/public/template/courses/courses.html"></div>
+                     ng-include="'/moodle/public/template/courses/courses.html'"></div>
             </div>
         </div>
     </div>

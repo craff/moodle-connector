@@ -2,6 +2,6 @@
      ng-class="{'minimal-mine-recent-width five folder-article infoBackgroundTopMargin' : viewModeMyCourses == 'icons',
      'all-width bottom-margin' : viewModeMyCourses == 'list'}"
      ng-repeat="folder in folders.getFoldersToShow(currentFolderId, courses.searchInput.MyCourse) track by $index">
-    <div static-include="/moodle/public/template/courses/folderDetails.html" lvl-draggable lvl-drop-target
+    <div ng-include="'/moodle/public/template/courses/folderDetails.html'" lvl-draggable lvl-drop-target
          class="Folder" on-drop="dropped(dragEl, dropEl)"></div>
 </div>

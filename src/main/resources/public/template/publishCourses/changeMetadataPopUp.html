@@ -9,7 +9,8 @@
     <br>
     <div class=" ">
         <div class="row">
-            <multi-combo title="[[lang.translate('levels')]]" class="ten cell" combo-model="levels.all" search-on="label" order-by="label" filtered-model="courseToPublish.levels"></multi-combo>
+            <multi-combo title="[[lang.translate('levels')]]" class="ten cell" combo-model="levels.all"
+                         search-on="label" order-by="label" filtered-model="courseToPublish.levels"></multi-combo>
             <div class="twelve cell select-blocks">
                 <div ng-repeat="level in courseToPublish.levels"
                      ng-click="removeLevelFromCourse(level)"
@@ -19,7 +20,8 @@
             </div>
         </div>
         <div class="row">
-            <multi-combo title="[[lang.translate('disciplines')]]" class="ten cell" combo-model="disciplines.all" search-on="label"  order-by="label" filtered-model="courseToPublish.disciplines"></multi-combo>
+            <multi-combo title="[[lang.translate('disciplines')]]" class="ten cell" combo-model="disciplines.all"
+                         search-on="label"  order-by="label" filtered-model="courseToPublish.disciplines"></multi-combo>
             <div class="twelve cell select-blocks">
                 <div ng-repeat="discipline in courseToPublish.disciplines"
                      ng-click="removeDisciplineFromCourse(discipline)"
@@ -32,7 +34,8 @@
             <label >
                 <i18n>keyword</i18n>
             </label>
-            <input class="row" type="text" ng-model="courseToPublish._plain_text" ng-keyup="addKeyWord($event)"  i18n-placeholder="moodle.key.words.separation" >
+            <input class="row" type="text" ng-model="courseToPublish._plain_text" ng-keyup="addKeyWord($event)"
+                   i18n-placeholder="moodle.key.words.separation" >
             <div class=" twelve cell select-blocks">
                 <div ng-repeat="word in courseToPublish.plain_text"
                      ng-click="removeWordFromCourse(word)"
