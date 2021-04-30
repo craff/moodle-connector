@@ -132,7 +132,7 @@ public class MoodleController extends ControllerHelper {
             if (user != null) {
                 createUpdateWSUrlCreateuser(user, event -> {
                     if (event.isRight()) {
-                        renderView(request);
+                        redirect(request, moodleConfig.getString("address_moodle"), "/login/index.php");
                         eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
                     } else {
                         log.error("Error updating users", event.left());
@@ -144,17 +144,6 @@ public class MoodleController extends ControllerHelper {
                 unauthorized(request);
             }
         });
-    }
-
-    /**
-     * Get host conf
-     *
-     * @param request Client request
-     */
-    @Get("/conf")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
-    public void conf(HttpServerRequest request) {
-        renderJson(request, new JsonObject().put("host",moodleConfig.getString("address_moodle")));
     }
 
     @Put("/folders/move")

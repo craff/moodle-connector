@@ -4,7 +4,6 @@ import {Folder, Folders, Course, Courses, Discipline, Disciplines, Level, Levels
 import {Utils} from "../utils/Utils";
 import {TIME_TO_REFRESH_DUPLICATION, STATUS} from "../constantes";
 import {Configuration} from "../model/Configuration";
-import http from "axios";
 
 export const mainController = ng.controller('MoodleController', ['$scope', '$timeout', '$templateCache', 'route',
     ($scope, $timeout, $templateCache, route) => {
@@ -24,7 +23,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         },
     });
     $scope.isCreating = false;
-    $scope.isLogin = false;
     $scope.switchTab = function (current: string) {
         $scope.toasterShow = false;
         $scope.currentTab = current;
@@ -74,11 +72,6 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     $scope.initController = async function () {
         $scope.config = new Configuration();
         await $scope.config.sync();
-        //log the user in Moodle
-        if(!$scope.isLogin){
-            await http.get($scope.config.host + "/login/index.php");
-            $scope.isLogin = true;
-        }
         $scope.lang= lang;
         $scope.levels = new Levels();
         $scope.levels.sync();
