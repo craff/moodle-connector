@@ -128,22 +128,27 @@ public class MoodleController extends ControllerHelper {
     @Get("")
     @SecuredAction(workflow_view)
     public void view(HttpServerRequest request) {
-        UserUtils.getUserInfos(eb, request, user -> {
-            if (user != null) {
-                createUpdateWSUrlCreateuser(user, event -> {
-                    if (event.isRight()) {
-                        redirect(request, moodleConfig.getString("address_moodle"), "/login/index.php");
-                        eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
-                    } else {
-                        log.error("Error updating users", event.left());
-                        renderError(request);
-                    }
-                });
-            } else {
-                log.error("User not found in session.");
-                unauthorized(request);
-            }
-        });
+        if(request.params().contains("logged") && request.params().get("logged").equals("true")){
+            renderView(request);
+        } else {
+            UserUtils.getUserInfos(eb, request, user -> {
+                if (user != null) {
+                    createUpdateWSUrlCreateuser(user, event -> {
+                        if (event.isRight()) {
+                            request.headers().add("Access-Control-Allow-Origin","*");
+                            redirect(request, moodleConfig.getString("address_moodle"), "/login/index.php");
+                            eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
+                        } else {
+                            log.error("Error updating users", event.left());
+                            renderError(request);
+                        }
+                    });
+                } else {
+                    log.error("User not found in session.");
+                    unauthorized(request);
+                }
+            });
+        }
     }
 
     @Put("/folders/move")
@@ -229,7 +234,6 @@ public class MoodleController extends ControllerHelper {
             }
             UserUtils.getUserInfos(eb, request, user -> {
                 URI moodleUri = null;
-                final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 try {
                     GregorianCalendar calendar = new GregorianCalendar();
                     String uniqueID = UUID.randomUUID().toString();
@@ -260,7 +264,7 @@ public class MoodleController extends ControllerHelper {
                                     URLEncoder.encode(idImage, "UTF-8");
                         }
 
-                        final String moodleUrl = moodleUri.toString() +
+                        final String moodleUrl = moodleUri +
                                 "?wstoken=" + moodleConfig.getString("wsToken") +
                                 "&wsfunction=" + WS_CREATE_FUNCTION +
                                 "&parameters[username]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
@@ -479,7 +483,7 @@ public class MoodleController extends ControllerHelper {
                         courses.add(createCourseForSend(course, courseDuplicate));
                     }
                     else {
-                        log.error("Fail to find course to duplicate : " + courseDuplicate);
+                        log.error("Fail to find course to duplicate : " + courseDuplicate.toString());
                     }
                 }
             }
@@ -881,11 +885,11 @@ public class MoodleController extends ControllerHelper {
             UserUtils.getUserInfos(eb, request, user -> {
                 if (user != null) {
                     for (Object idGroup : shareCourseObject.copy().getJsonObject("groups").getMap().keySet().toArray()) {
-                        if (idGroup.toString().substring(0, 3).equals("GR_")) {
+                        if (idGroup.toString().startsWith("GR_")) {
                             shareCourseObject.getJsonObject("groups").put(idGroup.toString().substring(3), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
                             shareCourseObject.getJsonObject("groups").remove(idGroup.toString());
                         }
-                        if (idGroup.toString().substring(0, 3).equals("SB_")) {
+                        if (idGroup.toString().startsWith("SB_")) {
                             shareCourseObject.getJsonObject("bookmarks").put(idGroup.toString().substring(2), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
                             shareCourseObject.getJsonObject("groups").remove(idGroup.toString());
                         }
