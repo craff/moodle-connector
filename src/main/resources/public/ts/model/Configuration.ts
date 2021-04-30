@@ -1,13 +1,13 @@
 import http from "axios";
 
 export class Configuration {
-   id_bp_category : number;
+   host : string;
 
     constructor() {
     }
 
     async sync () {
-        let {data} = await http.get(`/moodle/conf/public`);
-        this.id_bp_category = data['publicBankCategoryId'];
+        let {data} = await http.get(`/moodle/conf`);
+        this.host = data['host'];
     }
 }

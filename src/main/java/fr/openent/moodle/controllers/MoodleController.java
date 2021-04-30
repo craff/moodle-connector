@@ -74,6 +74,8 @@ public class MoodleController extends ControllerHelper {
 
     private final String userMail;
 
+    private final String baseWsMoodleUrl;
+
 
     @Override
     public void init(Vertx vertx, JsonObject config, RouteMatcher rm,
@@ -95,6 +97,9 @@ public class MoodleController extends ControllerHelper {
 
         //todo remove mail constant and add mail from zimbra, ent ...
         this.userMail = Moodle.moodleConfig.getString("userMail");
+
+        baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
+
     }
 
     //Permissions
@@ -123,8 +128,33 @@ public class MoodleController extends ControllerHelper {
     @Get("")
     @SecuredAction(workflow_view)
     public void view(HttpServerRequest request) {
-        renderView(request);
-        eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
+        UserUtils.getUserInfos(eb, request, user -> {
+            if (user != null) {
+                createUpdateWSUrlCreateuser(user, event -> {
+                    if (event.isRight()) {
+                        renderView(request);
+                        eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
+                    } else {
+                        log.error("Error updating users", event.left());
+                        renderError(request);
+                    }
+                });
+            } else {
+                log.error("User not found in session.");
+                unauthorized(request);
+            }
+        });
+    }
+
+    /**
+     * Get host conf
+     *
+     * @param request Client request
+     */
+    @Get("/conf")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void conf(HttpServerRequest request) {
+        renderJson(request, new JsonObject().put("host",moodleConfig.getString("address_moodle")));
     }
 
     @Put("/folders/move")
@@ -460,7 +490,7 @@ public class MoodleController extends ControllerHelper {
                         courses.add(createCourseForSend(course, courseDuplicate));
                     }
                     else {
-                        log.error("Fail to find course to duplicate : " + courseDuplicate.toString());
+                        log.error("Fail to find course to duplicate : " + courseDuplicate);
                     }
                 }
             }
@@ -526,6 +556,21 @@ public class MoodleController extends ControllerHelper {
             log.error("Error in createUrlMoodleGetCourses" + error);
             throw error;
         }
+    }
+
+    private void createUpdateWSUrlCreateuser(UserInfos user, Handler<Either<String, Buffer>> handlerUpdateUser) {
+        JsonObject body = new JsonObject();
+        JsonObject userJson = new JsonObject()
+                .put("username",user.getUserId())
+                .put("firstname",user.getFirstName())
+                .put("lastname",user.getLastName())
+                .put("id",user.getUserId())
+                .put("email",this.userMail);
+        body.put("parameters", new JsonArray().add(userJson))
+                .put("wstoken", moodleConfig.getString("wsToken"))
+                .put("wsfunction", WS_POST_CREATE_OR_UPDATE_USER)
+                .put("moodlewsrestformat", JSON);
+        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerUpdateUser);
     }
 
     private JsonObject createCourseForSend(JsonObject course, JsonObject courseDuplicate) {

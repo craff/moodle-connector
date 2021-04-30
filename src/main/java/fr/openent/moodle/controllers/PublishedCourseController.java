@@ -5,17 +5,15 @@ import fr.openent.moodle.service.PublishedCourseService;
 import fr.openent.moodle.service.impl.DefaultPublishedCourseService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
-
 import io.vertx.core.http.HttpServerRequest;
 import org.entcore.common.controller.ControllerHelper;
-import org.entcore.common.storage.Storage;
 
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
 
 public class PublishedCourseController extends ControllerHelper {
 
-    private PublishedCourseService publishedCourseService;
-    public PublishedCourseController(final Storage storage) {
+    private final PublishedCourseService publishedCourseService;
+    public PublishedCourseController() {
         super();
         this.publishedCourseService = new DefaultPublishedCourseService(Moodle.moodleSchema, "");
     }
