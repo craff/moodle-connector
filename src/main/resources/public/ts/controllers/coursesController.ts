@@ -116,6 +116,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         await $scope.initFolders();
         $scope.activityType = undefined;
         $scope.imgCompatibleMoodle = false;
+        $scope.filterChoice = {
+            levels : [],
+            disciplines : []
+        };
         $scope.typeActivity = {
             availableOptions: [
                 {id: 'quiz', name: 'Quizz'},
@@ -915,6 +919,12 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.courseToPublish = $scope.getSelectedCourses()[0];
         $scope.courseToPublish.myRights = {};
         $scope.courseToPublish = Mix.castAs(PublicCourse, $scope.courseToPublish) ;
+        $scope.courseToPublish.levels.forEach(level => {
+            $scope.filterChoice.levels.push(level);
+        });
+        $scope.courseToPublish.disciplines.forEach(discipline => {
+            $scope.filterChoice.disciplines.push(discipline);
+        })
         template.open('lightboxContainer', 'publishCourses/changeMetadataPopUp');
         $scope.openLightbox = true;
         Utils.safeApply($scope);
@@ -953,6 +963,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
                 await $scope.initFolders();
                 if (!isStartDuplicationCheck)
                     await $scope.updateCourse();
+                $scope.isPrintMenuCoursesPublished();
                 notify.success('moodle.info.publishTextConfirmSuccess');
             });
     };
