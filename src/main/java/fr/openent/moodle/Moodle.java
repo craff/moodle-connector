@@ -3,10 +3,12 @@ package fr.openent.moodle;
 import fr.openent.moodle.controllers.MoodleController;
 import fr.openent.moodle.controllers.PublishedCourseController;
 import fr.openent.moodle.controllers.SynchController;
+import fr.openent.moodle.cron.notifyMoodle;
 import fr.openent.moodle.cron.synchDuplicationMoodle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.http.BaseServer;
+import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.service.impl.SqlCrudService;
 import org.entcore.common.share.impl.SqlShareService;
 import org.entcore.common.sql.SqlConf;
@@ -32,6 +34,7 @@ public class Moodle extends BaseServer {
 	public static String WS_POST_ENROLL_USERS_COURSES = "local_entcgi_services_enrolluserscourses";
 	public static String WS_POST_UPDATE_COHORTS = "local_entcgi_services_updatecohort";
 	public static String WS_POST_DELETE_COHORTS = "local_entcgi_services_deletecohortes";
+	public static String WS_CHECK_NOTIFICATIONS = "local_entcgi_services_notifications";
 
 	public static Integer ROLE_AUDITEUR;
 	public static Integer ROLE_EDITEUR;
@@ -55,6 +58,7 @@ public class Moodle extends BaseServer {
 
 	public static String moodleSchema;
     public static JsonObject moodleConfig;
+
 	@Override
 	public void start() throws Exception {
 		super.start();
@@ -86,7 +90,17 @@ public class Moodle extends BaseServer {
 					new synchDuplicationMoodle(vertx, moodleController)
 			);
 		} catch (ParseException e) {
-			log.fatal("Invalid cron expression.", e);
+			log.fatal("Invalid timeSecondSynchCron cron expression.", e);
+		}
+
+		TimelineHelper timelineHelper = new TimelineHelper(vertx, eb, config);
+
+		try {
+			new CronTrigger(vertx, config.getString("timeCheckNotifs")).schedule(
+					new notifyMoodle(vertx, moodleController, timelineHelper)
+			);
+		} catch (ParseException e) {
+			log.fatal("Invalid timeCheckNotifs cron expression.", e);
 		}
 
 		addController(moodleController);

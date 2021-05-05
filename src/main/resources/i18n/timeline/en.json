@@ -1,0 +1,10 @@
+{
+  "moodle": "Moodle",
+  "moodle.notification": "Moodle notification",
+  "push.notif.moodle": "New Moodle notification",
+  "timeline.no.sender": "Unknown sender",
+  "timeline.moodle.notification": "New Moodle notification from ",
+  "timeline.consult": ". Consult the ",
+  "timeline.moodle.course": "Moodle course",
+  "timeline.moodle.activity": "activity"
+}

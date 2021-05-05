@@ -1,0 +1,99 @@
+package fr.openent.moodle.cron;
+
+import fr.openent.moodle.controllers.MoodleController;
+import fr.openent.moodle.helper.HttpClientHelper;
+import fr.wseduc.webutils.Either;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.notification.TimelineHelper;
+import org.entcore.common.user.UserInfos;
+
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static fr.openent.moodle.Moodle.*;
+import static fr.openent.moodle.controllers.MoodleController.baseWsMoodleUrl;
+
+public class notifyMoodle extends ControllerHelper implements Handler<Long> {
+
+    MoodleController moodleController;
+    private final TimelineHelper timelineHelper;
+    private Timestamp startDate;
+
+    private final SimpleDateFormat myDate;
+
+    public notifyMoodle(Vertx vertx, MoodleController moodleController, TimelineHelper timelineHelper) {
+        this.moodleController = moodleController;
+        this.vertx = vertx;
+        this.timelineHelper = timelineHelper;
+        myDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    }
+
+    @Override
+    public void handle(Long event) {
+        if(startDate == null){
+            startDate = Timestamp.valueOf(myDate.format(new Date()));
+        } else {
+            log.debug("Moodle Notifications cron started");
+            launchNotifies(event1 -> {
+                if (event1.isRight())
+                    log.debug("Cron notifications end successfully");
+                else
+                    log.debug("Cron notification not full");
+            });
+        }
+    }
+
+    private void checkNotification(Handler<Either<String, Buffer>> handlerUpdateUser) {
+        Timestamp endDate = Timestamp.valueOf(myDate.format(new Date()));
+        String url = baseWsMoodleUrl + "?wstoken=" + moodleConfig.getString("wsToken") +
+                "&wsfunction=" + WS_CHECK_NOTIFICATIONS +
+                "&parameters[startdate]=" + startDate.getTime()/1000 +
+                "&parameters[enddate]=" + endDate.getTime()/1000 +
+                "&moodlewsrestformat=" + JSON;
+        //change date for next time we get notifications
+        startDate = endDate;
+        HttpClientHelper.webServiceMoodlePost(null, url, vertx, handlerUpdateUser);
+    }
+
+    private void launchNotifies(final Handler<Either<String, JsonObject>> eitherHandler) {
+        checkNotification(event -> {
+            if (event.isRight()) {
+                JsonArray notifications = event.right().getValue().toJsonObject().getJsonArray("notifications");
+                if(notifications != null) {
+                    for (Object notify : notifications) {
+                        JsonObject notification = (JsonObject) notify;
+                        UserInfos user = new UserInfos();
+                        user.setUserId(notification.getString("useridfrom"));
+                        user.setUsername(notification.getString("firstname") + " " + notification.getString("lastname"));
+                        String timelineSender = user.getUsername() != null ? user.getUsername() : null;
+                        String message = notification.getString("fullmessage");
+                        String courseUri = message.substring(message.indexOf("(") + 1, message.indexOf(")"));
+                        final JsonObject params = new JsonObject()
+                                .put("subject", notification.getString("subject"))
+                                .put("activityUri", notification.getString("contexturl"))
+                                .put("courseUri", courseUri)
+                                .put("disableAntiFlood", true);
+                        params.put("username", timelineSender).put("uri", "/userbook/annuaire#" + user.getUserId());
+                        List<String> recipients = new ArrayList<>();
+                        recipients.add(notification.getString("useridto"));
+                        params.put("pushNotif", new JsonObject().put("title", "push.notif.moodle").put("body", ""));
+                        timelineHelper.notifyTimeline(null, "moodle.notification", user, recipients,
+                                notification.getInteger("id").toString(), params);
+                    }
+                }
+                eitherHandler.handle(new Either.Right<>(new JsonObject()));
+            } else {
+                log.error("Error getting notifications", event.left());
+                eitherHandler.handle(new Either.Left<>(event.left().getValue()));
+            }
+        });
+    }
+}

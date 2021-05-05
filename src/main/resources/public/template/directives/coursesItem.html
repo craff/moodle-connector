@@ -20,16 +20,18 @@
                                     coursePictureBackground : place == 'coursesMine' && view == 'icons' && course.course_type == 'topics' ,
                                     courseSharedPicture : place == 'coursesShared' && view == 'icons' && course.course_type == 'topics'}"
          ng-click="place != 'coursesToCome'&& course.goTo()">
+        <img ng-src="moodle/public/img/logo_image_ent.png" class="image-dashboard"
+             ng-class="{ 'NoImagePicture' : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list'),
+        'NoImageMine' : place == 'coursesMine' && view == 'icons', 'NoImageShared' : place == 'coursesShared' && view == 'icons',
+        'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons', 'NoImageToCome' : place == 'coursesToCome' && view == 'icons'}"
+             ng-if="course.imageurl === null || course.imageurl === undefined || course.imageurl === '-'"/>
         <img ng-src="[[course.imageurl]]" class="image-dashboard"
              ng-class="{ recentPicture : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list') ,
                 toDoPicture : place == 'coursesToDo' && first && view == 'icons',
                 toComePicture : place == 'coursesToCome' && view == 'icons',
                 defaultPicture : place == 'coursesMine' && view == 'icons',
                 sharedPicture : place == 'coursesShared' && view == 'icons'}"
-             ng-show="course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-' "/>
-        <img ng-src="moodle/public/img/logo_image_ent.png" class="image-dashboard" ng-class="{ 'NoImagePicture' : place == 'coursesRecent' || ((place == 'coursesToDo' || place == 'coursesToCome' || place == 'coursesMine' || place == 'coursesShared') && view == 'list'),
-        'NoImageMine' : place == 'coursesMine' && view == 'icons', 'NoImageShared' : place == 'coursesShared' && view == 'icons', 'NoImageToDo' : place == 'coursesToDo' && first && view == 'icons', 'NoImageToCome' : place == 'coursesToCome' && view == 'icons'}"
-             ng-show="course.imageurl === null || course.imageurl === undefined || course.imageurl === '-' "/>
+             ng-if="course.imageurl !== null && course.imageurl !== undefined && course.imageurl !== '-'"/>
     </div>
 
     <div ng-class="{ 'cell pseudo-eleven' : place == 'coursesToDo' &&  !first && view == 'icons',

@@ -17,6 +17,7 @@
         "sql": true,
         "db-schema": "moodle",
         "timeSecondSynchCron": "${timeSecondSynchCron}",
+        "timeCheckNotifs": "${timeCheckNotifs}",
         "numberOfMaxDuplicationTentatives": ${numberOfMaxDuplicationTentatives},
         "numberOfMaxPendingDuplication": ${numberOfMaxPendingDuplication},
         "timeDuplicationBeforeDelete": "${timeDuplicationBeforeDelete}",

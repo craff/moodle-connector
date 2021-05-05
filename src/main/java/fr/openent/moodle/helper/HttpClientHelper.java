@@ -93,18 +93,15 @@ public class HttpClientHelper extends ControllerHelper {
             httpClientRequest.setChunked(true);
 
             Object parameters = shareSend.getMap().get("parameters");
-            String encodedParameters;
+            String encodedParameters = "";
             if (parameters instanceof JsonObject) {
                 encodedParameters = ((JsonObject) parameters).encode();
             } else if (parameters instanceof JsonArray) {
                 encodedParameters = ((JsonArray) parameters).encode();
-            } else {
-                log.error("unknown parameters format");
-                handler.handle(new Either.Left<>("unknown parameters format"));
-                return;
             }
-
-            httpClientRequest.write("parameters=").write(encodedParameters);
+            if(!encodedParameters.isEmpty()){
+                httpClientRequest.write("parameters=").write(encodedParameters);
+            }
             httpClientRequest.write("&wstoken=").write(shareSend.getString("wstoken"));
             httpClientRequest.write("&wsfunction=").write(shareSend.getString("wsfunction"));
             httpClientRequest.write("&moodlewsrestformat=").write(shareSend.getString("moodlewsrestformat"));
