@@ -12,10 +12,10 @@
             <multi-combo title="[[lang.translate('levels')]]" class="ten cell" combo-model="levels.all"
                          search-on="label" order-by="label" filtered-model="courseToPublish.levels"></multi-combo>
             <div class="twelve cell select-blocks">
-                <div ng-repeat="level in filterChoice.levels"
+                <div ng-repeat="level in courseToPublish.levels"
                      ng-click="removeLevelFromCourse(level)"
                      class="labels-in-ligne">
-                    <div > <span ng-bind="level[1]"></span>  </div>
+                    <div > <span ng-bind="level.label"></span>  </div>
                 </div>
             </div>
         </div>
@@ -23,10 +23,10 @@
             <multi-combo title="[[lang.translate('disciplines')]]" class="ten cell" combo-model="disciplines.all"
                          search-on="label"  order-by="label" filtered-model="courseToPublish.disciplines"></multi-combo>
             <div class="twelve cell select-blocks">
-                <div ng-repeat="discipline in filterChoice.disciplines"
+                <div ng-repeat="discipline in courseToPublish.disciplines"
                      ng-click="removeDisciplineFromCourse(discipline)"
                      class="labels-in-ligne">
-                    <div> <span ng-bind="discipline[1]"></span>  </div>
+                    <div> <span ng-bind="discipline.label"></span>  </div>
                 </div>
             </div>
         </div>
@@ -38,9 +38,9 @@
                    i18n-placeholder="moodle.key.words.separation" >
             <div class=" twelve cell select-blocks">
                 <div ng-repeat="word in courseToPublish.plain_text"
-                     ng-click="removeWordFromCourse(word[1])"
+                     ng-click="removeWordFromCourse(word)"
                      class="labels-in-ligne">
-                    <div><span ng-bind="word[1]"></span> </div>
+                    <div><span ng-bind="word.label"></span> </div>
                 </div>
             </div>
         </div>

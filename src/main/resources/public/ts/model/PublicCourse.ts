@@ -1,14 +1,14 @@
 import {Shareable, notify} from "entcore";
 import http from 'axios';
-import {Mix,Selectable,Selection} from 'entcore-toolkit';
 import {Author, Course} from "./Course";
+import {Labels} from "./Label";
 
 export class PublicCourse extends Course implements Shareable{
 
     coursesId : Array<number>;
-    disciplines : Array<string>;
-    levels : Array<string>;
-    plain_text: Array<string> = [];
+    disciplines : Labels;
+    levels : Labels;
+    plain_text: Labels;
     fullname : string;
     summary : string;
     imageurl : string;
@@ -52,54 +52,5 @@ export class PublicCourse extends Course implements Shareable{
         } catch (e) {
             notify.error("moodle.course.publish.update.err");
         }
-    }
-}
-
-export class Level implements Selectable {
-    id : number;
-    label : string;
-
-    selected : boolean = false;
-
-    constructor(id?: number, label?: string) {
-        this.id = id;
-        this.label = label;
-    }
-    toString = () => this.label;
-
-}
-
-export class Levels extends Selection<Level> {
-
-    constructor () {
-        super([]);
-    }
-    async sync (): Promise<void> {
-        let { data } = await http.get(`/moodle/levels`);
-        this.all = Mix.castArrayAs(Level, data);
-    }
-}
-
-
-export class Discipline implements Selectable {
-    id : number;
-    label : string;
-    selected : boolean = false;
-
-    constructor(id?: number, label?: string) {
-        this.id = id;
-        this.label = label;
-    }
-    toString = () => this.label;
-}
-
-export class Disciplines extends Selection<Discipline> {
-
-    constructor () {
-        super([]);
-    }
-    async sync (): Promise<void> {
-        let { data } = await http.get(`/moodle/disciplines`);
-        this.all = Mix.castArrayAs(Discipline, data);
     }
 }

@@ -3,6 +3,7 @@ import http from "axios";
 import {Mix} from "entcore-toolkit";
 import {Folders} from "./Folder";
 import {STATUS} from "../constantes";
+import {Label, Labels} from "./Label";
 
 export class Course implements Shareable {
     shared: any;
@@ -38,9 +39,7 @@ export class Course implements Shareable {
     };
     duplication: string;
     usernumber: number;
-    disciplines : Array<string>;
-    levels : Array<string>;
-    plain_text: Array<string> = [];
+    plain_text: Labels;
 
     constructor() {
         this.type = "1";
@@ -256,6 +255,20 @@ export class Courses {
                 };
                 if (course.summary == null) {
                     course.summary = "";
+                }
+                let disciplinesArray = new Labels();
+                let levelsArray = new Labels();
+                if(!!course.disciplines) {
+                    course.disciplines.forEach(function (discipline) {
+                        disciplinesArray.all.push(new Label(null, discipline[1]));
+                    });
+                    course.disciplines = Mix.castArrayAs(Label, disciplinesArray.all);
+                }
+                if(!!course.levels) {
+                    course.levels.forEach(function (level) {
+                        levelsArray.all.push(new Label(null, level[1]));
+                    });
+                    course.levels = Mix.castArrayAs(Label, levelsArray.all);
                 }
             });
             this.coursesByUser = _.filter(this.allCourses, function (course) {
@@ -573,6 +586,8 @@ export class Courses {
     isOrderedDesc(field) {
         return this.order.field === field && this.order.desc;
     }
+
+
 }
 
 export class Author {
