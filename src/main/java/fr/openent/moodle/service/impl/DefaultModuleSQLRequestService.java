@@ -456,7 +456,10 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
             disciplineArray.add((courseToPublish.getJsonArray("disciplines").getJsonObject(i).getString("label")));
         }
 
-        JsonArray plainTextArray = courseToPublish.getJsonArray("plain_text");
+        JsonArray plainTextArray = new JsonArray();
+        for (int i = 0; i < courseToPublish.getJsonArray("plain_text").size(); i++) {
+            plainTextArray.add((courseToPublish.getJsonArray("plain_text").getJsonObject(i).getString("label")));
+        }
 
         String test = "";
         if (disciplineArray.isEmpty())

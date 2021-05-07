@@ -40,7 +40,7 @@
                 <div ng-repeat="word in courseToPublish.plain_text"
                      ng-click="removeWordFromCourse(word)"
                      class="labels-in-ligne">
-                    <div > [[word]] </div>
+                    <div><span ng-bind="word.label"></span> </div>
                 </div>
             </div>
         </div>

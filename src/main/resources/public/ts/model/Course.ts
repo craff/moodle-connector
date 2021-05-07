@@ -586,8 +586,6 @@ export class Courses {
     isOrderedDesc(field) {
         return this.order.field === field && this.order.desc;
     }
-
-
 }
 
 export class Author {
