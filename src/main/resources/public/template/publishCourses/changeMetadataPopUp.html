@@ -10,7 +10,7 @@
     <div class=" ">
         <div class="row">
             <multi-combo title="[[lang.translate('levels')]]" class="ten cell" combo-model="levels.all"
-                         search-on="label" order-by="label" filtered-model="courseToPublish.levels"></multi-combo>
+                         search-on="label" order-by="label" filtered-model="filterChoice.levels"></multi-combo>
             <div class="twelve cell select-blocks">
                 <div ng-repeat="level in filterChoice.levels"
                      ng-click="removeLevelFromCourse(level)"
@@ -21,7 +21,7 @@
         </div>
         <div class="row">
             <multi-combo title="[[lang.translate('disciplines')]]" class="ten cell" combo-model="disciplines.all"
-                         search-on="label"  order-by="label" filtered-model="courseToPublish.disciplines"></multi-combo>
+                         search-on="label"  order-by="label" filtered-model="filterChoice.disciplines"></multi-combo>
             <div class="twelve cell select-blocks">
                 <div ng-repeat="discipline in filterChoice.disciplines"
                      ng-click="removeDisciplineFromCourse(discipline)"
