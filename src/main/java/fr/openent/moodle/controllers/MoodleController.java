@@ -125,27 +125,8 @@ public class MoodleController extends ControllerHelper {
     @Get("")
     @SecuredAction(workflow_view)
     public void view(HttpServerRequest request) {
-        if(request.params().contains("logged") && request.params().get("logged").equals("true")){
-            renderView(request);
-        } else {
-            UserUtils.getUserInfos(eb, request, user -> {
-                if (user != null) {
-                    createUpdateWSUrlCreateuser(user, event -> {
-                        if (event.isRight()) {
-                            request.headers().add("Access-Control-Allow-Origin","*");
-                            redirect(request, moodleConfig.getString("address_moodle"), "/login/index.php");
-                            eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
-                        } else {
-                            log.error("Error updating users", event.left());
-                            renderError(request);
-                        }
-                    });
-                } else {
-                    log.error("User not found in session.");
-                    unauthorized(request);
-                }
-            });
-        }
+        renderView(request);
+        eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
     }
 
     @Put("/folders/move")
@@ -160,7 +141,8 @@ public class MoodleController extends ControllerHelper {
                         log.error("User not found in session.");
                         unauthorized(request);
                     }
-                }));
+                })
+        );
     }
 
     @Delete("/folder")
