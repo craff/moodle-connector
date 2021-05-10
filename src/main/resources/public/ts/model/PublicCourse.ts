@@ -25,7 +25,7 @@ export class PublicCourse extends Course implements Shareable{
             coursesId: this.coursesId,
             disciplines: this.disciplines,
             levels: this.levels,
-            plain_text: this.plain_text,
+            plain_text: !!this.plain_text ? this.plain_text.all : [],
             role: this.role,
             title: this.fullname,
             description: this.summary,

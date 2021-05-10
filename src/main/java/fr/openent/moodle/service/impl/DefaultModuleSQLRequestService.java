@@ -447,18 +447,24 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
         courseToPublish.put("title", courseToPublish.getString("title") + formater.format(now));
 
         JsonArray levelArray = new JsonArray();
-        for (int i = 0; i < courseToPublish.getJsonArray("levels").size(); i++) {
-            levelArray.add((courseToPublish.getJsonArray("levels").getJsonObject(i).getString("label")));
+        if(courseToPublish.containsKey("levels")) {
+            for (int i = 0; i < courseToPublish.getJsonArray("levels").size(); i++) {
+                levelArray.add((courseToPublish.getJsonArray("levels").getJsonObject(i).getString("label")));
+            }
         }
 
         JsonArray disciplineArray = new JsonArray();
-        for (int i = 0; i < courseToPublish.getJsonArray("disciplines").size(); i++) {
-            disciplineArray.add((courseToPublish.getJsonArray("disciplines").getJsonObject(i).getString("label")));
+        if(courseToPublish.containsKey("disciplines")) {
+            for (int i = 0; i < courseToPublish.getJsonArray("disciplines").size(); i++) {
+                disciplineArray.add((courseToPublish.getJsonArray("disciplines").getJsonObject(i).getString("label")));
+            }
         }
 
         JsonArray plainTextArray = new JsonArray();
-        for (int i = 0; i < courseToPublish.getJsonArray("plain_text").size(); i++) {
-            plainTextArray.add((courseToPublish.getJsonArray("plain_text").getJsonObject(i).getString("label")));
+        if(courseToPublish.containsKey("plain_text")) {
+            for (int i = 0; i < courseToPublish.getJsonArray("plain_text").size(); i++) {
+                plainTextArray.add((courseToPublish.getJsonArray("plain_text").getJsonObject(i).getString("label")));
+            }
         }
 
         String test = "";
