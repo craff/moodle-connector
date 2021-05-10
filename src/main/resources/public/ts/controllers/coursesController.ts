@@ -118,7 +118,8 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.imgCompatibleMoodle = false;
         $scope.filterChoice = {
             levels : [],
-            disciplines : []
+            disciplines : [],
+            plain_text : []
         };
         $scope.typeActivity = {
             availableOptions: [
@@ -924,7 +925,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         });
         $scope.courseToPublish.disciplines.forEach(discipline => {
             $scope.filterChoice.disciplines.push(discipline);
-        })
+        });
+        $scope.courseToPublish.plain_text.forEach(word => {
+            $scope.filterChoice.plain_text.push(word);
+        });
         template.open('lightboxContainer', 'publishCourses/changeMetadataPopUp');
         $scope.openLightbox = true;
         Utils.safeApply($scope);
