@@ -12,6 +12,7 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.user.UserInfos;
 
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,16 +43,21 @@ public class notifyMoodle extends ControllerHelper implements Handler<Long> {
             startDate = Timestamp.valueOf(myDate.format(new Date()));
         } else {
             log.debug("Moodle Notifications cron started");
-            launchNotifies(event1 -> {
-                if (event1.isRight())
-                    log.debug("Cron notifications end successfully");
-                else
-                    log.debug("Cron notification not full");
-            });
+            try {
+                launchNotifies(event1 -> {
+                    if (event1.isRight())
+                        log.debug("Cron notifications end successfully");
+                    else
+                        log.debug("Cron notification not full");
+                });
+            } catch (UnsupportedEncodingException e) {
+                log.error("UnsupportedEncodingException",e);
+                log.error("Cron notification not full");
+            }
         }
     }
 
-    private void checkNotification(Handler<Either<String, Buffer>> handlerUpdateUser) {
+    private void checkNotification(Handler<Either<String, Buffer>> handlerUpdateUser) throws UnsupportedEncodingException {
         Timestamp endDate = Timestamp.valueOf(myDate.format(new Date()));
         String url = baseWsMoodleUrl + "?wstoken=" + moodleConfig.getString("wsToken") +
                 "&wsfunction=" + WS_CHECK_NOTIFICATIONS +
@@ -63,7 +69,7 @@ public class notifyMoodle extends ControllerHelper implements Handler<Long> {
         HttpClientHelper.webServiceMoodlePost(null, url, vertx, handlerUpdateUser);
     }
 
-    private void launchNotifies(final Handler<Either<String, JsonObject>> eitherHandler) {
+    private void launchNotifies(final Handler<Either<String, JsonObject>> eitherHandler) throws UnsupportedEncodingException {
         checkNotification(event -> {
             if (event.isRight()) {
                 JsonArray notifications = event.right().getValue().toJsonObject().getJsonArray("notifications");

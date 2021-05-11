@@ -10,6 +10,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -88,16 +89,21 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                                                         "&parameters[auditeurid]=" + "" +
                                                         "&parameters[course][0][categoryid]=" + courseToDuplicate.getInteger("category_id");
                                             }
-                                            HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, postEvent -> {
-                                                if (postEvent.isRight()) {
-                                                    log.info("Duplication request sent to Moodle");
-                                                    eitherHandler.handle(new Either.Right<>(postEvent.right().getValue().toJsonArray()
-                                                            .getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
-                                                } else {
-                                                    log.error("Failed to contact Moodle");
-                                                    eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
-                                                }
-                                            });
+                                            try {
+                                                HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, postEvent -> {
+                                                    if (postEvent.isRight()) {
+                                                        log.info("Duplication request sent to Moodle");
+                                                        eitherHandler.handle(new Either.Right<>(postEvent.right().getValue().toJsonArray()
+                                                                .getJsonObject(0).getJsonArray("courses").getJsonObject(0)));
+                                                    } else {
+                                                        log.error("Failed to contact Moodle");
+                                                        eitherHandler.handle(new Either.Left<>("Failed to contact Moodle"));
+                                                    }
+                                                });
+                                            } catch (UnsupportedEncodingException e) {
+                                                log.error("Fail to encode JSON",e);
+                                                eitherHandler.handle(new Either.Left<>("failed to create webServiceMoodlePost"));
+                                            }
                                         }
                                     } else {
                                         eitherHandler.handle(new Either.Left<>("There are no course to duplicate in the duplication table"));

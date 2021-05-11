@@ -530,7 +530,7 @@ public class MoodleController extends ControllerHelper {
         }
     }
 
-    private void createUpdateWSUrlCreateuser(UserInfos user, Handler<Either<String, Buffer>> handlerUpdateUser) {
+    private void createUpdateWSUrlCreateuser(UserInfos user, Handler<Either<String, Buffer>> handlerUpdateUser) throws UnsupportedEncodingException {
         JsonObject body = new JsonObject();
         JsonObject userJson = new JsonObject()
                 .put("username",user.getUserId())
@@ -1047,7 +1047,7 @@ public class MoodleController extends ControllerHelper {
                 }
             }
 
-            log.info("JSON PARTAGE WITH MAIL : " + shareObjectToFill.toString());
+            log.info("JSON PARTAGE WITH MAIL : " + shareObjectToFill);
 
             JsonObject shareSend = new JsonObject();
             shareSend.put("parameters", shareObjectToFill)
@@ -1065,17 +1065,22 @@ public class MoodleController extends ControllerHelper {
             if (moodleUri != null) {
                 final String moodleUrl = moodleUri.toString();
                 log.info("CALL WS_CREATE_SHARECOURSE");
-                HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, event -> {
-                    if (event.isRight()) {
-                        log.info("SUCCESS WS_CREATE_SHARECOURSE");
-                        request.response()
-                                .setStatusCode(200)
-                                .end();
-                    } else {
-                        log.error("FAIL WS_CREATE_SHARECOURSE" + event.left().getValue());
-                        unauthorized(request);
-                    }
-                });
+                try {
+                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, event -> {
+                        if (event.isRight()) {
+                            log.info("SUCCESS WS_CREATE_SHARECOURSE");
+                            request.response()
+                                    .setStatusCode(200)
+                                    .end();
+                        } else {
+                            log.error("FAIL WS_CREATE_SHARECOURSE" + event.left().getValue());
+                            unauthorized(request);
+                        }
+                    });
+                } catch (UnsupportedEncodingException e) {
+                    log.error("UnsupportedEncodingException",e);
+                    renderError(request);
+                }
             }
             //});
         });

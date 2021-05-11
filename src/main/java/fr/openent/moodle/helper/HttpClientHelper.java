@@ -12,8 +12,10 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.ProxyOptions;
 import org.entcore.common.controller.ControllerHelper;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static fr.openent.moodle.Moodle.moodleConfig;
@@ -55,7 +57,7 @@ public class HttpClientHelper extends ControllerHelper {
         return vertx.createHttpClient(options);
     }
 
-    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, Vertx vertx, Handler<Either<String, Buffer>> handler) {
+    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, Vertx vertx, Handler<Either<String, Buffer>> handler) throws UnsupportedEncodingException {
 
         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
@@ -95,9 +97,9 @@ public class HttpClientHelper extends ControllerHelper {
             Object parameters = shareSend.getMap().get("parameters");
             String encodedParameters = "";
             if (parameters instanceof JsonObject) {
-                encodedParameters = ((JsonObject) parameters).encode();
+                encodedParameters = URLEncoder.encode(((JsonObject) parameters).encode(), "UTF-8");
             } else if (parameters instanceof JsonArray) {
-                encodedParameters = ((JsonArray) parameters).encode();
+                encodedParameters = URLEncoder.encode(((JsonArray) parameters).encode(), "UTF-8");
             }
             if(!encodedParameters.isEmpty()){
                 httpClientRequest.write("parameters=").write(encodedParameters);

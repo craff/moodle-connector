@@ -16,6 +16,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -97,13 +98,18 @@ public class DefaultMoodleService implements moodleService {
             }
             if (moodleUri != null) {
                 final String moodleUrl = moodleUri.toString();
-                HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, registerEvent -> {
-                    if (registerEvent.isRight()) {
-                        handler.handle(new Either.Right<>(registerEvent.right().getValue().toJsonArray()));
-                    } else {
-                        log.error("FAIL WS_CREATE_SHARECOURSE" + registerEvent.left().getValue());
-                    }
-                });
+                try {
+                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, registerEvent -> {
+                        if (registerEvent.isRight()) {
+                            handler.handle(new Either.Right<>(registerEvent.right().getValue().toJsonArray()));
+                        } else {
+                            log.error("FAIL WS_CREATE_SHARECOURSE" + registerEvent.left().getValue());
+                        }
+                    });
+                } catch (UnsupportedEncodingException e) {
+                    log.error("Failed to create webServiceMoodlePost in registerUserInPublicCourse - UnsupportedEncodingException", e);
+                    handler.handle(new Either.Left<>(e.getMessage()));
+                }
             }
         });
     }

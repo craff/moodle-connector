@@ -22,6 +22,7 @@ import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
 import org.entcore.common.user.UserUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -140,7 +141,13 @@ public class DefaultSynchService {
                     endSyncUsers(handler);
                 } else {
                     // Un fois inscriptions individuelles ok, lancer les suppressions
-                    deleteUsers(arrUsersToDelete, handlerDeleteUsers);
+                    try {
+                        deleteUsers(arrUsersToDelete, handlerDeleteUsers);
+                    } catch (UnsupportedEncodingException e) {
+                        httpClient.close();
+                        handler.handle(new Either.Left<>(e.toString()));
+                        log.error("Error deleteUsers - UnsupportedEncodingException", e);
+                    }
                 }
             } else {
                 httpClient.close();
@@ -189,7 +196,13 @@ public class DefaultSynchService {
                     log.info(message);
                     endSyncUsers(handler);
                 } else {
-                    enrollUsersIndivudually(arrUsersToEnroll, handlerEnrollUsers);
+                    try {
+                        enrollUsersIndivudually(arrUsersToEnroll, handlerEnrollUsers);
+                    } catch (UnsupportedEncodingException e) {
+                        httpClient.close();
+                        handler.handle(new Either.Left<>(e.toString()));
+                        log.error("Error enrollUsersIndivudually - UnsupportedEncodingException", e);
+                    }
                 }
             } else {
                 httpClient.close();
@@ -252,17 +265,23 @@ public class DefaultSynchService {
                                 log.info(message);
                                 endSyncUsers(handler);
                             } else {
-                                updateUsers(arrUsersToUpdate, event -> {
-                                    if (event.isRight()) {
-                                        log.info("END updating users");
-                                        endSyncUsers(handler);
-                                    } else {
-                                        httpClient.close();
-                                        handler.handle(new Either.Left<>(event.left().getValue()));
-                                        log.error("Error updating users", event.left());
-                                    }
+                                try {
+                                    updateUsers(arrUsersToUpdate, event -> {
+                                        if (event.isRight()) {
+                                            log.info("END updating users");
+                                            endSyncUsers(handler);
+                                        } else {
+                                            httpClient.close();
+                                            handler.handle(new Either.Left<>(event.left().getValue()));
+                                            log.error("Error updating users", event.left());
+                                        }
 
-                                });
+                                    });
+                                } catch (UnsupportedEncodingException e) {
+                                    httpClient.close();
+                                    handler.handle(new Either.Left<>(e.toString()));
+                                    log.error("Error updating users - UnsupportedEncodingException", e);
+                                }
                             }
 
                             if (listGetFuture.isEmpty()) {
@@ -388,7 +407,7 @@ public class DefaultSynchService {
         }
     }
 
-    private void deleteUsers(JsonArray arrUsersToDelete, Handler<Either<String, Buffer>> handlerDeleteUserse) {
+    private void deleteUsers(JsonArray arrUsersToDelete, Handler<Either<String, Buffer>> handlerDeleteUserse) throws UnsupportedEncodingException {
         log.info("START deleting users");
         JsonObject body = new JsonObject();
         body.put("parameters", arrUsersToDelete)
@@ -398,7 +417,7 @@ public class DefaultSynchService {
         HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerDeleteUserse);
     }
 
-    private void updateUsers(JsonArray arrUsersToUpdate, Handler<Either<String, Buffer>> handlerUpdateUser) {
+    private void updateUsers(JsonArray arrUsersToUpdate, Handler<Either<String, Buffer>> handlerUpdateUser) throws UnsupportedEncodingException {
         log.info("START updating users");
         JsonObject body = new JsonObject();
         body.put("parameters", arrUsersToUpdate)
@@ -408,14 +427,13 @@ public class DefaultSynchService {
         HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerUpdateUser);
     }
 
-    private void enrollUsersIndivudually(JsonArray arrUsersToEnroll, Handler<Either<String, Buffer>> handlerEnrollUsers) {
+    private void enrollUsersIndivudually(JsonArray arrUsersToEnroll, Handler<Either<String, Buffer>> handlerEnrollUsers) throws UnsupportedEncodingException {
         log.info("START enrolling users individually");
         JsonObject body = new JsonObject();
         body.put("parameters", arrUsersToEnroll)
                 .put("wstoken", moodleConfig.getString("wsToken"))
                 .put("wsfunction", WS_POST_ENROLL_USERS_COURSES)
                 .put("moodlewsrestformat", JSON);
-        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerEnrollUsers);
     }
 
@@ -481,7 +499,7 @@ public class DefaultSynchService {
 
 
     // --------------------------------------- GROUPS ---------------------------------------------------
-    private void updateCohorts(JsonArray arrCohortsToUpdate, Handler<Either<String, Buffer>> handlerCohort) {
+    private void updateCohorts(JsonArray arrCohortsToUpdate, Handler<Either<String, Buffer>> handlerCohort) throws UnsupportedEncodingException {
         log.info("START updating cohorts");
         JsonObject body = new JsonObject();
         body.put("parameters", arrCohortsToUpdate)
@@ -491,7 +509,7 @@ public class DefaultSynchService {
         HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerCohort);
     }
 
-    private void deleteCohorts(JsonArray arrCohortsToDelete, Handler<Either<String, Buffer>> handlerCohort) {
+    private void deleteCohorts(JsonArray arrCohortsToDelete, Handler<Either<String, Buffer>> handlerCohort) throws UnsupportedEncodingException {
         log.info("START deleting cohorts");
         JsonObject body = new JsonObject();
         body.put("parameters", arrCohortsToDelete)
@@ -733,14 +751,26 @@ public class DefaultSynchService {
 
                 // Inscription individuel de tous les utilisateurs à leurs cours
                 // s'ils sont identifiés comme sortant d'une cohorte
-                getUsersCoursesAndEnroll(usersIdsToEnrrollIndivually, handler);
+                try {
+                    getUsersCoursesAndEnroll(usersIdsToEnrrollIndivually, handler);
+                } catch (UnsupportedEncodingException e) {
+                    httpClient.close();
+                    handler.handle(new Either.Left<>(e.toString()));
+                    log.error("Error getUsersCoursesAndEnroll - UnsupportedEncodingException", e);
+                }
             }
         };
 
         handlerEnrollGroups = event -> {
             if (event.isRight()) {
                 log.info("END enrolling users individually");
-                updateAnDeleteCohorts(handler);
+                try {
+                    updateAnDeleteCohorts(handler);
+                } catch (UnsupportedEncodingException e) {
+                    httpClient.close();
+                    handler.handle(new Either.Left<>(e.toString()));
+                    log.error("Error updateAnDeleteCohorts - UnsupportedEncodingException", e);
+                }
             } else {
                 httpClient.close();
                 handler.handle(new Either.Left<>(event.left().getValue()));
@@ -775,7 +805,7 @@ public class DefaultSynchService {
         moduleSQLRequestService.getDistinctSharedBookMarkUsers(groupsIds, true, getSharedBookMarkHandler);
     }
 
-    private void updateAnDeleteCohorts(Handler<Either<String, JsonObject>> handler) {
+    private void updateAnDeleteCohorts(Handler<Either<String, JsonObject>> handler) throws UnsupportedEncodingException {
         if (arrCohortsToUpdate.isEmpty() && arrCohortsToDelete.isEmpty()) {
             String message = "Aucune cohorte à update/delete";
             log.info(message);
@@ -827,7 +857,7 @@ public class DefaultSynchService {
         }
     }
 
-    private void getUsersCoursesAndEnroll(JsonArray usersIdsToEnrrollIndivually, Handler<Either<String, JsonObject>> handler) {
+    private void getUsersCoursesAndEnroll(JsonArray usersIdsToEnrrollIndivually, Handler<Either<String, JsonObject>> handler) throws UnsupportedEncodingException {
 
         if(usersIdsToEnrrollIndivually.isEmpty()) {
             String message = "No user to enrroll";
@@ -862,10 +892,22 @@ public class DefaultSynchService {
                     if (arrUsersToEnroll.isEmpty()) {
                         String message = "Aucune inscription individuelle necessaire (pas de cours)";
                         log.info(message);
-                        updateAnDeleteCohorts(handler);
+                        try {
+                            updateAnDeleteCohorts(handler);
+                        } catch (UnsupportedEncodingException e) {
+                            httpClient.close();
+                            handler.handle(new Either.Left<>(e.getMessage()));
+                            log.error("Error updateAnDeleteCohorts - UnsupportedEncodingException", e);
+                        }
                         endSyncGroups(handler);
                     } else {
-                        enrollUsersIndivudually(arrUsersToEnroll, handlerEnrollGroups);
+                        try {
+                            enrollUsersIndivudually(arrUsersToEnroll, handlerEnrollGroups);
+                        } catch (UnsupportedEncodingException e) {
+                            httpClient.close();
+                            handler.handle(new Either.Left<>(e.getMessage()));
+                            log.error("Error enrollUsersIndivudually - UnsupportedEncodingException", e);
+                        }
                     }
                 } else {
                     httpClient.close();
