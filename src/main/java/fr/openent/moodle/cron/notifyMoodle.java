@@ -80,12 +80,11 @@ public class notifyMoodle extends ControllerHelper implements Handler<Long> {
                         user.setUserId(notification.getString("useridfrom"));
                         user.setUsername(notification.getString("firstname") + " " + notification.getString("lastname"));
                         String timelineSender = user.getUsername() != null ? user.getUsername() : null;
-                        String message = notification.getString("fullmessage");
-                        String courseUri = message.substring(message.indexOf("(") + 1, message.indexOf(")"));
+                        String subject = notification.getString("subject");
+                        if(!subject.endsWith(".")){subject += ".";}
                         final JsonObject params = new JsonObject()
-                                .put("subject", notification.getString("subject"))
+                                .put("subject", subject)
                                 .put("activityUri", notification.getString("contexturl"))
-                                .put("courseUri", courseUri)
                                 .put("disableAntiFlood", true);
                         params.put("username", timelineSender).put("uri", "/userbook/annuaire#" + user.getUserId());
                         List<String> recipients = new ArrayList<>();
