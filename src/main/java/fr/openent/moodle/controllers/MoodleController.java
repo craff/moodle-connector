@@ -283,7 +283,7 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("public Get picture for moodle website")
     @Get("/files/:id")
     public void getFile(HttpServerRequest request) {
-        String idImage = request.getParam("id").substring(0, request.getParam("id").lastIndexOf('.'));
+        String idImage = request.getParam("id");
         moodleEventBus.getImage(idImage, event -> {
             if (event.isRight()) {
                 JsonObject document = event.right().getValue();
@@ -301,7 +301,7 @@ public class MoodleController extends ControllerHelper {
     }
 
     @ApiDoc("get info image workspace")
-    @Get("/info/image/:id")
+    @Get("info/image/:id/")
     public void getInfoImg(final HttpServerRequest request) {
         try {
             moodleEventBus.getImage(request.getParam("id"), DefaultResponseHandler.defaultResponseHandler(request));
