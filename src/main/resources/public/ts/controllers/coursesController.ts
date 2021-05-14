@@ -920,6 +920,10 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
         $scope.courseToPublish = $scope.getSelectedCourses()[0];
         $scope.courseToPublish.myRights = {};
         $scope.courseToPublish = Mix.castAs(PublicCourse, $scope.courseToPublish) ;
+        $scope.filterChoice.levels = [];
+        $scope.filterChoice.disciplines = [];
+        $scope.filterChoice.plain_text = [];
+
         $scope.courseToPublish.levels.forEach(level => {
             $scope.filterChoice.levels.push(level);
         });
