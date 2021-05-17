@@ -2,9 +2,12 @@
   "moodle": "Moodle",
   "moodle.notification": "Moodle notification",
   "push.notif.moodle": "New Moodle notification",
+  "moodle.enrol_notification": "Moodle enrolment notification",
   "timeline.no.sender": "Unknown sender",
   "timeline.moodle.notification": "New Moodle notification from ",
   "timeline.consult": " Consult the ",
   "timeline.moodle.course": "Moodle course",
-  "timeline.moodle.activity": "activity"
+  "timeline.moodle.activity": "activity",
+  "timeline.enrol.username": " has enrolled you in his Moodle course.",
+  "timeline.enrol.no.username": "You have been enrolled in a Moodle course."
 }

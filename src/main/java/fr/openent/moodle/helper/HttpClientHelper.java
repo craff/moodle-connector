@@ -57,7 +57,8 @@ public class HttpClientHelper extends ControllerHelper {
         return vertx.createHttpClient(options);
     }
 
-    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, Vertx vertx, Handler<Either<String, Buffer>> handler) throws UnsupportedEncodingException {
+    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, Vertx vertx,
+                                            Handler<Either<String, Buffer>> handler) throws UnsupportedEncodingException {
 
         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);

@@ -78,7 +78,9 @@ public class Moodle extends BaseServer {
 		courseConf.setTable("course");
 		courseConf.setShareTable("course_shares");
 
-		MoodleController moodleController = new MoodleController(storage, eb);
+		TimelineHelper timelineHelper = new TimelineHelper(vertx, eb, config);
+
+		MoodleController moodleController = new MoodleController(storage, eb, timelineHelper);
         PublishedCourseController publishedCourseController = new PublishedCourseController();
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
@@ -92,8 +94,6 @@ public class Moodle extends BaseServer {
 		} catch (ParseException e) {
 			log.fatal("Invalid timeSecondSynchCron cron expression.", e);
 		}
-
-		TimelineHelper timelineHelper = new TimelineHelper(vertx, eb, config);
 
 		try {
 			new CronTrigger(vertx, config.getString("timeCheckNotifs")).schedule(

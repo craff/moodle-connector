@@ -39,6 +39,7 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -76,6 +77,8 @@ public class MoodleController extends ControllerHelper {
 
     public static final String baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
 
+    private final TimelineHelper timelineHelper;
+
 
     @Override
     public void init(Vertx vertx, JsonObject config, RouteMatcher rm,
@@ -84,7 +87,7 @@ public class MoodleController extends ControllerHelper {
         eventStore = EventStoreFactory.getFactory().getEventStore(Moodle.class.getSimpleName());
     }
 
-    public MoodleController(final Storage storage, EventBus eb) {
+    public MoodleController(final Storage storage, EventBus eb, TimelineHelper timelineHelper) {
         super();
         this.eb = eb;
         this.storage = storage;
@@ -97,6 +100,8 @@ public class MoodleController extends ControllerHelper {
 
         //todo remove mail constant and add mail from zimbra, ent ...
         this.userMail = Moodle.moodleConfig.getString("userMail");
+
+        this.timelineHelper = timelineHelper;
     }
 
     //Permissions
@@ -863,11 +868,13 @@ public class MoodleController extends ControllerHelper {
                 if (user != null) {
                     for (Object idGroup : shareCourseObject.copy().getJsonObject("groups").getMap().keySet().toArray()) {
                         if (idGroup.toString().startsWith("GR_")) {
-                            shareCourseObject.getJsonObject("groups").put(idGroup.toString().substring(3), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
+                            shareCourseObject.getJsonObject("groups")
+                                    .put(idGroup.toString().substring(3), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
                             shareCourseObject.getJsonObject("groups").remove(idGroup.toString());
                         }
                         if (idGroup.toString().startsWith("SB_")) {
-                            shareCourseObject.getJsonObject("bookmarks").put(idGroup.toString().substring(2), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
+                            shareCourseObject.getJsonObject("bookmarks")
+                                    .put(idGroup.toString().substring(2), shareCourseObject.getJsonObject("groups").getValue(idGroup.toString()));
                             shareCourseObject.getJsonObject("groups").remove(idGroup.toString());
                         }
                     }
@@ -926,7 +933,8 @@ public class MoodleController extends ControllerHelper {
                             JsonArray usersFutureResult = getUsersFuture.result();
                             JsonArray groupsFutureResult = getUsersInGroupsFuture.result();
                             JsonArray bookmarksFutureResult = getBookmarksFuture.result();
-                            JsonArray getTheAuditeurIdFutureResult = getTheAuditeurIdFuture.result().getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+                            JsonArray getTheAuditeurIdFutureResult = getTheAuditeurIdFuture.result().getJsonObject(0)
+                                    .getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
 
                             JsonObject auditeur = new JsonObject();
                             for (int i = 0; i < getTheAuditeurIdFutureResult.size(); i++) {
@@ -943,7 +951,8 @@ public class MoodleController extends ControllerHelper {
                                 shareObjectToFill.put("users", usersFutureResult);
                                 for (Object userObject : usersFutureResult) {
                                     JsonObject userJson = ((JsonObject) userObject);
-                                    if (userJson.getString("id").equals(user.getUserId()) && userJson.getString("id").equals(auditeur.getString("id"))) {
+                                    if (userJson.getString("id").equals(user.getUserId()) &&
+                                            userJson.getString("id").equals(auditeur.getString("id"))) {
                                         userJson.put("role", moodleConfig.getInteger("idAuditeur"));
                                     } else {
                                         userJson.put("role", mapInfo.get(userJson.getString("id")));
@@ -962,12 +971,14 @@ public class MoodleController extends ControllerHelper {
                             List<Integer> listRankGroup = new ArrayList<>();
                             int i = 0;
                             if (bookmarksFutureResult != null && !bookmarksFutureResult.isEmpty()) {
-                                postShareProcessingService.getUsersInBookmarksFutureLoop(shareObjectToFill, mapInfo, bookmarksFutureResult, listUsersFutures, listRankGroup, i);
+                                postShareProcessingService.getUsersInBookmarksFutureLoop(shareObjectToFill, mapInfo,
+                                        bookmarksFutureResult, listUsersFutures, listRankGroup, i);
                             }
                             if (listUsersFutures.size() > 0) {
                                 CompositeFuture.all(listUsersFutures).setHandler(finished -> {
                                     if (finished.succeeded()) {
-                                        postShareProcessingService.processUsersInBookmarksFutureResult(shareObjectToFill, listUsersFutures, listRankGroup);
+                                        postShareProcessingService.processUsersInBookmarksFutureResult(shareObjectToFill,
+                                                listUsersFutures, listRankGroup);
                                         sendRightShare(shareObjectToFill, request);
                                     } else {
                                         badRequest(request, event.cause().getMessage());
@@ -999,33 +1010,12 @@ public class MoodleController extends ControllerHelper {
             if (shareObjectToFill.getJsonArray("groups") != null) {
                 for (int i = 0; i < shareObjectToFill.getJsonArray("groups").size(); i++) {
                     for (int j = 0; j < shareObjectToFill.getJsonArray("groups").getJsonObject(i).getJsonArray("users").size(); j++) {
-                        zimbraEmail.add(shareObjectToFill.getJsonArray("groups").getJsonObject(i).getJsonArray("users").getJsonObject(j).getString("id"));
+                        zimbraEmail.add(shareObjectToFill.getJsonArray("groups").getJsonObject(i).getJsonArray("users")
+                                .getJsonObject(j).getString("id"));
                     }
                 }
             }
-            log.info("JSON PARTAGE : " + shareObjectToFill.toString());
 
-            /*log.info("CALL getZimbraEmail : ");
-                moodleEventBus.getZimbraEmail(zimbraEmail, event -> {
-
-                log.info("END getZimbraEmail : ");
-                JsonObject zimbraResult = event.right().getValue();
-                ArrayList zimbraArray = new ArrayList(zimbraResult.getMap().keySet());
-                JsonObject zimbraObject = new JsonObject();
-                for (int i = 0; i < zimbraArray.size(); i++) {
-                    zimbraObject.put(zimbraArray.get(i).toString(), zimbraResult.getJsonObject(zimbraArray.get(i)
-                            .toString()).getString("email"));
-                }
-                Map<String, Object> zimbraMap = (zimbraObject.getMap());
-                JsonArray users = share.getJsonArray("users");
-                if(users != null) {
-                    for(int i = 0; i < users.size(); i++) {
-                        JsonObject user1 = users.getJsonObject(i);
-                        String idUser = user1.getString("id");
-                        user1.put("email", zimbraMap.get(idUser));
-                    }
-                }
-            */
             JsonArray users = shareObjectToFill.getJsonArray("users");
             if (users != null) {
                 for (int i = 0; i < users.size(); i++) {
@@ -1047,8 +1037,6 @@ public class MoodleController extends ControllerHelper {
                 }
             }
 
-            log.info("JSON PARTAGE WITH MAIL : " + shareObjectToFill);
-
             JsonObject shareSend = new JsonObject();
             shareSend.put("parameters", shareObjectToFill)
                     .put("wstoken", moodleConfig.getString("wsToken"))
@@ -1069,6 +1057,7 @@ public class MoodleController extends ControllerHelper {
                     HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, event -> {
                         if (event.isRight()) {
                             log.info("SUCCESS WS_CREATE_SHARECOURSE");
+                            enrolNotify(event.right().getValue().toJsonArray().getJsonObject(0).getJsonArray("response").getJsonObject(0), user);
                             request.response()
                                     .setStatusCode(200)
                                     .end();
@@ -1082,8 +1071,45 @@ public class MoodleController extends ControllerHelper {
                     renderError(request);
                 }
             }
-            //});
         });
+    }
+
+    private void enrolNotify( JsonObject response, UserInfos user) {
+        int courseId = response.getInteger("courseid");
+        JsonArray usersEnrolled = response.getJsonArray("users");
+        JsonArray groupsEnrolled = response.getJsonArray("groups");
+
+        String timelineSender = user.getUsername() != null ? user.getUsername() : null;
+        List<String> recipients = new ArrayList<>();
+        final JsonObject params = new JsonObject()
+                .put("courseUri", moodleConfig.getString("address_moodle") + "/course/view.php?id=" + courseId)
+                .put("disableAntiFlood", true);
+        params.put("username", timelineSender).put("uri", "/userbook/annuaire#" + user.getUserId());
+
+        for (Object userEnrolled : usersEnrolled) {
+            JsonObject userJson = (JsonObject) userEnrolled;
+            if (!userJson.getString("result").contains("already") && !userJson.getValue("idnumber").toString().equals("0")) {
+                recipients.add(userJson.getString("idnumber"));
+            }
+        }
+        for (Object group : groupsEnrolled) {
+            JsonObject groupJson = (JsonObject) group;
+            if (!groupJson.getString("result").contains("already") && !groupJson.getValue("idnumber").toString().equals("0")) {
+                usersEnrolled = groupJson.getJsonArray("users");
+                for (Object userEnrolled : usersEnrolled) {
+                    JsonObject userJson = (JsonObject) userEnrolled;
+                    if (!userJson.getString("result").contains("already") && !userJson.getValue("idnumber").toString().equals("0")) {
+                        recipients.add(userJson.getString("idnumber"));
+                    }
+                }
+            }
+        }
+
+        params.put("pushNotif", new JsonObject().put("title", "push.notif.moodle").put("body", ""));
+
+        if(!recipients.isEmpty()) {
+            timelineHelper.notifyTimeline(null, "moodle.enrol_notification", user, recipients, params);
+        }
     }
 
     @Get("/course/share/BP/:id")
