@@ -156,7 +156,7 @@
              id="path1472-1"
              inkscape:connector-curvature="0" />
           <path
-             style="opacity:1;fill:#e20037;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             style="opacity:1;fill:$primary;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              d="m 121.1294,163.8828 c 0,0 -30.335089,3.60814 -34.344129,5.07813 -4.00904,1.46998 -11.62623,8.01808 -7.75082,14.56618 3.87541,6.54811 13.76438,9.75534 16.03617,10.02261 2.27179,0.26727 31.136899,2.40543 32.606889,2.40543 1.46998,0 3.0736,-3.74178 3.74177,-4.81085 0.66817,-1.06908 2.13816,-3.0736 2.13816,-3.0736 0,0 14.83345,-15.50164 11.62622,-17.10525 -3.20723,-1.60362 -24.05426,-7.08265 -24.05426,-7.08265 z"
              id="path1466-0"
              inkscape:connector-curvature="0" />
@@ -179,7 +179,7 @@
              sodipodi:nodetypes="cssccccc"
              transform="translate(18.898809,-41.577381)" />
           <path
-             style="fill:#e20037;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             style="fill:$primary;fill-opacity:1;stroke:none;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              d="m 183.87092,171.5668 c 0,0 13.76438,3.60814 14.03165,11.8935 0.26727,8.28535 -7.75081,12.29439 -9.48807,12.96257 -1.73725,0.66817 -6.28083,3.0736 -21.24792,0.93544 -14.9671,-2.13816 -19.24341,-3.0736 -19.51068,-3.87541 -0.26727,-0.80181 -1.87088,-6.1472 -2.00452,-6.81537 -0.13364,-0.66817 -0.94725,-6.05271 -0.0118,-6.18635 0.93544,-0.13363 -5.51365,0.0901 -5.51365,0.0901 l 0.44734,-8.46995 12.56167,-6.01356 20.71338,-2.53907 z"
              id="path1468-4"
              inkscape:connector-curvature="0"
@@ -329,7 +329,7 @@
            sodipodi:cx="271.65109"
            sodipodi:type="arc"
            id="path1542-5-3-4"
-           style="opacity:1;vector-effect:none;fill:#e20037;fill-opacity:1;stroke:none;stroke-width:1.85904;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:2.3;stroke-dasharray:44.617, 44.617;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill" />
+           style="opacity:1;vector-effect:none;fill:$primary;fill-opacity:1;stroke:none;stroke-width:1.85904;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:2.3;stroke-dasharray:44.617, 44.617;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill" />
         <path
            sodipodi:arc-type="arc"
            inkscape:export-ydpi="90"

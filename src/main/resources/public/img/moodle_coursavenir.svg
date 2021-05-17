@@ -179,7 +179,7 @@
            inkscape:export-ydpi="90" />
         <path
            sodipodi:arc-type="arc"
-           style="opacity:1;vector-effect:none;fill:#e20037;fill-opacity:1;stroke:none;stroke-width:0.286488;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill"
+           style="opacity:1;vector-effect:none;fill:$primary;fill-opacity:1;stroke:none;stroke-width:0.286488;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:markers stroke fill"
            id="path1635-6-6"
            sodipodi:type="arc"
            sodipodi:cx="27.830053"
@@ -345,11 +345,11 @@
           </g>
         </g>
         <g
-           style="fill:#e20037;fill-opacity:1"
+           style="fill:$primary;fill-opacity:1"
            transform="matrix(0.44134065,0,0,0.44134065,-32.812245,71.47678)"
            id="g1066">
           <rect
-             style="fill:#e20037;fill-opacity:1;stroke:none;stroke-width:0.772999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             style="fill:$primary;fill-opacity:1;stroke:none;stroke-width:0.772999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
              id="rect1057"
              width="52.160713"
              height="17.386906"
@@ -358,13 +358,13 @@
              rx="8.6000509"
              ry="8.6934528" />
           <circle
-             style="fill:#e20037;fill-opacity:1;stroke:none;stroke-width:0.637385;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             style="fill:$primary;fill-opacity:1;stroke:none;stroke-width:0.637385;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
              id="path1059"
              cx="461.88693"
              cy="92.415169"
              r="8.8824406" />
           <circle
-             style="fill:#e20037;fill-opacity:1;stroke:none;stroke-width:0.571862;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+             style="fill:$primary;fill-opacity:1;stroke:none;stroke-width:0.571862;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
              id="path1061"
              cx="478.99033"
              cy="89.863846"

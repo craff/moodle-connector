@@ -75,7 +75,7 @@ body.moodle {
     }
 
     label.chip.checkbox-course.selected {
-      background-color: #e20037;
+      background-color: $primary;
     }
 
     .checkbox-activity {
@@ -147,16 +147,6 @@ body.moodle {
 
   .list-dashboard {
     margin: 15px 0px 15px 0px;
-  }
-
-  .coursesBackground-dashboard {
-    background: #eee;
-    @media screen and (min-width: 800px) {
-      padding: 15px 60px;
-    }
-    @media screen and (max-width: 800px) {
-      padding: 20px 15px;
-    }
   }
 
   .duplicateCourse{
@@ -439,9 +429,10 @@ body.moodle {
   progress-bar {
     &.courseProgress{
       .progress-bar {
-        background: #F6B3C3;
+        background: $primary;
         .filled {
-          background: #e20037;
+          background: $primary;
+          filter: brightness(120%);
         }
       }
     }
@@ -483,15 +474,16 @@ body.moodle {
   }
 
   label.chip.checkbox-course.selected {
-    background-color: #e20037;
+    background-color: $primary;
   }
 
   .switch input[type=checkbox]:checked+.tick {
-    background: #e20037;
+    background: $primary;
   }
 
   .switch input[type=checkbox]:checked+.tick:before {
-    background: #EE6687;
+    background: $primary;
+    filter: brightness(70%);
   }
 
   .move-up{
@@ -544,7 +536,7 @@ body.moodle {
 
     &.selected {
       &.course {
-        background-color: #e20037;
+        background-color: $primary;
       }
 
       &.activity {
@@ -558,7 +550,7 @@ body.moodle {
   }
 
   .textError {
-    color: #e20037;
+    color: $primary;
   }
 
   .yellow-color{
