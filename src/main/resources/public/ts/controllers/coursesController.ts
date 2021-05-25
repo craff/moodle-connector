@@ -121,6 +121,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             disciplines : [],
             plain_text : []
         };
+        $scope.plain_text;
         $scope.typeActivity = {
             availableOptions: [
                 {id: 'quiz', name: 'Quizz'},
@@ -917,25 +918,29 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.openPopUpMetadataChange = () => {
-        $scope.courseToPublish = $scope.getSelectedCourses()[0];
-        $scope.courseToPublish.myRights = {};
-        $scope.courseToPublish = Mix.castAs(PublicCourse, $scope.courseToPublish) ;
-        $scope.filterChoice.levels = [];
-        $scope.filterChoice.disciplines = [];
-        $scope.filterChoice.plain_text = [];
-
-        $scope.courseToPublish.levels.forEach(level => {
-            $scope.filterChoice.levels.push(level);
-        });
-        $scope.courseToPublish.disciplines.forEach(discipline => {
-            $scope.filterChoice.disciplines.push(discipline);
-        });
-        $scope.courseToPublish.plain_text.forEach(word => {
-            $scope.filterChoice.plain_text.push(word);
-        });
         template.open('lightboxContainer', 'publishCourses/changeMetadataPopUp');
         $scope.openLightbox = true;
         Utils.safeApply($scope);
+        $scope.courseToPublish = $scope.getSelectedCourses()[0];
+        $scope.courseToPublish.myRights = {};
+        $scope.courseToPublish = Mix.castAs(PublicCourse, $scope.courseToPublish);
+        $scope.courseToPublish.plain_text.all = $scope.courseToPublish.plain_text;
+        $scope.filterChoice.levels = [];
+        $scope.filterChoice.disciplines = [];
+        $scope.filterChoice.plain_text = [];
+        $timeout(() =>
+            {
+                $scope.courseToPublish.levels.forEach(level => {
+                    $scope.filterChoice.levels.push($scope.levels.all.find(level_bis => level.label == level_bis.label));
+                });
+                $scope.courseToPublish.disciplines.forEach(discipline => {
+                    $scope.filterChoice.disciplines.push($scope.disciplines.all.find(discipline_bis => discipline.label == discipline_bis.label));
+                });
+                $scope.courseToPublish.plain_text.forEach(word => {
+                    $scope.filterChoice.plain_text.push(word);
+                });
+                Utils.safeApply($scope);}
+            , 100);
     };
 
         $scope.removeLevelFromCourse = (level: Label) => {
@@ -948,13 +953,16 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.courseToPublish.disciplines = _.without($scope.courseToPublish.disciplines, discipline);
         };
 
-    $scope.addKeyWord = (event) => {
+    $scope.addKeyWord = (event, plain_text) => {
         if (event.keyCode == 59 || event.key == "Enter") {
-            $scope.courseToPublish._plain_text =  $scope.courseToPublish._plain_text.replace(';','');
-            if ($scope.courseToPublish._plain_text.trim()!= ""){
-                if (!$scope.courseToPublish.plain_text)
-                    $scope.courseToPublish.plain_text = new Labels;
-                $scope.courseToPublish.plain_text.all.push(new Label(null, $scope.courseToPublish._plain_text.trim()));
+            //$scope.courseToPublish._plain_text =  $scope.courseToPublish._plain_text.replace(';','');
+            if (plain_text.trim()!= ""){
+                if (!!!$scope.courseToPublish.plain_text) {
+                    $scope.courseToPublish.plain_text = new Labels();
+                    $scope.filterChoice.plain_text = new Labels();
+                }
+                $scope.courseToPublish.plain_text.all.push(new Label(null, plain_text.trim()));
+                $scope.filterChoice.plain_text.push(new Label(null, plain_text.trim()));
             }
 /*            $scope.courseToPublish._plain_text.all.push(new Label(null, ""));*/
         }
