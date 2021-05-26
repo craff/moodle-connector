@@ -430,9 +430,9 @@ body.moodle {
     &.courseProgress{
       .progress-bar {
         background: $primary;
+        box-shadow: inset 0 0 100px 100px rgba(255,255,255,0.75);
         .filled {
           background: $primary;
-          filter: brightness(120%);
         }
       }
     }
