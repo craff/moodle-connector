@@ -1437,7 +1437,10 @@ public class MoodleController extends ControllerHelper {
             }
             newMetadata.put("discipline_label", disciplineArray);
 
-            JsonArray plainTextArray = updateMetadata.getJsonArray("plain_text");
+            JsonArray plainTextArray = new JsonArray();
+            for (int i = 0; i < updateMetadata.getJsonArray("plain_text").size(); i++) {
+                plainTextArray.add((updateMetadata.getJsonArray("plain_text").getJsonObject(i).getString("label")));
+            }
             newMetadata.put("key_words", plainTextArray);
 
             callMediacentreEventBusToUpdateMetadata(updateMetadata, ebEvent -> {

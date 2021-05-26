@@ -214,8 +214,11 @@ public class DefaultMoodleEventBus extends ControllerHelper implements moodleEve
         }
         query.getJsonObject("doc").put("disciplines", disciplineArray);
 
-        JsonArray plainTextArray = updateMetadata.getJsonArray("plain_text");
-        query.getJsonObject("doc").put("plain_text", plainTextArray);
+        JsonArray plainTextArray = new JsonArray();
+        for (int i = 0; i < updateMetadata.getJsonArray("plain_text").size(); i++) {
+            plainTextArray.add((updateMetadata.getJsonArray("plain_text").getJsonObject(i).getString("label")));
+        }
+        query.getJsonObject("doc").put("key_words", plainTextArray);
 
         JsonObject resources = new JsonObject();
         resources.put("query", query)

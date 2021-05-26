@@ -508,12 +508,14 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
 
     @Override
     public void updatePublicCourseMetadata(Integer course_id, JsonObject newMetadata, Handler<Either<String, JsonObject>> handler) {
-        String query = "UPDATE " + Moodle.moodleSchema + ".publication SET discipline_label = ?, level_label = ? " +
-                "WHERE course_id = ?";
+        String query = "UPDATE " + Moodle.moodleSchema + ".publication SET discipline_label = " + Sql.arrayPrepared(newMetadata.getJsonArray("discipline_label"))
+                + ", level_label = " + Sql.arrayPrepared(newMetadata.getJsonArray("level_label")) + ", key_words = " +
+                Sql.arrayPrepared(newMetadata.getJsonArray("key_words")) + " WHERE course_id = ?";
 
         JsonArray values = new JsonArray();
-        values.add(newMetadata.getJsonArray("discipline_label"));
-        values.add(newMetadata.getJsonArray("level_label"));
+        values.addAll(newMetadata.getJsonArray("discipline_label"));
+        values.addAll(newMetadata.getJsonArray("level_label"));
+        values.addAll(newMetadata.getJsonArray("key_words"));
         values.add(course_id);
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
