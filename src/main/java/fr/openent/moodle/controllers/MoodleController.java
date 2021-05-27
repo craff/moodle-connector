@@ -1429,11 +1429,17 @@ public class MoodleController extends ControllerHelper {
             for (int i = 0; i < updateMetadata.getJsonArray("levels").size(); i++) {
                 levelArray.add((updateMetadata.getJsonArray("levels").getJsonObject(i).getString("label")));
             }
+            if(levelArray.isEmpty()) {
+                levelArray.add("");
+            }
             newMetadata.put("level_label", levelArray);
 
             JsonArray disciplineArray = new JsonArray();
             for (int i = 0; i < updateMetadata.getJsonArray("disciplines").size(); i++) {
                 disciplineArray.add((updateMetadata.getJsonArray("disciplines").getJsonObject(i).getString("label")));
+            }
+            if(disciplineArray.isEmpty()) {
+                disciplineArray.add("");
             }
             newMetadata.put("discipline_label", disciplineArray);
 
@@ -1441,8 +1447,10 @@ public class MoodleController extends ControllerHelper {
             for (int i = 0; i < updateMetadata.getJsonArray("plain_text").size(); i++) {
                 plainTextArray.add((updateMetadata.getJsonArray("plain_text").getJsonObject(i).getString("label")));
             }
+            if(plainTextArray.isEmpty()) {
+                plainTextArray.add("");
+            }
             newMetadata.put("key_words", plainTextArray);
-
             callMediacentreEventBusToUpdateMetadata(updateMetadata, ebEvent -> {
                 if (ebEvent.isRight()) {
                     moduleSQLRequestService.updatePublicCourseMetadata(course_id, newMetadata, event -> {

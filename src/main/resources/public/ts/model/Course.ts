@@ -261,19 +261,25 @@ export class Courses {
                 let textArray = new Labels();
                 if(!!course.disciplines) {
                     course.disciplines.forEach(function (discipline) {
-                        disciplinesArray.all.push(new Label(null, discipline[1]));
+                        if(!!discipline[1]) {
+                            disciplinesArray.all.push(new Label(null, discipline[1]));
+                        }
                     });
                     course.disciplines = Mix.castArrayAs(Label, disciplinesArray.all);
                 }
                 if(!!course.levels) {
                     course.levels.forEach(function (level) {
-                        levelsArray.all.push(new Label(null, level[1]));
+                        if(!!level[1]) {
+                            levelsArray.all.push(new Label(null, level[1]));
+                        }
                     });
                     course.levels = Mix.castArrayAs(Label, levelsArray.all);
                 }
                 if(!!course.plain_text) {
                     course.plain_text.forEach(function (word) {
-                        textArray.all.push(new Label(null, word[1]));
+                        if(!!word[1]) {
+                            textArray.all.push(new Label(null, word[1]));
+                        }
                     });
                     course.plain_text = Mix.castArrayAs(Label, textArray.all);
                 }

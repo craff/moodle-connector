@@ -183,6 +183,7 @@
 	"moodle.course.publish.update.err": "Erreur lors de la modification du cours",
 	"moodle.key.words.separation": "Veuillez renseigner les mots clefs choisis",
 	"moodle.info.publishTextConfirmSuccess": "Le cours a bien été publié",
+	"moodle.info.modifyTextConfirmSuccess": "Le cours a bien été modifié",
 	"moodle.empty.create.courses": "Vous n'avez créé aucun cours pour le moment",
 	"moodle.empty.toCome.courses": "Il n'y a pour l'instant aucun cours à venir",
 	"moodle.empty.ToDo.courses": "Vous n'êtes inscrit à aucun cours pour le moment",

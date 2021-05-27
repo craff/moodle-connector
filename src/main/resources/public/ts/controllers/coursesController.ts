@@ -989,7 +989,18 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
     };
 
     $scope.modifyCourse = async () => {
-        await $scope.courseToPublish.modify();
+        $scope.courseToPublish.levels = $scope.filterChoice.levels;
+        $scope.courseToPublish.disciplines = $scope.filterChoice.disciplines;
+        $scope.courseToPublish.plain_text.all = $scope.filterChoice.plain_text;
+        await $scope.courseToPublish.modify()
+            .then(async (): Promise<void> => {
+            await $scope.initFolders();
+            await $scope.initCoursesByUser();
+            $timeout((): void =>
+                $scope.updateCourse(), TIME_TO_REFRESH_DUPLICATION);
+            $scope.isPrintMenuCoursesPublished();
+            notify.success('moodle.info.modifyTextConfirmSuccess');
+        });
         $scope.resetSelect();
         $scope.closePopUp();
         $scope.toasterShow = false;
