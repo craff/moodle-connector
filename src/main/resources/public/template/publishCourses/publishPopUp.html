@@ -34,7 +34,7 @@
             <label >
                 <i18n>keyword</i18n>
             </label>
-            <input class="row" type="text" ng-model="plain_text" ng-keyup="addKeyWord($event, plain_text)"
+            <input class="row" type="text" ng-model="query.plain_text" ng-keyup="addKeyWord($event)"
                    i18n-placeholder="moodle.key.words.separation" >
             <div class=" twelve cell select-blocks">
                 <div ng-repeat="word in courseToPublish.plain_text.all"

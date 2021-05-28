@@ -1450,7 +1450,7 @@ public class MoodleController extends ControllerHelper {
             if(plainTextArray.isEmpty()) {
                 plainTextArray.add("");
             }
-            newMetadata.put("key_words", plainTextArray);
+            newMetadata.put("plain_text", plainTextArray);
             callMediacentreEventBusToUpdateMetadata(updateMetadata, ebEvent -> {
                 if (ebEvent.isRight()) {
                     moduleSQLRequestService.updatePublicCourseMetadata(course_id, newMetadata, event -> {

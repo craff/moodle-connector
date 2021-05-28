@@ -121,7 +121,7 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             disciplines : [],
             plain_text : []
         };
-        $scope.plain_text;
+        $scope.query = {plain_text: ""};
         $scope.typeActivity = {
             availableOptions: [
                 {id: 'quiz', name: 'Quizz'},
@@ -953,24 +953,28 @@ export const mainController = ng.controller('MoodleController', ['$scope', '$tim
             $scope.courseToPublish.disciplines = _.without($scope.courseToPublish.disciplines, discipline);
         };
 
-    $scope.addKeyWord = (event, plain_text) => {
+    $scope.addKeyWord = (event) => {
         if (event.keyCode == 59 || event.key == "Enter") {
-            //$scope.courseToPublish._plain_text =  $scope.courseToPublish._plain_text.replace(';','');
-            if (plain_text.trim()!= ""){
+            if ($scope.query.plain_text.trim()!= ""){
                 if (!!!$scope.courseToPublish.plain_text) {
                     $scope.courseToPublish.plain_text = new Labels();
                     $scope.filterChoice.plain_text = new Labels();
                 }
-                $scope.courseToPublish.plain_text.all.push(new Label(null, plain_text.trim()));
-                $scope.filterChoice.plain_text.push(new Label(null, plain_text.trim()));
+                $scope.courseToPublish.plain_text.all.push(new Label(null, $scope.query.plain_text.trim()));
+                $scope.filterChoice.plain_text.push(new Label(null, $scope.query.plain_text.trim()));
+                $scope.query.plain_text = "";
+                Utils.safeApply($scope);
             }
-/*            $scope.courseToPublish._plain_text.all.push(new Label(null, ""));*/
         }
     };
 
         $scope.removeWordFromCourse = (word: Label) => {
             $scope.filterChoice.plain_text = _.without($scope.filterChoice.plain_text , word);
             $scope.courseToPublish.plain_text = _.without($scope.courseToPublish.plain_text, word);
+            if($scope.courseToPublish.plain_text.length == 0) {
+                $scope.courseToPublish.plain_text = new Labels();
+                $scope.courseToPublish.plain_text.all = [];
+            }
         };
 
     $scope.publishCourse = async () => {
