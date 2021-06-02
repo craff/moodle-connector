@@ -34,7 +34,3 @@ routes.define(function($routeProvider){
         redirectTo: '/'
     });
 });
-
-//require("ng-clamp1");
-//
-// ng.addRequiredModule('ng-clamp');

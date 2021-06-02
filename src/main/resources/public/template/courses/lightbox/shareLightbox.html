@@ -1,0 +1,5 @@
+<!-- popup for share a course -->
+<div ng-controller="shareController">
+    <share-panel auto-close="true" app-prefix="moodle" resources="myCourse"
+                 on-validate="submitShareCourse()" ng-if="myCourse"></share-panel>
+</div>

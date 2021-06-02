@@ -1,4 +1,4 @@
-<div>
+<div ng-controller="dashboardController">
     <div class="row">
         <span class="left-magnet title-dashboard">
             <i18n>moodle.to.do.courses</i18n>
@@ -54,11 +54,11 @@
                 </div>
             </div>
             <div class="cell right-magnet title-dashboard zero-mobile">
-                <i class="show-list" ng-class="{ selected: viewModeToDo == 'list' }" ng-click="changeViewMode('ToDo','list')"></i>
+                <i class="show-list" ng-class="{ selected: show.viewModeToDo == 'list' }" ng-click="changeViewMode('ToDo','list')"></i>
             </div>
             <span> </span>
             <div class="cell right-magnet zero-mobile">
-                <i class="show-icons" ng-class="{ selected: viewModeToDo == 'icons' }" ng-click="changeViewMode('ToDo','icons')"></i>
+                <i class="show-icons" ng-class="{ selected: show.viewModeToDo == 'icons' }" ng-click="changeViewMode('ToDo','icons')"></i>
             </div>
         </div>
         <div class="row center-courses">
@@ -70,11 +70,13 @@
                     <div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.coursesToShow('coursesToDo').slice(firstCoursesToDo,lastCoursesToDo)" class="twelve-mobile style-bord-with-over-effect infoBackground bottom-margin"
-            ng-class="{'definedImageSmallToDoWidth cell infoBackgroundTopMargin right-course-margin' : courses.isTheFirst(course) && viewModeToDo == 'icons',
-             'undefined-image-small-toDo-width cell infoBackgroundTopMargin right-course-margin' : !courses.isTheFirst(course) && viewModeToDo == 'icons',
-              'all-width cell' : viewModeToDo == 'list'}">
-                <courses-item course="course" place="'coursesToDo'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToDo" first ="courses.isTheFirst(course)"></courses-item>
+            <div ng-repeat="course in courses.coursesToShow('coursesToDo').slice(show.firstCoursesToDo,show.lastCoursesToDo)"
+                 class="twelve-mobile style-bord-with-over-effect infoBackground bottom-margin"
+            ng-class="{'definedImageSmallToDoWidth cell infoBackgroundTopMargin right-course-margin' : courses.isTheFirst(course) && show.viewModeToDo == 'icons',
+             'undefined-image-small-toDo-width cell infoBackgroundTopMargin right-course-margin' : !courses.isTheFirst(course) && show.viewModeToDo == 'icons',
+              'all-width cell' : show.viewModeToDo == 'list'}">
+                <courses-item course="course" place="'coursesToDo'" check="showToaster"
+                              view ="show.viewModeToDo" first ="courses.isTheFirst(course)"></courses-item>
             </div>
             <div class="twelve courses-empty vertical-spacing" ng-if="courses.coursesToShow('coursesToDo').length == 0 && !displayMessageLoader">
                 <img src="moodle/public/img/moodle_inscriptions.svg"/>
@@ -86,10 +88,11 @@
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button ng-if="!(firstCoursesToDo == 0)" class="pagination-button" ng-click="previousCoursesButton('ToDo')" >
+                    <button ng-if="!(show.firstCoursesToDo == 0)" class="pagination-button" ng-click="previousCoursesButton('ToDo')" >
                         <i class="left-open"></i>
                     </button>
-                    <button ng-if="!(lastCoursesToDo >= courses.coursesToShow('coursesToDo').length)" class="pagination-button" ng-click="nextCoursesButton('ToDo')">
+                    <button ng-if="!(show.lastCoursesToDo >= courses.coursesToShow('coursesToDo').length)"
+                            class="pagination-button" ng-click="nextCoursesButton('ToDo')">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -146,11 +149,11 @@
                 </div>
             </div>
             <div class="cell right-magnet title-dashboard zero-mobile">
-                <i class="show-list" ng-class="{ selected: viewModeToCome == 'list' }" ng-click="changeViewMode('ToCome','list')"></i>
+                <i class="show-list" ng-class="{ selected: show.viewModeToCome == 'list' }" ng-click="changeViewMode('ToCome','list')"></i>
             </div>
             <span> </span>
             <div class="cell right-magnet zero-mobile">
-                 <i class="show-icons" ng-class="{ selected: viewModeToCome == 'icons' }" ng-click="changeViewMode('ToCome','icons')"></i>
+                 <i class="show-icons" ng-class="{ selected: show.viewModeToCome == 'icons' }" ng-click="changeViewMode('ToCome','icons')"></i>
             </div>
         </div>
         <div class="row center-courses">
@@ -162,10 +165,11 @@
                     <div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(firstCoursesToCome,lastCoursesToCome)"
+            <div ng-repeat="course in courses.coursesToShow('coursesToCome').slice(show.firstCoursesToCome,show.lastCoursesToCome)"
                  class="twelve-mobile style-bord-without-over-effect infoBackground bottom-margin grey-color"
-                 ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell infoBackgroundTopMargin' : viewModeToCome == 'icons'}">
-                <courses-item course="course" place="'coursesToCome'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor" view ="viewModeToCome"></courses-item>
+                 ng-class="{ 'all-width cell' : viewModeToCome == 'list', 'small-width cell infoBackgroundTopMargin' : show.viewModeToCome == 'icons'}">
+                <courses-item course="course" place="'coursesToCome'" check="showToaster"
+                              view ="show.viewModeToCome"></courses-item>
             </div>
             <div class="twelve courses-empty vertical-spacing" ng-if="courses.coursesToShow('coursesToCome').length == 0 && !displayMessageLoader">
                 <img src="moodle/public/img/moodle_coursavenir.svg"/>
@@ -177,10 +181,11 @@
         <div class="row next-previous-courses">
             <div class="cell right-magnet">
                 <li class="changeWeekButton">
-                    <button  ng-if=" !(firstCoursesToCome == 0)" class="pagination-button" ng-click="previousCoursesButton('ToCome')">
+                    <button  ng-if=" !(show.firstCoursesToCome == 0)" class="pagination-button" ng-click="previousCoursesButton('ToCome')">
                         <i class="left-open"></i>
                     </button>
-                    <button ng-if=" !(lastCoursesToCome >= courses.coursesToShow('coursesToCome').length)" class="pagination-button" ng-click="nextCoursesButton('ToCome')">
+                    <button ng-if=" !(show.lastCoursesToCome >= courses.coursesToShow('coursesToCome').length)"
+                            class="pagination-button" ng-click="nextCoursesButton('ToCome')">
                         <i class="open-right"></i>
                     </button>
                 </li>
@@ -204,8 +209,9 @@
                     <div class="lds-dual-ring row center-courses"></div>
                 </div>
             </div>
-            <div ng-repeat="course in courses.getLastCreation()" class="all-width cell twelve-mobile style-bord-with-over-effect infoBackground bottom-margin">
-                <courses-item course="course" place="'coursesRecent'" check="showToaster" date-function="printRightFormatDate" author-function="printRightFormatAuthor"></courses-item>
+            <div ng-repeat="course in courses.getLastCreation()"
+                 class="all-width cell twelve-mobile style-bord-with-over-effect infoBackground bottom-margin">
+                <courses-item course="course" place="'coursesRecent'" check="showToaster"></courses-item>
             </div>
             <div class="twelve courses-empty vertical-spacing" ng-if="courses.getLastCreation().length == 0 && !displayMessageLoader">
                 <img src="moodle/public/img/moodle_creation.svg"/>

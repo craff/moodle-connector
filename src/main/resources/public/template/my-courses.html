@@ -1,4 +1,4 @@
-<div class="row">
+<div class="row" ng-controller="myCoursesController">
     <div class="twelve twelve-mobile">
         <div class="row-mobile stickyParent">
             <div class="cell three twelve-mobile horizontal-spacing rightPaddingMenu sticky">
@@ -27,13 +27,13 @@
                         </select>
                     </div>
                 </div>
-                <div class="horizontal-spacing zero-mobile" ng-include="'/moodle/public/template/courses/folderItem.html'"></div>
+                <div class="horizontal-spacing zero-mobile" ng-include="'/moodle/public/template/folders/folderItem.html'"></div>
                 <div id="mySidenavCourses" class="sideNavMyCourses ellipsis">
                     <div class="vertical-spacing row">
                         <i18n class="text-font titleSideNav">moodle.folders</i18n>
                         <a class="closebtn" ng-click="closeNavMyCourses()">&times;</a>
                     </div>
-                    <div class="horizontal-spacing upNav" ng-include="'/moodle/public/template/courses/folderItem.html'"></div>
+                    <div class="horizontal-spacing upNav" ng-include="'/moodle/public/template/folders/folderItem.html'"></div>
                 </div>
             </div>
             <div class="nine twelve-mobile cell horizontal-spacing padding-left-corp" >
@@ -42,21 +42,22 @@
                     <span ng-if="courses.searchInput.MyCourse == ''" class="big-folder ellipsis">[[folderName()]]</span>
                     <span ng-if="courses.searchInput.MyCourse != undefined" class="big-folder ellipsis">[[courses.searchInput.MyCourse]]</span>
                     <label class="cell right-magnet title-dashboard zero-mobile">
-                        <i class="show-list" ng-class="{ selected: viewModeMyCourses == 'list' }"
+                        <i class="show-list" ng-class="{ selected: show.viewModeMyCourses == 'list' }"
                            ng-click="changeViewMode('MyCourses','list')"></i>
                     </label>
                     <span> </span>
                     <label class="cell right-magnet zero-mobile">
-                        <i class="show-icons" ng-class="{ selected: viewModeMyCourses == 'icons' }"
+                        <i class="show-icons" ng-class="{ selected: show.viewModeMyCourses == 'icons' }"
                            ng-click="changeViewMode('MyCourses','icons')"></i>
                     </label>
                     <br/>
                 </p>
                 <p class="row zero-mobile" ng-include="'/moodle/public/template/courses/filters.html'"></p>
-                <div class="row coursesBottomPadding" ng-include="'/moodle/public/template/courses/folders.html'"
-                     ng-if="printFolders"></div>
+                <div class="row coursesBottomPadding" ng-include="'/moodle/public/template/folders/folders.html'"
+                     ng-if="show.printFolders"></div>
                 <div class="row coursesBottomPadding"
-                     ng-include="'/moodle/public/template/courses/courses.html'"></div>
+                     ng-include="'/moodle/public/template/courses/courses.html'"
+                     ng-controller="coursesController"></div>
             </div>
         </div>
     </div>

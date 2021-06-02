@@ -1,6 +1,6 @@
 <label ng-show="false">[[folder.id]]</label>
 <div class="cell"
-     ng-class="{topFolderIcons : viewModeMyCourses == 'icons', topFolderList : viewModeMyCourses == 'list'}"
+     ng-class="{topFolderIcons : show.viewModeMyCourses == 'icons', topFolderList : show.viewModeMyCourses == 'list'}"
      ng-click="isPrintSubfolder(folder)">
     <i class="folderIcon big-folder-size"></i>
     </br>
@@ -15,7 +15,7 @@
             <i18n ng-if="countItems(folder) > 1">moodle.folder.items</i18n>
             <i18n ng-if="countItems(folder) < 2">moodle.folder.item</i18n>
         </label>
-        <label class="checkbox right-magnet folderCheckbox" ng-class="{folderCheckboxList : viewModeMyCourses == 'list'}">
+        <label class="checkbox right-magnet folderCheckbox" ng-class="{folderCheckboxList : show.viewModeMyCourses == 'list'}">
             <input type="checkbox" ng-change="showToaster()" ng-model="folder.select">
             <span></span>
         </label>

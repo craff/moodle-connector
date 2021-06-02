@@ -1,12 +1,14 @@
 <div>
-    <div ng-class="{colorActivity: folders.folderIdMoveIn == 0, colorCourse : folders.folderIdMoveIn !== 0}" ng-click="targetMenu()">
+    <div ng-class="{colorActivity: folders.folderIdMoveIn == 0, colorCourse : folders.folderIdMoveIn !== 0}"
+         ng-click="targetMenu()">
         <i class="sort-desc"></i>
         <i18n>moodle.courses</i18n>
         </br>
     </div>
-    <div ng-repeat="folder in getFolderParent()">
-        <span ng-class="{colorActivity: folders.folderIdMoveIn === folder.id, colorCourse : folders.folderIdMoveIn !== folder.id}">
-            <span ng-init="folder.subfolder=getSubfolder(folder);" class="left-padding"
+    <div ng-repeat="folder in folders.getParentFolder()">
+        <span ng-class="{colorActivity: folders.folderIdMoveIn === folder.id,
+        colorCourse : folders.folderIdMoveIn !== folder.id}">
+            <span ng-init="folder.subfolder=folders.getSubfolder(folder.id);" class="left-padding"
                   ng-click="isPrintTargetSubfolder(folder)" ng-if="!(folder.select)">
                 <i class="icon-play"
                    ng-if="!folder.printTargetSubfolder && folder.subfolder && folder.subfolder.length"></i>
@@ -24,7 +26,7 @@
 <script type="text/ng-template"  id="tree_item_target_renderer.html">
     <div ng-repeat="folder in folder.subfolder">
         <span ng-class="{colorActivity: folders.folderIdMoveIn === folder.id, colorCourse : folders.folderIdMoveIn !== folder.id}">
-            <span ng-init="folder.subfolder=getSubfolder(folder);" class="left-padding"
+            <span ng-init="folder.subfolder=folder.subfolder.getSubfolder(folder.id);" class="left-padding"
                   ng-click="isPrintTargetSubfolder(folder)" ng-if="!(folder.select)">
                 <i class="icon-play"
                    ng-if="!folder.printTargetSubfolder && folder.subfolder && folder.subfolder.length"></i>

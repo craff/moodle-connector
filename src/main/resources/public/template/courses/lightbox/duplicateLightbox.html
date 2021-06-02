@@ -1,5 +1,5 @@
 <!-- alert for duplicate folders and courses -->
-<form ng-submit="duplicateElements()">
+<form ng-submit="duplicateElements()" ng-controller="duplicateController">
     <div class="twelve cell horizontal-spacing">
         <h2 class="row twelve">
             <i18n>moodle.lightBox.duplicate.title</i18n>
@@ -8,7 +8,8 @@
             <i18n>moodle.lightBox.duplicate.content</i18n>
         </p>
         <ul class="list-element-delete">
-            <li class="ellipsis bottom-margin" ng-repeat="courseSendForDuplication in courses.allCourses" ng-if="courseSendForDuplication.select">
+            <li class="ellipsis bottom-margin" ng-repeat="courseSendForDuplication in courses.allCourses"
+                ng-if="courseSendForDuplication.select">
                 <label class="checkbox" >
                     <input type="checkbox" checked  ng-model="courseSendForDuplication.selectConfirm" class="checkbox"/>
                     &nbsp;&nbsp;
@@ -27,7 +28,8 @@
     <div class="row">
         <div class="right-magnet">
             <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
-            <input type="submit" class="button" i18n-value="moodle.lightBox.duplicate.submit" ng-disabled="!confirmDuplicateSend()"/>
+            <input type="submit" class="button" i18n-value="moodle.lightBox.duplicate.submit"
+                   ng-disabled="!confirmDuplicateSend()"/>
         </div>
     </div>
 </form>

@@ -1,0 +1,7 @@
+<div class="cell twelve-mobile style-bord-with-over-effect infoBackground"
+     ng-class="{'minimal-mine-recent-width five folder-article infoBackgroundTopMargin' : show.viewModeMyCourses == 'icons',
+     'all-width bottom-margin' : show.viewModeMyCourses == 'list'}"
+     ng-repeat="folder in folders.getFoldersToShow(show.currentFolderId, courses.searchInput.MyCourse) track by $index">
+    <div ng-include="'/moodle/public/template/folders/folderDetails.html'" lvl-draggable lvl-drop-target
+         class="Folder" on-drop="dropped(dragEl, dropEl)"></div>
+</div>

@@ -11,19 +11,21 @@
         </div>
     </div>
     <div ng-hide="!displayFilterCourse">
-        <label class="chip margin-left checkbox-course" ng-class="{ selected: typeFilter[0]}">
+        <label class="chip margin-left checkbox-course" ng-class="{ selected: show.typeFilter[0]}">
             <span>
                 <i18n>course</i18n>
             </span>
-            <input type="checkbox" ng-click="checkTypeFilterSelected(0)">
+            <input type="checkbox" ng-click="show.typeFilter[0] = !show.typeFilter[0];">
         </label>
-        <label class="chip margin-left checkbox-activity" ng-class="{ selected: typeFilter[1]}">
+        <label class="chip margin-left checkbox-activity" ng-class="{ selected: show.typeFilter[1]}">
             <span>
                 <i18n>activity</i18n>
             </span>
-            <input type="checkbox" ng-click="checkTypeFilterSelected(1)" >
+            <input type="checkbox" ng-click="show.typeFilter[1] = !show.typeFilter[1];" >
         </label>
-        <label class="chip margin-left checkbox-activity" ng-class="{ selected: courses.isOrderedAsc('creationDate') || courses.isOrderedDesc('creationDate')}" ng-click="courses.orderByField('creationDate')">
+        <label class="chip margin-left checkbox-activity"
+               ng-class="{ selected: courses.isOrderedAsc('creationDate') || courses.isOrderedDesc('creationDate')}"
+               ng-click="courses.orderByField('creationDate')">
             <span translate content="creationDate"></span>
             <span class="icons">
                     <i class="arrow orderArrow" ng-if="courses.isOrderedAsc('creationDate')"></i>

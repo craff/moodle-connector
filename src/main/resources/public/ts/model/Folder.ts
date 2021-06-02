@@ -33,7 +33,7 @@ export class Folder {
 
     async create() {
         try {
-            let {data, status} = await http.post('/moodle/folder', this.toJson());
+            let {status} = await http.post('/moodle/folder', this.toJson());
             return status
         } catch (e) {
             notify.error("Save function didn't work");

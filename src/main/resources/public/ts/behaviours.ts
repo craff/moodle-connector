@@ -37,7 +37,8 @@ Behaviours.register('moodle', {
 		}
 
 		for (const behaviour in moodleBehaviours.resources) {
-			if (model.me.hasRight(rightsContainer, moodleBehaviours.resources[behaviour]) || model.me.userId === resource.owner.userId || model.me.userId === rightsContainer.owner.userId) {
+			if (model.me.hasRight(rightsContainer, moodleBehaviours.resources[behaviour]) ||
+				model.me.userId === resource.owner.userId || model.me.userId === rightsContainer.owner.userId) {
 				if (resource.myRights[behaviour] !== undefined) {
 					resource.myRights[behaviour] = resource.myRights[behaviour] && moodleBehaviours.resources[behaviour];
 				} else {

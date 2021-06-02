@@ -1,5 +1,5 @@
 <!-- alert for delete folders and courses -->
-<form ng-submit="deleteElements()">
+<form ng-submit="deleteElements()" ng-controller="deleteController">
     <div class="twelve cell horizontal-spacing">
         <h2 class="row twelve">
             <i18n>moodle.lightBox.delete.title</i18n>
@@ -9,7 +9,7 @@
             <i18n>moodle.lightBox.delete.content</i18n>
         </p>
         <ul class="list-element-delete">
-            <li class="ellipsis" ng-repeat="folderList in getAllFolders()" ng-if="folderList.select">
+            <li class="ellipsis" ng-repeat="folderList in folders.getAllFoldersModel()" ng-if="folderList.select">
                 <label class="checkbox">
                     <input id="folders" type="checkbox" ng-change="confirmDeleteSend()" checked class="checkbox"
                            ng-model="folderList.selectConfirm"/>
@@ -27,7 +27,7 @@
     </div>
     <br>
     <div class="row bottomMarginLoading">
-        <div class="duplicationFailed lds-facebook right-magnet" ng-if="submitWait">
+        <div class="duplicationFailed lds-facebook right-magnet" ng-if="show.submitWait">
             <div class="greyLoading"></div>
             <div class="greyLoading"></div>
             <div class="greyLoading"></div>
@@ -36,7 +36,8 @@
     <div class="row">
         <div class="right-magnet">
             <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
-            <input type="submit" class="button" i18n-value="moodle.lightBox.delete.title" ng-disabled="!disableDeleteSend || submitWait"/>
+            <input type="submit" class="button" i18n-value="moodle.lightBox.delete.title"
+                   ng-disabled="!show.disableDeleteSend || show.submitWait"/>
         </div>
     </div>
 </form>
