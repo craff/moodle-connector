@@ -1,8 +1,6 @@
 package fr.openent.moodle;
 
-import fr.openent.moodle.controllers.MoodleController;
-import fr.openent.moodle.controllers.PublishedCourseController;
-import fr.openent.moodle.controllers.SynchController;
+import fr.openent.moodle.controllers.*;
 import fr.openent.moodle.cron.notifyMoodle;
 import fr.openent.moodle.cron.synchDuplicationMoodle;
 import io.vertx.core.eventbus.EventBus;
@@ -42,9 +40,9 @@ public class Moodle extends BaseServer {
 
 	public static String JSON = "json";
 
-	public static String MOODLE_READ = "fr-openent-moodle-controllers-MoodleController|read";
-	public static String MOODLE_CONTRIB = "fr-openent-moodle-controllers-MoodleController|contrib";
-	public static String MOODLE_MANAGER = "fr-openent-moodle-controllers-MoodleController|shareSubmit";
+	public static String MOODLE_READ = "fr-openent-moodle-controllers-ShareController|read";
+	public static String MOODLE_CONTRIB = "fr-openent-moodle-controllers-ShareController|contrib";
+	public static String MOODLE_MANAGER = "fr-openent-moodle-controllers-ShareController|shareSubmit";
 
 	public static String WAITING = "en attente";
 	public static String PENDING = "en cours";
@@ -80,8 +78,12 @@ public class Moodle extends BaseServer {
 
 		TimelineHelper timelineHelper = new TimelineHelper(vertx, eb, config);
 
-		MoodleController moodleController = new MoodleController(storage, eb, timelineHelper);
-        PublishedCourseController publishedCourseController = new PublishedCourseController();
+		MoodleController moodleController = new MoodleController(storage, eb);
+        PublishedController publishedController = new PublishedController();
+		CourseController courseController = new CourseController(eb);
+		DuplicateController duplicateController = new DuplicateController(eb);
+		FolderController folderController = new FolderController(eb);
+		ShareController shareController = new ShareController(eb,timelineHelper);
 		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
 		SynchController synchController = new SynchController(eb, vertx);
@@ -89,7 +91,7 @@ public class Moodle extends BaseServer {
 
 		try {
 			new CronTrigger(vertx, config.getString("timeSecondSynchCron")).schedule(
-					new synchDuplicationMoodle(vertx, moodleController)
+					new synchDuplicationMoodle(vertx)
 			);
 		} catch (ParseException e) {
 			log.fatal("Invalid timeSecondSynchCron cron expression.", e);
@@ -97,7 +99,7 @@ public class Moodle extends BaseServer {
 
 		try {
 			new CronTrigger(vertx, config.getString("timeCheckNotifs")).schedule(
-					new notifyMoodle(vertx, moodleController, timelineHelper)
+					new notifyMoodle(vertx, timelineHelper)
 			);
 		} catch (ParseException e) {
 			log.fatal("Invalid timeCheckNotifs cron expression.", e);
@@ -105,6 +107,10 @@ public class Moodle extends BaseServer {
 
 		addController(moodleController);
 		addController(synchController);
-		addController(publishedCourseController);
+		addController(publishedController);
+		addController(courseController);
+		addController(duplicateController);
+		addController(folderController);
+		addController(shareController);
 	}
 }

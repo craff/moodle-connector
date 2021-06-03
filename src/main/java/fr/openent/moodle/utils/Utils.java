@@ -20,13 +20,10 @@ public class Utils {
             for (int i = 0; i < coursesUniq.size(); i++) {
                 if (((JsonObject) course).getValue("courseid").toString().equals(coursesUniq.getJsonObject(i).getValue("courseid").toString())) {
                     findDuplicates = true;
-
-                    if (isStrongerRole(Integer.parseInt(((JsonObject) course).getValue("role").toString()),
-                            Integer.parseInt(coursesUniq.getJsonObject(i).getValue("role").toString()))) {
+                    if (isStrongerRole(Integer.parseInt(((JsonObject) course).getValue("role").toString()))) {
                         coursesUniq.remove(i);
                         coursesUniq.add(course);
                     }
-
                 }
             }
             if (!findDuplicates) {
@@ -37,7 +34,7 @@ public class Utils {
     }
 
 
-    public static boolean isStrongerRole(Integer role1, Integer role2) {
+    public static boolean isStrongerRole(Integer role1) {
         return role1.equals(Moodle.ROLE_AUDITEUR) ||
                 (role1.equals(Moodle.ROLE_EDITEUR) && role1.equals(Moodle.ROLE_APPRENANT));
 

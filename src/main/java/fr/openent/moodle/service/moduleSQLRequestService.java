@@ -142,13 +142,6 @@ public interface moduleSQLRequestService {
     void setChoice(JsonObject courses, String view, Handler<Either<String, JsonObject>> handler);
 
     /**
-     * @param bookmarksIds ids bookmarks
-     * @param addPrefix    boolean
-     * @param handler      function handler returning data
-     */
-    void getDistinctSharedBookMarkUsers(JsonArray bookmarksIds, boolean addPrefix, Handler<Either<String, Map<String, JsonObject>>> handler);
-
-    /**
      * insert duplication table
      *
      * @param courseToDuplicate course to duplicate
@@ -241,4 +234,16 @@ public interface moduleSQLRequestService {
      * @param handler function handler returning data
      */
     void getPublicCourseData(JsonArray id, Handler<Either<String, JsonObject>> handler);
+
+    /**
+     * get All Disciplines
+     * @param handler function handler returning data
+     */
+    void getDisciplines (Handler<Either<String, JsonArray>> handler);
+
+    /**
+     * get All Levels
+     * @param handler function handler returning data
+     */
+    void getLevels (Handler<Either<String, JsonArray>> handler) ;
 }

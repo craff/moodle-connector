@@ -2,11 +2,9 @@ package fr.openent.moodle.service.impl;
 
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.moduleNeoRequestService;
 import fr.openent.moodle.service.moduleSQLRequestService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -17,22 +15,15 @@ import org.entcore.common.sql.SqlResult;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static fr.openent.moodle.Moodle.*;
 
 public class DefaultModuleSQLRequestService extends SqlCrudService implements moduleSQLRequestService {
 
-    private final moduleNeoRequestService moduleNeoRequestService;
-
     private final Logger log = LoggerFactory.getLogger(DefaultModuleSQLRequestService.class);
 
     public DefaultModuleSQLRequestService(String schema, String table) {
         super(schema, table);
-
-        this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
     }
 
     @Override
@@ -309,43 +300,6 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     }
 
     @Override
-    public void getDistinctSharedBookMarkUsers(final JsonArray bookmarksIds, boolean addPrefix, Handler<Either<String, Map<String, JsonObject>>> handler) {
-        moduleNeoRequestService.getSharedBookMarkUsers(bookmarksIds, resultSharedBookMark -> {
-            if (resultSharedBookMark.isLeft()) {
-                log.error("Error getting getSharedBookMarkUsers", resultSharedBookMark.left());
-                handler.handle(new Either.Left<>("Error getting getSharedBookMarkUsers"));
-            } else {
-                JsonArray results = resultSharedBookMark.right().getValue();
-                Map<String, JsonObject> uniqResults = new HashMap<>();
-                if (results != null && !results.isEmpty()) {
-                    for (Object objShareBook : results) {
-                        JsonObject jsonShareBook = ((JsonObject) objShareBook).getJsonObject("sharedBookMark");
-                        String idShareBook = jsonShareBook.getString("id");
-                        if (addPrefix) {
-                            idShareBook = "SB" + idShareBook;
-                            jsonShareBook.put("id", idShareBook);
-                        }
-
-                        JsonObject shareBookToMerge = uniqResults.get(idShareBook);
-                        if (shareBookToMerge != null) {
-                            List<JsonObject> users = jsonShareBook.getJsonArray("users").getList();
-                            List<JsonObject> usersToMerge = shareBookToMerge.getJsonArray("users").getList();
-
-                            // fusion des listes sans doublon
-                            users.removeAll(usersToMerge);
-                            users.addAll(usersToMerge);
-                            jsonShareBook.put("users", new JsonArray(users));
-                        }
-
-                        uniqResults.put(idShareBook, jsonShareBook);
-                    }
-                }
-                handler.handle(new Either.Right<>(uniqResults));
-            }
-        });
-    }
-
-    @Override
     public void insertDuplicateTable (JsonObject courseToDuplicate, Handler<Either<String, JsonObject>> handler) {
         JsonArray values = new JsonArray();
         String query = "INSERT INTO " + Moodle.moodleSchema + ".duplication (id_course, id_folder, id_users, status, category_id";
@@ -508,7 +462,8 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
 
     @Override
     public void updatePublicCourseMetadata(Integer course_id, JsonObject newMetadata, Handler<Either<String, JsonObject>> handler) {
-        String query = "UPDATE " + Moodle.moodleSchema + ".publication SET discipline_label = " + Sql.arrayPrepared(newMetadata.getJsonArray("discipline_label"))
+        String query = "UPDATE " + Moodle.moodleSchema + ".publication SET discipline_label = " +
+                Sql.arrayPrepared(newMetadata.getJsonArray("discipline_label"))
                 + ", level_label = " + Sql.arrayPrepared(newMetadata.getJsonArray("level_label")) + ", key_words = " +
                 Sql.arrayPrepared(newMetadata.getJsonArray("plain_text")) + " WHERE course_id = ?";
 
@@ -557,5 +512,17 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
                 "WHERE course_id = ?";
 
         sql.prepared(selectCourse, id, SqlResult.validUniqueResultHandler(handler));
+    }
+
+    @Override
+    public void getLevels(Handler<Either<String, JsonArray>> handler) {
+        String query = "Select * From " + Moodle.moodleSchema + ".levels;";
+        sql.prepared(query, new JsonArray(), SqlResult.validResultHandler(handler));
+    }
+
+    @Override
+    public void getDisciplines(Handler<Either<String, JsonArray>> handler) {
+        String query = "Select * From " + Moodle.moodleSchema + ".disciplines;";
+        sql.prepared(query, new JsonArray(), SqlResult.validResultHandler(handler));
     }
 }

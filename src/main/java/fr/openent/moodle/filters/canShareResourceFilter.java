@@ -12,10 +12,7 @@ import org.entcore.common.user.UserInfos;
 public class canShareResourceFilter implements ResourcesProvider {
     @Override
     public void authorize(HttpServerRequest request, Binding binding, UserInfos userInfos, Handler<Boolean> handler) {
-        final String subjectId = request.params().get("id");
-
         //TODO recuperer autorisations sur la resource (roles + propriétaire)
-
         handler.handle(true);
     }
 }

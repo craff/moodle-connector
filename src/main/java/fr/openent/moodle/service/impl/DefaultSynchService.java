@@ -802,7 +802,41 @@ public class DefaultSynchService {
 
         JsonArray groupsIds = new JsonArray(lstGroupIds);
         moduleNeoRequestService.getGroups(groupsIds, getGroupsHandler);
-        moduleSQLRequestService.getDistinctSharedBookMarkUsers(groupsIds, true, getSharedBookMarkHandler);
+        getDistinctSharedBookMarkUsers(groupsIds, getSharedBookMarkHandler);
+    }
+
+    private void getDistinctSharedBookMarkUsers(final JsonArray bookmarksIds, Handler<Either<String, Map<String, JsonObject>>> handler) {
+        moduleNeoRequestService.getSharedBookMarkUsers(bookmarksIds, resultSharedBookMark -> {
+            if (resultSharedBookMark.isLeft()) {
+                log.error("Error getting getSharedBookMarkUsers", resultSharedBookMark.left());
+                handler.handle(new Either.Left<>("Error getting getSharedBookMarkUsers"));
+            } else {
+                JsonArray results = resultSharedBookMark.right().getValue();
+                Map<String, JsonObject> uniqResults = new HashMap<>();
+                if (results != null && !results.isEmpty()) {
+                    for (Object objShareBook : results) {
+                        JsonObject jsonShareBook = ((JsonObject) objShareBook).getJsonObject("sharedBookMark");
+                        String idShareBook = jsonShareBook.getString("id");
+                        idShareBook = "SB" + idShareBook;
+                        jsonShareBook.put("id", idShareBook);
+
+                        JsonObject shareBookToMerge = uniqResults.get(idShareBook);
+                        if (shareBookToMerge != null) {
+                            List<JsonObject> users = jsonShareBook.getJsonArray("users").getList();
+                            List<JsonObject> usersToMerge = shareBookToMerge.getJsonArray("users").getList();
+
+                            // fusion des listes sans doublon
+                            users.removeAll(usersToMerge);
+                            users.addAll(usersToMerge);
+                            jsonShareBook.put("users", new JsonArray(users));
+                        }
+
+                        uniqResults.put(idShareBook, jsonShareBook);
+                    }
+                }
+                handler.handle(new Either.Right<>(uniqResults));
+            }
+        });
     }
 
     private void updateAnDeleteCohorts(Handler<Either<String, JsonObject>> handler) throws UnsupportedEncodingException {

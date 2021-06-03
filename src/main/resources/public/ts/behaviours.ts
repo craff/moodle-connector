@@ -5,20 +5,20 @@ console.log('moodle behaviours loaded');
 const moodleBehaviours = {
 	resources: {
 		read: {
-			right: "fr-openent-moodle-controllers-MoodleController|read"
+			right: "fr-openent-moodle-controllers-ShareController|read"
 		},
 		contrib: {
-			right: "fr-openent-moodle-controllers-MoodleController|contrib"
+			right: "fr-openent-moodle-controllers-ShareController|contrib"
 		},
 		manager: {
-			right: "fr-openent-moodle-controllers-MoodleController|shareSubmit"
+			right: "fr-openent-moodle-controllers-ShareController|shareSubmit"
 		}
 	},
 	workflow: {
-		createCourse: 'fr.openent.moodle.controllers.MoodleController|create',
-		delete: 'fr.openent.moodle.controllers.MoodleController|delete',
+		createCourse: 'fr.openent.moodle.controllers.CourseController|create',
+		delete: 'fr.openent.moodle.controllers.CourseController|delete',
 		view: 'fr.openent.moodle.controllers.MoodleController|view',
-		publish: 'fr.openent.moodle.controllers.MoodleController|publish'
+		publish: 'fr.openent.moodle.controllers.PublishedController|publish'
 	}
 };
 

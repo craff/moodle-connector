@@ -1,6 +1,5 @@
 package fr.openent.moodle.cron;
 
-import fr.openent.moodle.controllers.MoodleController;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
@@ -24,14 +23,12 @@ import static fr.openent.moodle.controllers.MoodleController.baseWsMoodleUrl;
 
 public class notifyMoodle extends ControllerHelper implements Handler<Long> {
 
-    MoodleController moodleController;
     private final TimelineHelper timelineHelper;
     private Timestamp startDate;
 
     private final SimpleDateFormat myDate;
 
-    public notifyMoodle(Vertx vertx, MoodleController moodleController, TimelineHelper timelineHelper) {
-        this.moodleController = moodleController;
+    public notifyMoodle(Vertx vertx, TimelineHelper timelineHelper) {
         this.vertx = vertx;
         this.timelineHelper = timelineHelper;
         myDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

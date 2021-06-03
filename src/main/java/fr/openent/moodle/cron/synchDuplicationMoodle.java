@@ -1,6 +1,6 @@
 package fr.openent.moodle.cron;
+
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.controllers.MoodleController;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.moduleSQLRequestService;
@@ -18,11 +18,8 @@ import static fr.openent.moodle.Moodle.*;
 
 public class synchDuplicationMoodle extends ControllerHelper implements Handler<Long> {
 
-    MoodleController moodleController;
     private final moduleSQLRequestService moduleSQLRequestService;
-
-    public synchDuplicationMoodle(Vertx vertx, MoodleController moodleController) {
-        this.moodleController = moodleController;
+    public synchDuplicationMoodle(Vertx vertx) {
         this.vertx = vertx;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
     }
