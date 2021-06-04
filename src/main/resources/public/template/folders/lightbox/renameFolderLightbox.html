@@ -6,7 +6,7 @@
         </h2>
         <br>
         <label class="row twelve">
-            <input type="text" class="twelve" required i18n-placeholder="moodle.folder.name.rename" ng-model="folder.name"
+            <input type="text" class="twelve" required i18n-placeholder="moodle.folder.name.rename" ng-model="folder.toRename.name"
                    ng-pattern="/^[a-zA-Z. \-\+\*\(\),;:0-9éèàç\_]*[a-zA-Z. \-\+\*\(\),;:0-9éèàç\_]{1,60}$/" autofocus>
         </label>
     </div>
@@ -15,7 +15,7 @@
         <div class="right-magnet">
             <input type="button" class="cancel" i18n-value="cancel" ng-click="closePopUp()"/>
             <input type="submit" class="button" i18n-value="rename" ng-click="renameFolder()"
-                   ng-disabled="folder.name == '' || folder.name == undefined"/>
+                   ng-disabled="folder.toRename.name == '' || folder.toRename.name == undefined"/>
         </div>
     </div>
 </div>

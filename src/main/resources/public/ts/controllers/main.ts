@@ -96,6 +96,9 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
             $scope.show.lastCoursesToDo = $scope.count("ToDo");
             $scope.show.lastCoursesToCome = $scope.count("ToCome");
             $scope.folders = new Folders();
+            $scope.folder = {
+                toRename : new Folder()
+            };
             $scope.filterChoice = {
                 levels : [],
                 disciplines : [],
@@ -359,5 +362,9 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
                 $scope.setPrintSubfolderValue();
                 $scope.show.printFolders = false;
             }
+        };
+
+        $scope.getSelectedCourses = function () {
+            return _.where([...$scope.courses.coursesByUser, ...$scope.courses.coursesShared, ...$scope.courses.coursesPublished], {select: true});
         };
     }]);
