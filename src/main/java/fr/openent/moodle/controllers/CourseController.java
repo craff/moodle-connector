@@ -3,6 +3,7 @@ package fr.openent.moodle.controllers;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
+import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.moduleSQLRequestService;
 import fr.openent.moodle.utils.Utils;
 import fr.wseduc.rs.*;
@@ -49,8 +50,8 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 public class CourseController extends ControllerHelper {
 
     private final moduleSQLRequestService moduleSQLRequestService;
-
     private final String userMail;
+    private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
 
 
     @Override
@@ -65,6 +66,7 @@ public class CourseController extends ControllerHelper {
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         //todo remove mail constant and add mail from zimbra, ent ...
         this.userMail = Moodle.moodleConfig.getString("userMail");
+        this.moodleEventBus = new DefaultMoodleEventBus(eb);
     }
 
     //Permissions
@@ -226,7 +228,7 @@ public class CourseController extends ControllerHelper {
                                 if(!SQLCourse.getString("fullname").equals(course.getString("fullname")) ||
                                         !SQLCourse.getString("imageurl").equals(course.getString("imageurl")) ||
                                         !SQLCourse.getString("summary").equals(course.getString("summary")) ){
-                                    callMediacentreEventBusToUpdate(course, ebEvent -> {
+                                    callMediacentreEventBusToUpdate(course, moodleEventBus, ebEvent -> {
                                         if (ebEvent.isRight()) {
                                             moduleSQLRequestService.updatePublicCourse(course, event -> {
                                                 if (event.isRight()) {
@@ -439,7 +441,7 @@ public class CourseController extends ControllerHelper {
                     HttpClientHelper.webServiceMoodlePost(null, moodleDeleteUrl, vertx, responseMoodle -> {
                         if (responseMoodle.isRight()) {
                             if (courses.getBoolean("categoryType")) {
-                                callMediacentreEventBusToDelete(request, event -> {
+                                callMediacentreEventBusToDelete(request, moodleEventBus, event -> {
                                     if (event.isRight()) {
                                         log.info("ElasticSearch course deletion is a success");
                                         request.response()

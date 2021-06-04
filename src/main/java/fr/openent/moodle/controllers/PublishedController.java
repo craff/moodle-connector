@@ -10,6 +10,7 @@ import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Handler;
+import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -23,11 +24,11 @@ import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayRespo
 public class PublishedController extends ControllerHelper {
 
     private final fr.openent.moodle.service.moduleSQLRequestService moduleSQLRequestService;
-    private static fr.openent.moodle.service.moodleEventBus moodleEventBus;
-    public PublishedController() {
+    private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
+    public PublishedController(EventBus eb) {
         super();
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
-        moodleEventBus = new DefaultMoodleEventBus(eb);
+        this.moodleEventBus = new DefaultMoodleEventBus(eb);
     }
 
     private static final String workflow_publish = "moodle.publish";
@@ -120,7 +121,7 @@ public class PublishedController extends ControllerHelper {
                 plainTextArray.add("");
             }
             newMetadata.put("plain_text", plainTextArray);
-            callMediacentreEventBusToUpdateMetadata(updateMetadata, ebEvent -> {
+            callMediacentreEventBusToUpdateMetadata(updateMetadata, moodleEventBus, ebEvent -> {
                 if (ebEvent.isRight()) {
                     moduleSQLRequestService.updatePublicCourseMetadata(course_id, newMetadata, event -> {
                         if (event.isRight()) {
@@ -140,19 +141,23 @@ public class PublishedController extends ControllerHelper {
         });
     }
 
-    static public void callMediacentreEventBusForPublish(JsonArray id, final Handler<Either<String, JsonObject>> handler) {
-        moodleEventBus.publishInMediacentre(id, handler);
+    static public void callMediacentreEventBusForPublish(JsonArray id, fr.openent.moodle.service.moodleEventBus eventBus,
+                                                         final Handler<Either<String, JsonObject>> handler) {
+        eventBus.publishInMediacentre(id, handler);
     }
 
-    static public void callMediacentreEventBusToDelete(HttpServerRequest request, final Handler<Either<String, JsonObject>> handler) {
-        RequestUtils.bodyToJson(request, deleteEvent -> moodleEventBus.deleteResourceInMediacentre(deleteEvent, handler));
+    static public void callMediacentreEventBusToDelete(HttpServerRequest request, fr.openent.moodle.service.moodleEventBus eventBus,
+                                                       final Handler<Either<String, JsonObject>> handler) {
+        RequestUtils.bodyToJson(request, deleteEvent -> eventBus.deleteResourceInMediacentre(deleteEvent, handler));
     }
 
-    public void callMediacentreEventBusToUpdateMetadata(JsonObject updateMetadata, final Handler<Either<String, JsonObject>> handler) {
-        moodleEventBus.updateResourceInMediacentre(updateMetadata, handler);
+    public void callMediacentreEventBusToUpdateMetadata(JsonObject updateMetadata, fr.openent.moodle.service.moodleEventBus eventBus,
+                                                        final Handler<Either<String, JsonObject>> handler) {
+        eventBus.updateResourceInMediacentre(updateMetadata, handler);
     }
 
-    static public void callMediacentreEventBusToUpdate(JsonObject updateCourse, final Handler<Either<String, JsonObject>> handler) {
-        moodleEventBus.updateInMediacentre(updateCourse, handler);
+    static public void callMediacentreEventBusToUpdate(JsonObject updateCourse, fr.openent.moodle.service.moodleEventBus eventBus,
+                                                       final Handler<Either<String, JsonObject>> handler) {
+        eventBus.updateInMediacentre(updateCourse, handler);
     }
 }

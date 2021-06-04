@@ -2,6 +2,7 @@ package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
+import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.moduleSQLRequestService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
@@ -30,6 +31,7 @@ import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayRespo
 public class DuplicateController extends ControllerHelper {
 
     private final moduleSQLRequestService moduleSQLRequestService;
+    private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
 
     @Override
     public void init(Vertx vertx, JsonObject config, RouteMatcher rm,
@@ -41,6 +43,7 @@ public class DuplicateController extends ControllerHelper {
         super();
         this.eb = eb;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
+        this.moodleEventBus = new DefaultMoodleEventBus(eb);
     }
 
     //Permissions
@@ -244,7 +247,7 @@ public class DuplicateController extends ControllerHelper {
                                                     moduleSQLRequestService.deleteFinishedCoursesDuplicate(deleteEvent -> {
                                                         if (deleteEvent.isRight()) {
                                                             JsonArray id = new JsonArray().add(Integer.parseInt(duplicateResponse.getString("courseid")));
-                                                            callMediacentreEventBusForPublish(id, mediacentreEvent ->
+                                                            callMediacentreEventBusForPublish(id, moodleEventBus, mediacentreEvent ->
                                                                     request.response()
                                                                             .setStatusCode(200)
                                                                             .end());

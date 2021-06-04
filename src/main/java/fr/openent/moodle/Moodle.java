@@ -79,7 +79,7 @@ public class Moodle extends BaseServer {
 		TimelineHelper timelineHelper = new TimelineHelper(vertx, eb, config);
 
 		MoodleController moodleController = new MoodleController(storage, eb);
-        PublishedController publishedController = new PublishedController();
+        PublishedController publishedController = new PublishedController(eb);
 		CourseController courseController = new CourseController(eb);
 		DuplicateController duplicateController = new DuplicateController(eb);
 		FolderController folderController = new FolderController(eb);
