@@ -108,9 +108,9 @@ export const publishController = ng.controller('publishController', ['$scope', '
         };
 
         $scope.resetPublicationPopUp = async () => {
-            $scope.deselectAll();
-            $scope.disciplines = undefined;
-            $scope._plain_text = undefined;
+            $scope.filterChoice.levels = [];
+            $scope.filterChoice.disciplines = [];
+            $scope.filterChoice.plain_text = [];
         };
 
     }]);
