@@ -45,6 +45,8 @@ public class DefaultSynchService {
     private HttpClient httpClient;
 
     private final String baseWsMoodleUrl;
+    private final String userMail;
+
 
     private Map<String, JsonObject> mapUsersMoodle;
     private Map<String, JsonObject> mapUsersFound;
@@ -62,6 +64,7 @@ public class DefaultSynchService {
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
         this.moodleEventBus = new DefaultMoodleEventBus(eb);
+        this.userMail = Moodle.moodleConfig.getString("userMail");
         baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
     }
 
@@ -697,10 +700,6 @@ public class DefaultSynchService {
                             JsonObject jsonUserNeo = ((JsonObject) objUserNeo);
                             boolean exist = arrUsersMoodle.stream().anyMatch(u -> u.equals(jsonUserNeo.getString("id")));
                             if (!exist) {
-                                moodleEventBus.getZimbraEmail(new JsonArray().add(jsonUserNeo.getString("id")), res -> {
-                                    if (res.isLeft()) {
-                                        log.error("Error getting user mail " + jsonUserNeo.getString("id"), res.left());
-                                    } else {
                                         if (jsonCohorteWithUpdate[0] == null) {
                                             jsonCohorteWithUpdate[0] = new JsonObject();
                                         }
@@ -710,12 +709,10 @@ public class DefaultSynchService {
                                             useradded = new JsonArray();
                                         }
 
-                                        jsonUserNeo.put("email", res.right().getValue().getJsonObject(jsonUserNeo.getString("id")).getString("email"));
+                                        jsonUserNeo.put("email", this.userMail);
                                         useradded.add(jsonUserNeo);
                                         jsonCohorteWithUpdate[0].put("useradded", useradded);
                                     }
-                                });
-                            }
                         }
 
                         // identification des utilisateurs supprimés de la cohorte
