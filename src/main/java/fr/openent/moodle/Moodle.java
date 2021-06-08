@@ -84,7 +84,7 @@ public class Moodle extends BaseServer {
 		DuplicateController duplicateController = new DuplicateController(eb);
 		FolderController folderController = new FolderController(eb);
 		ShareController shareController = new ShareController(eb,timelineHelper);
-		moodleController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
+		shareController.setShareService(new SqlShareService(moodleSchema, "course_shares", eb, securedActions, null));
 		moodleController.setCrudService(new SqlCrudService(moodleSchema, "course"));
 		SynchController synchController = new SynchController(eb, vertx);
 
