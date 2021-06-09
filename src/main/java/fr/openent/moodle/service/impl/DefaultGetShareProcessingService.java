@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.moodleConfig;
+import static fr.openent.moodle.controllers.ShareController.resource_read;
 import static java.util.Objects.isNull;
 
 public class DefaultGetShareProcessingService extends ControllerHelper implements getShareProcessingService {
@@ -117,8 +118,17 @@ public class DefaultGetShareProcessingService extends ControllerHelper implement
             }
         }
 
-        if (shareJsonInfosFinal.getJsonArray("actions").size() == 3)
-            shareJsonInfosFinal.getJsonArray("actions").remove(1);
+        if (shareJsonInfosFinal.getJsonArray("actions").size() == 3){
+            int indexToRemove = 0;
+            for(int i = 0; i < shareJsonInfosFinal.getJsonArray("actions").size(); i++){
+                JsonObject action = shareJsonInfosFinal.getJsonArray("actions").getJsonObject(i);
+                if(action.getString("displayName").equals(resource_read)){
+                    indexToRemove = i;
+                }
+            }
+            shareJsonInfosFinal.getJsonArray("actions").remove(indexToRemove);
+        }
+
         while (usersEnrolledId.contains(user.getUserId())) {
             userEnrolmentsArray.getJsonArray("users").remove(usersEnrolledId.indexOf(user.getUserId()));
             usersEnrolled = userEnrolmentsArray.getJsonArray("users");

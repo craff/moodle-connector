@@ -81,7 +81,7 @@ public class ShareController extends ControllerHelper {
     }
 
     //Permissions
-    private static final String resource_read = "moodle.read";
+    public static final String resource_read = "moodle.read";
     private static final String resource_contrib = "moodle.contrib";
     private static final String resource_manager = "moodle.manager";
     private static final String workflow_accessPublicCourse = "moodle.accessPublicCourse";
