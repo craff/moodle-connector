@@ -41,6 +41,7 @@ public class SynchController extends ControllerHelper {
                     log.info("Unzip  : " + upload.filename());
                     ZipInputStream zipStream = new ZipInputStream(new ByteArrayInputStream(buff.getBytes()));
                     ZipEntry userFileZipEntry = zipStream.getNextEntry();
+                    assert userFileZipEntry != null;
                     log.info("Reading : " + userFileZipEntry.getName());
                     Scanner sc = new Scanner(zipStream);
                     // skip header
@@ -87,9 +88,9 @@ public class SynchController extends ControllerHelper {
                 });
             } else {
                 log.info("No cohort to sync");
+                log.info("--END syncGroups --");
                 request.response().setStatusCode(200).end();
             }
         });
-        log.info("--END syncGroups --");
     }
 }

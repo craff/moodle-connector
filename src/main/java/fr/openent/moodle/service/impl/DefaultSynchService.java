@@ -552,9 +552,7 @@ public class DefaultSynchService {
         for (Object objChorts : jsonArrayCohorts) {
             JsonObject jsonCohort = ((JsonObject)objChorts);
             log.info(jsonCohort);
-
             try {
-
                 // suppression prefixe
                 String idCohort = jsonCohort.getString("idnumber");
                 /*idCohort = idCohort.replace("GR_","");
@@ -571,7 +569,6 @@ public class DefaultSynchService {
 
 
     private void endSyncGroups (Handler<Either<String, JsonObject>> handler) {
-        log.info("endSyncGroups : ");
         httpClient.close();
         JsonObject result = new JsonObject();
         result.put("status", "ok");
@@ -645,7 +642,7 @@ public class DefaultSynchService {
             } else {
 
                 // groupes / sharebook non retrouvés dans l'ENT
-                mapCohortsNotFound = new HashMap<String, JsonObject>(mapCohortsMoodle);
+                mapCohortsNotFound = new HashMap<>(mapCohortsMoodle);
                 mapCohortsNotFound.keySet().removeAll(mapCohortsFound.keySet());
 
                 JsonArray usersIdsToEnrrollIndivually = new JsonArray();
@@ -700,19 +697,21 @@ public class DefaultSynchService {
                             JsonObject jsonUserNeo = ((JsonObject) objUserNeo);
                             boolean exist = arrUsersMoodle.stream().anyMatch(u -> u.equals(jsonUserNeo.getString("id")));
                             if (!exist) {
-                                        if (jsonCohorteWithUpdate[0] == null) {
-                                            jsonCohorteWithUpdate[0] = new JsonObject();
-                                        }
-                                        JsonArray useradded = jsonCohorteWithUpdate[0].getJsonArray("useradded");
+                                if (jsonCohorteWithUpdate[0] == null) {
+                                    jsonCohorteWithUpdate[0] = new JsonObject();
+                                    jsonCohorteWithUpdate[0].put("id", jsonCohortNeo.getString("id"));
+                                    jsonCohorteWithUpdate[0].put("newname", jsonCohortNeo.getString("name"));
+                                }
+                                JsonArray useradded = jsonCohorteWithUpdate[0].getJsonArray("useradded");
 
-                                        if (useradded == null) {
-                                            useradded = new JsonArray();
-                                        }
+                                if (useradded == null) {
+                                    useradded = new JsonArray();
+                                }
 
-                                        jsonUserNeo.put("email", this.userMail);
-                                        useradded.add(jsonUserNeo);
-                                        jsonCohorteWithUpdate[0].put("useradded", useradded);
-                                    }
+                                jsonUserNeo.put("email", this.userMail);
+                                useradded.add(jsonUserNeo);
+                                jsonCohorteWithUpdate[0].put("useradded", useradded);
+                            }
                         }
 
                         // identification des utilisateurs supprimés de la cohorte
@@ -724,6 +723,8 @@ public class DefaultSynchService {
                             if (!exist) {
                                 if (jsonCohorteWithUpdate[0] == null) {
                                     jsonCohorteWithUpdate[0] = new JsonObject();
+                                    jsonCohorteWithUpdate[0].put("id", jsonCohortNeo.getString("id"));
+                                    jsonCohorteWithUpdate[0].put("newname", jsonCohortNeo.getString("name"));
                                 }
                                 JsonArray userdeleted = jsonCohorteWithUpdate[0].getJsonArray("userdeleted");
 
@@ -785,7 +786,6 @@ public class DefaultSynchService {
             } else {
                 endSyncGroups(handler);
             }
-
         };
         //---FIN HANDLERS--
 
@@ -888,13 +888,13 @@ public class DefaultSynchService {
         }
     }
 
-    private void getUsersCoursesAndEnroll(JsonArray usersIdsToEnrrollIndivually, Handler<Either<String, JsonObject>> handler) throws UnsupportedEncodingException {
+    private void getUsersCoursesAndEnroll(JsonArray usersIdsToEnrrollIndivually, Handler<Either<String, JsonObject>> handler)
+            throws UnsupportedEncodingException {
 
         if(usersIdsToEnrrollIndivually.isEmpty()) {
             String message = "No user to enrroll";
             log.info(message);
             updateAnDeleteCohorts(handler);
-            endSyncGroups(handler);
         } else {
 
             // Recupération des cours de tous ces utilisateurs
