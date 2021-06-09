@@ -14,6 +14,7 @@ import io.vertx.core.buffer.impl.BufferImpl;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -84,7 +85,7 @@ public class DefaultSynchService {
             String userLine = scUsers.nextLine();
             log.info(userLine);
 
-            String[] values = userLine.split(";");
+            String[] values = userLine.split(",");
 
             try {
                 JsonObject jsonUser = new JsonObject();
@@ -233,71 +234,55 @@ public class DefaultSynchService {
                     }
                     mapUsersNotFound[0] = new HashMap<>(mapUsersMoodle);
                     mapUsersNotFound[0].keySet().removeAll(mapUsersFound.keySet());
-
-
-                    JsonArray idUsersFound = new JsonArray(Arrays.asList(mapUsersFound.keySet().toArray()));
-                    moodleEventBus.getZimbraEmail(idUsersFound, res -> {
-                        if (res.isLeft()) {
-                            handler.handle(new Either.Left<>("Error getting users mail"));
-                            log.error("Error getting users mail", res.left());
-                        } else {
-                            JsonObject jsonUsersMail = res.right().getValue();
-                            Set<String> keysUsers = jsonUsersMail.getMap().keySet();
-                            for (String idUser : keysUsers) {
-                                JsonObject userNeo = mapUsersFound.get(idUser);
-                                userNeo.put("email", jsonUsersMail.getJsonObject(idUser).getString("email"));
-                                mapUsersFound.put(idUser, userNeo);
-                            }
-
-                            JsonArray arrUsersToUpdate = new JsonArray();
-                            for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
-                                JsonObject jsonUserFromNeo = entryUser.getValue();
-                                if (jsonUserFromNeo.getValue("deleteDate") != null) {
-                                    Future getCoursesFuture = Future.future();
-                                    listGetFuture.add(getCoursesFuture);
-                                    getCourses(jsonUserFromNeo, getCoursesFuture);
-                                }
-
-                                if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
-                                    arrUsersToUpdate.add(jsonUserFromNeo);
-                                }
-                            }
-
-                            if (arrUsersToUpdate.isEmpty()) {
-                                String message = "Aucune mise à jour necessaire";
-                                log.info(message);
-                                endSyncUsers(handler);
-                            } else {
-                                try {
-                                    updateUsers(arrUsersToUpdate, event -> {
-                                        if (event.isRight()) {
-                                            log.info("END updating users");
-                                            endSyncUsers(handler);
-                                        } else {
-                                            httpClient.close();
-                                            handler.handle(new Either.Left<>(event.left().getValue()));
-                                            log.error("Error updating users", event.left());
-                                        }
-
-                                    });
-                                } catch (UnsupportedEncodingException e) {
-                                    httpClient.close();
-                                    handler.handle(new Either.Left<>(e.toString()));
-                                    log.error("Error updating users - UnsupportedEncodingException", e);
-                                }
-                            }
-
-                            if (listGetFuture.isEmpty()) {
-                                String message = "Aucun utilisateur supprimé avec des cours";
-                                log.info(message);
-                                endSyncUsers(handler);
-                            } else {
-                                CompositeFuture.all(listGetFuture).setHandler(handlerGetCourses);
-                            }
-
-
+                    JsonArray arrUsersToUpdate = new JsonArray();
+                    for (Map.Entry<String, JsonObject> entryUser : mapUsersFound.entrySet()) {
+                        JsonObject jsonUserFromNeo = entryUser.getValue();
+                        if (jsonUserFromNeo.getValue("deleteDate") != null) {
+                            Future getCoursesFuture = Future.future();
+                            listGetFuture.add(getCoursesFuture);
+                            getCourses(jsonUserFromNeo, getCoursesFuture);
                         }
-                    });
+                         if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
+                             jsonUserFromNeo.put("email", this.userMail);
+                             arrUsersToUpdate.add(jsonUserFromNeo);
+                         }
+                    }
+                    for (Map.Entry<String, JsonObject> entryUser : mapUsersNotFound[0].entrySet()) {
+                        JsonObject jsonUserFromNeo = entryUser.getValue();
+                        Future getCoursesFuture = Future.future();
+                        listGetFuture.add(getCoursesFuture);
+                        getCourses(jsonUserFromNeo, getCoursesFuture);
+
+                    }
+                    if (arrUsersToUpdate.isEmpty()) {
+                        String message = "Aucune mise à jour necessaire";
+                        log.info(message);
+                        endSyncUsers(handler);
+                    } else {
+                        try {
+                            updateUsers(arrUsersToUpdate, event -> {
+                                if (event.isRight()) {
+                                    log.info("END updating users");
+                                    endSyncUsers(handler);
+                                } else {
+                                    httpClient.close();
+                                    handler.handle(new Either.Left<>(event.left().getValue()));
+                                    log.error("Error updating users", event.left());
+                                }
+                            });
+                        } catch (UnsupportedEncodingException e) {
+                            httpClient.close();
+                            handler.handle(new Either.Left<>(e.toString()));
+                            log.error("Error updating users - UnsupportedEncodingException", e);
+                        }
+                    }
+                    if (listGetFuture.isEmpty()) {
+                        String message = "Aucun utilisateur supprimé avec des cours";
+                        log.info(message);
+                        endSyncUsers(handler);
+                    } else {
+                        CompositeFuture.all(listGetFuture).setHandler(handlerGetCourses);
+                    }
                 }
             } catch (Throwable t) {
                 log.error("Erreur getUsersHandler : ", t);
@@ -372,28 +357,47 @@ public class DefaultSynchService {
 
                         // si auteur
                         if (jsonCours.getString("role").equals(ROLE_AUDITEUR.toString())) {
-
                             // TODO réattribuer le cours à un admin étab CGI (A préciser)
                             //    récupérer l'ADML dans l'ENT / le créer dans Moodle si besoin
                             //    utiliser web service Moodle  local_entcgi_services_enrolluserscourses pour inscrire l'ADML en tant que propriétaire du cours à la place de l'ancien
 
                             // Suppression de l’utilisateur (ou rendre inactif si trop coûteux en perf et purge à posteriori) + détachement de ses cohortes :
-                            identifyUserToDelete(arrUsersToDelete, idUser, false);
+                            identifyUserToDelete(arrUsersToDelete, idUser, true);
                         }
 
                         // si editeur ou apprenant
                         if (jsonCours.getString("role").equals(ROLE_EDITEUR.toString())
                                 || jsonCours.getString("role").equals(ROLE_APPRENANT.toString())) {
+                            Future<JsonArray> getUsersEnrolmentsFuture = Future.future();
 
                             // Détachement de l’utilisateur de ses cohortes + supprimer physiquement ?
                             // --> suppression soft dans un premier temps, et purge par la suite
-                            identifyUserToDelete(arrUsersToDelete, idUser, false);
 
-                            // TODO gérer cas dernier éditeur : idem que propriétaire
+                            getUsersEnrolmentsFromMoodle(jsonCours.getInteger("courseid"), getUsersEnrolmentsFuture);
+                            JsonArray finalArrUsersToDelete = arrUsersToDelete;
+                            getUsersEnrolmentsFuture.setHandler(event -> {
+                                if (event.succeeded()) {
+                                    int nbEditeur = 0;
+                                    boolean isEditor = false;
+                                    JsonArray usersEnrolment = getUsersEnrolmentsFuture.result();
+                                    JsonArray users = usersEnrolment.getJsonObject(0).getJsonArray("enrolments").getJsonObject(0).getJsonArray("users");
+                                    for (int i = 0; i < users.size(); i++) {
+                                        JsonObject user = users.getJsonObject(i);
+                                        if (user.getInteger("role").equals(ROLE_EDITEUR)) {
+                                            nbEditeur++;
+                                            isEditor = user.getString("id").equals(idUser) ? true : false;
+                                        }
+                                    }
+                                    if (nbEditeur == 1 && isEditor) {
+                                        identifyUserToDelete(finalArrUsersToDelete, idUser, true);
+                                    } else {
+                                        identifyUserToDelete(finalArrUsersToDelete, idUser, false);
+                                    }
+                                }
+                            });
                         }
                     }
                 }
-
             } else if(syncCase.equals(SyncCase.SYNC_GROUP)) {
                 if (!jsonArrayCourses.isEmpty()) {
                     for (Object cours : jsonArrayCourses) {
@@ -440,6 +444,49 @@ public class DefaultSynchService {
         HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerEnrollUsers);
     }
 
+    private void getUsersEnrolmentsFromMoodle(Integer idCourse, Future<JsonArray> future) {
+        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+        final AtomicBoolean responseIsSent = new AtomicBoolean(false);
+        Buffer wsResponse = new BufferImpl();
+        final String moodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path")) +
+                "?wstoken=" + moodleConfig.getString("wsToken") +
+                "&wsfunction=" + WS_GET_SHARECOURSE +
+                "&parameters[courseid]=" + idCourse +
+                "&moodlewsrestformat=" + JSON;
+        Handler<HttpClientResponse> getUsersEnrolmentsHandler = response -> {
+            if (response.statusCode() == 200) {
+                response.handler(wsResponse::appendBuffer);
+                response.endHandler(end -> {
+                    JsonArray finalGroups = new JsonArray(wsResponse);
+                    future.complete(finalGroups);
+                    if (!responseIsSent.getAndSet(true)) {
+                        httpClient.close();
+                    }
+                });
+            } else {
+                log.error("Fail to call get share course right webservice" + response.statusMessage());
+                response.bodyHandler(event -> {
+                    log.error("Returning body after GET CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
+                    future.fail(response.statusMessage());
+                    if (!responseIsSent.getAndSet(true)) {
+                        httpClient.close();
+                    }
+                });
+            }
+        };
+
+        final HttpClientRequest httpClientRequest = httpClient.getAbs(moodleUrl, getUsersEnrolmentsHandler);
+        httpClientRequest.headers().set("Content-Length", "0");
+        //Typically an unresolved Address, a timeout about connection or response
+        httpClientRequest.exceptionHandler(event -> {
+            log.error(event.getMessage(), event);
+            future.fail(event.getMessage());
+            if (!responseIsSent.getAndSet(true)) {
+                httpClient.close();
+            }
+        }).end();
+    }
+
     private void getCourses(JsonObject jsonUser, Future getCoursesFuture) {
         final String moodleUrl = baseWsMoodleUrl + "?wstoken=" + moodleConfig.getString("wsToken") +
                 "&wsfunction=" + WS_GET_USERCOURSES +
@@ -480,16 +527,15 @@ public class DefaultSynchService {
 
     private boolean areUsersEquals(JsonObject jsonUserFromNeo, JsonObject jsonUserFromMoodle) {
         return jsonUserFromMoodle.getString("id").equals(jsonUserFromNeo.getString("id")) &&
-                jsonUserFromMoodle.getString("firstname").equals(jsonUserFromNeo.getString("firstName")) &&
-                jsonUserFromMoodle.getString("lastname").equals(jsonUserFromNeo.getString("lastName")) &&
-                jsonUserFromMoodle.getString("email").equals(jsonUserFromNeo.getString("email"));
+                jsonUserFromMoodle.getString("firstname").equals(jsonUserFromNeo.getString("firstname")) &&
+                jsonUserFromMoodle.getString("lastname").equals(jsonUserFromNeo.getString("lastname"));
     }
 
 
     private void getUsers(Object[] idUsers, Handler<Either<String, JsonArray>> handler){
 
-        String RETURNING = " RETURN  u.id as id, u.firstName as firstName, u.lastName as lastName, " +
-                "u.deleteDate as deleteDate ORDER BY lastName, firstName ";
+        String RETURNING = " RETURN  u.id as id, u.firstName as firstname, u.lastName as lastname, u.login as username, " +
+                "u.deleteDate as deleteDate ORDER BY lastname, firstname";
 
         JsonObject params = new JsonObject();
         params.put("idUsers", new fr.wseduc.webutils.collections.JsonArray(Arrays.asList(idUsers)));
