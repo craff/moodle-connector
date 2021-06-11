@@ -1,6 +1,7 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
+import fr.openent.moodle.security.CreateFolderRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.moduleSQLRequestService;
 import fr.wseduc.rs.*;
@@ -13,11 +14,13 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.http.RouteMatcher;
 
 import java.util.Map;
 
+import static fr.openent.moodle.Moodle.*;
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
 import static org.entcore.common.http.response.DefaultResponseHandler.defaultResponseHandler;
 
@@ -37,12 +40,6 @@ public class FolderController extends ControllerHelper {
         this.eb = eb;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
     }
-
-    //Permissions
-    private static final String workflow_createFolder = "moodle.createFolder";
-    private static final String workflow_deleteFolder = "moodle.deleteFolder";
-    private static final String workflow_moveFolder = "moodle.moveFolder";
-    private static final String workflow_rename = "moodle.rename";
 
     @Put("/folders/move")
     @ApiDoc("move a folder")
@@ -102,7 +99,8 @@ public class FolderController extends ControllerHelper {
 
     @Get("/folder/countsFolders/:id")
     @ApiDoc("Get course in database by folder id")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(CreateFolderRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getCountsItemInFolder(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             if (user != null) {
@@ -117,7 +115,8 @@ public class FolderController extends ControllerHelper {
 
     @Get("/folders")
     @ApiDoc("Get folder in database")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(CreateFolderRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getFolder(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             if (user != null) {

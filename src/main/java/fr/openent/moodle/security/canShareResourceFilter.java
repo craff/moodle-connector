@@ -1,4 +1,4 @@
-package fr.openent.moodle.filters;
+package fr.openent.moodle.security;
 
 import fr.wseduc.webutils.http.Binding;
 import io.vertx.core.Handler;

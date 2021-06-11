@@ -1,11 +1,13 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
+import fr.openent.moodle.security.PublicateRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.request.RequestUtils;
@@ -15,10 +17,10 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserUtils;
 
-import static fr.openent.moodle.Moodle.WAITING;
-import static fr.openent.moodle.Moodle.moodleConfig;
+import static fr.openent.moodle.Moodle.*;
 import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayResponseHandler;
 
 public class PublishedController extends ControllerHelper {
@@ -31,11 +33,10 @@ public class PublishedController extends ControllerHelper {
         this.moodleEventBus = new DefaultMoodleEventBus(eb);
     }
 
-    private static final String workflow_publish = "moodle.publish";
-
-
     @Get("/levels")
     @ApiDoc("get all levels")
+    @ResourceFilter(PublicateRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getLevels (HttpServerRequest request) {
         moduleSQLRequestService.getLevels(arrayResponseHandler(request));
     }
@@ -43,6 +44,8 @@ public class PublishedController extends ControllerHelper {
 
     @Get("/disciplines")
     @ApiDoc("get all disciplines")
+    @ResourceFilter(PublicateRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getDisciplines (HttpServerRequest request) {
         moduleSQLRequestService.getDisciplines(arrayResponseHandler(request));
     }
@@ -90,6 +93,8 @@ public class PublishedController extends ControllerHelper {
 
     @Post("/metadata/update")
     @ApiDoc("Update public course metadata")
+    @ResourceFilter(PublicateRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void updatePublicCourseMetadata(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, updateMetadata -> {
             Integer course_id = updateMetadata.getJsonArray("coursesId").getInteger(0);

@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static fr.openent.moodle.Moodle.moodleConfig;
-import static fr.openent.moodle.controllers.ShareController.resource_read;
+import static fr.openent.moodle.Moodle.resource_read;
 import static java.util.Objects.isNull;
 
 public class DefaultGetShareProcessingService extends ControllerHelper implements getShareProcessingService {

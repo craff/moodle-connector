@@ -1,7 +1,10 @@
 package fr.openent.moodle.controllers;
 
+import fr.openent.moodle.security.SynchroRight;
 import fr.openent.moodle.service.impl.DefaultSynchService;
 import fr.wseduc.rs.Post;
+import fr.wseduc.security.ActionType;
+import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.I18n;
 import fr.wseduc.webutils.request.RequestUtils;
 import io.vertx.core.Vertx;
@@ -12,12 +15,15 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Scanner;
+import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import static fr.openent.moodle.Moodle.workflow_synchro;
 
 public class SynchController extends ControllerHelper {
 
@@ -29,7 +35,7 @@ public class SynchController extends ControllerHelper {
     }
 
     @Post("/synch/users")
-    //@SecuredAction(value ="", type = ActionType.AUTHENTICATED)
+    @SecuredAction(workflow_synchro)
     public void syncUsers(final HttpServerRequest request){
         log.info("--START syncUsers --");
         request.setExpectMultipart(true);
@@ -70,7 +76,8 @@ public class SynchController extends ControllerHelper {
     }
 
     @Post("/synch/groups")
-    //@SecuredAction(value ="", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(SynchroRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void syncGroups(final HttpServerRequest request){
         log.info("--START syncGroups --");
         RequestUtils.bodyToJson(request, cohorts -> {

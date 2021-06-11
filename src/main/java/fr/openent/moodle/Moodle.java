@@ -53,6 +53,23 @@ public class Moodle extends BaseServer {
 	public static String MEDIACENTRE_DELETE = "fr.openent.mediacentre.source.Moodle|delete";
 	public static String MEDIACENTRE_UPDATE = "fr.openent.mediacentre.source.Moodle|update";
 
+	//Permissions
+	public static final String workflow_view = "moodle.view";
+	public static final String workflow_createCourse = "moodle.createCourse";
+	public static final String workflow_deleteCourse = "moodle.deleteCourse";
+	public static final String workflow_moveCourse = "moodle.moveCourse";
+	public static final String workflow_publish = "moodle.publish";
+	public static final String workflow_duplicate = "moodle.duplicate";
+	public static final String workflow_createFolder = "moodle.createFolder";
+	public static final String workflow_deleteFolder = "moodle.deleteFolder";
+	public static final String workflow_moveFolder = "moodle.moveFolder";
+	public static final String workflow_rename = "moodle.rename";
+	public static final String resource_read = "moodle.read";
+	public static final String resource_contrib = "moodle.contrib";
+	public static final String resource_manager = "moodle.manager";
+	public static final String workflow_accessPublicCourse = "moodle.accessPublicCourse";
+	public static final String workflow_synchro = "moodle.synchro";
+
 
 	public static String moodleSchema;
     public static JsonObject moodleConfig;

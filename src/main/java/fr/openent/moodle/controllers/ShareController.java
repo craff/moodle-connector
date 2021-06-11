@@ -1,7 +1,7 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.filters.canShareResourceFilter;
+import fr.openent.moodle.security.canShareResourceFilter;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.service.getShareProcessingService;
 import fr.openent.moodle.service.impl.DefaultGetShareProcessingService;
@@ -79,12 +79,6 @@ public class ShareController extends ControllerHelper {
 
         this.timelineHelper = timelineHelper;
     }
-
-    //Permissions
-    public static final String resource_read = "moodle.read";
-    private static final String resource_contrib = "moodle.contrib";
-    private static final String resource_manager = "moodle.manager";
-    private static final String workflow_accessPublicCourse = "moodle.accessPublicCourse";
 
     @Get("/share/json/:id")
     @ApiDoc("Lists rights for a given course.")

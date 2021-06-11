@@ -2,6 +2,7 @@ package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
+import fr.openent.moodle.security.AccessRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.moduleSQLRequestService;
@@ -24,6 +25,7 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -70,9 +72,6 @@ public class MoodleController extends ControllerHelper {
 
     }
 
-    //Permissions
-    private static final String workflow_view = "moodle.view";
-
     /**
      * Displays the home view.
      *
@@ -87,6 +86,8 @@ public class MoodleController extends ControllerHelper {
 
     @ApiDoc("public Get picture for moodle website")
     @Get("/files/:id")
+    @ResourceFilter(AccessRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getFile(HttpServerRequest request) {
         String idImage = request.getParam("id");
         moodleEventBus.getImage(idImage, event -> {
@@ -107,6 +108,8 @@ public class MoodleController extends ControllerHelper {
 
     @ApiDoc("get info image workspace")
     @Get("info/image/:id/")
+    @ResourceFilter(AccessRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getInfoImg(final HttpServerRequest request) {
         try {
             moodleEventBus.getImage(request.getParam("id"), DefaultResponseHandler.defaultResponseHandler(request));
@@ -117,7 +120,8 @@ public class MoodleController extends ControllerHelper {
 
     @Get("/choices")
     @ApiDoc("get a choice")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(AccessRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getChoices(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             if (user != null) {
@@ -132,7 +136,8 @@ public class MoodleController extends ControllerHelper {
 
     @Put("/choices/:view")
     @ApiDoc("set a choice")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(AccessRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void setChoice(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "courses", courses ->
                 UserUtils.getUserInfos(eb, request, user -> {

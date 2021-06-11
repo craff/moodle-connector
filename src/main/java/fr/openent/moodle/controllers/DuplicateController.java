@@ -1,6 +1,7 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
+import fr.openent.moodle.security.DuplicateRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.moduleSQLRequestService;
@@ -8,6 +9,7 @@ import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
+import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.http.Renders;
@@ -19,6 +21,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.http.RouteMatcher;
 
@@ -45,10 +48,6 @@ public class DuplicateController extends ControllerHelper {
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         this.moodleEventBus = new DefaultMoodleEventBus(eb);
     }
-
-    //Permissions
-    private static final String workflow_duplicate = "moodle.duplicate";
-
 
     @Post("/course/duplicate")
     @ApiDoc("Duplicate courses")
@@ -82,6 +81,8 @@ public class DuplicateController extends ControllerHelper {
 
     @Post("/course/duplicate/BP/:id")
     @ApiDoc("Duplicate a BP course")
+    @ResourceFilter(DuplicateRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void duplicatePublicCourse(HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             int courseId = 0;
@@ -114,6 +115,8 @@ public class DuplicateController extends ControllerHelper {
 
     @Get("/duplicateCourses")
     @ApiDoc("Get duplicate courses")
+    @ResourceFilter(DuplicateRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getDuplicateCourses(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             if (user != null) {
@@ -134,6 +137,8 @@ public class DuplicateController extends ControllerHelper {
 
     @Delete("/courseDuplicate/:id")
     @ApiDoc("delete a duplicateFailed folder")
+    @ResourceFilter(DuplicateRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void deleteDuplicateCourse(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             if (user != null) {
@@ -165,6 +170,7 @@ public class DuplicateController extends ControllerHelper {
 
     @Post("/course/duplicate/response")
     @ApiDoc("Duplicate courses")
+    //TODO Sécuriser cette route api
     public void getMoodleResponse(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "duplicateResponse", duplicateResponse ->
                 UserUtils.getUserInfos(eb, request, user -> {

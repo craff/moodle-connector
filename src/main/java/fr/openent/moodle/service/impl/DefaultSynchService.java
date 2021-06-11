@@ -3,8 +3,6 @@ package fr.openent.moodle.service.impl;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.service.moduleNeoRequestService;
-import fr.openent.moodle.service.moduleSQLRequestService;
-import fr.openent.moodle.service.moodleEventBus;
 import fr.openent.moodle.utils.SyncCase;
 import fr.openent.moodle.utils.Utils;
 import fr.wseduc.webutils.Either;
@@ -38,10 +36,7 @@ public class DefaultSynchService {
     protected EventBus eb;
     private final Neo4j neo4j = Neo4j.getInstance();
 
-    private final moduleSQLRequestService moduleSQLRequestService;
     private final moduleNeoRequestService moduleNeoRequestService;
-
-    private final moodleEventBus moodleEventBus;
 
     private HttpClient httpClient;
 
@@ -62,9 +57,7 @@ public class DefaultSynchService {
     public DefaultSynchService(EventBus eb, Vertx vertx) {
         this.eb = eb;
         this.vertx = vertx;
-        this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
-        this.moodleEventBus = new DefaultMoodleEventBus(eb);
         this.userMail = Moodle.moodleConfig.getString("userMail");
         baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
     }

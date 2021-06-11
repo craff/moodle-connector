@@ -2,6 +2,7 @@ package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
+import fr.openent.moodle.security.AccessRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.moduleSQLRequestService;
@@ -24,6 +25,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.http.RouteMatcher;
@@ -68,11 +70,6 @@ public class CourseController extends ControllerHelper {
         this.userMail = Moodle.moodleConfig.getString("userMail");
         this.moodleEventBus = new DefaultMoodleEventBus(eb);
     }
-
-    //Permissions
-    private static final String workflow_createCourse = "moodle.createCourse";
-    private static final String workflow_deleteCourse = "moodle.deleteCourse";
-    private static final String workflow_moveCourse = "moodle.moveCourse";
 
     @Post("/course")
     @ApiDoc("create a course")
@@ -156,7 +153,8 @@ public class CourseController extends ControllerHelper {
 
     @Get("/user/courses")
     @ApiDoc("Get courses by user in moodle and sql")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(AccessRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getCoursesByUser(final HttpServerRequest request) {
         UserUtils.getUserInfos(eb, request, user -> {
             if (user != null) {
@@ -471,6 +469,8 @@ public class CourseController extends ControllerHelper {
 
     @Get("/course/:id")
     @ApiDoc("Redirect to Moodle")
+    @ResourceFilter(AccessRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void redirectToMoodle(HttpServerRequest request) {
         String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
         redirect(request, moodleConfig.getString("address_moodle"), "/course/" + scope + ".php?id=" +
@@ -479,7 +479,8 @@ public class CourseController extends ControllerHelper {
 
     @Put("/course/preferences")
     @ApiDoc("set preferences")
-    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    @ResourceFilter(AccessRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void setPreferences(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "coursePreferences", coursePreferences ->
                 UserUtils.getUserInfos(eb, request, user -> {
