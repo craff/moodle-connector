@@ -160,11 +160,6 @@ public class DefaultSynchService {
 
             if (eventFuture.succeeded()) {
                 log.info("END getting courses");
-                for (Map.Entry<String, JsonObject> entryUser : mapUsersMoodle.entrySet()) {
-                    JsonObject jsonUser = entryUser.getValue();
-                    log.info(jsonUser.toString());
-                    log.info("-------");
-                }
 
                 // Utilisateurs non retrouvés (supp physiquement)
                 for (Map.Entry<String, JsonObject> entryUser : mapUsersNotFound[0].entrySet()) {
@@ -235,10 +230,10 @@ public class DefaultSynchService {
                             listGetFuture.add(getCoursesFuture);
                             getCourses(jsonUserFromNeo, getCoursesFuture);
                         }
-                         if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
-                             jsonUserFromNeo.put("email", this.userMail);
-                             arrUsersToUpdate.add(jsonUserFromNeo);
-                         }
+                        if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
+                            jsonUserFromNeo.put("email", this.userMail);
+                            arrUsersToUpdate.add(jsonUserFromNeo);
+                        }
                     }
                     for (Map.Entry<String, JsonObject> entryUser : mapUsersNotFound[0].entrySet()) {
                         JsonObject jsonUserFromNeo = entryUser.getValue();
@@ -986,8 +981,5 @@ public class DefaultSynchService {
                 }
             });
         }
-
     }
-
-
 }

@@ -18,11 +18,9 @@ import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.http.filter.ResourceFilter;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.Scanner;
-import java.io.IOException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
+
 import static fr.openent.moodle.Moodle.workflow_synchro;
 
 public class SynchController extends ControllerHelper {
@@ -43,34 +41,25 @@ public class SynchController extends ControllerHelper {
         request.uploadHandler(upload -> {
             upload.handler(buff::appendBuffer);
             upload.endHandler(end -> {
-                try {
-                    log.info("Unzip  : " + upload.filename());
-                    ZipInputStream zipStream = new ZipInputStream(new ByteArrayInputStream(buff.getBytes()));
-                    ZipEntry userFileZipEntry = zipStream.getNextEntry();
-                    assert userFileZipEntry != null;
-                    log.info("Reading : " + userFileZipEntry.getName());
-                    Scanner sc = new Scanner(zipStream);
-                    // skip header
-                    if(sc.hasNextLine()) {
-                        sc.nextLine();
-                    } else {
-                        log.info("Empty user file");
-                        return;
-                    }
-                    defaultSynchService.syncUsers(sc, syncUsersEither -> {
-                        if(syncUsersEither.isLeft()) {
-                            log.error("--END syncUsers FAIL--");
-                            badRequest(request);
-                        } else {
-                            log.info("--END syncUsers SUCCESS--");
-                            request.response().setStatusCode(200).end();
-                        }
-                    });
-                } catch (IOException e) {
-                    log.error("Error reading zip", e);
-                } finally {
-                    log.info("--END syncUsers --");
+                log.info("File received  : " + upload.filename());
+                InputStream stream = new ByteArrayInputStream(buff.getBytes());
+                Scanner sc = new Scanner(stream);
+                // skip header
+                if(sc.hasNextLine()) {
+                    sc.nextLine();
+                } else {
+                    log.info("Empty user file");
+                    return;
                 }
+                defaultSynchService.syncUsers(sc, syncUsersEither -> {
+                    if(syncUsersEither.isLeft()) {
+                        log.error("--END syncUsers FAIL--");
+                        badRequest(request);
+                    } else {
+                        log.info("--END syncUsers SUCCESS--");
+                        request.response().setStatusCode(200).end();
+                    }
+                });
             });
         });
     }
