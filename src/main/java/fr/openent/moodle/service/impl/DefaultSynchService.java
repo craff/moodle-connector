@@ -286,15 +286,18 @@ public class DefaultSynchService {
 
 
     private void identifyUserToDelete (JsonArray arrUsersToDelete, String idUser, boolean remove) {
-        JsonObject userToDelete = new JsonObject();
-        userToDelete.put("id", idUser);
-        if(remove) {
-            userToDelete.put("remove", "hard");
-        } else {
-            userToDelete.put("remove", "soft");
+        boolean alreadyInList = arrUsersToDelete.stream().anyMatch(u -> ((JsonObject)u).getString("id").equals(idUser));
+        if(alreadyInList){
+            for(int i = 0; i< arrUsersToDelete.size(); i++){
+                if(arrUsersToDelete.getJsonObject(i).getString("id").equals(idUser) && remove){
+                    arrUsersToDelete.getJsonObject(i).put("remove", "hard");
+                }
+            }
+        }else {
+            JsonObject userToDelete = new JsonObject();
+            userToDelete.put("id", idUser).put("remove", remove ? "hard" : "soft");
+            arrUsersToDelete.add(userToDelete);
         }
-
-        arrUsersToDelete.add(userToDelete);
     }
 
     private void identifyUserToEnroll (JsonArray arrCoursesUserToEnroll, String coursId, String role) {
