@@ -170,7 +170,8 @@ public class DuplicateController extends ControllerHelper {
 
     @Post("/course/duplicate/response")
     @ApiDoc("Duplicate courses")
-    //TODO Sécuriser cette route api
+    @ResourceFilter(DuplicateRight.class)
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getMoodleResponse(HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "duplicateResponse", duplicateResponse ->
                 UserUtils.getUserInfos(eb, request, user -> {
