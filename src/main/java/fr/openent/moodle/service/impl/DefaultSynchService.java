@@ -230,10 +230,11 @@ public class DefaultSynchService {
                             listGetFuture.add(getCoursesFuture);
                             getCourses(jsonUserFromNeo, getCoursesFuture);
                         }
-                        if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
-                            jsonUserFromNeo.put("email", this.userMail);
-                            arrUsersToUpdate.add(jsonUserFromNeo);
-                        }
+                         if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
+                             jsonUserFromNeo.put("email", this.userMail);
+                             jsonUserFromNeo.put("username", jsonUserFromNeo.getString("id"));
+                             arrUsersToUpdate.add(jsonUserFromNeo);
+                         }
                     }
                     for (Map.Entry<String, JsonObject> entryUser : mapUsersNotFound[0].entrySet()) {
                         JsonObject jsonUserFromNeo = entryUser.getValue();
