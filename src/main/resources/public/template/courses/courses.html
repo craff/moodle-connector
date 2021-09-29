@@ -30,7 +30,7 @@
      class="cell twelve-mobile course-article style-bord-with-over-effect infoBackground bottom-margin"
      ng-class="{'minimal-mine-recent-width infoBackgroundTopMargin': show.viewModeMyCourses == 'icons', 'all-width': show.viewModeMyCourses == 'list'}"
      ng-repeat="course in courses.orderCourses(courses.coursesShared)">
-    <courses-item course="course" place="coursesShared" check="showToaster"
+    <courses-item course="course" place="show.coursesShared" check="showToaster"
                   view="show.viewModeMyCourses"></courses-item>
 </div>
 <div ng-if="show.principal_folder == utils.PRINCIPAL_FOLDER_TYPE.shared && showCourse(course.course_type) &&
