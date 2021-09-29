@@ -25,6 +25,7 @@ import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.controller.ControllerHelper;
+import org.entcore.common.events.EventStore;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
@@ -50,7 +51,7 @@ import static java.util.Objects.isNull;
 import static org.entcore.common.http.response.DefaultResponseHandler.defaultResponseHandler;
 
 public class CourseController extends ControllerHelper {
-
+    private final EventStore eventStore;
     private final moduleSQLRequestService moduleSQLRequestService;
     private final String userMail;
     private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
@@ -62,8 +63,9 @@ public class CourseController extends ControllerHelper {
         super.init(vertx, config, rm, securedActions);
     }
 
-    public CourseController(EventBus eb) {
+    public CourseController(EventStore eventStore, EventBus eb) {
         super();
+        this.eventStore = eventStore;
         this.eb = eb;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         //todo remove mail constant and add mail from zimbra, ent ...
@@ -138,7 +140,16 @@ public class CourseController extends ControllerHelper {
                                 log.info(courseCreatedInMoodle);
                                 course.put("moodleid", courseCreatedInMoodle.getValue("courseid"))
                                         .put("userid", user.getUserId());
-                                moduleSQLRequestService.createCourse(course, defaultResponseHandler(request));
+
+                                moduleSQLRequestService.createCourse(course, event -> {
+                                    if (event.isRight()) {
+                                        eventStore.createAndStoreEvent(Moodle.MoodleEvent.CREATE.name(), request);
+                                        Renders.renderJson(request, event.right().getValue(), 200);
+                                    } else {
+                                        JsonObject error = (new JsonObject()).put("error", event.left().getValue());
+                                        Renders.renderJson(request, error, 400);
+                                    }
+                                });
                             } else {
                                 Utils.sendErrorRequest(request, "FAIL creating course : " + responseMoodle.left().getValue());
                             }

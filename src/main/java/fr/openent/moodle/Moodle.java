@@ -5,6 +5,8 @@ import fr.openent.moodle.cron.notifyMoodle;
 import fr.openent.moodle.cron.synchDuplicationMoodle;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
+import org.entcore.common.events.EventStore;
+import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.BaseServer;
 import org.entcore.common.notification.TimelineHelper;
 import org.entcore.common.service.impl.SqlCrudService;
@@ -18,6 +20,7 @@ import fr.wseduc.cron.CronTrigger;
 import java.text.ParseException;
 
 public class Moodle extends BaseServer {
+	public enum MoodleEvent { ACCESS, CREATE }
 
 	public static String DIRECTORY_BUS_ADDRESS = "directory";
 	public static String ZIMBRA_BUS_ADDRESS = "fr.openent.zimbra";
@@ -85,6 +88,7 @@ public class Moodle extends BaseServer {
 		moodleSchema = config.getString("db-schema");
         moodleConfig = config;
 		EventBus eb = getEventBus(vertx);
+		EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Moodle.class.getSimpleName());
 
 		final Storage storage = new StorageFactory(vertx, config, /*new ExercizerStorage()*/ null).getStorage();
 
@@ -95,9 +99,9 @@ public class Moodle extends BaseServer {
 
 		TimelineHelper timelineHelper = new TimelineHelper(vertx, eb, config);
 
-		MoodleController moodleController = new MoodleController(storage, eb);
+		MoodleController moodleController = new MoodleController(eventStore, storage, eb);
         PublishedController publishedController = new PublishedController(eb);
-		CourseController courseController = new CourseController(eb);
+		CourseController courseController = new CourseController(eventStore, eb);
 		DuplicateController duplicateController = new DuplicateController(eb);
 		FolderController folderController = new FolderController(eb);
 		ShareController shareController = new ShareController(eb,timelineHelper);

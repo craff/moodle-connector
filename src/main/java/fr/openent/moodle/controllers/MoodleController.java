@@ -46,8 +46,6 @@ public class MoodleController extends ControllerHelper {
 
     private EventStore eventStore;
 
-    private enum MoodleEvent {ACCESS}
-
     private final String userMail;
 
     public static final String baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
@@ -56,11 +54,11 @@ public class MoodleController extends ControllerHelper {
     public void init(Vertx vertx, JsonObject config, RouteMatcher rm,
                      Map<String, fr.wseduc.webutils.security.SecuredAction> securedActions) {
         super.init(vertx, config, rm, securedActions);
-        eventStore = EventStoreFactory.getFactory().getEventStore(Moodle.class.getSimpleName());
     }
 
-    public MoodleController(final Storage storage, EventBus eb) {
+    public MoodleController(EventStore eventStore, final Storage storage, EventBus eb) {
         super();
+        this.eventStore = eventStore;
         this.eb = eb;
         this.storage = storage;
 
