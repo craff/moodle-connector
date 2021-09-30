@@ -690,6 +690,46 @@ body.moodle {
     }
   }
 
+
+  .convert {
+    &-picker {
+      display: flex;
+      flex-direction: column;
+      margin-top: 2%;
+
+      .file-picker {
+        display: flex;
+        align-content: center;
+        margin: 2% 0;
+
+        .loading-list {
+          padding-top: 0;
+          overflow: unset;
+          max-height: unset;
+        }
+
+        @media screen and (max-width: 800px) {
+          flex-direction: column;
+        }
+
+        .no-list {
+          display: flex;
+
+          @media screen and (max-width: 800px) {
+            justify-content: center;
+          }
+
+          i18n {
+            margin: auto 0 auto 10%;
+
+            @media screen and (max-width: 800px) {
+              margin: auto 0;
+            }
+          }
+        }
+      }
+    }
+  }
 }
 
 //TEMP FIX

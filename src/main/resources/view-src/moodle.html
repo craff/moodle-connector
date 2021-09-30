@@ -24,30 +24,34 @@
                         </span>
                     </h1>
                 </app-title>
-                    <div class="row twelve cell tabs zero-mobile" style="min-height: 60px;">
-                        <div class="cell">
-                            <header class="horizontal-spacing selected" data-ng-click="switchTab('dashboard')"
-                                    data-ng-class="{ selected: show.currentTab === 'dashboard' }">
-                                <span>
-                                    <i18n>moodle.dashboard.dashboard</i18n>
-                                </span>
-                            </header>
-                            <header class="horizontal-spacing " data-ng-click="switchTab('courses')"
-                                    data-ng-class="{ selected: show.currentTab === 'courses' }">
-                                <span>
-                                    <i18n>moodle.dashboard.courses</i18n>
-                                </span>
-                            </header>
-                            <!--<header class="horizontal-spacing" data-ng-click="switchTab('library')"
-                            data-ng-class="{ selected: show.currentTab === 'library' }">
-                                <span>
-                                    <i18n>moodle.dashboard.libraries</i18n>
-                                </span>
-                            </header>-->
-                        </div>
-                        <input type="submit" i18n-value="moodle.course.new" ng-click="openCreateCoursePopUp()"
-                               class="right-magnet" workflow="moodle.createCourse">
+                <div class="row twelve cell tabs zero-mobile" style="min-height: 60px;" ng-if="show.currentTab != 'converter'">
+                    <div class="cell">
+                        <header class="horizontal-spacing selected" data-ng-click="switchTab('dashboard')"
+                                data-ng-class="{ selected: show.currentTab === 'dashboard' }">
+                            <span>
+                                <i18n>moodle.dashboard.dashboard</i18n>
+                            </span>
+                        </header>
+                        <header class="horizontal-spacing " data-ng-click="switchTab('courses')"
+                                data-ng-class="{ selected: show.currentTab === 'courses' }">
+                            <span>
+                                <i18n>moodle.dashboard.courses</i18n>
+                            </span>
+                        </header>
+                        <!--<header class="horizontal-spacing" data-ng-click="switchTab('library')"
+                        data-ng-class="{ selected: show.currentTab === 'library' }">
+                            <span>
+                                <i18n>moodle.dashboard.libraries</i18n>
+                            </span>
+                        </header>-->
                     </div>
+                    <button class="right-magnet" ng-click="openCreateCoursePopUp()" workflow="moodle.createCourse">
+                        <i18n>moodle.course.new</i18n>
+                    </button>
+                    <button class="cancel right-magnet" ng-click="goConverter()" workflow="moodle.convert">
+                        <i18n>moodle.convert.button</i18n>
+                    </button>
+                </div>
                 <nav class="vertical mobile-navigation tabs zero-desktop heightNavBar" side-nav >
                     <header class="horizontal-spacing selected row ellipsis" data-ng-click="switchTab('dashboard')"
                             data-ng-class="{ selected: show.currentTab === 'dashboard' }">
@@ -76,7 +80,7 @@
 
             <container template="main"></container>
             <container template="toaster"></container>
-            <div ng-click="openCreateCoursePopUp()" ng-if="!show.toaster && show.currentTab != 'courses'"
+            <div ng-click="openCreateCoursePopUp()" ng-if="!show.toaster && show.currentTab != 'courses' && show.currentTab != 'converter'"
                  class="fab zero-desktop" workflow="moodle.createCourse">
                 +
             </div>

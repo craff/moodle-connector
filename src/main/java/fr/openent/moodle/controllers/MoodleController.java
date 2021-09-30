@@ -3,12 +3,14 @@ package fr.openent.moodle.controllers;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.security.AccessRight;
+import fr.openent.moodle.security.ConvertRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.moduleSQLRequestService;
 import fr.openent.moodle.service.moodleEventBus;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
+import fr.wseduc.rs.Post;
 import fr.wseduc.rs.Put;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -138,31 +140,38 @@ public class MoodleController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void setChoice(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "courses", courses ->
-                UserUtils.getUserInfos(eb, request, user -> {
-                    if (user != null) {
-                        courses.put("userId", user.getUserId());
-                        String view = request.getParam("view");
-                        moduleSQLRequestService.setChoice(courses, view, defaultResponseHandler(request));
-                    } else {
-                        log.error("User not found in session.");
-                        unauthorized(request);
-                    }
-                }));
+            UserUtils.getUserInfos(eb, request, user -> {
+                if (user != null) {
+                    courses.put("userId", user.getUserId());
+                    String view = request.getParam("view");
+                    moduleSQLRequestService.setChoice(courses, view, defaultResponseHandler(request));
+                } else {
+                    log.error("User not found in session.");
+                    unauthorized(request);
+                }
+            }));
+    }
+
+    @Post("/convert")
+    @ApiDoc("Convert files Its Learning files to XML and return logs")
+    @SecuredAction(workflow_convert)
+    public void convert(final HttpServerRequest request) {
+        renderJson(request, new JsonObject()); // TODO link to Samuel's python script
     }
 
     private void createUpdateWSUrlCreateuser(UserInfos user, Handler<Either<String, Buffer>> handlerUpdateUser)
-            throws UnsupportedEncodingException {
-        JsonObject body = new JsonObject();
-        JsonObject userJson = new JsonObject()
-                .put("username",user.getUserId())
-                .put("firstname",user.getFirstName())
-                .put("lastname",user.getLastName())
-                .put("id",user.getUserId())
-                .put("email",this.userMail);
-        body.put("parameters", new JsonArray().add(userJson))
-                .put("wstoken", moodleConfig.getString("wsToken"))
-                .put("wsfunction", WS_POST_CREATE_OR_UPDATE_USER)
-                .put("moodlewsrestformat", JSON);
-        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerUpdateUser);
+        throws UnsupportedEncodingException {
+            JsonObject body = new JsonObject();
+            JsonObject userJson = new JsonObject()
+                    .put("username",user.getUserId())
+                    .put("firstname",user.getFirstName())
+                    .put("lastname",user.getLastName())
+                    .put("id",user.getUserId())
+                    .put("email",this.userMail);
+            body.put("parameters", new JsonArray().add(userJson))
+                    .put("wstoken", moodleConfig.getString("wsToken"))
+                    .put("wsfunction", WS_POST_CREATE_OR_UPDATE_USER)
+                    .put("moodlewsrestformat", JSON);
+            HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerUpdateUser);
+        }
     }
-}

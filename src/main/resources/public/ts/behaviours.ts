@@ -18,7 +18,8 @@ const moodleBehaviours = {
 		createCourse: 'fr.openent.moodle.controllers.CourseController|create',
 		delete: 'fr.openent.moodle.controllers.CourseController|delete',
 		view: 'fr.openent.moodle.controllers.MoodleController|view',
-		publish: 'fr.openent.moodle.controllers.PublishedController|publish'
+		publish: 'fr.openent.moodle.controllers.PublishedController|publish',
+		convert: 'fr.openent.moodle.controllers.MoodleController|convert'
 	}
 };
 

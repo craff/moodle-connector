@@ -72,6 +72,7 @@ public class Moodle extends BaseServer {
 	public static final String resource_manager = "moodle.manager";
 	public static final String workflow_accessPublicCourse = "moodle.accessPublicCourse";
 	public static final String workflow_synchro = "moodle.synchro";
+	public static final String workflow_convert = "moodle.convert";
 
 
 	public static String moodleSchema;

@@ -7,7 +7,8 @@ public enum WorkflowActions {
     DUPLICATE_RIGHT (workflow_duplicate),
     CREATE_FOLDER_RIGHT (workflow_createFolder),
     PUBLICATE_RIGHT (workflow_publish),
-    SYNCHRO_RIGHT (workflow_synchro);
+    SYNCHRO_RIGHT (workflow_synchro),
+    CONVERT_RIGHT (workflow_convert);
 
     private final String actionName;
 

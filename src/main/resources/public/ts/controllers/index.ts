@@ -5,3 +5,4 @@ export * from './toaster';
 export * from './courses';
 export * from './folders';
 export * from './lightbox';
+export * from './converter';

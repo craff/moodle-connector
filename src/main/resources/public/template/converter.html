@@ -1,0 +1,13 @@
+<div class="convert" ng-controller="ConverterController as vm">
+    <div class="row">
+        <button class="right-magnet" ng-click="vm.goMenu()"><i18n>moodle.convert.backToMenu</i18n></button>
+    </div>
+    <div class="convert-picker">
+        <i18n>moodle.convert.description</i18n>
+        <moodle-picker-file files="vm.files" multiple="true"></moodle-picker-file>
+        <button class="centered" ng-click="vm.convertFiles()"><i18n>moodle.convert.doConvert.button</i18n></button>
+    </div>
+    <div class="convert-logs">
+        <div ng-repeat="log in vm.logs" ng-if="vm.logs.length > 0">[[log]]</div>
+    </div>
+</div>

@@ -188,5 +188,14 @@
 	"moodle.empty.toCome.courses": "Il n'y a pour l'instant aucun cours à venir",
 	"moodle.empty.ToDo.courses": "Vous n'êtes inscrit à aucun cours pour le moment",
 	"moodle.empty.sharing.courses": "Aucun cours partagés avec vous pour le moment",
-	"moodle.empty.publish.courses": "Aucun cours publiés pour l'instant"
+	"moodle.empty.publish.courses": "Aucun cours publiés pour l'instant",
+
+	"moodle.convert.button": "Convertisseur de questions",
+	"moodle.convert.backToMenu": "Retour vers le tableau de bord",
+	"moodle.convert.description": "Déposez vos fichiers Its Learning au format ZIP, puis cliquez sur le bouton 'Convertir' pour les générer au format XML Moodle. Une fois convertis, les fichiers seront directement téléchargés sur votre ordinateur.",
+	"moodle.convert.files.none": "Vous n'avez pas encore déposé de fichiers à convertir ...",
+	"moodle.convert.error.format": "Vos fichiers de type non ZIP n'ont pas été importés",
+	"moodle.convert.doConvert.button": "Convertir mes fichiers Its Learning en fichier XML Moodle",
+	"moodle.convert.error.convert": "Une erreur est survenue lors de la conversion des fichiers",
+	"moodle.convert.logs.title": "Logs de traitement des fichiers fournis"
 }

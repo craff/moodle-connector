@@ -253,7 +253,8 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
                     return 7;
                 else
                     return 4;
-            } else if (place == "ToDo") {
+            }
+            else if (place == "ToDo") {
                 if ($scope.show.viewModeToDo == 'list')
                     return 7;
                 else {
@@ -299,8 +300,8 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
                 $timeout((): void =>
                         $scope.updateCourse()
                     , TIME_TO_REFRESH_DUPLICATION);
-            } else
-                await $scope.initCoursesByUser();
+            }
+            else await $scope.initCoursesByUser();
         };
 
         $(window).resize(function () {
@@ -327,7 +328,8 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
             if (place == "ToCome") {
                 $scope.show.firstCoursesToCome = 0;
                 $scope.show.lastCoursesToCome = $scope.count("ToCome");
-            } else if (place == "ToDo") {
+            }
+            else if (place == "ToDo") {
                 $scope.show.firstCoursesToDo = 0;
                 $scope.show.lastCoursesToDo = $scope.count("ToDo");
             }
@@ -348,12 +350,13 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
             $scope.show.sharedCourse = false;
             $scope.show.currentFolderId = 0;
             $scope.show.principal_folder = Utils.PRINCIPAL_FOLDER_TYPE[folderSelected];
-            if($scope.show.principal_folder === Utils.PRINCIPAL_FOLDER_TYPE.my_courses){
+            if ($scope.show.principal_folder === Utils.PRINCIPAL_FOLDER_TYPE.my_courses){
                 $scope.courses.searchInput.MyCourse = '';
                 $scope.initFolders();
                 $scope.folders.searchInFolders = 0;
                 $scope.show.printFolders = true;
-            }else{
+            }
+            else{
                 $scope.myCourse = undefined;
                 $scope.courses.order = {
                     field: "creationDate",
@@ -367,4 +370,12 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
         $scope.getSelectedCourses = function () {
             return _.where([...$scope.courses.coursesByUser, ...$scope.courses.coursesShared, ...$scope.courses.coursesPublished], {select: true});
         };
+
+        $scope.goConverter = async () : Promise<void> => {
+            $scope.show.currentTab = 'converter';
+            await template.open('main', 'converter');
+            await Utils.safeApply($scope);
+        };
+
+
     }]);
