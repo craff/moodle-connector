@@ -86,10 +86,8 @@ public class MoodleController extends ControllerHelper {
 
     @ApiDoc("public Get picture for moodle website")
     @Get("/files/:id")
-    @ResourceFilter(AccessRight.class)
-    @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getFile(HttpServerRequest request) {
-        String idImage = request.getParam("id");
+        String idImage = request.getParam("id").substring(0, request.getParam("id").lastIndexOf('.'));
         moodleEventBus.getImage(idImage, event -> {
             if (event.isRight()) {
                 JsonObject document = event.right().getValue();
@@ -107,7 +105,7 @@ public class MoodleController extends ControllerHelper {
     }
 
     @ApiDoc("get info image workspace")
-    @Get("info/image/:id/")
+    @Get("/info/image/:id")
     @ResourceFilter(AccessRight.class)
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getInfoImg(final HttpServerRequest request) {

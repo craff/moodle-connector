@@ -51,12 +51,14 @@ export const createCourseController = ng.controller('createCourseController', ['
          * get info image
          */
         $scope.getTypeImage = function () {
-            if ($scope.course.imageurl) {
-                $scope.course.setInfoImg();
-                $timeout(() =>
-                        $scope.show.imgCompatibleMoodle = $scope.course.infoImg.compatibleMoodle
-                    , 1000)
-            }
+            $timeout(() => {
+                if ($scope.course.imageurl) {
+                    $scope.course.setInfoImg();
+                    $timeout(() =>
+                            $scope.show.imgCompatibleMoodle = $scope.course.infoImg.compatibleMoodle
+                        , 1000)
+                }
+            }, 1000)
             Utils.safeApply($scope);
         };
 
