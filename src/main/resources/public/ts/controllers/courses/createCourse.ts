@@ -10,7 +10,7 @@ export const createCourseController = ng.controller('createCourseController', ['
                 {id: 'resource', name: 'Fichier'},
                 {id: 'page', name: 'Page'},
                 {id: 'assign', name: 'Devoir'},
-                {id: 'hvp', name: 'H5P'}
+                {id: 'h5p', name: 'H5P'}
             ],
             selectedOption: {id: undefined, name: 'Choisissez votre type'}
         };
