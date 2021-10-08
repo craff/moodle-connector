@@ -3,7 +3,6 @@ package fr.openent.moodle.controllers;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.security.AccessRight;
-import fr.openent.moodle.security.ConvertRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.openent.moodle.service.moduleSQLRequestService;
@@ -24,9 +23,10 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.WebClient;
+import io.vertx.ext.web.multipart.MultipartForm;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
-import org.entcore.common.events.EventStoreFactory;
 import org.entcore.common.http.filter.ResourceFilter;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
@@ -46,11 +46,14 @@ public class MoodleController extends ControllerHelper {
     private final moodleEventBus moodleEventBus;
     private final Storage storage;
 
-    private EventStore eventStore;
+    private final EventStore eventStore;
 
     private final String userMail;
 
-    public static final String baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
+    public static final String baseWsMoodleUrl = (moodleConfig.getString("address_moodle") +
+            moodleConfig.getString("ws-path"));
+
+    private final WebClient client;
 
     @Override
     public void init(Vertx vertx, JsonObject config, RouteMatcher rm,
@@ -58,7 +61,7 @@ public class MoodleController extends ControllerHelper {
         super.init(vertx, config, rm, securedActions);
     }
 
-    public MoodleController(EventStore eventStore, final Storage storage, EventBus eb) {
+    public MoodleController(EventStore eventStore, final Storage storage, EventBus eb, Vertx vertx) {
         super();
         this.eventStore = eventStore;
         this.eb = eb;
@@ -69,6 +72,8 @@ public class MoodleController extends ControllerHelper {
 
         //todo remove mail constant and add mail from zimbra, ent ...
         this.userMail = Moodle.moodleConfig.getString("userMail");
+
+        this.client = WebClient.create(vertx);
 
     }
 
@@ -87,7 +92,8 @@ public class MoodleController extends ControllerHelper {
     @ApiDoc("public Get picture for moodle website")
     @Get("/files/:id")
     public void getFile(HttpServerRequest request) {
-        String idImage = request.getParam("id").substring(0, request.getParam("id").lastIndexOf('.'));
+        String idImage = request.getParam("id")
+                .substring(0, request.getParam("id").lastIndexOf('.'));
         moodleEventBus.getImage(idImage, event -> {
             if (event.isRight()) {
                 JsonObject document = event.right().getValue();
@@ -110,7 +116,8 @@ public class MoodleController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void getInfoImg(final HttpServerRequest request) {
         try {
-            moodleEventBus.getImage(request.getParam("id"), DefaultResponseHandler.defaultResponseHandler(request));
+            moodleEventBus.getImage(request.getParam("id"),
+                    DefaultResponseHandler.defaultResponseHandler(request));
         } catch (Exception e) {
             log.error("Gail to get image workspace", e);
         }
@@ -138,38 +145,61 @@ public class MoodleController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void setChoice(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "courses", courses ->
-            UserUtils.getUserInfos(eb, request, user -> {
-                if (user != null) {
-                    courses.put("userId", user.getUserId());
-                    String view = request.getParam("view");
-                    moduleSQLRequestService.setChoice(courses, view, defaultResponseHandler(request));
-                } else {
-                    log.error("User not found in session.");
-                    unauthorized(request);
-                }
-            }));
+                UserUtils.getUserInfos(eb, request, user -> {
+                    if (user != null) {
+                        courses.put("userId", user.getUserId());
+                        String view = request.getParam("view");
+                        moduleSQLRequestService.setChoice(courses, view, defaultResponseHandler(request));
+                    } else {
+                        log.error("User not found in session.");
+                        unauthorized(request);
+                    }
+                }));
     }
 
     @Post("/convert")
-    @ApiDoc("Convert files Its Learning files to XML and return logs")
+    @ApiDoc("get infos to connect to the python transfo server")
     @SecuredAction(workflow_convert)
     public void convert(final HttpServerRequest request) {
-        renderJson(request, new JsonObject()); // TODO link to Samuel's python script
+        request.setExpectMultipart(true);
+        final Buffer buff = Buffer.buffer();
+        request.uploadHandler(upload -> {
+            upload.handler(buff::appendBuffer);
+            upload.endHandler(end -> {
+                log.info("File received  : " + upload.filename());
+                JsonObject serverConfig = Moodle.moodleConfig.getJsonObject("transfoLMSServer");
+                String serverTransfoUrl = serverConfig.getString("ip_adress") + "/convert/";
+                MultipartForm form = MultipartForm.create()
+                        .binaryFileUpload("file",upload.filename(),buff,"application/octet-stream");
+                client.postAbs(serverTransfoUrl)
+                        .sendMultipartForm(form, resp -> {
+                            if (resp.succeeded()) {
+                                log.info("File sent and transform with success ");
+                                JsonObject result = new JsonObject().put("message",resp.result().getHeader("message"))
+                                                .put("xml",resp.result().bodyAsString());
+                                renderJson(request, result);
+                            } else {
+                                log.error("Failed to contact server transfoLMS : " + resp.result().bodyAsString());
+                                renderError(request);
+                            }
+                        });
+            });
+        });
     }
 
     private void createUpdateWSUrlCreateuser(UserInfos user, Handler<Either<String, Buffer>> handlerUpdateUser)
-        throws UnsupportedEncodingException {
-            JsonObject body = new JsonObject();
-            JsonObject userJson = new JsonObject()
-                    .put("username",user.getUserId())
-                    .put("firstname",user.getFirstName())
-                    .put("lastname",user.getLastName())
-                    .put("id",user.getUserId())
-                    .put("email",this.userMail);
-            body.put("parameters", new JsonArray().add(userJson))
-                    .put("wstoken", moodleConfig.getString("wsToken"))
-                    .put("wsfunction", WS_POST_CREATE_OR_UPDATE_USER)
-                    .put("moodlewsrestformat", JSON);
-            HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerUpdateUser);
-        }
+            throws UnsupportedEncodingException {
+        JsonObject body = new JsonObject();
+        JsonObject userJson = new JsonObject()
+                .put("username",user.getUserId())
+                .put("firstname",user.getFirstName())
+                .put("lastname",user.getLastName())
+                .put("id",user.getUserId())
+                .put("email",this.userMail);
+        body.put("parameters", new JsonArray().add(userJson))
+                .put("wstoken", moodleConfig.getString("wsToken"))
+                .put("wsfunction", WS_POST_CREATE_OR_UPDATE_USER)
+                .put("moodlewsrestformat", JSON);
+        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerUpdateUser);
     }
+}

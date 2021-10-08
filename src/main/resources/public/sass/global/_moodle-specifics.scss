@@ -692,6 +692,9 @@ body.moodle {
 
 
   .convert {
+    &-logs {
+      display: block;
+    }
     &-picker {
       display: flex;
       flex-direction: column;

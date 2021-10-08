@@ -11,7 +11,8 @@ export const moodlePickerFile = ng.directive('moodlePickerFile', () => {
 			<div show="display.listFiles">
 				<div class="media-library file-picker">
                     <container template="pick" class="six twelve-mobile"></container>
-                    <container template="list" class="six twelve-mobile" ng-if="filesArray.length > 0"></container>
+                    <container template="list" class="six twelve-mobile" ng-if="filesArray.length > 0" 
+                    style="height: 200px; overflow-y: scroll;"></container>
                     <div class="six twelve-mobile no-list" ng-if="filesArray.length == 0"><i18n>moodle.convert.files.none</i18n></div>
 				</div>
 			</div>
