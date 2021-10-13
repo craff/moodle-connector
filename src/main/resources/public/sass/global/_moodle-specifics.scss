@@ -692,6 +692,10 @@ body.moodle {
 
 
   .convert {
+    @media screen and (max-width: 800px) {
+      margin: 20px;
+    }
+
     &-logs {
       display: block;
     }
