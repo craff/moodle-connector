@@ -524,7 +524,7 @@ export class Courses {
                     this.lastCreation = true;
                     this.toDo = true;
                     this.toCome = true;
-                    this.coursestodosort = this.typeShow.filter(type => type.id == "doing");
+                    this.coursestodosort = this.typeShow.filter(type => type.id == "all");
                     this.coursestocomesort = this.typeShow.filter(type => type.id == "all");
                 }
             }

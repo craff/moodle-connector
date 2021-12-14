@@ -38,6 +38,7 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
             await template.open('main', 'dashboard_home');
             await $scope.courses.getChoice();
             await initViewLoading();
+            initMobileView();
             await Utils.safeApply($scope);
         };
 
@@ -55,6 +56,13 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
                 await $scope.courses.getCoursesByUser(model.me.userId)
                     .then(() => $scope.displayMessageLoader = false)
                     .catch(() => $scope.displayMessageLoader = false);
+            }
+        };
+
+        const initMobileView = () => {
+            if ($(window).width() < 800) {
+                if ($scope.courses.coursestodosort[0].id == 'finished')
+                    $scope.courses.coursestodosort = $scope.courses.typeShow[0];
             }
         };
 
@@ -104,10 +112,6 @@ export const mainController = ng.controller('mainController', ['$scope', '$timeo
                 disciplines : [],
                 plain_text : []
             };
-            if ($(window).width() < 800) {
-                if ($scope.courses.coursestodosort[0].id == 'finished')
-                    $scope.courses.coursestodosort = $scope.courses.typeShow[0];
-            }
         };
 
         $scope.setPrintSubfolderValue = function () {
