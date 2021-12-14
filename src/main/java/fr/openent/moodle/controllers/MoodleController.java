@@ -48,8 +48,6 @@ public class MoodleController extends ControllerHelper {
 
     private final EventStore eventStore;
 
-    private final String userMail;
-
     public static final String baseWsMoodleUrl = (moodleConfig.getString("address_moodle") +
             moodleConfig.getString("ws-path"));
 
@@ -69,9 +67,6 @@ public class MoodleController extends ControllerHelper {
 
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         this.moodleEventBus = new DefaultMoodleEventBus(eb);
-
-        //todo remove mail constant and add mail from zimbra, ent ...
-        this.userMail = Moodle.moodleConfig.getString("userMail");
 
         this.client = WebClient.create(vertx);
 
@@ -195,7 +190,7 @@ public class MoodleController extends ControllerHelper {
                 .put("firstname",user.getFirstName())
                 .put("lastname",user.getLastName())
                 .put("id",user.getUserId())
-                .put("email",this.userMail);
+                .put("email",user.getUserId() + "@moodle.net");
         body.put("parameters", new JsonArray().add(userJson))
                 .put("wstoken", moodleConfig.getString("wsToken"))
                 .put("wsfunction", WS_POST_CREATE_OR_UPDATE_USER)

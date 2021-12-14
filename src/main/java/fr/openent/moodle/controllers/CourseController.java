@@ -53,7 +53,6 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 public class CourseController extends ControllerHelper {
     private final EventStore eventStore;
     private final moduleSQLRequestService moduleSQLRequestService;
-    private final String userMail;
     private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
 
 
@@ -68,8 +67,6 @@ public class CourseController extends ControllerHelper {
         this.eventStore = eventStore;
         this.eb = eb;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
-        //todo remove mail constant and add mail from zimbra, ent ...
-        this.userMail = Moodle.moodleConfig.getString("userMail");
         this.moodleEventBus = new DefaultMoodleEventBus(eb);
     }
 
@@ -121,7 +118,7 @@ public class CourseController extends ControllerHelper {
                                 "&wsfunction=" + WS_CREATE_FUNCTION +
                                 "&parameters[username]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
                                 "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
-                                "&parameters[email]=" + URLEncoder.encode(this.userMail, "UTF-8") +
+                                "&parameters[email]=" + URLEncoder.encode(user.getUserId() + "@moodle.net", "UTF-8") +
                                 "&parameters[firstname]=" + URLEncoder.encode(user.getFirstName(), "UTF-8") +
                                 "&parameters[lastname]=" + URLEncoder.encode(user.getLastName(), "UTF-8") +
                                 "&parameters[fullname]=" + URLEncoder.encode(course.getString("fullname"), "UTF-8") +

@@ -41,8 +41,6 @@ public class DefaultSynchService {
     private HttpClient httpClient;
 
     private final String baseWsMoodleUrl;
-    private final String userMail;
-
 
     private Map<String, JsonObject> mapUsersMoodle;
     private Map<String, JsonObject> mapUsersFound;
@@ -58,7 +56,6 @@ public class DefaultSynchService {
         this.eb = eb;
         this.vertx = vertx;
         this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
-        this.userMail = Moodle.moodleConfig.getString("userMail");
         baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
     }
 
@@ -231,7 +228,7 @@ public class DefaultSynchService {
                             getCourses(jsonUserFromNeo, getCoursesFuture);
                         }
                          if (!areUsersEquals(jsonUserFromNeo, mapUsersMoodle.get(jsonUserFromNeo.getString("id")))) {
-                             jsonUserFromNeo.put("email", this.userMail);
+                             jsonUserFromNeo.put("email", jsonUserFromNeo.getString("id") + "@moodle.net");
                              jsonUserFromNeo.put("username", jsonUserFromNeo.getString("id"));
                              arrUsersToUpdate.add(jsonUserFromNeo);
                          }
@@ -746,7 +743,7 @@ public class DefaultSynchService {
                                     useradded = new JsonArray();
                                 }
 
-                                jsonUserNeo.put("email", this.userMail);
+                                jsonUserNeo.put("email", jsonUserNeo.getString("id") + "@moodle.net");
                                 useradded.add(jsonUserNeo);
                                 jsonCohorteWithUpdate[0].put("useradded", useradded);
                             }

@@ -55,8 +55,6 @@ public class ShareController extends ControllerHelper {
     private final postShareProcessingService postShareProcessingService;
     private final moodleService moodleService;
 
-    private final String userMail;
-
     private final TimelineHelper timelineHelper;
 
 
@@ -73,9 +71,6 @@ public class ShareController extends ControllerHelper {
         this.getShareProcessingService = new DefaultGetShareProcessingService();
         this.postShareProcessingService = new DefaultPostShareProcessingService();
         this.moodleService = new DefaultMoodleService();
-
-        //todo remove mail constant and add mail from zimbra, ent ...
-        this.userMail = Moodle.moodleConfig.getString("userMail");
 
         this.timelineHelper = timelineHelper;
     }
@@ -389,8 +384,8 @@ public class ShareController extends ControllerHelper {
             JsonArray users = shareObjectToFill.getJsonArray("users");
             if (users != null) {
                 for (int i = 0; i < users.size(); i++) {
-                    JsonObject manualUsers = users.getJsonObject(i);
-                    manualUsers.put("email", this.userMail);
+                    JsonObject manualUser = users.getJsonObject(i);
+                    manualUser.put("email", manualUser.getString("id") + "@moodle.net");
                 }
             }
 
@@ -401,7 +396,7 @@ public class ShareController extends ControllerHelper {
                     if (usersInGroup != null) {
                         for (int j = 0; j < usersInGroup.size(); j++) {
                             JsonObject userInGroup = usersInGroup.getJsonObject(j);
-                            userInGroup.put("email", this.userMail);
+                            userInGroup.put("email", userInGroup.getString("id") + "@moodle.net");
                         }
                     }
                 }
