@@ -1,0 +1,61 @@
+{
+    "name": "fr.openent~moodle-connector~{{ moodleVersion }}",
+    "config": {
+		"main" : "fr.openent.moodle.Moodle",
+		"port" : 8200,
+		"app-name" : "Moodle",
+		"app-address" : "/moodle",
+		"app-icon" : "moodle-logo",
+		"host": "https://{{ host }}",
+		"ssl" : true,
+		"auto-redeploy": false,
+		"userbook-host": "https://{{ host }}",
+		"integration-mode" : "HTTP",
+		"app-registry.port" : 8012,
+		"mode" : "prod",
+		"entcore.port" : 8009,
+		"sql": true,
+		"db-schema": "moodle",
+		{% if item == 'jobs' %}
+		"timeSecondSynchCron": "*/5 * * * * ? *",
+		"timeCheckNotifs": "*/30 * * * * ? *",
+		{% else %}
+		"timeSecondSynchCron": "*/5 * * * * ? 2099",
+		"timeCheckNotifs": "*/30 * * * * ? 2099",
+		{% endif %}
+		"numberOfMaxDuplicationTentatives": {{ numberOfMaxDuplicationTentatives }},
+		"numberOfMaxPendingDuplication": {{ numberOfMaxPendingDuplication }},
+		"timeDuplicationBeforeDelete": "{{ timeDuplicationBeforeDelete }}",
+		"address_moodle": "{{ moodleServer }}",
+		{% if httpClientMaxPoolSize is defined %}
+		"http-client-max-pool-size" : {{ httpClientMaxPoolSize }},
+		{% endif %}
+		"ws-path": "{{ moodleWsPath }}",
+		"wsToken": "{{ wstoken }}",
+		"idStudent": {{ idStudent }},
+		"idEditingTeacher": {{ idEditingTeacher }},
+		"deleteCategoryId": {{ deleteCategoryId }},
+		"idAuditeur": {{ idAuditeur }},
+		"header": "{{ header }}",
+		"idGuest": {{ idGuest }},
+		"publicBankCategoryId": {{ publicBankCategoryId }},
+		"mainCategoryId": {{ mainCategoryId }},
+		"userMail": "{{ userMail }}",
+		"publicConf": {
+			"xiti": {
+				"ID_SERVICE": {
+					"default": 17
+				},
+				"LIBELLE_SERVICE": {
+					"default": "PARCOURS_PEDAGOGIQUE"
+				},
+				"OUTIL": "MOODLE"
+			}
+		}
+		{% if transfoLMSServer is defined %}
+		, "transfoLMSServer": {
+			"ip_adress": "{{ transfoLMSServer }}"
+		}
+		{% endif %}
+	}
+}
