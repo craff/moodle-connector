@@ -44,12 +44,12 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
         sql.prepared(createFolder, values, SqlResult.validUniqueResultHandler(handler));
     }
 
-
     @Override
     public void renameFolder(final JsonObject folder, final Handler<Either<String, JsonObject>> handler){
 
-        String renameFolder = "UPDATE " + Moodle.moodleSchema + ".folder SET name='"+folder.getValue("name")+"' WHERE id="+folder.getValue("id");
-        sql.raw(renameFolder , SqlResult.validUniqueResultHandler(handler));
+        String renameFolder = "UPDATE " + Moodle.moodleSchema + ".folder SET name= ? WHERE id= ?";
+        JsonArray values = new JsonArray().add(folder.getValue("name")).add(folder.getValue("id"));
+        sql.prepared(renameFolder, values, SqlResult.validUniqueResultHandler(handler));
     }
 
     @Override
@@ -132,8 +132,7 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     @Override
     public void setPreferences(final JsonObject course, final Handler<Either<String, JsonObject>> handler) {
         String query = "INSERT INTO " + Moodle.moodleSchema + ".preferences (moodle_id, user_id, masked, favorites)" +
-                " VALUES (?, ?, ?, ?) ON CONFLICT (moodle_id, user_id) DO UPDATE SET masked =" + course.getBoolean("masked") +
-                ", favorites =" + course.getBoolean("favorites") + " ; " +
+                " VALUES (?, ?, ?, ?) ON CONFLICT (moodle_id, user_id) DO UPDATE SET masked = ?, favorites = ?; " +
                 "DELETE FROM " + Moodle.moodleSchema + ".preferences WHERE masked = false AND favorites = false;";
 
         JsonArray values = new JsonArray();
@@ -141,7 +140,8 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
         values.add(course.getString("userId"));
         values.add(course.getBoolean("masked"));
         values.add(course.getBoolean("favorites"));
-
+        values.add(course.getBoolean("masked"));
+        values.add(course.getBoolean("favorites"));
 
         sql.prepared(query, values, SqlResult.validUniqueResultHandler(handler));
     }
@@ -501,7 +501,7 @@ public class DefaultModuleSQLRequestService extends SqlCrudService implements mo
     @Override
     public void getDuplicationId(JsonArray publicationId, Handler<Either<String, JsonObject>> handler) {
         String getId = "SELECT publishfk FROM " + Moodle.moodleSchema + ".duplication " +
-        "WHERE id = ?";
+                "WHERE id = ?";
 
         sql.prepared(getId, publicationId, SqlResult.validUniqueResultHandler(handler));
     }
