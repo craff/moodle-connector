@@ -18,7 +18,7 @@
             </button>
             <button ng-click="openPopUpDuplicate()" class="cell"
                     ng-show="show.nbFoldersSelect === 0 && show.categoryBoolean"
-                    workflow="moodle.createCourse" ng-if="show.sharedCourse == false">
+                    workflow="moodle.duplicate" ng-if="show.sharedCourse == false">
                 <i18n>moodle.toaster.duplicate</i18n>
             </button>
             <button ng-click="openPopUpMove()" class="cell" ng-show="show.categoryBoolean"

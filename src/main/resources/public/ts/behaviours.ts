@@ -19,7 +19,8 @@ const moodleBehaviours = {
 		delete: 'fr.openent.moodle.controllers.CourseController|delete',
 		view: 'fr.openent.moodle.controllers.MoodleController|view',
 		publish: 'fr.openent.moodle.controllers.PublishedController|publish',
-		convert: 'fr.openent.moodle.controllers.MoodleController|convert'
+		convert: 'fr.openent.moodle.controllers.MoodleController|convert',
+		duplicate: 'fr.openent.moodle.controllers.DuplicateController|duplicate'
 	}
 };
 
