@@ -8,7 +8,8 @@ import io.vertx.core.json.JsonObject;
 
 public interface moodleService {
 
-    void registerUserInPublicCourse(JsonArray usersId, Integer courseId, Vertx vertx, Handler<Either<String, JsonArray>> handler);
+    void registerUserInPublicCourse(JsonArray usersId, Integer courseId, Vertx vertx, JsonObject moodleClient,
+                                    Handler<Either<String, JsonArray>> handler);
 
-    void getAuditeur(Integer courseId, Vertx vertx, Handler<Either<String, JsonArray>> handler);
+    void getAuditeur(Integer courseId, Vertx vertx, JsonObject moodleClient, Handler<Either<String, JsonArray>> handler);
 }

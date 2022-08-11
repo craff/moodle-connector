@@ -4,6 +4,7 @@ import fr.openent.moodle.controllers.*;
 import fr.openent.moodle.cron.notifyMoodle;
 import fr.openent.moodle.cron.synchDuplicationMoodle;
 import io.vertx.core.eventbus.EventBus;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
@@ -18,6 +19,8 @@ import org.entcore.common.storage.StorageFactory;
 import fr.wseduc.cron.CronTrigger;
 
 import java.text.ParseException;
+import java.util.Iterator;
+import java.util.Map;
 
 public class Moodle extends BaseServer {
 	public enum MoodleEvent { ACCESS, CREATE }
@@ -77,6 +80,7 @@ public class Moodle extends BaseServer {
 
 	public static String moodleSchema;
     public static JsonObject moodleConfig;
+	public static JsonObject moodleMultiClient;
 
 	@Override
 	public void start() throws Exception {
@@ -90,6 +94,19 @@ public class Moodle extends BaseServer {
         moodleConfig = config;
 		EventBus eb = getEventBus(vertx);
 		EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Moodle.class.getSimpleName());
+
+		JsonObject monoClient = new JsonObject().put(
+				moodleConfig.getString("host").replace("http://","").replace("https://",""),
+				new JsonObject()
+						.put("address_moodle", moodleConfig.getString("address_moodle"))
+						.put("ws-path", moodleConfig.getString("ws-path"))
+						.put("wsToken", moodleConfig.getString("wsToken"))
+		);
+
+		moodleMultiClient = moodleConfig.getJsonObject("multiClient", monoClient);
+		if(moodleMultiClient.isEmpty()) {
+			moodleMultiClient = monoClient;
+		}
 
 		final Storage storage = new StorageFactory(vertx, config, /*new ExercizerStorage()*/ null).getStorage();
 
@@ -120,9 +137,12 @@ public class Moodle extends BaseServer {
 		}
 
 		try {
-			new CronTrigger(vertx, config.getString("timeCheckNotifs")).schedule(
-					new notifyMoodle(vertx, timelineHelper)
-			);
+			for (Iterator<Map.Entry<String, Object>> it = moodleMultiClient.stream().iterator(); it.hasNext(); ) {
+				JsonObject moodleClient = (JsonObject) it.next().getValue();
+				new CronTrigger(vertx, config.getString("timeCheckNotifs")).schedule(
+						new notifyMoodle(vertx, moodleClient, timelineHelper)
+				);
+			}
 		} catch (ParseException e) {
 			log.fatal("Invalid timeCheckNotifs cron expression.", e);
 		}

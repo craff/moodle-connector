@@ -33,12 +33,13 @@ public class DefaultMoodleService implements moodleService {
         this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
     }
 
-    public void getAuditeur (Integer coursesId, Vertx vertx, Handler<Either<String, JsonArray>> handler) {
-        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+    public void getAuditeur (Integer coursesId, Vertx vertx, JsonObject moodleClient,
+                             Handler<Either<String, JsonArray>> handler) {
+        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, moodleClient);
         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         Buffer wsResponse = new BufferImpl();
-        final String moodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path")) +
-                "?wstoken=" + moodleConfig.getString("wsToken") +
+        final String moodleUrl = (moodleClient.getString("address_moodle") + moodleClient.getString("ws-path")) +
+                "?wstoken=" + moodleClient.getString("wsToken") +
                 "&wsfunction=" + WS_GET_SHARECOURSE +
                 "&parameters[courseid]=" + coursesId +
                 "&moodlewsrestformat=" + JSON;
@@ -76,7 +77,8 @@ public class DefaultMoodleService implements moodleService {
         }).end();
     }
 
-    public void registerUserInPublicCourse(JsonArray usersId, Integer courseId, Vertx vertx, Handler<Either<String, JsonArray>> handler) {
+    public void registerUserInPublicCourse(JsonArray usersId, Integer courseId, Vertx vertx, JsonObject moodleClient,
+                                           Handler<Either<String, JsonArray>> handler) {
         moduleNeoRequestService.getUsers(usersId, getUsersEvent -> {
             JsonObject shareObjectToFill = new JsonObject();
             shareObjectToFill.put("courseid", courseId);
@@ -85,13 +87,13 @@ public class DefaultMoodleService implements moodleService {
             JsonObject shareSend = new JsonObject();
 
             shareSend.put("parameters", shareObjectToFill)
-                    .put("wstoken", moodleConfig.getString("wsToken"))
+                    .put("wstoken", moodleClient.getString("wsToken"))
                     .put("wsfunction", WS_CREATE_SHARECOURSE)
                     .put("moodlewsrestformat", JSON);
 
             URI moodleUri = null;
             try {
-                final String service = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
+                final String service = (moodleClient.getString("address_moodle") + moodleClient.getString("ws-path"));
                 moodleUri = new URI(service);
             } catch (URISyntaxException e) {
                 log.error("Invalid moodle web service sending right share uri", e);
@@ -99,7 +101,7 @@ public class DefaultMoodleService implements moodleService {
             if (moodleUri != null) {
                 final String moodleUrl = moodleUri.toString();
                 try {
-                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, registerEvent -> {
+                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, moodleClient, registerEvent -> {
                         if (registerEvent.isRight()) {
                             handler.handle(new Either.Right<>(registerEvent.right().getValue().toJsonArray()));
                         } else {

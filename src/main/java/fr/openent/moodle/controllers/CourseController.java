@@ -81,6 +81,9 @@ public class CourseController extends ControllerHelper {
             if (isNull(course.getString("summary"))) {
                 course.put("summary", "");
             }
+
+            JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+
             UserUtils.getUserInfos(eb, request, user -> {
                 URI moodleUri = null;
                 try {
@@ -94,7 +97,7 @@ public class CourseController extends ControllerHelper {
                         course.put("shortname", calendar.toZonedDateTime().toString().substring(0, 7) +
                                 user.getFirstName().charAt(0) + user.getLastName().substring(0, 3) +
                                 course.getString("fullname").substring(0, 4) + uniqueID);
-                    final String service = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
+                    final String service = (moodleClient.getString("address_moodle") + moodleClient.getString("ws-path"));
 
                     final String urlSeparator = "";
                     moodleUri = new URI(service + urlSeparator);
@@ -114,7 +117,7 @@ public class CourseController extends ControllerHelper {
                         }
 
                         final String moodleUrl = moodleUri +
-                                "?wstoken=" + moodleConfig.getString("wsToken") +
+                                "?wstoken=" + moodleClient.getString("wsToken") +
                                 "&wsfunction=" + WS_CREATE_FUNCTION +
                                 "&parameters[username]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
                                 "&parameters[idnumber]=" + URLEncoder.encode(user.getUserId(), "UTF-8") +
@@ -130,7 +133,7 @@ public class CourseController extends ControllerHelper {
                                 "&parameters[activity]=" + URLEncoder.encode(course.getString("typeA"), "UTF-8") +
                                 "&moodlewsrestformat=" + JSON;
                         log.info("CALL WS create course : " + moodleUrl);
-                        HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, responseMoodle -> {
+                        HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, moodleClient, responseMoodle -> {
                             if (responseMoodle.isRight()) {
                                 log.info("SUCCESS creating course : ");
                                 JsonObject courseCreatedInMoodle = responseMoodle.right().getValue().toJsonArray().getJsonObject(0);
@@ -177,8 +180,9 @@ public class CourseController extends ControllerHelper {
         return eventSqlCourses -> {
             if (eventSqlCourses.isRight()) {
                 final JsonArray sqlCourses = eventSqlCourses.right().getValue();
-                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
-                final String moodleUrl = createUrlMoodleGetCourses(idUser);
+                JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+                final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, moodleClient);
+                final String moodleUrl = createUrlMoodleGetCourses(idUser, request);
                 final AtomicBoolean responseIsSent = new AtomicBoolean(false);
                 Buffer wsResponse = new BufferImpl();
                 log.info("CALL WS_GET_USERCOURSES : " + moodleUrl);
@@ -353,12 +357,13 @@ public class CourseController extends ControllerHelper {
         };
     }
 
-    private String createUrlMoodleGetCourses(String idUser) {
+    private String createUrlMoodleGetCourses(String idUser, HttpServerRequest request) {
         try {
+            JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
             return "" +
-                    (moodleConfig.getString("address_moodle") +
-                            moodleConfig.getString("ws-path")) +
-                    "?wstoken=" + moodleConfig.getString("wsToken") +
+                    (moodleClient.getString("address_moodle") +
+                            moodleClient.getString("ws-path")) +
+                    "?wstoken=" + moodleClient.getString("wsToken") +
                     "&wsfunction=" + WS_GET_USERCOURSES +
                     "&parameters[userid]=" + idUser +
                     "&moodlewsrestformat=" + JSON;
@@ -436,15 +441,16 @@ public class CourseController extends ControllerHelper {
                 for (int i = 0; i < coursesIds.size(); i++) {
                     idsDeletes.append("&parameters[course][").append(i).append("][courseid]=").append(coursesIds.getValue(i));
                 }
-                URI moodleDeleteUri = new URI(moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
+                JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+                URI moodleDeleteUri = new URI(moodleClient.getString("address_moodle") + moodleClient.getString("ws-path"));
                 if (moodleConfig.containsKey("deleteCategoryId")) {
                     final String moodleDeleteUrl = moodleDeleteUri +
-                            "?wstoken=" + moodleConfig.getString("wsToken") +
+                            "?wstoken=" + moodleClient.getString("wsToken") +
                             "&wsfunction=" + WS_DELETE_FUNCTION +
                             "&parameters[categoryid]=" + moodleConfig.getInteger("deleteCategoryId").toString() +
                             idsDeletes +
                             "&moodlewsrestformat=" + JSON;
-                    HttpClientHelper.webServiceMoodlePost(null, moodleDeleteUrl, vertx, responseMoodle -> {
+                    HttpClientHelper.webServiceMoodlePost(null, moodleDeleteUrl, vertx, moodleClient, responseMoodle -> {
                         if (responseMoodle.isRight()) {
                             if (courses.getBoolean("categoryType")) {
                                 callMediacentreEventBusToDelete(request, moodleEventBus, event -> {
@@ -481,7 +487,8 @@ public class CourseController extends ControllerHelper {
     @SecuredAction(value = "", type = ActionType.RESOURCE)
     public void redirectToMoodle(HttpServerRequest request) {
         String scope = request.params().contains("scope") ? request.getParam("scope") : "view";
-        redirect(request, moodleConfig.getString("address_moodle"), "/course/" + scope + ".php?id=" +
+        JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+        redirect(request, moodleClient.getString("address_moodle"), "/course/" + scope + ".php?id=" +
                 request.getParam("id") + "&notifyeditingon=1");
     }
 

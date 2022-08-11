@@ -1,8 +1,7 @@
 package fr.openent.moodle.controllers;
 
-import fr.openent.moodle.Moodle;
-import fr.openent.moodle.security.canShareResourceFilter;
 import fr.openent.moodle.helper.HttpClientHelper;
+import fr.openent.moodle.security.canShareResourceFilter;
 import fr.openent.moodle.service.getShareProcessingService;
 import fr.openent.moodle.service.impl.DefaultGetShareProcessingService;
 import fr.openent.moodle.service.impl.DefaultMoodleService;
@@ -128,11 +127,12 @@ public class ShareController extends ControllerHelper {
      * @param future  Future to get the Moodle users
      */
     private void getUsersEnrolmentsFromMoodle(HttpServerRequest request, Future<JsonArray> future) {
-        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+        JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, moodleClient);
         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         Buffer wsResponse = new BufferImpl();
-        final String moodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path")) +
-                "?wstoken=" + moodleConfig.getString("wsToken") +
+        final String moodleUrl = (moodleClient.getString("address_moodle") + moodleClient.getString("ws-path")) +
+                "?wstoken=" + moodleClient.getString("wsToken") +
                 "&wsfunction=" + WS_GET_SHARECOURSE +
                 "&parameters[courseid]=" + request.getParam("id") +
                 "&moodlewsrestformat=" + JSON;
@@ -402,14 +402,17 @@ public class ShareController extends ControllerHelper {
                 }
             }
 
+            JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+
+
             JsonObject shareSend = new JsonObject();
             shareSend.put("parameters", shareObjectToFill)
-                    .put("wstoken", moodleConfig.getString("wsToken"))
+                    .put("wstoken", moodleClient.getString("wsToken"))
                     .put("wsfunction", WS_CREATE_SHARECOURSE)
                     .put("moodlewsrestformat", JSON);
             URI moodleUri = null;
             try {
-                final String service = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
+                final String service = (moodleClient.getString("address_moodle") + moodleClient.getString("ws-path"));
                 final String urlSeparator = "";
                 moodleUri = new URI(service + urlSeparator);
             } catch (URISyntaxException e) {
@@ -419,11 +422,11 @@ public class ShareController extends ControllerHelper {
                 final String moodleUrl = moodleUri.toString();
                 log.info("CALL WS_CREATE_SHARECOURSE");
                 try {
-                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, event -> {
+                    HttpClientHelper.webServiceMoodlePost(shareSend, moodleUrl, vertx, moodleClient, event -> {
                         if (event.isRight()) {
                             log.info("SUCCESS WS_CREATE_SHARECOURSE");
                             enrolNotify(event.right().getValue().toJsonArray().getJsonObject(0)
-                                    .getJsonArray("response").getJsonObject(0), user);
+                                    .getJsonArray("response").getJsonObject(0), user, moodleClient);
                             request.response()
                                     .setStatusCode(200)
                                     .end();
@@ -440,7 +443,7 @@ public class ShareController extends ControllerHelper {
         });
     }
 
-    private void enrolNotify( JsonObject response, UserInfos user) {
+    private void enrolNotify(JsonObject response, UserInfos user, JsonObject moodleClient) {
         int courseId = response.getInteger("courseid");
         JsonArray usersEnrolled = response.getJsonArray("users");
         JsonArray groupsEnrolled = response.getJsonArray("groups");
@@ -448,7 +451,7 @@ public class ShareController extends ControllerHelper {
         String timelineSender = user.getUsername() != null ? user.getUsername() : null;
         List<String> recipients = new ArrayList<>();
         final JsonObject params = new JsonObject()
-                .put("courseUri", moodleConfig.getString("address_moodle") + "/course/view.php?id=" + courseId)
+                .put("courseUri", moodleClient.getString("address_moodle") + "/course/view.php?id=" + courseId)
                 .put("disableAntiFlood", true);
         params.put("username", timelineSender).put("uri", "/userbook/annuaire#" + user.getUserId());
 
@@ -491,16 +494,19 @@ public class ShareController extends ControllerHelper {
                 return;
             }
 
-            moodleService.getAuditeur(courseId, vertx, getAuditeurEvent -> {
+            JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+
+
+            moodleService.getAuditeur(courseId, vertx, moodleClient, getAuditeurEvent -> {
                 if (getAuditeurEvent.isRight()) {
                     JsonArray usersId = new JsonArray();
 
                     usersId.add(getAuditeurEvent.right().getValue().getJsonObject(0).getString("id"))
                             .add(user.getUserId());
                     if (!getAuditeurEvent.right().getValue().getJsonObject(0).getString("id").equals(user.getUserId())) {
-                        moodleService.registerUserInPublicCourse(usersId, courseId, vertx, registerEvent -> {
+                        moodleService.registerUserInPublicCourse(usersId, courseId, vertx, moodleClient, registerEvent -> {
                             if (registerEvent.isRight()) {
-                                redirect(request, moodleConfig.getString("address_moodle"), "/course/view.php?id=" +
+                                redirect(request, moodleClient.getString("address_moodle"), "/course/view.php?id=" +
                                         request.getParam("id") + "&notifyeditingon=1");
                             } else {
                                 log.error("FAIL WS_CREATE_SHARECOURSE" + registerEvent.left().getValue());
@@ -508,7 +514,7 @@ public class ShareController extends ControllerHelper {
                             }
                         });
                     } else {
-                        redirect(request, moodleConfig.getString("address_moodle"), "/course/view.php?id=" +
+                        redirect(request, moodleClient.getString("address_moodle"), "/course/view.php?id=" +
                                 request.getParam("id") + "&notifyeditingon=1");
                     }
                 } else {

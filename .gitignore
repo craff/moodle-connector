@@ -19,3 +19,4 @@ package-lock.json
 /build.sh
 /docker-compose.yml
 /node_modules/
+/gradle/

@@ -40,7 +40,8 @@ public class DefaultSynchService {
 
     private HttpClient httpClient;
 
-    private final String baseWsMoodleUrl;
+    private String baseWsMoodleUrl;
+    private JsonObject moodleClient;
 
     private Map<String, JsonObject> mapUsersMoodle;
     private Map<String, JsonObject> mapUsersFound;
@@ -56,17 +57,18 @@ public class DefaultSynchService {
         this.eb = eb;
         this.vertx = vertx;
         this.moduleNeoRequestService = new DefaultModuleNeoRequestService();
-        baseWsMoodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path"));
     }
 
-    private void initSyncUsers() {
+    private void initSyncUsers(JsonObject moodleClientToApply) {
         mapUsersMoodle = new HashMap<>();
         mapUsersFound = new HashMap<>();
         arrUsersToDelete = new JsonArray();
         arrUsersToEnroll = new JsonArray();
         mapUsersNotFound = new Map[]{new HashMap<String, JsonObject>()};
         compositeFuturEnded = new AtomicInteger(2);
-        httpClient = HttpClientHelper.createHttpClient(vertx);
+        moodleClient = moodleClientToApply;
+        baseWsMoodleUrl = (moodleClient.getString("address_moodle") + moodleClient.getString("ws-path"));
+        httpClient = HttpClientHelper.createHttpClient(vertx, moodleClient);
     }
 
 
@@ -102,11 +104,11 @@ public class DefaultSynchService {
         }
     }
 
-    public void syncUsers(Scanner scUsers, Handler<Either<String, JsonObject>> handler) {
+    public void syncUsers(Scanner scUsers, JsonObject moodleClient, Handler<Either<String, JsonObject>> handler) {
         log.info("START syncUsers");
 
         List<Future> listGetFuture = new ArrayList<>();
-        initSyncUsers();
+        initSyncUsers(moodleClient);
         putUsersInMap(scUsers);
 
         // ---------- HANDLERS --------------
@@ -363,7 +365,6 @@ public class DefaultSynchService {
                             // --> suppression soft dans un premier temps, et purge par la suite
 
                             getUsersEnrolmentsFromMoodle(jsonCours.getInteger("courseid"), getUsersEnrolmentsFuture);
-                            JsonArray finalArrUsersToDelete = arrUsersToDelete;
                             getUsersEnrolmentsFuture.setHandler(event -> {
                                 if (event.succeeded()) {
                                     int nbEditeur = 0;
@@ -374,14 +375,10 @@ public class DefaultSynchService {
                                         JsonObject user = users.getJsonObject(i);
                                         if (user.getInteger("role").equals(ROLE_EDITEUR)) {
                                             nbEditeur++;
-                                            isEditor = user.getString("id").equals(idUser) ? true : false;
+                                            isEditor = user.getString("id").equals(idUser);
                                         }
                                     }
-                                    if (nbEditeur == 1 && isEditor) {
-                                        identifyUserToDelete(finalArrUsersToDelete, idUser, true);
-                                    } else {
-                                        identifyUserToDelete(finalArrUsersToDelete, idUser, false);
-                                    }
+                                    identifyUserToDelete(arrUsersToDelete, idUser, nbEditeur == 1 && isEditor);
                                 }
                             });
                         }
@@ -407,38 +404,38 @@ public class DefaultSynchService {
         log.info("START deleting users");
         JsonObject body = new JsonObject();
         body.put("parameters", arrUsersToDelete)
-                .put("wstoken", moodleConfig.getString("wsToken"))
+                .put("wstoken", moodleClient.getString("wsToken"))
                 .put("wsfunction", WS_POST_DELETE_USER)
                 .put("moodlewsrestformat", JSON);;
-        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerDeleteUserse);
+        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, moodleClient, handlerDeleteUserse);
     }
 
     private void updateUsers(JsonArray arrUsersToUpdate, Handler<Either<String, Buffer>> handlerUpdateUser) throws UnsupportedEncodingException {
         log.info("START updating users");
         JsonObject body = new JsonObject();
         body.put("parameters", arrUsersToUpdate)
-                .put("wstoken", moodleConfig.getString("wsToken"))
+                .put("wstoken", moodleClient.getString("wsToken"))
                 .put("wsfunction", WS_POST_CREATE_OR_UPDATE_USER)
                 .put("moodlewsrestformat", JSON);
-        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerUpdateUser);
+        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, moodleClient, handlerUpdateUser);
     }
 
     private void enrollUsersIndivudually(JsonArray arrUsersToEnroll, Handler<Either<String, Buffer>> handlerEnrollUsers) throws UnsupportedEncodingException {
         log.info("START enrolling users individually");
         JsonObject body = new JsonObject();
         body.put("parameters", arrUsersToEnroll)
-                .put("wstoken", moodleConfig.getString("wsToken"))
+                .put("wstoken", moodleClient.getString("wsToken"))
                 .put("wsfunction", WS_POST_ENROLL_USERS_COURSES)
                 .put("moodlewsrestformat", JSON);
-        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerEnrollUsers);
+        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, moodleClient, handlerEnrollUsers);
     }
 
     private void getUsersEnrolmentsFromMoodle(Integer idCourse, Future<JsonArray> future) {
-        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, moodleClient);
         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
         Buffer wsResponse = new BufferImpl();
-        final String moodleUrl = (moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path")) +
-                "?wstoken=" + moodleConfig.getString("wsToken") +
+        final String moodleUrl = baseWsMoodleUrl +
+                "?wstoken=" + moodleClient.getString("wsToken") +
                 "&wsfunction=" + WS_GET_SHARECOURSE +
                 "&parameters[courseid]=" + idCourse +
                 "&moodlewsrestformat=" + JSON;
@@ -477,7 +474,7 @@ public class DefaultSynchService {
     }
 
     private void getCourses(JsonObject jsonUser, Future getCoursesFuture) {
-        final String moodleUrl = baseWsMoodleUrl + "?wstoken=" + moodleConfig.getString("wsToken") +
+        final String moodleUrl = baseWsMoodleUrl + "?wstoken=" + moodleClient.getString("wsToken") +
                 "&wsfunction=" + WS_GET_USERCOURSES +
                 "&parameters[userid]=" + jsonUser.getString("id") +
                 "&moodlewsrestformat=" + JSON;
@@ -541,20 +538,20 @@ public class DefaultSynchService {
         log.info("START updating cohorts");
         JsonObject body = new JsonObject();
         body.put("parameters", arrCohortsToUpdate)
-                .put("wstoken", moodleConfig.getString("wsToken"))
+                .put("wstoken", moodleClient.getString("wsToken"))
                 .put("wsfunction", WS_POST_UPDATE_COHORTS)
                 .put("moodlewsrestformat", JSON);
-        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerCohort);
+        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, moodleClient, handlerCohort);
     }
 
     private void deleteCohorts(JsonArray arrCohortsToDelete, Handler<Either<String, Buffer>> handlerCohort) throws UnsupportedEncodingException {
         log.info("START deleting cohorts");
         JsonObject body = new JsonObject();
         body.put("parameters", arrCohortsToDelete)
-                .put("wstoken", moodleConfig.getString("wsToken"))
+                .put("wstoken", moodleClient.getString("wsToken"))
                 .put("wsfunction", WS_POST_DELETE_COHORTS)
                 .put("moodlewsrestformat", JSON);
-        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, handlerCohort);
+        HttpClientHelper.webServiceMoodlePost(body, baseWsMoodleUrl, vertx, moodleClient, handlerCohort);
     }
 
 
@@ -565,7 +562,7 @@ public class DefaultSynchService {
     private JsonArray arrCohortsToDelete;
     private JsonArray arrCohortsToUpdate;
 
-    private void initSyncGroups() {
+    private void initSyncGroups(JsonObject moodleClientToApply) {
         mapCohortsMoodle = new HashMap<>();
         mapCohortsFound = new HashMap<>();
         mapCohortsNotFound = new HashMap<>();
@@ -579,7 +576,11 @@ public class DefaultSynchService {
         arrCohortsToUpdate = new JsonArray();
 
         compositeFuturEnded = new AtomicInteger(3);
-        httpClient = HttpClientHelper.createHttpClient(vertx);
+
+        moodleClient = moodleClientToApply;
+        baseWsMoodleUrl = (moodleClient.getString("address_moodle") + moodleClient.getString("ws-path"));
+
+        httpClient = HttpClientHelper.createHttpClient(vertx, moodleClient);
     }
 
 
@@ -613,9 +614,9 @@ public class DefaultSynchService {
     private Handler<Either<String, Buffer>> handlerEnrollGroups;
     private Handler<AsyncResult<CompositeFuture>> handlerUpdateAndDeleteCohorts;
 
-    public void syncGroups(JsonArray jsonArrayCohorts, Handler<Either<String, JsonObject>> handler) {
+    public void syncGroups(JsonArray jsonArrayCohorts, JsonObject moodleClient, Handler<Either<String, JsonObject>> handler) {
         log.info("START syncGroups");
-        initSyncGroups();
+        initSyncGroups(moodleClient);
         putCohortsInMap(jsonArrayCohorts);
 
         //---HANDLERS--

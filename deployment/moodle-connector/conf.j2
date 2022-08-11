@@ -57,5 +57,8 @@
 			"ip_adress": "{{ transfoLMSServer }}"
 		}
 		{% endif %}
+        {% if moodleMultiClient is defined %}
+        , "multiClient": {{ moodleMultiClient }}
+        {% endif %}
 	}
 }

@@ -31,10 +31,10 @@ public class HttpClientHelper extends ControllerHelper {
      * Create default HttpClient
      * @return new HttpClient
      */
-    public static HttpClient createHttpClient(Vertx vertx) {
+    public static HttpClient createHttpClient(Vertx vertx, JsonObject moodleClient) {
         boolean setSsl = true;
         try {
-            setSsl = "https".equals(new URI(moodleConfig.getString("address_moodle")).getScheme());
+            setSsl = "https".equals(new URI(moodleClient.getString("address_moodle")).getScheme());
         } catch (URISyntaxException e) {
             log.error("Invalid moodle uri",e);
         }
@@ -57,11 +57,11 @@ public class HttpClientHelper extends ControllerHelper {
         return vertx.createHttpClient(options);
     }
 
-    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, Vertx vertx,
+    public static void webServiceMoodlePost(JsonObject shareSend, String moodleUrl, Vertx vertx, JsonObject moodleClient,
                                             Handler<Either<String, Buffer>> handler) throws UnsupportedEncodingException {
 
         final AtomicBoolean responseIsSent = new AtomicBoolean(false);
-        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx);
+        final HttpClient httpClient = HttpClientHelper.createHttpClient(vertx, moodleClient);
 
         URI url;
         try {
@@ -110,7 +110,8 @@ public class HttpClientHelper extends ControllerHelper {
             httpClientRequest.write("&moodlewsrestformat=").write(shareSend.getString("moodlewsrestformat"));
         }
 
-        httpClientRequest.putHeader("Host", moodleConfig.getString("header"));
+        httpClientRequest.putHeader("Host", moodleClient.getString("address_moodle")
+                .replace("http://","").replace("https://",""));
         httpClientRequest.putHeader("Content-type", "application/x-www-form-urlencoded");
         //Typically an unresolved Address, a timeout about connection or response
         httpClientRequest.exceptionHandler(new Handler<Throwable>() {

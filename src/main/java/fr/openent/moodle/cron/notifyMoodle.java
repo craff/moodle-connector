@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 
 import static fr.openent.moodle.Moodle.*;
-import static fr.openent.moodle.controllers.MoodleController.baseWsMoodleUrl;
 
 public class notifyMoodle extends ControllerHelper implements Handler<Long> {
 
@@ -27,11 +26,13 @@ public class notifyMoodle extends ControllerHelper implements Handler<Long> {
     private Timestamp startDate;
 
     private final SimpleDateFormat myDate;
+    private final JsonObject moodleClient;
 
-    public notifyMoodle(Vertx vertx, TimelineHelper timelineHelper) {
+    public notifyMoodle(Vertx vertx, JsonObject moodleClientToApply, TimelineHelper timelineHelper) {
         this.vertx = vertx;
         this.timelineHelper = timelineHelper;
         myDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        moodleClient = moodleClientToApply;
     }
 
     @Override
@@ -56,14 +57,15 @@ public class notifyMoodle extends ControllerHelper implements Handler<Long> {
 
     private void checkNotification(Handler<Either<String, Buffer>> handlerUpdateUser) throws UnsupportedEncodingException {
         Timestamp endDate = Timestamp.valueOf(myDate.format(new Date()));
-        String url = baseWsMoodleUrl + "?wstoken=" + moodleConfig.getString("wsToken") +
+        String url = moodleClient.getString("address_moodle") +
+                moodleClient.getString("ws-path") + "?wstoken=" + moodleClient.getString("wsToken") +
                 "&wsfunction=" + WS_CHECK_NOTIFICATIONS +
                 "&parameters[startdate]=" + startDate.getTime()/1000 +
                 "&parameters[enddate]=" + endDate.getTime()/1000 +
                 "&moodlewsrestformat=" + JSON;
         //change date for next time we get notifications
         startDate = endDate;
-        HttpClientHelper.webServiceMoodlePost(null, url, vertx, handlerUpdateUser);
+        HttpClientHelper.webServiceMoodlePost(null, url, vertx, moodleClient, handlerUpdateUser);
     }
 
     private void launchNotifies(final Handler<Either<String, JsonObject>> eitherHandler) throws UnsupportedEncodingException {

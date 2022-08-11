@@ -12,6 +12,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import org.entcore.common.controller.ControllerHelper;
@@ -21,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import static fr.openent.moodle.Moodle.moodleMultiClient;
 import static fr.openent.moodle.Moodle.workflow_synchro;
 
 public class SynchController extends ControllerHelper {
@@ -51,7 +53,10 @@ public class SynchController extends ControllerHelper {
                     log.info("Empty user file");
                     return;
                 }
-                defaultSynchService.syncUsers(sc, syncUsersEither -> {
+
+                JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+
+                defaultSynchService.syncUsers(sc, moodleClient, syncUsersEither -> {
                     if(syncUsersEither.isLeft()) {
                         log.error("--END syncUsers FAIL--");
                         badRequest(request);
@@ -72,8 +77,11 @@ public class SynchController extends ControllerHelper {
         RequestUtils.bodyToJson(request, cohorts -> {
             JsonArray jsonArrayCohorts = cohorts.getJsonArray("cohorts");
             if(jsonArrayCohorts != null && jsonArrayCohorts.size() > 0) {
+
+                JsonObject moodleClient = moodleMultiClient.getJsonObject(request.host());
+
                 defaultSynchService.acceptLanguage = I18n.acceptLanguage(request);
-                defaultSynchService.syncGroups(jsonArrayCohorts, syncGroupsEither -> {
+                defaultSynchService.syncGroups(jsonArrayCohorts, moodleClient, syncGroupsEither -> {
                     if(syncGroupsEither.isLeft()) {
                         log.error("--END syncGroups FAIL--");
                         badRequest(request);

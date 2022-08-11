@@ -19,9 +19,12 @@ import static fr.openent.moodle.Moodle.*;
 public class synchDuplicationMoodle extends ControllerHelper implements Handler<Long> {
 
     private final moduleSQLRequestService moduleSQLRequestService;
+    private final JsonObject moodleClient;
+
     public synchDuplicationMoodle(Vertx vertx) {
         this.vertx = vertx;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
+        moodleClient = moodleMultiClient.getJsonObject(moodleConfig.getString("host").replace("http://","").replace("https://",""));
     }
 
     @Override
@@ -58,7 +61,7 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
 
                                         URI moodleUri = null;
                                         try {
-                                            final String service = moodleConfig.getString("address_moodle") + moodleConfig.getString("ws-path");
+                                            final String service = moodleClient.getString("address_moodle") + moodleClient.getString("ws-path");
                                             moodleUri = new URI(service);
                                         } catch (URISyntaxException e) {
                                             log.error("Invalid moodle web service sending demand of duplication uri", e);
@@ -67,7 +70,7 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                                             String moodleUrl;
                                             if (courseToDuplicate.getInteger("category_id").equals(moodleConfig.getInteger("publicBankCategoryId"))) {
                                                 moodleUrl = moodleUri +
-                                                        "?wstoken=" + moodleConfig.getString("wsToken") +
+                                                        "?wstoken=" + moodleClient.getString("wsToken") +
                                                         "&wsfunction=" + WS_POST_DUPLICATECOURSE +
                                                         "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
                                                         "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
@@ -77,7 +80,7 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                                                         "&parameters[course][0][categoryid]=" + courseToDuplicate.getInteger("category_id");
                                             } else {
                                                 moodleUrl = moodleUri +
-                                                        "?wstoken=" + moodleConfig.getString("wsToken") +
+                                                        "?wstoken=" + moodleClient.getString("wsToken") +
                                                         "&wsfunction=" + WS_POST_DUPLICATECOURSE +
                                                         "&parameters[idnumber]=" + courseToDuplicate.getString("userid") +
                                                         "&parameters[course][0][moodlecourseid]=" + courseToDuplicate.getInteger("courseid") +
@@ -87,7 +90,7 @@ public class synchDuplicationMoodle extends ControllerHelper implements Handler<
                                                         "&parameters[course][0][categoryid]=" + courseToDuplicate.getInteger("category_id");
                                             }
                                             try {
-                                                HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, postEvent -> {
+                                                HttpClientHelper.webServiceMoodlePost(null, moodleUrl, vertx, moodleClient, postEvent -> {
                                                     if (postEvent.isRight()) {
                                                         log.info("Duplication request sent to Moodle");
                                                         eitherHandler.handle(new Either.Right<>(postEvent.right().getValue().toJsonArray()
