@@ -16,7 +16,7 @@ export class Utils {
         return principal_folder === this.PRINCIPAL_FOLDER_TYPE.published
     };
     static safeApply (that: any) {
-        return new Promise((resolve) => {
+        return new Promise<void>((resolve) => {
             let phase = (that.$root !== null)?that.$root.$$phase : undefined;
             if(phase === '$apply' || phase === '$digest') {
                 if(resolve && (typeof(resolve) === 'function')) resolve();
