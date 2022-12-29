@@ -220,7 +220,7 @@ public class CourseController extends ControllerHelper {
                             .map(obj -> (((JsonObject) obj).getValue("moodle_id")).toString()).collect(Collectors.toList());
                     for (int i = 0; i < courses.size(); i++) {
                         JsonObject course = courses.getJsonObject(i);
-                        String summary = course.getString("summary").replaceAll("</p><p>", " ; ")
+                        String summary = course.getString("summary", "").replaceAll("</p><p>", " ; ")
                                 .replaceAll("<p>", "").replaceAll("</p>", "");
                         if(summary.endsWith("<br>"))
                             summary = summary.substring(0, summary.length() - 4);
@@ -232,12 +232,12 @@ public class CourseController extends ControllerHelper {
                             String idFolder = SQLCourse.getValue("folder_id").toString();
                             course.put("folderId", Integer.parseInt(idFolder));
                             if(!isNull(SQLCourse.getString("fullname"))){
-                                course.put("levels", SQLCourse.getJsonArray("levels"));
-                                course.put("disciplines", SQLCourse.getJsonArray("disciplines"));
-                                course.put("plain_text", SQLCourse.getJsonArray("plain_text"));
-                                if(!SQLCourse.getString("fullname").equals(course.getString("fullname")) ||
-                                        !SQLCourse.getString("imageurl").equals(course.getString("imageurl")) ||
-                                        !SQLCourse.getString("summary").equals(course.getString("summary")) ){
+                                course.put("levels", SQLCourse.getJsonArray("levels", new JsonArray()));
+                                course.put("disciplines", SQLCourse.getJsonArray("disciplines", new JsonArray()));
+                                course.put("plain_text", SQLCourse.getJsonArray("plain_text", new JsonArray()));
+                                if(!SQLCourse.getString("fullname", "").equals(course.getString("fullname", "")) ||
+                                        !SQLCourse.getString("imageurl", "").equals(course.getString("imageurl", "")) ||
+                                        !SQLCourse.getString("summary", "").equals(course.getString("summary", "")) ){
                                     callMediacentreEventBusToUpdate(course, moodleEventBus, ebEvent -> {
                                         if (ebEvent.isRight()) {
                                             moduleSQLRequestService.updatePublicCourse(course, event -> {
@@ -254,9 +254,9 @@ public class CourseController extends ControllerHelper {
                                 }
                             }
                         } else {
-                            course.put("moodleid", course.getValue("courseid"))
+                            course.put("moodleid", course.getValue("courseid", ""))
                                     .put("userid", idUser).put("folderId", 0);
-                            String auteur = course.getJsonArray("auteur").getJsonObject(0).getString("entidnumber");
+                            String auteur = course.getJsonArray("auteur", new JsonArray()).getJsonObject(0).getString("entidnumber", "");
                             if (auteur != null && auteur.equals(user.getUserId())) {
                                 moduleSQLRequestService.createCourse(course, eventResponseCreate -> {
                                     if (eventResponseCreate.isLeft()) {
