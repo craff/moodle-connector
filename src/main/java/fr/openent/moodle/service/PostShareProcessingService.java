@@ -9,7 +9,7 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 import java.util.Map;
 
-public interface postShareProcessingService {
+public interface PostShareProcessingService {
 
     void getResultUsers(JsonObject shareCourseObject, JsonArray usersIds, Map<String, Object> idUsers, JsonObject idFront, JsonObject keyShare, Handler<Either<String, JsonArray>> handler);
 

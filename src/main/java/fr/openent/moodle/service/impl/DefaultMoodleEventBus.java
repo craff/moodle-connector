@@ -1,7 +1,8 @@
 package fr.openent.moodle.service.impl;
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.moodleEventBus;
+import fr.openent.moodle.service.ModuleSQLRequestService;
+import fr.openent.moodle.service.MoodleEventBus;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
@@ -14,10 +15,10 @@ import static fr.wseduc.webutils.Utils.handlerToAsyncHandler;
 import static org.entcore.common.neo4j.Neo4jResult.validResultHandler;
 
 
-public class DefaultMoodleEventBus extends ControllerHelper implements moodleEventBus {
+public class DefaultMoodleEventBus extends ControllerHelper implements MoodleEventBus {
 
     private final EventBus eb;
-    private final fr.openent.moodle.service.moduleSQLRequestService moduleSQLRequestService;
+    private final ModuleSQLRequestService moduleSQLRequestService;
 
 
     public DefaultMoodleEventBus(EventBus eb) {

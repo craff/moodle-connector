@@ -1,6 +1,6 @@
 package fr.openent.moodle.service.impl;
 
-import fr.openent.moodle.service.moduleNeoRequestService;
+import fr.openent.moodle.service.ModuleNeoRequestService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -8,7 +8,7 @@ import io.vertx.core.json.JsonObject;
 import org.entcore.common.neo4j.Neo4j;
 import org.entcore.common.neo4j.Neo4jResult;
 
-public class DefaultModuleNeoRequestService implements moduleNeoRequestService {
+public class DefaultModuleNeoRequestService implements ModuleNeoRequestService {
 
     @Override
     public void getUsers(final JsonArray usersIds, Handler<Either<String, JsonArray>> handler) {

@@ -1,6 +1,6 @@
 package fr.openent.moodle.service.impl;
 
-import fr.openent.moodle.service.getShareProcessingService;
+import fr.openent.moodle.service.GetShareProcessingService;
 import fr.wseduc.webutils.Either;
 import fr.wseduc.webutils.I18n;
 import io.vertx.core.Handler;
@@ -20,7 +20,7 @@ import static fr.openent.moodle.Moodle.moodleConfig;
 import static fr.openent.moodle.Moodle.resource_read;
 import static java.util.Objects.isNull;
 
-public class DefaultGetShareProcessingService extends ControllerHelper implements getShareProcessingService {
+public class DefaultGetShareProcessingService extends ControllerHelper implements GetShareProcessingService {
 
     public DefaultGetShareProcessingService() {
         super();

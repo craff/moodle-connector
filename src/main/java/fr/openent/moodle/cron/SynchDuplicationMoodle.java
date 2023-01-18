@@ -3,7 +3,7 @@ package fr.openent.moodle.cron;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
-import fr.openent.moodle.service.moduleSQLRequestService;
+import fr.openent.moodle.service.ModuleSQLRequestService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -16,12 +16,12 @@ import java.net.URISyntaxException;
 
 import static fr.openent.moodle.Moodle.*;
 
-public class synchDuplicationMoodle extends ControllerHelper implements Handler<Long> {
+public class SynchDuplicationMoodle extends ControllerHelper implements Handler<Long> {
 
-    private final moduleSQLRequestService moduleSQLRequestService;
+    private final ModuleSQLRequestService moduleSQLRequestService;
     private final JsonObject moodleClient;
 
-    public synchDuplicationMoodle(Vertx vertx) {
+    public SynchDuplicationMoodle(Vertx vertx) {
         this.vertx = vertx;
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
         moodleClient = moodleMultiClient.getJsonObject(moodleConfig.getString("host").replace("http://","").replace("https://",""));

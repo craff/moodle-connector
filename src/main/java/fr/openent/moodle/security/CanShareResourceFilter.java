@@ -9,7 +9,7 @@ import org.entcore.common.user.UserInfos;
 /**
  * Created by lugana on 01/03/2019.
  */
-public class canShareResourceFilter implements ResourcesProvider {
+public class CanShareResourceFilter implements ResourcesProvider {
     @Override
     public void authorize(HttpServerRequest request, Binding binding, UserInfos userInfos, Handler<Boolean> handler) {
         //TODO recuperer autorisations sur la resource (roles + propriétaire)

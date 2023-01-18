@@ -20,7 +20,7 @@ import java.util.List;
 
 import static fr.openent.moodle.Moodle.*;
 
-public class notifyMoodle extends ControllerHelper implements Handler<Long> {
+public class NotifyMoodle extends ControllerHelper implements Handler<Long> {
 
     private final TimelineHelper timelineHelper;
     private Timestamp startDate;
@@ -28,7 +28,7 @@ public class notifyMoodle extends ControllerHelper implements Handler<Long> {
     private final SimpleDateFormat myDate;
     private final JsonObject moodleClient;
 
-    public notifyMoodle(Vertx vertx, JsonObject moodleClientToApply, TimelineHelper timelineHelper) {
+    public NotifyMoodle(Vertx vertx, JsonObject moodleClientToApply, TimelineHelper timelineHelper) {
         this.vertx = vertx;
         this.timelineHelper = timelineHelper;
         myDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

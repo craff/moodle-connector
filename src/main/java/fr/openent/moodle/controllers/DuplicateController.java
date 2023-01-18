@@ -2,9 +2,10 @@ package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.security.DuplicateRight;
+import fr.openent.moodle.service.MoodleEventBus;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
-import fr.openent.moodle.service.moduleSQLRequestService;
+import fr.openent.moodle.service.ModuleSQLRequestService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Delete;
 import fr.wseduc.rs.Get;
@@ -33,8 +34,8 @@ import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayRespo
 
 public class DuplicateController extends ControllerHelper {
 
-    private final moduleSQLRequestService moduleSQLRequestService;
-    private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
+    private final ModuleSQLRequestService moduleSQLRequestService;
+    private final MoodleEventBus moodleEventBus;
 
     @Override
     public void init(Vertx vertx, JsonObject config, RouteMatcher rm,

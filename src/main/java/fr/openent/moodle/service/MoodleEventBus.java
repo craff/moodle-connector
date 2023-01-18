@@ -2,11 +2,10 @@ package fr.openent.moodle.service;
 
 import io.vertx.core.Handler;
 import fr.wseduc.webutils.Either;
-import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-public interface moodleEventBus {
+public interface MoodleEventBus {
 
     /**
      * Get email to create a course

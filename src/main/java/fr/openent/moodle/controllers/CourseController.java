@@ -3,9 +3,10 @@ package fr.openent.moodle.controllers;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.security.AccessRight;
+import fr.openent.moodle.service.MoodleEventBus;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
-import fr.openent.moodle.service.moduleSQLRequestService;
+import fr.openent.moodle.service.ModuleSQLRequestService;
 import fr.openent.moodle.utils.Utils;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
@@ -52,8 +53,8 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 
 public class CourseController extends ControllerHelper {
     private final EventStore eventStore;
-    private final moduleSQLRequestService moduleSQLRequestService;
-    private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
+    private final ModuleSQLRequestService moduleSQLRequestService;
+    private final MoodleEventBus moodleEventBus;
 
 
     @Override

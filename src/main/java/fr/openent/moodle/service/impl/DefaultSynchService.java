@@ -1,8 +1,7 @@
 package fr.openent.moodle.service.impl;
 
-import fr.openent.moodle.Moodle;
 import fr.openent.moodle.helper.HttpClientHelper;
-import fr.openent.moodle.service.moduleNeoRequestService;
+import fr.openent.moodle.service.ModuleNeoRequestService;
 import fr.openent.moodle.utils.SyncCase;
 import fr.openent.moodle.utils.Utils;
 import fr.wseduc.webutils.Either;
@@ -36,7 +35,7 @@ public class DefaultSynchService {
     protected EventBus eb;
     private final Neo4j neo4j = Neo4j.getInstance();
 
-    private final moduleNeoRequestService moduleNeoRequestService;
+    private final ModuleNeoRequestService moduleNeoRequestService;
 
     private HttpClient httpClient;
 

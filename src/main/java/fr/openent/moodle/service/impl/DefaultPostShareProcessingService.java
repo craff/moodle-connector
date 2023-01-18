@@ -1,7 +1,7 @@
 package fr.openent.moodle.service.impl;
 
-import fr.openent.moodle.service.moduleNeoRequestService;
-import fr.openent.moodle.service.postShareProcessingService;
+import fr.openent.moodle.service.ModuleNeoRequestService;
+import fr.openent.moodle.service.PostShareProcessingService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -15,9 +15,9 @@ import java.util.Map;
 import static fr.openent.moodle.Moodle.moodleConfig;
 import static java.util.Objects.isNull;
 
-public class DefaultPostShareProcessingService extends ControllerHelper implements postShareProcessingService {
+public class DefaultPostShareProcessingService extends ControllerHelper implements PostShareProcessingService {
 
-    private final moduleNeoRequestService moduleNeoRequestService;
+    private final ModuleNeoRequestService moduleNeoRequestService;
 
     public DefaultPostShareProcessingService() {
         super();

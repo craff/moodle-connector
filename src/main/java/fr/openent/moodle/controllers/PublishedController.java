@@ -2,6 +2,8 @@ package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.security.PublicateRight;
+import fr.openent.moodle.service.ModuleSQLRequestService;
+import fr.openent.moodle.service.MoodleEventBus;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
 import fr.wseduc.rs.ApiDoc;
@@ -25,8 +27,8 @@ import static fr.wseduc.webutils.http.response.DefaultResponseHandler.arrayRespo
 
 public class PublishedController extends ControllerHelper {
 
-    private final fr.openent.moodle.service.moduleSQLRequestService moduleSQLRequestService;
-    private final fr.openent.moodle.service.moodleEventBus moodleEventBus;
+    private final ModuleSQLRequestService moduleSQLRequestService;
+    private final MoodleEventBus moodleEventBus;
     public PublishedController(EventBus eb) {
         super();
         this.moduleSQLRequestService = new DefaultModuleSQLRequestService(Moodle.moodleSchema, "course");
@@ -146,22 +148,22 @@ public class PublishedController extends ControllerHelper {
         });
     }
 
-    static public void callMediacentreEventBusForPublish(JsonArray id, fr.openent.moodle.service.moodleEventBus eventBus,
+    static public void callMediacentreEventBusForPublish(JsonArray id, MoodleEventBus eventBus,
                                                          final Handler<Either<String, JsonObject>> handler) {
         eventBus.publishInMediacentre(id, handler);
     }
 
-    static public void callMediacentreEventBusToDelete(HttpServerRequest request, fr.openent.moodle.service.moodleEventBus eventBus,
+    static public void callMediacentreEventBusToDelete(HttpServerRequest request, MoodleEventBus eventBus,
                                                        final Handler<Either<String, JsonObject>> handler) {
         RequestUtils.bodyToJson(request, deleteEvent -> eventBus.deleteResourceInMediacentre(deleteEvent, handler));
     }
 
-    public void callMediacentreEventBusToUpdateMetadata(JsonObject updateMetadata, fr.openent.moodle.service.moodleEventBus eventBus,
+    public void callMediacentreEventBusToUpdateMetadata(JsonObject updateMetadata, MoodleEventBus eventBus,
                                                         final Handler<Either<String, JsonObject>> handler) {
         eventBus.updateResourceInMediacentre(updateMetadata, handler);
     }
 
-    static public void callMediacentreEventBusToUpdate(JsonObject updateCourse, fr.openent.moodle.service.moodleEventBus eventBus,
+    static public void callMediacentreEventBusToUpdate(JsonObject updateCourse, MoodleEventBus eventBus,
                                                        final Handler<Either<String, JsonObject>> handler) {
         eventBus.updateInMediacentre(updateCourse, handler);
     }

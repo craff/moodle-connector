@@ -3,7 +3,7 @@ package fr.openent.moodle.controllers;
 import fr.openent.moodle.Moodle;
 import fr.openent.moodle.security.CreateFolderRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
-import fr.openent.moodle.service.moduleSQLRequestService;
+import fr.openent.moodle.service.ModuleSQLRequestService;
 import fr.wseduc.rs.*;
 import fr.wseduc.security.ActionType;
 import fr.wseduc.security.SecuredAction;
@@ -26,7 +26,7 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 
 public class FolderController extends ControllerHelper {
 
-    private final moduleSQLRequestService moduleSQLRequestService;
+    private final ModuleSQLRequestService moduleSQLRequestService;
 
 
     @Override

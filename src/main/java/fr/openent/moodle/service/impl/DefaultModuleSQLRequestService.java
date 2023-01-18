@@ -2,7 +2,7 @@ package fr.openent.moodle.service.impl;
 
 
 import fr.openent.moodle.Moodle;
-import fr.openent.moodle.service.moduleSQLRequestService;
+import fr.openent.moodle.service.ModuleSQLRequestService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -18,7 +18,7 @@ import java.util.Date;
 
 import static fr.openent.moodle.Moodle.*;
 
-public class DefaultModuleSQLRequestService extends SqlCrudService implements moduleSQLRequestService {
+public class DefaultModuleSQLRequestService extends SqlCrudService implements ModuleSQLRequestService {
 
     private final Logger log = LoggerFactory.getLogger(DefaultModuleSQLRequestService.class);
 

@@ -7,7 +7,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.user.UserInfos;
 
-public interface getShareProcessingService {
+public interface GetShareProcessingService {
 
     /**
      * Fill the final shareJson with groups

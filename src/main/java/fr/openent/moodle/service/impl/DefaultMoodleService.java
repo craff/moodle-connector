@@ -1,8 +1,8 @@
 package fr.openent.moodle.service.impl;
 
 import fr.openent.moodle.helper.HttpClientHelper;
-import fr.openent.moodle.service.moduleNeoRequestService;
-import fr.openent.moodle.service.moodleService;
+import fr.openent.moodle.service.ModuleNeoRequestService;
+import fr.openent.moodle.service.MoodleService;
 import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -23,9 +23,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static fr.openent.moodle.Moodle.*;
 
-public class DefaultMoodleService implements moodleService {
+public class DefaultMoodleService implements MoodleService {
 
-    private final moduleNeoRequestService moduleNeoRequestService;
+    private final ModuleNeoRequestService moduleNeoRequestService;
     private final Logger log = LoggerFactory.getLogger(DefaultMoodleService.class);
 
     public DefaultMoodleService() {

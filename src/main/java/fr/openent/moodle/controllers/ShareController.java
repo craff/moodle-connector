@@ -1,13 +1,13 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.helper.HttpClientHelper;
-import fr.openent.moodle.security.canShareResourceFilter;
-import fr.openent.moodle.service.getShareProcessingService;
+import fr.openent.moodle.security.CanShareResourceFilter;
+import fr.openent.moodle.service.GetShareProcessingService;
 import fr.openent.moodle.service.impl.DefaultGetShareProcessingService;
 import fr.openent.moodle.service.impl.DefaultMoodleService;
 import fr.openent.moodle.service.impl.DefaultPostShareProcessingService;
-import fr.openent.moodle.service.moodleService;
-import fr.openent.moodle.service.postShareProcessingService;
+import fr.openent.moodle.service.MoodleService;
+import fr.openent.moodle.service.PostShareProcessingService;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Put;
@@ -50,9 +50,9 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 
 public class ShareController extends ControllerHelper {
 
-    private final getShareProcessingService getShareProcessingService;
-    private final postShareProcessingService postShareProcessingService;
-    private final moodleService moodleService;
+    private final GetShareProcessingService getShareProcessingService;
+    private final PostShareProcessingService postShareProcessingService;
+    private final MoodleService moodleService;
 
     private final TimelineHelper timelineHelper;
 
@@ -76,7 +76,7 @@ public class ShareController extends ControllerHelper {
 
     @Get("/share/json/:id")
     @ApiDoc("Lists rights for a given course.")
-    @ResourceFilter(canShareResourceFilter.class)
+    @ResourceFilter(CanShareResourceFilter.class)
     @SecuredAction(value = resource_read, type = ActionType.RESOURCE)
     public void share(final HttpServerRequest request) {
         final Handler<Either<String, JsonObject>> handler = defaultResponseHandler(request);
@@ -215,7 +215,7 @@ public class ShareController extends ControllerHelper {
 
     @Put("/contrib")
     @ApiDoc("Adds rights for a given course.")
-    @ResourceFilter(canShareResourceFilter.class)
+    @ResourceFilter(CanShareResourceFilter.class)
     @SecuredAction(value = resource_contrib, type = ActionType.RESOURCE)
     public void contrib(final HttpServerRequest request) {
 
@@ -223,7 +223,7 @@ public class ShareController extends ControllerHelper {
 
     @Put("/share/resource/:id")
     @ApiDoc("Adds rights for a given course.")
-    @ResourceFilter(canShareResourceFilter.class)
+    @ResourceFilter(CanShareResourceFilter.class)
     @SecuredAction(value = resource_manager, type = ActionType.RESOURCE)
     public void shareSubmit(final HttpServerRequest request) {
         RequestUtils.bodyToJson(request, pathPrefix + "share", shareCourseObject -> {

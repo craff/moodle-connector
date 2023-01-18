@@ -4,7 +4,7 @@ import fr.wseduc.webutils.Either;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 
-public interface moduleNeoRequestService {
+public interface ModuleNeoRequestService {
 
     /**
      * get users

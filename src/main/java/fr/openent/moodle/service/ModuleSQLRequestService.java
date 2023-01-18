@@ -5,9 +5,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-import java.util.Map;
-
-public interface moduleSQLRequestService {
+public interface ModuleSQLRequestService {
 
     /**
      * delete folders

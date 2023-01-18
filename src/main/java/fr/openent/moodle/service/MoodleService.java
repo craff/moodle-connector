@@ -6,7 +6,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
-public interface moodleService {
+public interface MoodleService {
 
     void registerUserInPublicCourse(JsonArray usersId, Integer courseId, Vertx vertx, JsonObject moodleClient,
                                     Handler<Either<String, JsonArray>> handler);

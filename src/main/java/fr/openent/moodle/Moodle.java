@@ -1,10 +1,9 @@
 package fr.openent.moodle;
 
 import fr.openent.moodle.controllers.*;
-import fr.openent.moodle.cron.notifyMoodle;
-import fr.openent.moodle.cron.synchDuplicationMoodle;
+import fr.openent.moodle.cron.NotifyMoodle;
+import fr.openent.moodle.cron.SynchDuplicationMoodle;
 import io.vertx.core.eventbus.EventBus;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.events.EventStoreFactory;
@@ -130,7 +129,7 @@ public class Moodle extends BaseServer {
 
 		try {
 			new CronTrigger(vertx, config.getString("timeSecondSynchCron")).schedule(
-					new synchDuplicationMoodle(vertx)
+					new SynchDuplicationMoodle(vertx)
 			);
 		} catch (ParseException e) {
 			log.fatal("Invalid timeSecondSynchCron cron expression.", e);
@@ -140,7 +139,7 @@ public class Moodle extends BaseServer {
 			for (Iterator<Map.Entry<String, Object>> it = moodleMultiClient.stream().iterator(); it.hasNext(); ) {
 				JsonObject moodleClient = (JsonObject) it.next().getValue();
 				new CronTrigger(vertx, config.getString("timeCheckNotifs")).schedule(
-						new notifyMoodle(vertx, moodleClient, timelineHelper)
+						new NotifyMoodle(vertx, moodleClient, timelineHelper)
 				);
 			}
 		} catch (ParseException e) {

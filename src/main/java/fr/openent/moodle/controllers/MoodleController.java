@@ -5,8 +5,8 @@ import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.security.AccessRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
 import fr.openent.moodle.service.impl.DefaultMoodleEventBus;
-import fr.openent.moodle.service.moduleSQLRequestService;
-import fr.openent.moodle.service.moodleEventBus;
+import fr.openent.moodle.service.ModuleSQLRequestService;
+import fr.openent.moodle.service.MoodleEventBus;
 import fr.wseduc.rs.ApiDoc;
 import fr.wseduc.rs.Get;
 import fr.wseduc.rs.Post;
@@ -42,8 +42,8 @@ import static org.entcore.common.http.response.DefaultResponseHandler.defaultRes
 
 public class MoodleController extends ControllerHelper {
 
-    private final moduleSQLRequestService moduleSQLRequestService;
-    private final moodleEventBus moodleEventBus;
+    private final ModuleSQLRequestService moduleSQLRequestService;
+    private final MoodleEventBus moodleEventBus;
     private final Storage storage;
 
     private final EventStore eventStore;
