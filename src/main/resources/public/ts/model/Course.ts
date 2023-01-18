@@ -163,6 +163,7 @@ export class Courses {
         this.coursesShared = [];
         this.coursesSharedToFollow = [];
         this.coursesByUser = [];
+        this.coursesPublished = [];
         this.showCourses = [];
         this.isSynchronized = false;
         this.searchInput = {

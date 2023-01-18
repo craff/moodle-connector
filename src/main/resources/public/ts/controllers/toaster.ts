@@ -29,7 +29,7 @@ export const toasterController = ng.controller('toasterController', ['$scope',
             if ($scope.courses.allCourses.filter(course => course.select).length > 0 &&
                 $scope.courses.allCourses.filter(course => course.select)[0].categoryid != $scope.courses.publicBankCategoryId) {
                 let courses = $scope.getSelectedCourses();
-                return courses.length === 1 && courses[0].owner.userId == model.me.userId;
+                return courses && courses.length === 1 && courses[0].owner.userId == model.me.userId;
             }
         };
 
