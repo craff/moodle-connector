@@ -83,7 +83,8 @@ public class NotifyMoodle extends ControllerHelper implements Handler<Long> {
                         if(!subject.endsWith(".")){subject += ".";}
                         final JsonObject params = new JsonObject()
                                 .put("subject", subject)
-                                .put("activityUri", notification.getString("contexturl"))
+                                .put("activityUri",
+                                        notification.getString("contexturl", moodleClient.getString("address_moodle","")))
                                 .put("disableAntiFlood", true);
                         params.put("username", timelineSender).put("uri", "/userbook/annuaire#" + user.getUserId());
                         List<String> recipients = new ArrayList<>();

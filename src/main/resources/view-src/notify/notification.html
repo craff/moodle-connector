@@ -24,5 +24,8 @@
 <span>{{#i18n}}timeline.no.sender{{/i18n}}</span>
 {{/username}}
 {{/uri}}
- :<br/><span>{{subject}}</span><span>{{#i18n}}timeline.consult{{/i18n}}</span>
+ :<br/><span>{{subject}}</span>
+{{#activityUri}}
+<span>{{#i18n}}timeline.consult{{/i18n}}</span>
 <a href="{{#host}}{{activityUri}}{{/host}}">{{#i18n}}timeline.moodle.activity{{/i18n}}</a>.
+{{/activityUri}}
