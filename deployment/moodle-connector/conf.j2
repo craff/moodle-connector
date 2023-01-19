@@ -60,5 +60,10 @@
         {% if moodleMultiClient is defined %}
         , "multiClient": {{ moodleMultiClient }}
         {% endif %}
+        {% if moodleDefaultShare is defined %}
+        , "share": {
+            "overrideDefaultActions": {{ moodleDefaultShare }}
+        }
+        {% endif %}
 	}
 }

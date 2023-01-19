@@ -21,6 +21,9 @@ const moodleBehaviours = {
 		publish: 'fr.openent.moodle.controllers.PublishedController|publish',
 		convert: 'fr.openent.moodle.controllers.MoodleController|convert',
 		duplicate: 'fr.openent.moodle.controllers.DuplicateController|duplicate'
+	},
+	share: {
+		overrideDefaultActions: ['moodle.contrib']
 	}
 };
 
@@ -62,5 +65,9 @@ Behaviours.register('moodle', {
 	},
 
 	loadResources: function () {
+	},
+
+	share: function() {
+		return moodleBehaviours.share;
 	}
 });

@@ -32,6 +32,9 @@
         "deleteCategoryId": ${deleteCategoryId},
         "publicBankCategoryId": ${publicBankCategoryId},
         "mainCategoryId": ${mainCategoryId},
-        "userMail" : "${userMail}"
+        "userMail" : "${userMail}",
+        "share": {
+            "overrideDefaultActions": ${moodleDefaultShare}
+        }
       }
     }

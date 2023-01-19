@@ -1,6 +1,7 @@
 package fr.openent.moodle.controllers;
 
 import fr.openent.moodle.Moodle;
+import fr.openent.moodle.core.Config;
 import fr.openent.moodle.helper.HttpClientHelper;
 import fr.openent.moodle.security.AccessRight;
 import fr.openent.moodle.service.impl.DefaultModuleSQLRequestService;
@@ -28,12 +29,14 @@ import io.vertx.ext.web.multipart.MultipartForm;
 import org.entcore.common.controller.ControllerHelper;
 import org.entcore.common.events.EventStore;
 import org.entcore.common.http.filter.ResourceFilter;
+import org.entcore.common.http.filter.SuperAdminFilter;
 import org.entcore.common.storage.Storage;
 import org.entcore.common.user.UserInfos;
 import org.entcore.common.user.UserUtils;
 import org.vertx.java.core.http.RouteMatcher;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
 import java.util.Map;
 
 import static fr.openent.moodle.Moodle.*;
@@ -79,6 +82,32 @@ public class MoodleController extends ControllerHelper {
     public void view(HttpServerRequest request) {
         renderView(request);
         eventStore.createAndStoreEvent(MoodleEvent.ACCESS.name(), request);
+    }
+
+    @Get("/config")
+    @SecuredAction(value = "", type = ActionType.RESOURCE)
+    @ResourceFilter(SuperAdminFilter.class)
+    public void getConfig(final HttpServerRequest request) {
+        JsonObject safeConfig = config.copy();
+        safeConfig.put("wsToken", "**********");
+        JsonObject configMultiClient = safeConfig.getJsonObject("multiClient", new JsonObject());
+        for (Iterator<Map.Entry<String, Object>> it = configMultiClient.stream().iterator(); it.hasNext(); ) {
+            JsonObject moodleClient = (JsonObject) it.next().getValue();
+            moodleClient.put("wsToken", "**********");
+        }
+        renderJson(request, safeConfig);
+    }
+
+    @Get("/config/share")
+    @ApiDoc("Get the sharing configuration (for example: default actions to check in share panel.")
+    @SecuredAction(value = "", type = ActionType.AUTHENTICATED)
+    public void getConfigShare(final HttpServerRequest request) {
+        JsonObject shareConfig = moodleConfig.getJsonObject(Config.SHARE);
+        if (shareConfig != null) {
+            renderJson(request, shareConfig, 200);
+        } else {
+            notFound(request, "No platform sharing configuration found");
+        }
     }
 
     @ApiDoc("public Get picture for moodle website")

@@ -29,7 +29,10 @@ Moodle permet de diffuser des documents (textes, audio, vidéo, etc.) et d’int
     "deleteCategoryId": ${deleteCategoryId},
     "publicBankCategoryId": ${publicBankCategoryId},
     "mainCategoryId": ${mainCategoryId},
-    "userMail" : "${userMail}"
+    "userMail" : "${userMail}",
+    "share": {
+        "overrideDefaultActions": "${moodleDefaultShare}"
+    }
   }
 }
 </pre>
@@ -53,4 +56,5 @@ deleteCategoryId = Integer
 publicBankCategoryId = Integer
 mainCategoryId = Integer
 userMail = ${String}
+moodleDefaultShare = Array(String)
 </pre>
