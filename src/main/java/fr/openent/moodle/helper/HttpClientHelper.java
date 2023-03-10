@@ -92,24 +92,6 @@ public class HttpClientHelper extends ControllerHelper {
             }
         });
 
-        if (shareSend != null) {
-            httpClientRequest.setChunked(true);
-
-            Object parameters = shareSend.getMap().get("parameters");
-            String encodedParameters = "";
-            if (parameters instanceof JsonObject) {
-                encodedParameters = URLEncoder.encode(((JsonObject) parameters).encode(), "UTF-8");
-            } else if (parameters instanceof JsonArray) {
-                encodedParameters = URLEncoder.encode(((JsonArray) parameters).encode(), "UTF-8");
-            }
-            if(!encodedParameters.isEmpty()){
-                httpClientRequest.write("parameters=").write(encodedParameters);
-            }
-            httpClientRequest.write("&wstoken=").write(shareSend.getString("wstoken"));
-            httpClientRequest.write("&wsfunction=").write(shareSend.getString("wsfunction"));
-            httpClientRequest.write("&moodlewsrestformat=").write(shareSend.getString("moodlewsrestformat"));
-        }
-
         httpClientRequest.putHeader("Host", moodleClient.getString("address_moodle")
                 .replace("http://","").replace("https://",""));
         httpClientRequest.putHeader("Content-type", "application/x-www-form-urlencoded");
@@ -123,6 +105,27 @@ public class HttpClientHelper extends ControllerHelper {
                     httpClient.close();
                 }
             }
-        }).setFollowRedirects(true).end();
+        }).setFollowRedirects(true);
+
+        if (shareSend != null) {
+            Buffer chunk = Buffer.buffer();
+            chunk.appendBuffer(Buffer.buffer("wstoken=" + shareSend.getString("wstoken") +
+                    "&wsfunction=" + shareSend.getString("wsfunction") +
+                    "&moodlewsrestformat=" + shareSend.getString("moodlewsrestformat")));
+
+            Object parameters = shareSend.getMap().get("parameters");
+            String encodedParameters = "";
+            if (parameters instanceof JsonObject) {
+                encodedParameters = ((JsonObject) parameters).encode();
+            } else if (parameters instanceof JsonArray) {
+                encodedParameters = ((JsonArray) parameters).encode();
+            }
+            if(!encodedParameters.isEmpty()){
+                chunk.appendBuffer(Buffer.buffer("&parameters=" + encodedParameters));
+            }
+            httpClientRequest.end(chunk);
+        } else {
+            httpClientRequest.end();
+        }
     }
 }
