@@ -83,6 +83,7 @@ public class HttpClientHelper extends ControllerHelper {
                 });
             } else {
                 log.error("Fail to post webservice" + response.statusMessage());
+                handler.handle(new Either.Left<>("Fail to post webservice" + response.statusMessage()));
                 response.bodyHandler(event -> {
                     log.error("Returning body after POST CALL : " + moodleUrl + ", Returning body : " + event.toString("UTF-8"));
                     if (!responseIsSent.getAndSet(true)) {

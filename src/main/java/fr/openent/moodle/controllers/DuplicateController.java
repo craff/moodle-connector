@@ -184,41 +184,27 @@ public class DuplicateController extends ControllerHelper {
                             finishedResponse(request, duplicateResponse);
                             break;
                         case "busy":
-                            log.info("A duplication is already in progress");
+                            log.info(String.format("[Moodle@%s::getMoodleResponse] A duplication is already in progress",
+                                    this.getClass().getSimpleName()));
                             break;
                         case "error":
-                            errorResponse(request, duplicateResponse);
+                            log.error(String.format("[Moodle@%s::getMoodleResponse] Duplication web-service failed",
+                                    this.getClass().getSimpleName()));
+                            sendOKDuplicateMoodleResponse(request);
                             break;
                         default:
-                            log.error("Failed to read the Moodle response");
+                            log.error(String.format("[Moodle@%s::getMoodleResponse] Failed to read the Moodle response",
+                                    this.getClass().getSimpleName()));
                             unauthorized(request);
                     }
                 })
         );
     }
 
-    private void errorResponse(HttpServerRequest request, JsonObject duplicateResponse) {
-        moduleSQLRequestService.getCourseToDuplicate(Integer.parseInt(duplicateResponse.getString("ident")), duplicateEvent -> {
-            if (duplicateEvent.isRight()) {
-                Integer nbAttempts = duplicateEvent.right().getValue().getInteger("nombre_tentatives");
-                final String status = WAITING;
-                Integer id = duplicateResponse.getInteger("ident");
-                moduleSQLRequestService.updateStatusCourseToDuplicate(status, id, nbAttempts, updateEvent -> {
-                    if (updateEvent.isRight()) {
-                        request.response()
-                                .setStatusCode(200)
-                                .end();
-                        log.error("Duplication web-service failed");
-                    } else {
-                        log.error("Failed to update database updateStatusCourseToDuplicate");
-                        unauthorized(request);
-                    }
-                });
-            } else {
-                log.error("Failed to access database getCourseToDuplicate");
-                unauthorized(request);
-            }
-        });
+    private void sendOKDuplicateMoodleResponse(HttpServerRequest request) {
+        request.response()
+                .setStatusCode(200)
+                .end();
     }
 
     private void finishedResponse(HttpServerRequest request, JsonObject duplicateResponse) {
@@ -238,9 +224,7 @@ public class DuplicateController extends ControllerHelper {
                                             .equals(moodleConfig.getInteger("publicBankCategoryId"))) {
                                         moduleSQLRequestService.deleteFinishedCoursesDuplicate(deleteEvent -> {
                                             if (deleteEvent.isRight()) {
-                                                request.response()
-                                                        .setStatusCode(200)
-                                                        .end();
+                                                sendOKDuplicateMoodleResponse(request);
                                             } else {
                                                 log.error("Problem to delete finished duplicate courses !");
                                                 unauthorized(request);
@@ -256,9 +240,7 @@ public class DuplicateController extends ControllerHelper {
                                                         if (deleteEvent.isRight()) {
                                                             JsonArray id = new JsonArray().add(Integer.parseInt(duplicateResponse.getString("courseid")));
                                                             callMediacentreEventBusForPublish(id, moodleEventBus, mediacentreEvent ->
-                                                                    request.response()
-                                                                            .setStatusCode(200)
-                                                                            .end());
+                                                                    sendOKDuplicateMoodleResponse(request));
                                                         } else {
                                                             log.error("Problem to delete finished duplicate courses !");
                                                             unauthorized(request);
@@ -285,9 +267,7 @@ public class DuplicateController extends ControllerHelper {
         moduleSQLRequestService.updateStatusCourseToDuplicate(PENDING,
                 Integer.parseInt(duplicateResponse.getString("ident")), 1, event -> {
                     if (event.isRight()) {
-                        request.response()
-                                .setStatusCode(200)
-                                .end();
+                        sendOKDuplicateMoodleResponse(request);
                     } else {
                         log.error("Cannot update the status of the course in duplication table");
                         unauthorized(request);
