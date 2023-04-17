@@ -1,5 +1,5 @@
     {
-      "name": "fr.openent~moodle-connector~1.7.5",
+      "name": "fr.openent~moodle-connector~1.7.6",
       "config": {
         "main" : "fr.openent.moodle.Moodle",
         "port" : 8200,
