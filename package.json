@@ -1,7 +1,7 @@
 {
-  "name": "moodle",
+  "name": "moodleNati",
   "version": "0.1.0",
-  "description": "ENT Core application to create Moodles",
+    "description": "ENT Core application to create Moodles (Nati specific)",
   "main": "gulpfile.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

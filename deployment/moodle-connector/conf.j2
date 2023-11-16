@@ -1,10 +1,10 @@
 {
     "name": "{{ moodleVersion }}",
     "config": {
-		"main" : "fr.openent.moodle.Moodle",
+		"main" : "fr.openent.moodle.MoodleNati",
 		"port" : 8200,
-		"app-name" : "Moodle",
-		"app-address" : "/moodle",
+		"app-name" : "MoodleNati",
+		"app-address" : "/moodleNati",
 		"app-icon" : "moodle-logo",
 		"host": "https://{{ host }}",
 		"ssl" : true,
@@ -15,7 +15,7 @@
 		"mode" : "prod",
 		"entcore.port" : 8009,
 		"sql": true,
-		"db-schema": "moodle",
+		"db-schema": "moodleNati",
 		{% if item == 'jobs' %}
 		"timeSecondSynchCron": "*/5 * * * * ? *",
 		"timeCheckNotifs": "*/30 * * * * ? *",

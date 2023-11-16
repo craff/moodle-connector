@@ -110,7 +110,7 @@ public class Moodle extends BaseServer {
 		final Storage storage = new StorageFactory(vertx, config, /*new ExercizerStorage()*/ null).getStorage();
 
 		SqlConf courseConf = SqlConfs.createConf(MoodleController.class.getName());
-		courseConf.setSchema("moodle");
+		courseConf.setSchema("moodleNati");
 		courseConf.setTable("course");
 		courseConf.setShareTable("course_shares");
 

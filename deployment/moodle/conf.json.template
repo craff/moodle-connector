@@ -1,10 +1,10 @@
     {
       "name": "fr.openent~moodle-connector~1.7-SNAPSHOT",
       "config": {
-        "main" : "fr.openent.moodle.Moodle",
+        "main" : "fr.openent.moodle.MoodleNati",
         "port" : 8200,
-        "app-name" : "Moodle",
-    	"app-address" : "/moodle",
+        "app-name" : "MoodleNati",
+    	"app-address" : "/moodleNati",
     	"app-icon" : "${host}/moodle/public/img/moodle-logo.png",
         "host": "${host}",
         "ssl" : $ssl,
@@ -15,7 +15,7 @@
         "mode" : "${mode}",
         "entcore.port" : 8009,
         "sql": true,
-        "db-schema": "moodle",
+        "db-schema": "moodleNati",
         "timeSecondSynchCron": "${timeSecondSynchCron}",
         "timeCheckNotifs": "${timeCheckNotifs}",
         "numberOfMaxDuplicationTentatives": ${numberOfMaxDuplicationTentatives},

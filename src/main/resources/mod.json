@@ -1,8 +1,8 @@
 {
-	"main" : "fr.openent.moodle.Moodle",
+	"main" : "fr.openent.moodle.MoodleNati",
 	"port" : 8200,
-	"app-name" : "Moodle",
-	"app-address" : "/moodle",
+	"app-name" : "MoodleNati",
+	"app-address" : "/moodleNati",
 	"app-icon" : "Moodle-large",
 	"app-displayName" : "Moodle",
 	"mode": "dev",
