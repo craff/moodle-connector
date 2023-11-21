@@ -15,7 +15,7 @@
         "mode" : "${mode}",
         "entcore.port" : 8009,
         "sql": true,
-        "db-schema": "moodle",
+        "dbSchema": ${dbSchema},
         "timeSecondSynchCron": "${timeSecondSynchCron}",
         "timeCheckNotifs": "${timeCheckNotifs}",
         "numberOfMaxDuplicationTentatives": ${numberOfMaxDuplicationTentatives},

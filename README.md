@@ -19,6 +19,7 @@ Moodle permet de diffuser des documents (textes, audio, vidéo, etc.) et d’int
     "numberOfMaxPendingDuplication": ${numberOfMaxPendingDuplication},
     "timeDuplicationBeforeDelete": "${timeDuplicationBeforeDelete}",
     "address_moodle": "${moodleServer}",
+	"dbSchema": "${dbSchema}",
     "ws-path": "${moodleWsPath}",
     "wsToken": "${wstoken}",
     "idStudent": ${idStudent},
@@ -46,6 +47,7 @@ numberOfMaxPendingDuplication = Integer
 timeDuplicationBeforeDelete = ${String}
 moodleServer = ${String}
 moodleWsPath = ${String}
+dbSchema = ${dbSchema}
 wstoken = ${String}
 idStudent = Integer
 idEditingTeacher = Integer

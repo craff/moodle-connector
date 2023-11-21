@@ -89,7 +89,7 @@ public class Moodle extends BaseServer {
 		ROLE_EDITEUR = config.getInteger("idEditingTeacher");
 		ROLE_APPRENANT = config.getInteger("idStudent");
 
-		moodleSchema = config.getString("db-schema");
+		moodleSchema = config.getString("dbSchema");
         moodleConfig = config;
 		EventBus eb = getEventBus(vertx);
 		EventStore eventStore = EventStoreFactory.getFactory().getEventStore(Moodle.class.getSimpleName());
@@ -110,7 +110,7 @@ public class Moodle extends BaseServer {
 		final Storage storage = new StorageFactory(vertx, config, /*new ExercizerStorage()*/ null).getStorage();
 
 		SqlConf courseConf = SqlConfs.createConf(MoodleController.class.getName());
-		courseConf.setSchema("moodle");
+		courseConf.setSchema(moodleConfig.getString("dbSchema"));
 		courseConf.setTable("course");
 		courseConf.setShareTable("course_shares");
 

@@ -15,7 +15,7 @@
 		"mode" : "prod",
 		"entcore.port" : 8009,
 		"sql": true,
-		"db-schema": "moodle",
+		"dbSchema": {{ dbSchema }},
 		{% if item == 'jobs' %}
 		"timeSecondSynchCron": "*/5 * * * * ? *",
 		"timeCheckNotifs": "*/30 * * * * ? *",
