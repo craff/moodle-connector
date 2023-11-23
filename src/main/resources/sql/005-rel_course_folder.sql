@@ -1,29 +1,29 @@
-CREATE TABLE moodle.rel_course_folder
+CREATE TABLE moodleNati.rel_course_folder
              (
                           folder_id BIGINT  ,
                           course_id BIGINT,
-                          CONSTRAINT folder_fk FOREIGN KEY (folder_id) REFERENCES moodle.folder(id) ON DELETE CASCADE,
-                          CONSTRAINT course_fk FOREIGN KEY (course_id) REFERENCES moodle.course(moodle_id)  ON DELETE CASCADE
+                          CONSTRAINT folder_fk FOREIGN KEY (folder_id) REFERENCES moodleNati.folder(id) ON DELETE CASCADE,
+                          CONSTRAINT course_fk FOREIGN KEY (course_id) REFERENCES moodleNati.course(moodle_id)  ON DELETE CASCADE
              );
 
 
-DELETE FROM moodle.course
-WHERE folder_id NOT IN (SELECT id from moodle.folder);
+DELETE FROM moodleNati.course
+WHERE folder_id NOT IN (SELECT id from moodleNati.folder);
 
-INSERT INTO moodle.rel_course_folder ( folder_id, course_id )
+INSERT INTO moodleNati.rel_course_folder ( folder_id, course_id )
 SELECT folder_id , moodle_id
-FROM   moodle.course
+FROM   moodleNati.course
 where folder_id != 0;
 
-UPDATE moodle.folder
+UPDATE moodleNati.folder
 SET parent_id = NULL
 WHERE  parent_id = 0;
 
-DELETE from moodle.folder
+DELETE from moodleNati.folder
 WHERE id = 0 ;
 
-ALTER TABLE moodle.course
+ALTER TABLE moodleNati.course
 DROP COLUMN folder_id ;
 
-ALTER TABLE moodle.folder
+ALTER TABLE moodleNati.folder
 DROP COLUMN structure_id;

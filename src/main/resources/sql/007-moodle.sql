@@ -1,4 +1,4 @@
-CREATE TABLE moodle.publication (
+CREATE TABLE moodleNati.publication (
   id BIGSERIAL NOT NULL,
   discipline_label VARCHAR ARRAY,
   level_label VARCHAR ARRAY,
@@ -13,11 +13,11 @@ CREATE TABLE moodle.publication (
   license BOOLEAN NOT NULL,
   course_id BIGINT,
   CONSTRAINT publicCourse_pk PRIMARY KEY (id),
-  CONSTRAINT course_fk FOREIGN KEY (course_id) REFERENCES moodle.course(moodle_id)
+  CONSTRAINT course_fk FOREIGN KEY (course_id) REFERENCES moodleNati.course(moodle_id)
 );
 
-ALTER TABLE moodle.duplication
+ALTER TABLE moodleNati.duplication
     ADD category_id BIGINT,
     ADD auditeur VARCHAR,
     ADD publishFK BIGINT,
-    ADD CONSTRAINT publication_fk FOREIGN KEY (publishFK) REFERENCES moodle.publication(id);
+    ADD CONSTRAINT publication_fk FOREIGN KEY (publishFK) REFERENCES moodleNati.publication(id);

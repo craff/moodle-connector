@@ -1,4 +1,4 @@
-CREATE TABLE moodle.duplication (
+CREATE TABLE moodleNati.duplication (
   id BIGSERIAL NOT NULL,
   id_course BIGINT NOT NULL,
   id_folder BIGINT NOT NULL,

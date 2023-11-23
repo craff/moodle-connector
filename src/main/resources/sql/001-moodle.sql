@@ -1,12 +1,12 @@
-CREATE SCHEMA moodle;
+CREATE SCHEMA moodleNati;
 
-CREATE TABLE moodle.scripts (
+CREATE TABLE moodleNati.scripts (
   filename character varying(255) NOT NULL,
   passed timestamp without time zone NOT NULL DEFAULT now(),
   CONSTRAINT scripts_pkey PRIMARY KEY (filename)
 );
 
-CREATE TABLE moodle.folder (
+CREATE TABLE moodleNati.folder (
   id bigserial NOT NULL,
   parent_id bigint,
   user_id character varying(36) NOT NULL,
@@ -14,19 +14,19 @@ CREATE TABLE moodle.folder (
   name character varying (255) NOT NULL,
   CONSTRAINT folder_pkey PRIMARY KEY (id),
   CONSTRAINT folders_parent_id_fkey FOREIGN KEY (parent_id)
-  REFERENCES moodle.folder (id) MATCH SIMPLE
+  REFERENCES moodleNati.folder (id) MATCH SIMPLE
     ON UPDATE NO ACTION
     ON DELETE CASCADE
 );
 
-CREATE TABLE moodle.course (
+CREATE TABLE moodleNati.course (
   moodle_id bigserial NOT NULL,
   folder_id bigint,
   user_id character varying(36) NOT NULL,
   CONSTRAINT course_pkey PRIMARY KEY (moodle_id)
 );
 
-CREATE TABLE moodle.choices (
+CREATE TABLE moodleNati.choices (
   user_id character varying(36) NOT NULL,
   lastCreation boolean,
   toDo boolean,
@@ -36,7 +36,7 @@ CREATE TABLE moodle.choices (
   CONSTRAINT choices_pkey PRIMARY KEY (user_id)
 );
 
-CREATE TABLE moodle.preferences (
+CREATE TABLE moodleNati.preferences (
    id bigserial NOT NULL,
    moodle_id bigserial NOT NULL,
    user_id character varying(36) NOT NULL,
